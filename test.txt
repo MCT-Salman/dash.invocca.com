@@ -1,0 +1,752 @@
+اريد استكمال الصفحة التالية
+
+```javascriptreact
+// src\pages\admin\HallsManagement.jsx
+import { useState, useMemo, useEffect, useRef } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useMediaQuery, useTheme } from '@mui/material'
+import * as XLSX from 'xlsx'
+import { saveAs } from 'file-saver'
+
+// MUI Components
+import MuiBox from '@/components/ui/MuiBox'
+import MuiTypography from '@/components/ui/MuiTypography'
+import MuiButton from '@/components/ui/MuiButton'
+import MuiTextField from '@/components/ui/MuiTextField'
+import MuiPaper from '@/components/ui/MuiPaper'
+import MuiCard from '@/components/ui/MuiCard'
+import MuiCardContent from '@/components/ui/MuiCardContent'
+import MuiCardActions from '@/components/ui/MuiCardActions'
+import MuiDialog from '@/components/ui/MuiDialog'
+import MuiDialogTitle from '@/components/ui/MuiDialogTitle'
+import MuiDialogContent from '@/components/ui/MuiDialogContent'
+import MuiDialogActions from '@/components/ui/MuiDialogActions'
+import MuiDivider from '@/components/ui/MuiDivider'
+import MuiGrid from '@/components/ui/MuiGrid'
+import MuiChip from '@/components/ui/MuiChip'
+import MuiAlert from '@/components/ui/MuiAlert'
+import MuiCircularProgress from '@/components/ui/MuiCircularProgress'
+import MuiSelect from '@/components/ui/MuiSelect'
+import MuiSwitch from '@/components/ui/MuiSwitch'
+import MuiAutocomplete from '@/components/ui/MuiAutocomplete'
+import MuiAvatar from '@/components/ui/MuiAvatar'
+
+// Layout & Common Components
+import DashboardLayout from '@/components/layout/DashboardLayout'
+import { LoadingScreen, EmptyState, ConfirmDialog, SEOHead, CardsView, TablePagination, DataTable } from '@/components/common'
+
+// Hooks & Utilities
+import { useNotification, useDebounce } from '@/hooks'
+import { QUERY_KEYS } from '@/config/constants'
+import { getAllHalls, createHall, updateHall, deleteHall, getServicesList } from '@/api/admin'
+import { formatCurrency, formatPhoneNumber, generateExportFileName } from '@/utils/helpers'
+
+// Icons
+import {
+  Building2,
+  Search,
+  Plus,
+  Pencil,
+  Trash2,
+  AlertCircle,
+  Eye,
+  Download,
+  Filter,
+  RefreshCw,
+  CheckCircle,
+  XCircle,
+  User,
+  Phone,
+  Users,
+  DollarSign,
+  MapPin,
+  Table,
+  Armchair as Chair,
+  Check,
+  X,
+  FileText,
+  Image as ImageIcon,
+  Wifi,
+  Car,
+  Coffee,
+  Music,
+  Star,
+  Upload,
+  Settings,
+  Shield,
+  Calendar,
+  Clock
+} from 'lucide-react'
+
+// Helper function for truncating text
+const truncateText = (text, maxLength = 50) => {
+  if (!text || typeof text !== 'string') return ''
+  if (text.length <= maxLength) return text
+  return text.substring(0, maxLength) + '...'
+}
+
+// ====================== Validation Schema ======================
+const createHallSchema = (editingHall = null) => z.object({
+  name: z.string()
+    .min(3, 'اسم القاعة يجب أن يكون 3 أحرف على الأقل')
+    .max(100, 'اسم القاعة طويل جداً'),
+
+  location: z.string()
+    .min(3, 'الموقع مطلوب')
+    .max(200, 'الموقع طويل جداً'),
+
+  address: z.string()
+    .min(5, 'العنوان التفصيلي مطلوب')
+    .max(300, 'العنوان طويل جداً'),
+
+  capacity: z.coerce.number()
+    .min(1, 'السعة مطلوبة')
+    .max(10000, 'السعة كبيرة جداً'),
+
+  tables: z.coerce.number()
+    .min(1, 'عدد الطاولات مطلوب')
+    .max(1000, 'عدد الطاولات كبير جداً'),
+
+  chairs: z.coerce.number()
+    .min(1, 'عدد الكراسي مطلوب')
+    .max(10000, 'عدد الكراسي كبير جداً'),
+
+  maxEmployees: z.coerce.number()
+    .min(1, 'الحد الأقصى للموظفين مطلوب')
+    .max(1000, 'الحد الأقصى للموظفين كبير جداً'),
+
+  defaultPrices: z.coerce.number()
+    .min(0, 'السعر مطلوب')
+    .max(1000000, 'السعر كبير جداً'),
+
+  managerName: z.string()
+    .min(3, 'اسم المدير مطلوب')
+    .max(100, 'اسم المدير طويل جداً'),
+
+  managerUsername: z.string()
+    .min(3, 'اسم المستخدم مطلوب')
+    .max(50, 'اسم المستخدم طويل جداً')
+    .regex(/^[a-zA-Z0-9_]+$/, 'اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام و _ فقط'),
+
+  managerPhone: z.string()
+    .regex(/^\d+$/, 'رقم الهاتف يجب أن يكون أرقام فقط')
+    .min(6, 'رقم الهاتف يجب أن يكون 6 أرقام على الأقل')
+    .max(15, 'رقم الهاتف طويل جداً'),
+
+  managerPassword: editingHall
+    ? z.string()
+      .min(6, 'كلمة المرور يجب أن تكون 6 أحرف على الأقل')
+      .max(50, 'كلمة المرور طويلة جداً')
+      .optional()
+      .or(z.literal(''))
+    : z.string()
+      .min(6, 'كلمة المرور مطلوبة')
+      .max(50, 'كلمة المرور طويلة جداً'),
+
+  description: z.string()
+    .max(1000, 'الوصف طويل جداً')
+    .optional()
+    .or(z.literal('')),
+
+  amenities: z.array(z.string())
+    .optional()
+    .default([]),
+
+  services: z.array(z.object({
+    service: z.string(),
+    customPrice: z.number().optional(),
+    isIncluded: z.boolean().optional().default(false),
+    notes: z.string().optional()
+  }))
+    .optional()
+    .default([]),
+
+  images: z.array(z.string())
+    .optional()
+    .default([]),
+
+  primaryImage: z.string()
+    .optional()
+    .nullable(),
+
+  isActive: z.boolean()
+    .optional()
+    .default(true)
+})
+
+// ====================== Main Component ======================
+const HallsManagement = () => {
+  // State Management
+  const [halls, setHalls] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [viewMode, setViewMode] = useState('table') // 'table' or 'card'
+  const [selectedHall, setSelectedHall] = useState(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialogType, setDialogType] = useState('') // 'create', 'edit', 'view', 'delete'
+  
+  // Refs
+  const fileInputRef = useRef(null)
+  const queryClient = useQueryClient()
+  
+  // Hooks
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const { showNotification } = useNotification()
+  const debouncedSearch = useDebounce(searchTerm, 500)
+
+  // Fetch Halls Function
+  const fetchHalls = async () => {
+    try {
+      setLoading(true)
+      const response = await getAllHalls()
+      
+      console.log('API Response:', response)
+      
+      // تحقق من بنية الاستجابة المختلفة
+      let hallsData = []
+      
+      if (Array.isArray(response)) {
+        hallsData = response
+      } else if (response?.data) {
+        if (Array.isArray(response.data)) {
+          hallsData = response.data
+        } else if (response.data?.data && Array.isArray(response.data.data)) {
+          hallsData = response.data.data
+        } else if (response.data?.halls && Array.isArray(response.data.halls)) {
+          hallsData = response.data.halls
+        }
+      }
+      
+      setHalls(hallsData)
+      setError(null)
+    } catch (err) {
+      console.error('Error fetching halls:', err)
+      setError('حدث خطأ في جلب بيانات القاعات')
+      showNotification({
+        title: 'خطأ',
+        message: 'فشل في تحميل بيانات القاعات',
+        type: 'error'
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Initial Data Fetch
+  useEffect(() => {
+    fetchHalls()
+  }, [])
+
+  // Filtered Halls
+  const filteredHalls = useMemo(() => {
+    if (!debouncedSearch) return halls
+    
+    return halls.filter(hall => 
+      hall.name?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      hall.location?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      hall.managerName?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      hall.managerPhone?.includes(debouncedSearch)
+    )
+  }, [halls, debouncedSearch])
+
+  // Table Columns Definition
+  const columns = [
+    {
+      id: 'name',
+      label: 'اسم القاعة',
+      align: 'right',
+      format: (value, row) => (
+        <MuiBox className="flex items-center gap-2">
+          {row.primaryImage || row.images?.[0] ? (
+            <MuiAvatar
+              src={row.primaryImage || row.images[0]}
+              alt={value}
+              className="h-10 w-10 border border-border"
+            />
+          ) : (
+            <Building2 className="h-10 w-10 p-2 text-primary-600 bg-primary-50 rounded-lg" />
+          )}
+          <MuiTypography variant="body2" className="font-medium">
+            {value}
+          </MuiTypography>
+        </MuiBox>
+      )
+    },
+    {
+      id: 'capacity',
+      label: 'السعة',
+      align: 'center',
+      format: (value) => (
+        <MuiBox className="flex items-center gap-1 justify-center">
+          <Users size={16} className="text-secondary-500" />
+          <span>{value} شخص</span>
+        </MuiBox>
+      )
+    },
+    {
+      id: 'location',
+      label: 'الموقع',
+      align: 'right',
+      format: (value) => (
+        <MuiBox className="flex items-center gap-1">
+          <MapPin size={16} className="text-info-500" />
+          <span>{truncateText(value, 30)}</span>
+        </MuiBox>
+      )
+    },
+    {
+      id: 'defaultPrices',
+      label: 'السعر الافتراضي',
+      align: 'center',
+      format: (value) => (
+        <MuiBox className="flex items-center gap-1 justify-center">
+          <DollarSign size={16} className="text-success-500" />
+          <span className="font-bold">{formatCurrency(value) || `${value} ل.س`}</span>
+        </MuiBox>
+      )
+    },
+    {
+      id: 'managerName',
+      label: 'اسم المدير',
+      align: 'right',
+      format: (value, row) => (
+        <MuiBox>
+          <MuiTypography variant="body2" className="font-medium">
+            {value}
+          </MuiTypography>
+          {row.managerPhone && (
+            <MuiTypography variant="caption" className="text-text-secondary">
+              {formatPhoneNumber(row.managerPhone) || row.managerPhone}
+            </MuiTypography>
+          )}
+        </MuiBox>
+      )
+    },
+    {
+      id: 'isActive',
+      label: 'الحالة',
+      align: 'center',
+      format: (value) => (
+        <MuiChip
+          label={value ? 'نشطة' : 'غير نشطة'}
+          size="small"
+          color={value ? 'success' : 'error'}
+          icon={value ? <CheckCircle size={14} /> : <XCircle size={14} />}
+          className={`!px-3 !py-1 ${value ? 'bg-success-100' : 'bg-error-100'}`}
+        />
+      )
+    }
+  ]
+
+  // Event Handlers
+  const handleEdit = (row) => {
+    setSelectedHall(row)
+    setDialogType('edit')
+    setDialogOpen(true)
+  }
+
+  const handleDelete = (row) => {
+    setSelectedHall(row)
+    setDialogType('delete')
+    setDialogOpen(true)
+  }
+
+  const handleView = (row) => {
+    setSelectedHall(row)
+    setDialogType('view')
+    setDialogOpen(true)
+  }
+
+  const handleToggleStatus = async (row) => {
+    try {
+      const updatedHall = { ...row, isActive: !row.isActive }
+      await updateHall(row.id, updatedHall)
+      
+      // Update local state
+      setHalls(halls.map(hall => 
+        hall.id === row.id ? updatedHall : hall
+      ))
+      
+      showNotification({
+        title: 'تم التحديث',
+        message: `تم ${updatedHall.isActive ? 'تفعيل' : 'إلغاء تفعيل'} القاعة بنجاح`,
+        type: 'success'
+      })
+    } catch (err) {
+      console.error('Error updating hall status:', err)
+      showNotification({
+        title: 'خطأ',
+        message: 'فشل في تحديث حالة القاعة',
+        type: 'error'
+      })
+    }
+  }
+
+  const handleCreate = () => {
+    setSelectedHall(null)
+    setDialogType('create')
+    setDialogOpen(true)
+  }
+
+  const handleRefresh = () => {
+    fetchHalls()
+  }
+
+  const handleExport = () => {
+    try {
+      const exportData = halls.map(hall => ({
+        'اسم القاعة': hall.name,
+        'الموقع': hall.location,
+        'السعة': hall.capacity,
+        'السعر الافتراضي': hall.defaultPrices,
+        'اسم المدير': hall.managerName,
+        'هاتف المدير': hall.managerPhone,
+        'الحالة': hall.isActive ? 'نشطة' : 'غير نشطة',
+        'الوصف': hall.description || '',
+        'العنوان': hall.address || '',
+        'عدد الطاولات': hall.tables || 0,
+        'عدد الكراسي': hall.chairs || 0
+      }))
+
+      const worksheet = XLSX.utils.json_to_sheet(exportData)
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'القاعات')
+      
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
+      const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+      
+      saveAs(data, generateExportFileName('halls'))
+      
+      showNotification({
+        title: 'تم التصدير',
+        message: 'تم تصدير بيانات القاعات بنجاح',
+        type: 'success'
+      })
+    } catch (err) {
+      console.error('Error exporting data:', err)
+      showNotification({
+        title: 'خطأ',
+        message: 'فشل في تصدير البيانات',
+        type: 'error'
+      })
+    }
+  }
+
+  // Render Loading State
+  if (loading && halls.length === 0) {
+    return <LoadingScreen message="جاري تحميل بيانات القاعات..." />
+  }
+
+  // Render Error State
+  if (error && halls.length === 0) {
+    return (
+      <EmptyState
+        title="حدث خطأ"
+        description={error}
+        icon={<AlertCircle className="h-12 w-12 text-error-500" />}
+        action={
+          <MuiButton
+            variant="contained"
+            color="primary"
+            startIcon={<RefreshCw />}
+            onClick={handleRefresh}
+          >
+            إعادة المحاولة
+          </MuiButton>
+        }
+        showPaper
+      />
+    )
+  }
+
+  return (
+    <MuiBox className="p-4 md:p-6">
+      <SEOHead title="إدارة القاعات" />
+      
+      {/* Header */}
+      <MuiBox className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <MuiTypography variant="h4" className="text-right font-bold text-text-primary">
+          إدارة القاعات ({halls.length})
+        </MuiTypography>
+        
+        <MuiBox className="flex flex-col sm:flex-row gap-3">
+          <MuiBox className="flex items-center gap-3">
+            <MuiTextField
+              placeholder="ابحث عن قاعة..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full sm:w-64"
+              size="small"
+              startAdornment={<Search className="text-text-secondary ml-2" size={20} />}
+            />
+            
+            <MuiButton
+              variant="outlined"
+              color="secondary"
+              onClick={() => setViewMode(viewMode === 'table' ? 'card' : 'table')}
+              startIcon={viewMode === 'table' ? <Table size={20} /> : <Building2 size={20} />}
+              className="hidden sm:flex"
+            >
+              {viewMode === 'table' ? 'بطاقات' : 'جدول'}
+            </MuiButton>
+          </MuiBox>
+          
+          <MuiBox className="flex gap-2">
+            <MuiButton
+              variant="outlined"
+              color="info"
+              startIcon={<Download size={20} />}
+              onClick={handleExport}
+              disabled={halls.length === 0}
+            >
+              تصدير
+            </MuiButton>
+            
+            <MuiButton
+              variant="contained"
+              color="primary"
+              startIcon={<Plus size={20} />}
+              onClick={handleCreate}
+            >
+              إضافة قاعة
+            </MuiButton>
+          </MuiBox>
+        </MuiBox>
+      </MuiBox>
+      
+      <MuiDivider className="mb-6" />
+      
+      {/* Stats Cards */}
+      {halls.length > 0 && (
+        <MuiGrid container spacing={3} className="mb-6">
+          <MuiGrid item xs={12} sm={6} md={3}>
+            <MuiCard className="text-center">
+              <MuiCardContent>
+                <MuiTypography variant="h4" className="text-primary-600 font-bold">
+                  {halls.length}
+                </MuiTypography>
+                <MuiTypography variant="body2" className="text-text-secondary">
+                  عدد القاعات
+                </MuiTypography>
+              </MuiCardContent>
+            </MuiCard>
+          </MuiGrid>
+          
+          <MuiGrid item xs={12} sm={6} md={3}>
+            <MuiCard className="text-center">
+              <MuiCardContent>
+                <MuiTypography variant="h4" className="text-success-600 font-bold">
+                  {halls.filter(h => h.isActive).length}
+                </MuiTypography>
+                <MuiTypography variant="body2" className="text-text-secondary">
+                  القاعات النشطة
+                </MuiTypography>
+              </MuiCardContent>
+            </MuiCard>
+          </MuiGrid>
+          
+          <MuiGrid item xs={12} sm={6} md={3}>
+            <MuiCard className="text-center">
+              <MuiCardContent>
+                <MuiTypography variant="h4" className="text-warning-600 font-bold">
+                  {halls.reduce((sum, hall) => sum + (hall.capacity || 0), 0)}
+                </MuiTypography>
+                <MuiTypography variant="body2" className="text-text-secondary">
+                  إجمالي السعة
+                </MuiTypography>
+              </MuiCardContent>
+            </MuiCard>
+          </MuiGrid>
+          
+          <MuiGrid item xs={12} sm={6} md={3}>
+            <MuiCard className="text-center">
+              <MuiCardContent>
+                <MuiTypography variant="h4" className="text-info-600 font-bold">
+                  {halls.length > 0 
+                    ? Math.round(halls.reduce((sum, hall) => sum + (hall.defaultPrices || 0), 0) / halls.length)
+                    : 0
+                  }
+                </MuiTypography>
+                <MuiTypography variant="body2" className="text-text-secondary">
+                  متوسط السعر
+                </MuiTypography>
+              </MuiCardContent>
+            </MuiCard>
+          </MuiGrid>
+        </MuiGrid>
+      )}
+      
+      {/* Content */}
+      {viewMode === 'table' ? (
+        <DataTable
+          columns={columns}
+          rows={filteredHalls}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onView={handleView}
+          onToggleStatus={handleToggleStatus}
+          loading={loading}
+          emptyMessage="لا توجد قاعات متاحة"
+          showActions={true}
+        />
+      ) : (
+        <CardsView
+          items={filteredHalls}
+          loading={loading}
+          emptyMessage="لا توجد قاعات متاحة"
+          renderItem={(hall) => (
+            <MuiCard className="h-full">
+              <MuiCardContent className="h-full flex flex-col">
+                <MuiBox className="flex justify-between items-start mb-4">
+                  <MuiChip
+                    label={hall.isActive ? 'نشطة' : 'غير نشطة'}
+                    size="small"
+                    color={hall.isActive ? 'success' : 'error'}
+                  />
+                  <MuiTypography variant="h6" className="font-bold text-right">
+                    {hall.name}
+                  </MuiTypography>
+                </MuiBox>
+                
+                <MuiBox className="space-y-2 mb-4 flex-grow">
+                  <MuiBox className="flex items-center gap-2">
+                    <MapPin size={16} className="text-info-500" />
+                    <MuiTypography variant="body2" className="text-text-secondary">
+                      {truncateText(hall.location, 40)}
+                    </MuiTypography>
+                  </MuiBox>
+                  
+                  <MuiBox className="flex items-center gap-2">
+                    <Users size={16} className="text-secondary-500" />
+                    <MuiTypography variant="body2">
+                      السعة: {hall.capacity} شخص
+                    </MuiTypography>
+                  </MuiBox>
+                  
+                  <MuiBox className="flex items-center gap-2">
+                    <DollarSign size={16} className="text-success-500" />
+                    <MuiTypography variant="body2">
+                      السعر: {formatCurrency(hall.defaultPrices) || `${hall.defaultPrices} ل.س`}
+                    </MuiTypography>
+                  </MuiBox>
+                  
+                  <MuiBox className="flex items-center gap-2">
+                    <User size={16} className="text-primary-500" />
+                    <MuiTypography variant="body2">
+                      المدير: {hall.managerName}
+                    </MuiTypography>
+                  </MuiBox>
+                </MuiBox>
+                
+                <MuiCardActions className="pt-4 border-t border-border">
+                  <MuiBox className="flex gap-2 w-full">
+                    <MuiButton
+                      size="small"
+                      variant="outlined"
+                      color="info"
+                      startIcon={<Eye size={16} />}
+                      onClick={() => handleView(hall)}
+                      fullWidth
+                    >
+                      عرض
+                    </MuiButton>
+                    <MuiButton
+                      size="small"
+                      variant="outlined"
+                      color="warning"
+                      startIcon={<Pencil size={16} />}
+                      onClick={() => handleEdit(hall)}
+                      fullWidth
+                    >
+                      تعديل
+                    </MuiButton>
+                  </MuiBox>
+                </MuiCardActions>
+              </MuiCardContent>
+            </MuiCard>
+          )}
+        />
+      )}
+      
+      {/* Dialogs will be implemented here */}
+      {/* Create/Edit Dialog, View Dialog, Delete Confirmation Dialog */}
+    </MuiBox>
+  )
+}
+
+export default HallsManagement
+```
+
+```javascriptreact
+على اساس هذه الداتا في ال body
+{
+  "name": "قاعة النمر الوردي ",
+  "description": "قاعة فاخرة للأفراح والمناسبات الخاصة",
+  "location": "الرياض، حي النخيل",
+  "address": "طريق الملك عبدالعزيز، الرياض 12345",
+  "maxEmployees": 200,
+  "capacity": 500,
+  "tables": 50,
+  "chairs": 500,
+  "defaultPrices": 800,
+  "services": [
+  { "service": "68f8bfa3e7f7153a896b5510", "customPrice": 400 }
+],
+  "images": ["hall1-1.jpg", "hall1-2.jpg", "hall1-3.jpg"],
+  "isActive": true,
+  "managerName": "مدير صالة قاعة النمر الوردي",
+  "managerUsername" : "tigar",
+  "managerPhone": "545454",
+  "managerPassword": "545454"
+}
+```
+
+وهذا الريسبونس
+{
+  "success": true,
+  "message": "تم إنشاء الصالة بنجاح",
+  "data": {
+    "_id": "691ef63d2ef839d9a8a36e19",
+    "name": "قاعة الأمورين",
+    "location": "الرياض، حي النخيل",
+    "tables": 50,
+    "chairs": 500,
+    "capacity": 500,
+    "maxEmployees": 200,
+    "defaultPrices": 800,
+    "services": [
+      {
+        "service": {
+          "_id": "68f8bfa3e7f7153a896b5510",
+          "name": "خدمة تنظيف شاملة",
+          "category": "cleaning",
+          "basePrice": 0,
+          "id": "68f8bfa3e7f7153a896b5510"
+        },
+        "isIncluded": true,
+        "notes": "",
+        "_id": "691ef63d2ef839d9a8a36e1a"
+      }
+    ],
+    "amenities": [],
+    "description": "قاعة فاخرة للأفراح والمناسبات الخاصة",
+    "images": [],
+    "isActive": true,
+    "generalManager": {
+      "_id": "691ef63d2ef839d9a8a36e17",
+      "name": "مدير صالة قاعة الأمورين",
+      "phone": "555555",
+      "role": "manager"
+    },
+    "createdAt": "2025-11-20T11:06:37.080Z",
+    "updatedAt": "2025-11-20T11:06:37.080Z",
+    "__v": 0,
+    "primaryImage": null,
+    "id": "691ef63d2ef839d9a8a36e19"
+  }
+}
