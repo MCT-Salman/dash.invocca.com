@@ -1,11 +1,12 @@
 // src\pages\manager\components\CreateEditClientDialog.jsx
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiBox from '@/components/ui/MuiBox'
 import MuiTypography from '@/components/ui/MuiTypography'
-import { BaseFormDialog, FormField } from '@/components/shared'
+import MuiTextField from '@/components/ui/MuiTextField'
+import { BaseFormDialog } from '@/components/shared'
 import { useNotification } from '@/hooks'
 import { createUserSchema } from '@/utils/validations'
 
@@ -16,6 +17,7 @@ export default function CreateEditClientDialog({ open, onClose, onSubmit, editin
     const {
         control,
         handleSubmit,
+        formState: { errors },
         reset
     } = useForm({
         resolver: zodResolver(createUserSchema(isEdit)),
@@ -88,44 +90,75 @@ export default function CreateEditClientDialog({ open, onClose, onSubmit, editin
                 </MuiGrid>
 
                 <MuiGrid item xs={12}>
-                    <FormField
-                        control={control}
+                    <Controller
                         name="name"
-                        label="اسم العميل"
-                        type="text"
-                        required
+                        control={control}
+                        render={({ field, fieldState: { error } }) => (
+                            <MuiTextField
+                                {...field}
+                                label="اسم العميل"
+                                required
+                                fullWidth
+                                error={!!error}
+                                helperText={error?.message}
+                            />
+                        )}
                     />
                 </MuiGrid>
 
                 <MuiGrid item xs={12}>
-                    <FormField
-                        control={control}
+                    <Controller
                         name="phone"
-                        label="رقم الهاتف"
-                        type="tel"
-                        required
+                        control={control}
+                        render={({ field, fieldState: { error } }) => (
+                            <MuiTextField
+                                {...field}
+                                label="رقم الهاتف"
+                                type="tel"
+                                required
+                                fullWidth
+                                error={!!error}
+                                helperText={error?.message}
+                                inputMode="tel"
+                            />
+                        )}
                     />
                 </MuiGrid>
 
                 <MuiGrid item xs={12}>
-                    <FormField
-                        control={control}
+                    <Controller
                         name="username"
-                        label="اسم المستخدم"
-                        type="text"
-                        required={!isEdit}
-                        placeholder={isEdit ? 'اتركه فارغاً إذا لم ترد تغييره' : ''}
+                        control={control}
+                        render={({ field, fieldState: { error } }) => (
+                            <MuiTextField
+                                {...field}
+                                label="اسم المستخدم"
+                                required={!isEdit}
+                                fullWidth
+                                placeholder={isEdit ? 'اتركه فارغاً إذا لم ترد تغييره' : ''}
+                                error={!!error}
+                                helperText={error?.message}
+                            />
+                        )}
                     />
                 </MuiGrid>
 
                 <MuiGrid item xs={12}>
-                    <FormField
-                        control={control}
+                    <Controller
                         name="password"
-                        label={isEdit ? 'كلمة المرور (اتركه فارغاً إذا لم ترد تغييره)' : 'كلمة المرور'}
-                        type="password"
-                        required={!isEdit}
-                        placeholder={!isEdit ? 'يجب أن تحتوي على حرف كبير وصغير ورقم' : ''}
+                        control={control}
+                        render={({ field, fieldState: { error } }) => (
+                            <MuiTextField
+                                {...field}
+                                label={isEdit ? 'كلمة المرور (اتركه فارغاً إذا لم ترد تغييره)' : 'كلمة المرور'}
+                                type="password"
+                                required={!isEdit}
+                                fullWidth
+                                placeholder={!isEdit ? 'يجب أن تحتوي على حرف كبير وصغير ورقم' : ''}
+                                error={!!error}
+                                helperText={error?.message || (!isEdit ? 'يجب أن تحتوي على حرف كبير وصغير ورقم' : '')}
+                            />
+                        )}
                     />
                     {!isEdit && (
                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', mt: 0.5, display: 'block', fontSize: '0.75rem' }}>

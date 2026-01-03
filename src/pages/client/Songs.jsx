@@ -15,20 +15,20 @@ import MuiSelect from '@/components/ui/MuiSelect'
 import MuiMenuItem from '@/components/ui/MuiMenuItem'
 import MuiFormControl from '@/components/ui/MuiFormControl'
 import MuiIconButton from '@/components/ui/MuiIconButton'
+import Tooltip from '@mui/material/Tooltip'
 import { SEOHead, LoadingScreen, EmptyState, ConfirmDialog } from '@/components/common'
-import { BaseFormDialog, FormField } from '@/components/shared'
+import { BaseFormDialog, BaseViewDialog } from '@/components/shared'
+import MuiTextField from '@/components/ui/MuiTextField'
 import { useDialogState, useCRUD, useNotification } from '@/hooks'
 import { QUERY_KEYS } from '@/config/constants'
 import { getEventSongs, addSong, updateSong, deleteSong, reorderSongs, getClientDashboard } from '@/api/client'
 import { formatDate, formatEmptyValue } from '@/utils/helpers'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Plus, Edit2, Trash2, Music, GripVertical, ArrowUp, ArrowDown, Calendar, Clock, Users, Building2 } from 'lucide-react'
-import MuiSwitch from '@/components/ui/MuiSwitch'
-import MuiFormControlLabel from '@mui/material/FormControlLabel'
+import { Plus, Edit2, Trash2, Music, GripVertical, ArrowUp, ArrowDown, Calendar, Clock, Users, Building2, ExternalLink, Eye, Link as LinkIcon, FileText } from 'lucide-react'
 import MuiChip from '@/components/ui/MuiChip'
-import { Controller } from 'react-hook-form'
+import MuiDivider from '@/components/ui/MuiDivider'
 import { DataTable } from '@/components/common'
 
 // Validation schema
@@ -37,7 +37,6 @@ const songSchema = z.object({
   artist: z.string().min(1, 'اسم الفنان مطلوب'),
   url: z.string().url('رابط غير صحيح').min(1, 'رابط الأغنية مطلوب'),
   duration: z.string().regex(/^\d{2}:\d{2}$/, 'المدة يجب أن تكون بصيغة MM:SS'),
-  isExplicit: z.boolean().optional().default(false),
   scheduledTime: z.string().optional(),
   notes: z.string().optional(),
 })
@@ -58,6 +57,21 @@ export default function ClientSongs() {
     isEdit,
     isDelete,
   } = useDialogState()
+
+  // View dialog state
+  const [viewingSong, setViewingSong] = useState(null)
+  const isView = !!viewingSong
+
+  const handleView = (song) => {
+    setViewingSong(song)
+  }
+
+  const handleCloseView = () => {
+    setViewingSong(null)
+  }
+
+  // Animation state for reordering
+  const [animatingRows, setAnimatingRows] = useState({})
 
   // Fetch events to populate event selector (using dashboard endpoint)
   const { data: dashboardData, isLoading: eventsLoading } = useQuery({
@@ -89,19 +103,30 @@ export default function ClientSongs() {
 
   // Reorder mutation
   const reorderMutation = useMutation({
-    mutationFn: (songOrders) => reorderSongs(selectedEventId, songOrders),
-    onSuccess: () => {
+    mutationFn: (songOrders) => {
+      if (!selectedEventId) {
+        throw new Error('يجب اختيار فعالية أولاً')
+      }
+      return reorderSongs(selectedEventId, songOrders)
+    },
+    onSuccess: (response) => {
       showNotification({
         title: 'نجح',
         message: 'تم إعادة ترتيب الأغاني بنجاح',
         type: 'success',
       })
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CLIENT_SONGS, selectedEventId] })
+      // Update the cache directly with the new data from response
+      if (response?.data && Array.isArray(response.data)) {
+        queryClient.setQueryData([QUERY_KEYS.CLIENT_SONGS, selectedEventId], { data: response.data })
+      } else {
+        // Fallback to invalidate if response structure is different
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CLIENT_SONGS, selectedEventId] })
+      }
     },
     onError: (error) => {
       showNotification({
         title: 'خطأ',
-        message: error?.response?.data?.message || 'فشل إعادة ترتيب الأغاني',
+        message: error?.response?.data?.message || error?.message || 'فشل إعادة ترتيب الأغاني',
         type: 'error',
       })
     },
@@ -126,74 +151,109 @@ export default function ClientSongs() {
     return []
   }, [songsData])
 
-  // Prepare songs for DataTable
+  // Prepare songs for DataTable - sort by orderInEvent
   const songsTableData = useMemo(() => {
-    return songs.map((song, index) => ({
+    const sortedSongs = [...songs].sort((a, b) => {
+      const orderA = a.orderInEvent || 0
+      const orderB = b.orderInEvent || 0
+      return orderA - orderB
+    })
+    return sortedSongs.map((song, index) => ({
       ...song,
       id: song._id || song.id,
       order: song.orderInEvent || index + 1,
     }))
   }, [songs])
 
-  // Handle reorder
+  // Handle reorder with animation
   const handleMoveUp = (song) => {
     const currentIndex = songsTableData.findIndex((s) => s.id === song.id)
     if (currentIndex <= 0) return
 
-    // Swap with previous item
-    const newOrder = songsTableData.map((s, idx) => {
-      if (idx === currentIndex) {
-        // Move current item up (decrease order)
-        return {
-          songId: s._id || s.id,
-          newOrder: currentIndex
-        }
-      } else if (idx === currentIndex - 1) {
-        // Move previous item down (increase order)
-        return {
-          songId: s._id || s.id,
-          newOrder: currentIndex + 1
-        }
-      } else {
-        // Keep other items in their current position
-        return {
-          songId: s._id || s.id,
-          newOrder: idx + 1
-        }
-      }
+    const previousSong = songsTableData[currentIndex - 1]
+    const currentSong = songsTableData[currentIndex]
+
+    // Set animation states
+    setAnimatingRows({
+      [currentSong.id]: 'move-up',
+      [previousSong.id]: 'move-down',
     })
 
-    reorderMutation.mutate(newOrder)
+    // Swap orders: move current up (to previous position), previous down (to current position)
+    // newOrder is 1-based (starts from 1)
+    // currentIndex is 0-based, so:
+    // - currentIndex = 0 means position 1 (1-based)
+    // - currentIndex = 1 means position 2 (1-based)
+    // To move current up: newOrder = currentIndex (which is previous position in 1-based)
+    // To move previous down: newOrder = currentIndex + 1 (which is current position in 1-based)
+    const songOrders = [
+      {
+        songId: currentSong._id || currentSong.id,
+        newOrder: currentIndex, // Move to previous position (1-based: currentIndex = previous position)
+      },
+      {
+        songId: previousSong._id || previousSong.id,
+        newOrder: currentIndex + 1, // Move to current position (1-based: currentIndex + 1 = current position)
+      },
+    ]
+
+    reorderMutation.mutate(songOrders, {
+      onSuccess: () => {
+        // Clear animation after transition
+        setTimeout(() => {
+          setAnimatingRows({})
+        }, 500)
+      },
+      onError: () => {
+        // Clear animation on error
+        setAnimatingRows({})
+      },
+    })
   }
 
   const handleMoveDown = (song) => {
     const currentIndex = songsTableData.findIndex((s) => s.id === song.id)
     if (currentIndex >= songsTableData.length - 1) return
 
-    // Swap with next item
-    const newOrder = songsTableData.map((s, idx) => {
-      if (idx === currentIndex) {
-        // Move current item down (increase order)
-        return {
-          songId: s._id || s.id,
-          newOrder: currentIndex + 2
-        }
-      } else if (idx === currentIndex + 1) {
-        // Move next item up (decrease order)
-        return {
-          songId: s._id || s.id,
-          newOrder: currentIndex + 1
-        }
-      } else {
-        // Keep other items in their current position
-        return {
-          songId: s._id || s.id,
-          newOrder: idx + 1
-        }
-      }
+    const currentSong = songsTableData[currentIndex]
+    const nextSong = songsTableData[currentIndex + 1]
+
+    // Set animation states
+    setAnimatingRows({
+      [currentSong.id]: 'move-down',
+      [nextSong.id]: 'move-up',
     })
 
-    reorderMutation.mutate(newOrder)
+    // Swap orders: move current down (to next position), next up (to current position)
+    // newOrder is 1-based (starts from 1)
+    // currentIndex is 0-based, so:
+    // - currentIndex = 0 means position 1 (1-based)
+    // - currentIndex = 1 means position 2 (1-based)
+    // To move current down: newOrder = currentIndex + 2 (which is next position in 1-based)
+    // To move next up: newOrder = currentIndex + 1 (which is current position in 1-based)
+    const songOrders = [
+      {
+        songId: currentSong._id || currentSong.id,
+        newOrder: currentIndex + 2, // Move to next position (1-based: currentIndex + 2 = next position)
+      },
+      {
+        songId: nextSong._id || nextSong.id,
+        newOrder: currentIndex + 1, // Move to current position (1-based: currentIndex + 1 = current position)
+      },
+    ]
+
+    reorderMutation.mutate(songOrders, {
+      onSuccess: () => {
+        // Clear animation after transition
+        setTimeout(() => {
+          setAnimatingRows({})
+        }, 500)
+      },
+      onError: () => {
+        // Clear animation on error
+        setAnimatingRows({})
+      },
+    })
   }
 
   const columns = [
@@ -230,42 +290,33 @@ export default function ClientSongs() {
             target="_blank"
             rel="noopener noreferrer"
             sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               color: 'var(--color-primary-500)',
               textDecoration: 'none',
+              transition: 'all 0.2s ease',
               '&:hover': {
-                textDecoration: 'underline',
+                color: 'var(--color-primary-400)',
+                transform: 'scale(1.1)',
               },
             }}
           >
-            {value.length > 40 ? `${value.substring(0, 40)}...` : value}
+            <Tooltip title={`فتح الرابط: ${value}`}>
+              <MuiIconButton
+                size="small"
+                sx={{
+                  color: 'var(--color-primary-500)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(216, 185, 138, 0.1)',
+                    color: 'var(--color-primary-400)',
+                  },
+                }}
+              >
+                <ExternalLink size={18} />
+              </MuiIconButton>
+            </Tooltip>
           </MuiBox>
-        )
-      },
-    },
-    {
-      id: 'isExplicit',
-      label: 'محتوى صريح',
-      format: (value) => {
-        return value ? (
-          <MuiChip
-            label="نعم"
-            size="small"
-            sx={{
-              backgroundColor: 'rgba(220, 38, 38, 0.1)',
-              color: '#dc2626',
-              fontWeight: 600,
-            }}
-          />
-        ) : (
-          <MuiChip
-            label="لا"
-            size="small"
-            sx={{
-              backgroundColor: 'rgba(34, 197, 94, 0.1)',
-              color: '#22c55e',
-              fontWeight: 600,
-            }}
-          />
         )
       },
     },
@@ -317,38 +368,33 @@ export default function ClientSongs() {
         return '—'
       },
     },
-    {
-      id: 'notes',
-      label: 'ملاحظات',
-      format: (value) => {
-        if (!value || !value.trim()) return '—'
-        return (
-          <MuiTypography
-            variant="body2"
-            sx={{
-              color: 'var(--color-text-secondary)',
-              maxWidth: '200px',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-            title={value}
-          >
-            {value}
-          </MuiTypography>
-        )
-      },
-    },
   ]
 
   const handleSubmit = async (data) => {
+    // Prepare data with only required fields
+    const submitData = {
+      title: data.title,
+      artist: data.artist,
+      url: data.url,
+      duration: data.duration,
+      scheduledTime: data.scheduledTime ? new Date(data.scheduledTime).toISOString() : undefined,
+      notes: data.notes || undefined,
+    }
+    
+    // Remove undefined fields
+    Object.keys(submitData).forEach(key => {
+      if (submitData[key] === undefined) {
+        delete submitData[key]
+      }
+    })
+
     if (isEdit && editingSong) {
-      const result = await handleUpdate(editingSong.id || editingSong._id, data)
+      const result = await handleUpdate(editingSong.id || editingSong._id, submitData)
       if (result?.success) {
         closeDialog()
       }
     } else {
-      const result = await handleCreate(data)
+      const result = await handleCreate(submitData)
       if (result?.success) {
         closeDialog()
       }
@@ -389,15 +435,6 @@ export default function ClientSongs() {
             value={selectedEventId}
             onChange={(e) => setSelectedEventId(e.target.value)}
             displayEmpty
-            sx={{
-              borderRadius: '12px',
-              background: 'var(--color-surface-dark)',
-              border: '1px solid var(--color-border-glass)',
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              },
-            }}
           >
             <MuiMenuItem value="" disabled>
               اختر الفعالية
@@ -578,52 +615,76 @@ export default function ClientSongs() {
                   <DataTable
                     columns={columns}
                     data={songsTableData}
+                    onView={handleView}
                     onEdit={openEditDialog}
                     onDelete={openDeleteDialog}
                     showActions={true}
                     loading={false}
                     emptyMessage="لا توجد أغاني"
-                    customActions={(row) => (
-                      <MuiBox sx={{ display: 'flex', gap: 0.5 }}>
-                        <MuiIconButton
-                          size="small"
-                          onClick={() => handleMoveUp(row)}
-                          disabled={songsTableData.findIndex((s) => s.id === row.id) === 0 || reorderMutation.isPending}
-                          sx={{
-                            background: 'rgba(216, 185, 138, 0.1)',
-                            '&:hover': {
-                              background: 'rgba(216, 185, 138, 0.2)',
-                              color: 'var(--color-primary-500)',
-                            },
-                            '&:disabled': {
-                              opacity: 0.3,
-                            },
-                          }}
-                        >
-                          <ArrowUp size={16} />
-                        </MuiIconButton>
-                        <MuiIconButton
-                          size="small"
-                          onClick={() => handleMoveDown(row)}
-                          disabled={
-                            songsTableData.findIndex((s) => s.id === row.id) === songsTableData.length - 1 ||
-                            reorderMutation.isPending
-                          }
-                          sx={{
-                            background: 'rgba(216, 185, 138, 0.1)',
-                            '&:hover': {
-                              background: 'rgba(216, 185, 138, 0.2)',
-                              color: 'var(--color-primary-500)',
-                            },
-                            '&:disabled': {
-                              opacity: 0.3,
-                            },
-                          }}
-                        >
-                          <ArrowDown size={16} />
-                        </MuiIconButton>
-                      </MuiBox>
-                    )}
+                    animatingRows={animatingRows}
+                    customActions={(row) => {
+                      const currentIndex = songsTableData.findIndex((s) => s.id === row.id)
+                      const isFirst = currentIndex === 0
+                      const isLast = currentIndex === songsTableData.length - 1
+                      const isPending = reorderMutation.isPending
+                      
+                      return (
+                        <MuiBox sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                          <Tooltip title="نقل لأعلى">
+                            <span>
+                              <MuiIconButton
+                                size="small"
+                                onClick={() => handleMoveUp(row)}
+                                disabled={isFirst || isPending}
+                                sx={{
+                                  color: isFirst ? 'var(--color-text-muted)' : 'var(--color-primary-500)',
+                                  background: isFirst ? 'transparent' : 'rgba(216, 185, 138, 0.1)',
+                                  border: '1px solid',
+                                  borderColor: isFirst ? 'var(--color-border-dark)' : 'rgba(216, 185, 138, 0.3)',
+                                  '&:hover:not(:disabled)': {
+                                    background: 'rgba(216, 185, 138, 0.2)',
+                                    borderColor: 'var(--color-primary-500)',
+                                    transform: 'translateY(-2px)',
+                                  },
+                                  '&:disabled': {
+                                    opacity: 0.3,
+                                    cursor: 'not-allowed',
+                                  },
+                                }}
+                              >
+                                <ArrowUp size={16} />
+                              </MuiIconButton>
+                            </span>
+                          </Tooltip>
+                          <Tooltip title="نقل لأسفل">
+                            <span>
+                              <MuiIconButton
+                                size="small"
+                                onClick={() => handleMoveDown(row)}
+                                disabled={isLast || isPending}
+                                sx={{
+                                  color: isLast ? 'var(--color-text-muted)' : 'var(--color-primary-500)',
+                                  background: isLast ? 'transparent' : 'rgba(216, 185, 138, 0.1)',
+                                  border: '1px solid',
+                                  borderColor: isLast ? 'var(--color-border-dark)' : 'rgba(216, 185, 138, 0.3)',
+                                  '&:hover:not(:disabled)': {
+                                    background: 'rgba(216, 185, 138, 0.2)',
+                                    borderColor: 'var(--color-primary-500)',
+                                    transform: 'translateY(2px)',
+                                  },
+                                  '&:disabled': {
+                                    opacity: 0.3,
+                                    cursor: 'not-allowed',
+                                  },
+                                }}
+                              >
+                                <ArrowDown size={16} />
+                              </MuiIconButton>
+                            </span>
+                          </Tooltip>
+                        </MuiBox>
+                      )
+                    }}
                   />
                 </MuiPaper>
               ) : (
@@ -664,6 +725,13 @@ export default function ClientSongs() {
         cancelLabel="إلغاء"
         loading={crudLoading}
       />
+
+      {/* View Song Dialog */}
+      <ViewSongDialog
+        open={isView}
+        onClose={handleCloseView}
+        song={viewingSong}
+      />
     </MuiBox>
   )
 }
@@ -683,7 +751,6 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
       artist: editingSong?.artist || '',
       url: editingSong?.url || '',
       duration: editingSong?.duration || '',
-      isExplicit: editingSong?.isExplicit || false,
       scheduledTime: editingSong?.scheduledTime
         ? new Date(editingSong.scheduledTime).toISOString().slice(0, 16)
         : '',
@@ -693,17 +760,49 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
 
   useEffect(() => {
     if (open) {
-      reset({
-        title: editingSong?.title || '',
-        artist: editingSong?.artist || '',
-        url: editingSong?.url || '',
-        duration: editingSong?.duration || '',
-        isExplicit: editingSong?.isExplicit || false,
-        scheduledTime: editingSong?.scheduledTime
-          ? new Date(editingSong.scheduledTime).toISOString().slice(0, 16)
-          : '',
-        notes: editingSong?.notes || '',
-      })
+      if (editingSong) {
+        // Format scheduledTime correctly for datetime-local input
+        let formattedScheduledTime = ''
+        if (editingSong.scheduledTime) {
+          try {
+            const date = new Date(editingSong.scheduledTime)
+            if (!isNaN(date.getTime())) {
+              // Get local datetime string in YYYY-MM-DDTHH:mm format
+              const year = date.getFullYear()
+              const month = String(date.getMonth() + 1).padStart(2, '0')
+              const day = String(date.getDate()).padStart(2, '0')
+              const hours = String(date.getHours()).padStart(2, '0')
+              const minutes = String(date.getMinutes()).padStart(2, '0')
+              formattedScheduledTime = `${year}-${month}-${day}T${hours}:${minutes}`
+            }
+          } catch (error) {
+            console.error('Error formatting scheduledTime:', error)
+          }
+        }
+
+        reset({
+          title: editingSong.title || '',
+          artist: editingSong.artist || '',
+          url: editingSong.url || '',
+          duration: editingSong.duration || '',
+          scheduledTime: formattedScheduledTime,
+          notes: editingSong.notes || '',
+        }, {
+          keepDefaultValues: false
+        })
+      } else {
+        // Reset to empty for create mode
+        reset({
+          title: '',
+          artist: '',
+          url: '',
+          duration: '',
+          scheduledTime: '',
+          notes: '',
+        }, {
+          keepDefaultValues: false
+        })
+      }
     }
   }, [open, editingSong, reset])
 
@@ -719,90 +818,293 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
       maxWidth="sm"
     >
       <MuiGrid container spacing={3}>
-        <FormField
-          name="title"
-          control={control}
-          label="عنوان الأغنية"
-          errors={errors}
-          required
-          fullWidth
-          gridItemProps={{ xs: 12 }}
-        />
-
-        <FormField
-          name="artist"
-          control={control}
-          label="الفنان"
-          errors={errors}
-          required
-          fullWidth
-          gridItemProps={{ xs: 12 }}
-        />
-
-        <FormField
-          name="url"
-          control={control}
-          label="رابط الأغنية"
-          errors={errors}
-          type="text"
-          required
-          fullWidth
-          placeholder="https://example.com/song.mp3"
-          gridItemProps={{ xs: 12 }}
-        />
-
-        <FormField
-          name="duration"
-          control={control}
-          label="المدة (MM:SS)"
-          errors={errors}
-          type="text"
-          required
-          fullWidth
-          placeholder="04:30"
-          gridItemProps={{ xs: 12 }}
-        />
-
         <MuiGrid item xs={12}>
           <Controller
-            name="isExplicit"
+            name="title"
             control={control}
             render={({ field }) => (
-              <MuiFormControlLabel
-                control={
-                  <MuiSwitch
-                    checked={field.value || false}
-                    onChange={field.onChange}
-                  />
-                }
-                label="محتوى صريح"
+              <MuiTextField
+                {...field}
+                label="عنوان الأغنية"
+                required
+                fullWidth
+                error={!!errors.title}
+                helperText={errors.title?.message}
               />
             )}
           />
         </MuiGrid>
 
-        <FormField
-          name="scheduledTime"
-          control={control}
-          label="وقت التشغيل"
-          errors={errors}
-          type="datetime-local"
-          fullWidth
-          gridItemProps={{ xs: 12 }}
-        />
+        <MuiGrid item xs={12}>
+          <Controller
+            name="artist"
+            control={control}
+            render={({ field }) => (
+              <MuiTextField
+                {...field}
+                label="الفنان"
+                required
+                fullWidth
+                error={!!errors.artist}
+                helperText={errors.artist?.message}
+              />
+            )}
+          />
+        </MuiGrid>
 
-        <FormField
-          name="notes"
-          control={control}
-          label="ملاحظات"
-          errors={errors}
-          type="textarea"
-          rows={3}
-          fullWidth
-          gridItemProps={{ xs: 12 }}
-        />
+        <MuiGrid item xs={12}>
+          <Controller
+            name="url"
+            control={control}
+            render={({ field }) => (
+              <MuiTextField
+                {...field}
+                label="رابط الأغنية"
+                type="text"
+                required
+                fullWidth
+                placeholder="https://example.com/song.mp3"
+                error={!!errors.url}
+                helperText={errors.url?.message}
+              />
+            )}
+          />
+        </MuiGrid>
+
+        <MuiGrid item xs={12}>
+          <Controller
+            name="duration"
+            control={control}
+            render={({ field }) => (
+              <MuiTextField
+                {...field}
+                label="المدة (MM:SS)"
+                type="text"
+                required
+                fullWidth
+                placeholder="04:30"
+                error={!!errors.duration}
+                helperText={errors.duration?.message}
+              />
+            )}
+          />
+        </MuiGrid>
+
+        <MuiGrid item xs={12}>
+          <Controller
+            name="scheduledTime"
+            control={control}
+            render={({ field }) => (
+              <MuiTextField
+                {...field}
+                label="وقت التشغيل"
+                type="datetime-local"
+                fullWidth
+                error={!!errors.scheduledTime}
+                helperText={errors.scheduledTime?.message}
+              />
+            )}
+          />
+        </MuiGrid>
+
+        <MuiGrid item xs={12}>
+          <Controller
+            name="notes"
+            control={control}
+            render={({ field }) => (
+              <MuiTextField
+                {...field}
+                label="ملاحظات"
+                multiline
+                rows={3}
+                fullWidth
+                error={!!errors.notes}
+                helperText={errors.notes?.message}
+              />
+            )}
+          />
+        </MuiGrid>
       </MuiGrid>
     </BaseFormDialog>
+  )
+}
+
+// View Song Dialog Component
+function ViewSongDialog({ open, onClose, song }) {
+  if (!song) return null
+
+  const headerImage = (
+    <MuiBox sx={{ height: '192px', width: '100%', backgroundColor: 'var(--color-bg-dark)', position: 'relative' }}>
+      <MuiBox sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.2), rgba(255, 227, 108, 0.1))' }}>
+        <MuiTypography variant="h3" sx={{ color: 'var(--color-primary-500)', fontWeight: 'bold' }}>
+          {song.title?.[0]?.toUpperCase() || 'S'}
+        </MuiTypography>
+      </MuiBox>
+      <MuiBox sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }} />
+      <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: '#fff' }}>
+        <MuiTypography variant="h4" sx={{ fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+          {formatEmptyValue(song.title)}
+        </MuiTypography>
+        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+          <Music size={16} style={{ color: 'rgba(255,255,255,0.8)' }} />
+          <MuiTypography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>
+            أغنية
+          </MuiTypography>
+        </MuiBox>
+      </MuiBox>
+    </MuiBox>
+  )
+
+  return (
+    <BaseViewDialog
+      open={open && !!song}
+      onClose={onClose}
+      maxWidth="md"
+      headerImage={headerImage}
+    >
+      <MuiGrid container spacing={3}>
+        {/* Basic Info */}
+        <MuiGrid item xs={12}>
+          <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+            <Music size={20} style={{ color: 'var(--color-primary-500)' }} />
+            <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+              معلومات الأغنية
+            </MuiTypography>
+          </MuiBox>
+        </MuiGrid>
+
+        <MuiGrid item xs={12} sm={6}>
+          <MuiBox>
+            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
+              عنوان الأغنية
+            </MuiTypography>
+            <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 500 }}>
+              {formatEmptyValue(song.title)}
+            </MuiTypography>
+          </MuiBox>
+        </MuiGrid>
+
+        <MuiGrid item xs={12} sm={6}>
+          <MuiBox>
+            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
+              الفنان
+            </MuiTypography>
+            <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 500 }}>
+              {formatEmptyValue(song.artist)}
+            </MuiTypography>
+          </MuiBox>
+        </MuiGrid>
+
+        <MuiGrid item xs={12} sm={6}>
+          <MuiBox>
+            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
+              المدة
+            </MuiTypography>
+            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Clock size={16} style={{ color: 'var(--color-primary-500)' }} />
+              <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 500 }}>
+                {formatEmptyValue(song.duration) || '—'}
+              </MuiTypography>
+            </MuiBox>
+          </MuiBox>
+        </MuiGrid>
+
+        <MuiGrid item xs={12} sm={6}>
+          <MuiBox>
+            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
+              وقت التشغيل
+            </MuiTypography>
+            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Calendar size={16} style={{ color: 'var(--color-primary-500)' }} />
+              <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 500 }}>
+                {song.scheduledTime
+                  ? formatDate(song.scheduledTime, 'DD/MM/YYYY HH:mm')
+                  : '—'}
+              </MuiTypography>
+            </MuiBox>
+          </MuiBox>
+        </MuiGrid>
+
+        <MuiGrid item xs={12}>
+          <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)' }} />
+        </MuiGrid>
+
+        {/* Link */}
+        <MuiGrid item xs={12}>
+          <MuiBox>
+            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 1 }}>
+              رابط الأغنية
+            </MuiTypography>
+            {song.url ? (
+              <MuiBox
+                component="a"
+                href={song.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  color: 'var(--color-primary-500)',
+                  textDecoration: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(216, 185, 138, 0.1)',
+                  border: '1px solid rgba(216, 185, 138, 0.3)',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(216, 185, 138, 0.2)',
+                    borderColor: 'var(--color-primary-500)',
+                    transform: 'translateY(-2px)',
+                  },
+                }}
+              >
+                <LinkIcon size={16} />
+                <MuiTypography variant="body2" sx={{ fontWeight: 500 }}>
+                  {song.url.length > 50 ? `${song.url.substring(0, 50)}...` : song.url}
+                </MuiTypography>
+                <ExternalLink size={14} />
+              </MuiBox>
+            ) : (
+              <MuiTypography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                —
+              </MuiTypography>
+            )}
+          </MuiBox>
+        </MuiGrid>
+
+        {/* Notes */}
+        {song.notes && (
+          <>
+            <MuiGrid item xs={12}>
+              <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)' }} />
+            </MuiGrid>
+            <MuiGrid item xs={12}>
+              <MuiBox>
+                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                  <FileText size={16} style={{ color: 'var(--color-primary-500)' }} />
+                  <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+                    الملاحظات
+                  </MuiTypography>
+                </MuiBox>
+                <MuiBox
+                  sx={{
+                    padding: 2,
+                    borderRadius: '8px',
+                    backgroundColor: 'rgba(216, 185, 138, 0.05)',
+                    border: '1px solid rgba(216, 185, 138, 0.15)',
+                  }}
+                >
+                  <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', whiteSpace: 'pre-wrap' }}>
+                    {song.notes}
+                  </MuiTypography>
+                </MuiBox>
+              </MuiBox>
+            </MuiGrid>
+          </>
+        )}
+      </MuiGrid>
+    </BaseViewDialog>
   )
 }
 

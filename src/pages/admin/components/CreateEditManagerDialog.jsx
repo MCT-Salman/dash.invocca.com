@@ -10,8 +10,6 @@ import MuiTypography from '@/components/ui/MuiTypography'
 import MuiSelect from '@/components/ui/MuiSelect'
 import MuiMenuItem from '@/components/ui/MuiMenuItem'
 import MuiSwitch from '@/components/ui/MuiSwitch'
-import MuiFormControl from '@/components/ui/MuiFormControl'
-import MuiInputLabel from '@/components/ui/MuiInputLabel'
 import { FormDialog } from '@/components/common'
 import { getHallsList } from '@/api/admin'
 import { useNotification } from '@/hooks'
@@ -197,22 +195,21 @@ export default function CreateEditManagerDialog({ open, onClose, onSubmit, editi
                         name="hallId"
                         control={control}
                         render={({ field }) => (
-                            <MuiFormControl fullWidth error={!!errors.hallId}>
-                                <MuiInputLabel>القاعة</MuiInputLabel>
-                                <MuiSelect
-                                    {...field}
-                                    label="القاعة"
-                                >
-                                    <MuiMenuItem value="">
-                                        <em>غير معين</em>
+                            <MuiSelect
+                                {...field}
+                                label="القاعة"
+                                error={!!errors.hallId}
+                                fullWidth
+                            >
+                                <MuiMenuItem value="">
+                                    <em>غير معين</em>
+                                </MuiMenuItem>
+                                {Array.isArray(hallsList) && hallsList.map(hall => (
+                                    <MuiMenuItem key={hall._id || hall.id} value={hall._id || hall.id}>
+                                        {hall.name}
                                     </MuiMenuItem>
-                                    {Array.isArray(hallsList) && hallsList.map(hall => (
-                                        <MuiMenuItem key={hall._id || hall.id} value={hall._id || hall.id}>
-                                            {hall.name}
-                                        </MuiMenuItem>
-                                    ))}
-                                </MuiSelect>
-                            </MuiFormControl>
+                                ))}
+                            </MuiSelect>
                         )}
                     />
                 </MuiGrid>

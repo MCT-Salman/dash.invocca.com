@@ -14,6 +14,8 @@ import MuiInputLabel from '@/components/ui/MuiInputLabel'
 import MuiIconButton from '@/components/ui/MuiIconButton'
 import MuiButton from '@/components/ui/MuiButton'
 import MuiFormHelperText from '@/components/ui/MuiFormHelperText'
+import MuiDatePicker from '@/components/ui/MuiDatePicker'
+import MuiTimePicker from '@/components/ui/MuiTimePicker'
 import { FormDialog } from '@/components/common'
 import { useNotification } from '@/hooks'
 import { getClients, getManagerHall, listManagerTemplates } from '@/api/manager'
@@ -380,12 +382,13 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                     <Controller
                         name="eventType"
                         control={control}
-                        render={({ field }) => (
-                            <MuiFormControl fullWidth error={!!errors.eventType}>
-                                <MuiInputLabel>نوع الفعالية</MuiInputLabel>
+                        render={({ field, fieldState: { error } }) => (
+                            <MuiBox>
                                 <MuiSelect
                                     {...field}
                                     label="نوع الفعالية"
+                                    error={!!error}
+                                    fullWidth
                                 >
                                     <MuiMenuItem value="wedding">زفاف</MuiMenuItem>
                                     <MuiMenuItem value="birthday">عيد ميلاد</MuiMenuItem>
@@ -394,8 +397,12 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                                     <MuiMenuItem value="corporate">فعالية شركات</MuiMenuItem>
                                     <MuiMenuItem value="other">أخرى</MuiMenuItem>
                                 </MuiSelect>
-                                {errors.eventType && <MuiFormHelperText>{errors.eventType.message}</MuiFormHelperText>}
-                            </MuiFormControl>
+                                {error && (
+                                    <MuiFormHelperText sx={{ color: 'var(--color-error-500)', mt: 0.5, mx: 1.75 }}>
+                                        {error.message}
+                                    </MuiFormHelperText>
+                                )}
+                            </MuiBox>
                         )}
                     />
                 </MuiGrid>
@@ -405,14 +412,15 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                     <Controller
                         name="templateId"
                         control={control}
-                        render={({ field }) => (
-                            <MuiFormControl fullWidth error={!!errors.templateId}>
-                                <MuiInputLabel>القالب (اختياري)</MuiInputLabel>
+                        render={({ field, fieldState: { error } }) => (
+                            <MuiBox>
                                 <MuiSelect
                                     {...field}
                                     label="القالب (اختياري)"
                                     value={field.value || ''}
                                     disabled={templatesLoading}
+                                    error={!!error}
+                                    fullWidth
                                     onChange={(e) => {
                                         // Convert empty string to null for proper API handling
                                         const value = e.target.value === '' ? null : e.target.value
@@ -428,8 +436,12 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                                         </MuiMenuItem>
                                     ))}
                                 </MuiSelect>
-                                {errors.templateId && <MuiFormHelperText>{errors.templateId.message}</MuiFormHelperText>}
-                            </MuiFormControl>
+                                {error && (
+                                    <MuiFormHelperText sx={{ color: 'var(--color-error-500)', mt: 0.5, mx: 1.75 }}>
+                                        {error.message}
+                                    </MuiFormHelperText>
+                                )}
+                            </MuiBox>
                         )}
                     />
                 </MuiGrid>
@@ -445,16 +457,15 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                     <Controller
                         name="eventDate"
                         control={control}
-                        render={({ field }) => (
-                            <MuiTextField
-                                {...field}
+                        render={({ field, fieldState: { error } }) => (
+                            <MuiDatePicker
                                 label="تاريخ الفعالية"
-                                type="date"
+                                value={field.value || null}
+                                onChange={field.onChange}
                                 fullWidth
                                 required
-                                InputLabelProps={{ shrink: true }}
-                                error={!!errors.eventDate}
-                                helperText={errors.eventDate?.message}
+                                error={!!error}
+                                helperText={error?.message}
                             />
                         )}
                     />
@@ -464,16 +475,15 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                     <Controller
                         name="startTime"
                         control={control}
-                        render={({ field }) => (
-                            <MuiTextField
-                                {...field}
+                        render={({ field, fieldState: { error } }) => (
+                            <MuiTimePicker
                                 label="وقت البداية"
-                                type="time"
+                                value={field.value || null}
+                                onChange={field.onChange}
                                 fullWidth
                                 required
-                                InputLabelProps={{ shrink: true }}
-                                error={!!errors.startTime}
-                                helperText={errors.startTime?.message}
+                                error={!!error}
+                                helperText={error?.message}
                             />
                         )}
                     />
@@ -483,16 +493,15 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                     <Controller
                         name="endTime"
                         control={control}
-                        render={({ field }) => (
-                            <MuiTextField
-                                {...field}
+                        render={({ field, fieldState: { error } }) => (
+                            <MuiTimePicker
                                 label="وقت النهاية"
-                                type="time"
+                                value={field.value || null}
+                                onChange={field.onChange}
                                 fullWidth
                                 required
-                                InputLabelProps={{ shrink: true }}
-                                error={!!errors.endTime}
-                                helperText={errors.endTime?.message}
+                                error={!!error}
+                                helperText={error?.message}
                             />
                         )}
                     />
@@ -554,20 +563,18 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                                 name="clientSelection"
                                 control={control}
                                 render={({ field }) => (
-                                    <MuiFormControl fullWidth>
-                                        <MuiInputLabel>اختر نوع العميل</MuiInputLabel>
-                                        <MuiSelect
-                                            {...field}
-                                            label="اختر نوع العميل"
-                                            onChange={(e) => {
-                                                field.onChange(e)
-                                                setClientSelection(e.target.value)
-                                            }}
-                                        >
-                                            <MuiMenuItem value="existing">عميل موجود</MuiMenuItem>
-                                            <MuiMenuItem value="new">عميل جديد</MuiMenuItem>
-                                        </MuiSelect>
-                                    </MuiFormControl>
+                                    <MuiSelect
+                                        {...field}
+                                        label="اختر نوع العميل"
+                                        fullWidth
+                                        onChange={(e) => {
+                                            field.onChange(e)
+                                            setClientSelection(e.target.value)
+                                        }}
+                                    >
+                                        <MuiMenuItem value="existing">عميل موجود</MuiMenuItem>
+                                        <MuiMenuItem value="new">عميل جديد</MuiMenuItem>
+                                    </MuiSelect>
                                 )}
                             />
                         </MuiGrid>
@@ -577,12 +584,13 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                                 <Controller
                                     name="clientId"
                                     control={control}
-                                    render={({ field }) => (
-                                        <MuiFormControl fullWidth error={!!errors.clientId}>
-                                            <MuiInputLabel>العميل</MuiInputLabel>
+                                    render={({ field, fieldState: { error } }) => (
+                                        <MuiBox>
                                             <MuiSelect
                                                 {...field}
                                                 label="العميل"
+                                                error={!!error}
+                                                fullWidth
                                             >
                                                 {Array.isArray(clients) && clients.map(client => (
                                                     <MuiMenuItem key={client._id || client.id} value={client._id || client.id}>
@@ -590,8 +598,12 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                                                     </MuiMenuItem>
                                                 ))}
                                             </MuiSelect>
-                                            {errors.clientId && <MuiFormHelperText>{errors.clientId.message}</MuiFormHelperText>}
-                                        </MuiFormControl>
+                                            {error && (
+                                                <MuiFormHelperText sx={{ color: 'var(--color-error-500)', mt: 0.5, mx: 1.75 }}>
+                                                    {error.message}
+                                                </MuiFormHelperText>
+                                            )}
+                                        </MuiBox>
                                     )}
                                 />
                             </MuiGrid>
@@ -683,13 +695,14 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                             <Controller
                                 name={`services.${index}.service`}
                                 control={control}
-                                render={({ field }) => (
-                                    <MuiFormControl fullWidth error={!!errors.services?.[index]?.service}>
-                                        <MuiInputLabel>الخدمة</MuiInputLabel>
+                                render={({ field, fieldState: { error } }) => (
+                                    <MuiBox>
                                         <MuiSelect
                                             {...field}
                                             label="الخدمة"
                                             disabled={servicesLoading}
+                                            error={!!error}
+                                            fullWidth
                                         >
                                             {servicesLoading ? (
                                                 <MuiMenuItem value="" disabled>جاري التحميل...</MuiMenuItem>
@@ -703,10 +716,12 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                                                 ))
                                             )}
                                         </MuiSelect>
-                                        {errors.services?.[index]?.service && (
-                                            <MuiFormHelperText>{errors.services[index].service.message}</MuiFormHelperText>
+                                        {error && (
+                                            <MuiFormHelperText sx={{ color: 'var(--color-error-500)', mt: 0.5, mx: 1.75 }}>
+                                                {error.message}
+                                            </MuiFormHelperText>
                                         )}
-                                    </MuiFormControl>
+                                    </MuiBox>
                                 )}
                             />
                         </MuiGrid>

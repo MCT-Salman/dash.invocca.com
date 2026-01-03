@@ -8,10 +8,7 @@ import MuiBox from '@/components/ui/MuiBox'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiTextField from '@/components/ui/MuiTextField'
 import MuiSelect from '@/components/ui/MuiSelect'
-import MuiFormControl from '@/components/ui/MuiFormControl'
-import MuiInputLabel from '@/components/ui/MuiInputLabel'
 import MuiMenuItem from '@/components/ui/MuiMenuItem'
-import MuiFormHelperText from '@/components/ui/MuiFormHelperText'
 import { Controller } from 'react-hook-form'
 
 /**
@@ -46,21 +43,26 @@ export default function FormField({
     const renderField = (field, error) => {
         if (type === 'select') {
             return (
-                <MuiFormControl fullWidth error={!!error} required={required} disabled={disabled} sx={sx}>
-                    <MuiInputLabel>{label}</MuiInputLabel>
-                    <MuiSelect
-                        {...field}
-                        label={label}
-                        value={field.value || ''}
-                    >
-                        {options.map((option) => (
-                            <MuiMenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MuiMenuItem>
-                        ))}
-                    </MuiSelect>
-                    {error && <MuiFormHelperText>{error.message}</MuiFormHelperText>}
-                </MuiFormControl>
+                <MuiSelect
+                    {...field}
+                    label={label}
+                    value={field.value || ''}
+                    error={!!error}
+                    disabled={disabled}
+                    fullWidth
+                    {...props}
+                    sx={{
+                        // Merge sx from props first, then override with local sx
+                        ...(props.sx || {}),
+                        ...sx
+                    }}
+                >
+                    {options.map((option) => (
+                        <MuiMenuItem key={option.value} value={option.value}>
+                            {option.label}
+                        </MuiMenuItem>
+                    ))}
+                </MuiSelect>
             )
         }
 
@@ -78,8 +80,12 @@ export default function FormField({
                     error={!!error}
                     helperText={error?.message}
                     fullWidth
-                    sx={sx}
                     {...props}
+                    sx={{
+                        // Merge sx from props first, then override with local sx
+                        ...(props.sx || {}),
+                        ...sx
+                    }}
                 />
             )
         }
@@ -95,8 +101,12 @@ export default function FormField({
                 error={!!error}
                 helperText={error?.message}
                 fullWidth
-                sx={sx}
                 {...props}
+                sx={{
+                    // Merge sx from props first, then override with local sx
+                    ...(props.sx || {}),
+                    ...sx
+                }}
             />
         )
     }

@@ -28,7 +28,9 @@ export default function DataTable({
     loading = false,
     emptyMessage = 'لا يوجد بيانات',
     showActions = true,
+    customActions,
     rowsPerPageOptions = [5, 10, 25, 50],
+    animatingRows = {}, // Object with rowId: 'move-up' | 'move-down'
     sx = {}
 }) {
     const tableData = useMemo(() => rows || data || [], [rows, data])
@@ -122,8 +124,9 @@ export default function DataTable({
                                     )
                                 })}
 
-                                {showActions && (onEdit || onDelete || onView || onToggleStatus) && (
-                                    <MuiBox sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2, pt: 2, borderTop: '1px solid var(--color-border-glass)' }}>
+                                {showActions && (onEdit || onDelete || onView || onToggleStatus || customActions) && (
+                                    <MuiBox sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'nowrap', mt: 2, pt: 2, borderTop: '1px solid var(--color-border-glass)' }}>
+                                        {customActions && customActions(row)}
                                         {onView && (
                                             <MuiTooltip title="عرض">
                                                 <MuiIconButton
@@ -214,7 +217,7 @@ export default function DataTable({
                                         {column.label}
                                     </MuiTableCell>
                                 ))}
-                                {showActions && (onEdit || onDelete || onView || onToggleStatus) && (
+                                {showActions && (onEdit || onDelete || onView || onToggleStatus || customActions) && (
                                     <MuiTableCell
                                         align="center"
                                         sx={{
@@ -231,13 +234,21 @@ export default function DataTable({
                             </MuiTableRow>
                         </MuiTableHead>
                         <MuiTableBody>
-                            {paginatedData.map((row, index) => (
+                            {paginatedData.map((row, index) => {
+                                const animationType = animatingRows[row.id]
+                                return (
                                 <MuiTableRow
                                     hover
                                     key={row.id || index}
                                     sx={{
                                         '&:hover': { background: 'rgba(216, 185, 138, 0.05) !important' },
-                                        '& td': { borderBottom: '1px solid var(--color-border-glass)' }
+                                        '& td': { borderBottom: '1px solid var(--color-border-glass)' },
+                                        ...(animationType === 'move-up' && {
+                                            animation: 'moveUp 0.5s ease-out',
+                                        }),
+                                        ...(animationType === 'move-down' && {
+                                            animation: 'moveDown 0.5s ease-out',
+                                        }),
                                     }}
                                 >
                                     {columns.map((column) => {
@@ -248,9 +259,10 @@ export default function DataTable({
                                             </MuiTableCell>
                                         )
                                     })}
-                                    {showActions && (onEdit || onDelete || onView || onToggleStatus) && (
+                                    {showActions && (onEdit || onDelete || onView || onToggleStatus || customActions) && (
                                         <MuiTableCell align="center">
-                                            <MuiBox sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                                            <MuiBox sx={{ display: 'flex', gap: 1, justifyContent: 'center', alignItems: 'center', flexWrap: 'nowrap' }}>
+                                                {customActions && customActions(row)}
                                                 {onView && (
                                                     <MuiTooltip title="عرض">
                                                         <MuiIconButton
@@ -311,7 +323,8 @@ export default function DataTable({
                                         </MuiTableCell>
                                     )}
                                 </MuiTableRow>
-                            ))}
+                                )
+                            })}
                         </MuiTableBody>
                     </MuiTable>
                 </MuiTableContainer>

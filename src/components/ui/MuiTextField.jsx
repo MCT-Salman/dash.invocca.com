@@ -243,7 +243,7 @@ const MuiTextField = ({
                 type={getActualType()}
                 value={currentValue}
                 label={label}
-                placeholder={placeholder}
+                placeholder={placeholder || label}
                 disabled={disabled}
                 required={required}
                 error={error}
@@ -255,6 +255,8 @@ const MuiTextField = ({
                         inputElement.style.color = '#EDEDED';
                         inputElement.style.WebkitTextFillColor = '#EDEDED';
                         inputElement.style.fontFamily = 'var(--font-family-base)';
+                        // Force placeholder color
+                        inputElement.style.setProperty('--placeholder-color', 'rgba(255, 255, 255, 0.25)');
                     }
 
                     if (props.onInput) props.onInput(e);
@@ -266,6 +268,8 @@ const MuiTextField = ({
                         if (inputElement) {
                             inputElement.style.color = '#EDEDED';
                             inputElement.style.WebkitTextFillColor = '#EDEDED';
+                            // Force placeholder color
+                            inputElement.style.setProperty('--placeholder-color', 'rgba(255, 255, 255, 0.2)');
                         }
                     }, 0);
                     handleChange(e);
@@ -277,6 +281,8 @@ const MuiTextField = ({
                         if (inputElement) {
                             inputElement.style.color = '#EDEDED';
                             inputElement.style.WebkitTextFillColor = '#EDEDED';
+                            // Force placeholder color
+                            inputElement.style.setProperty('--placeholder-color', 'rgba(255, 255, 255, 0.2)');
                         }
                     }, 0);
                     handleFocus(e);
@@ -288,25 +294,35 @@ const MuiTextField = ({
                 color={color}
                 sx={{
                     '& .MuiOutlinedInput-root': {
-                        borderRadius: '12px',
+                        borderRadius: '12px !important',
                         backgroundColor: 'transparent',
-                        border: '1px solid',
-                        borderColor: error ? 'var(--color-error-500)' : 'var(--color-border-glass)',
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         '&:hover': {
-                            borderColor: error ? 'var(--color-error-600)' : 'var(--color-primary-500)',
                             backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                            '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: error ? 'var(--color-error-600) !important' : 'var(--color-primary-500) !important',
+                            },
                         },
                         '&.Mui-focused': {
-                            borderColor: error ? 'var(--color-error-500)' : 'var(--color-primary-500)',
                             backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                            '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
+                                borderWidth: '1px !important',
+                            },
                             boxShadow: error
                                 ? '0 0 0 2px rgba(239, 68, 68, 0.1)'
                                 : '0 0 0 2px rgba(216, 185, 138, 0.1)',
                         },
                         '&.Mui-disabled': {
                             backgroundColor: 'rgba(255, 255, 255, 0.01)',
-                            borderColor: 'var(--color-border-dark)',
+                            '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'var(--color-border-dark) !important',
+                            },
+                        },
+                        '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: error ? 'var(--color-error-500) !important' : 'rgba(216, 185, 138, 0.3) !important',
+                            borderWidth: '1px !important',
+                            borderRadius: '12px !important',
                         },
                     },
                     '& .MuiInputBase-input': {
@@ -318,10 +334,47 @@ const MuiTextField = ({
                             color: '#EDEDED !important',
                             WebkitTextFillColor: '#EDEDED !important',
                         },
+                        // Date/Time picker icon styling
+                        '&::-webkit-calendar-picker-indicator': {
+                            filter: 'invert(1) brightness(2)',
+                            cursor: 'pointer',
+                            opacity: 0.9,
+                            '&:hover': {
+                                opacity: 1,
+                            },
+                        },
+                        '&::-webkit-inner-spin-button': {
+                            filter: 'invert(1) brightness(2)',
+                            cursor: 'pointer',
+                            opacity: 0.9,
+                        },
+                        '&::-webkit-outer-spin-button': {
+                            filter: 'invert(1) brightness(2)',
+                            cursor: 'pointer',
+                            opacity: 0.9,
+                        },
                         '&::placeholder': {
-                            color: 'var(--color-text-muted)',
+                            color: 'rgba(255, 255, 255, 0.2) !important',
+                            WebkitTextFillColor: 'rgba(255, 255, 255, 0.2) !important',
                             opacity: 1,
                             fontFamily: 'var(--font-family-base)',
+                        },
+                        '&::-webkit-input-placeholder': {
+                            color: 'rgba(255, 255, 255, 0.2) !important',
+                            WebkitTextFillColor: 'rgba(255, 255, 255, 0.2) !important',
+                            opacity: 1,
+                        },
+                        '&::-moz-placeholder': {
+                            color: 'rgba(255, 255, 255, 0.2) !important',
+                            opacity: 1,
+                        },
+                        '&:-ms-input-placeholder': {
+                            color: 'rgba(255, 255, 255, 0.2) !important',
+                            opacity: 1,
+                        },
+                        '&:-moz-placeholder': {
+                            color: 'rgba(255, 255, 255, 0.2) !important',
+                            opacity: 1,
                         },
                         // TARGETING AUTOFILL SPECIFICALLY
                         '&:-webkit-autofill': {
@@ -342,16 +395,23 @@ const MuiTextField = ({
                         }
                     },
                     '& .MuiInputLabel-root': {
-                        color: 'var(--color-text-secondary)',
+                        color: error ? 'var(--color-error-500)' : 'var(--color-primary-500)',
                         fontFamily: 'var(--font-family-base)',
+                        fontWeight: 500,
+                        fontSize: '0.95rem',
                         '&.Mui-focused': {
                             color: error ? 'var(--color-error-500)' : 'var(--color-primary-500)',
+                            fontWeight: 600,
                         },
                         '&.Mui-disabled': {
-                            color: 'var(--color-text-muted)',
+                            color: 'rgba(255, 255, 255, 0.5)',
+                        },
+                        '&.Mui-error': {
+                            color: 'var(--color-error-500)',
                         }
                     },
-                    ...props.sx
+                    // Merge with sx prop - external sx can override base styles
+                    ...(props.sx || {})
                 }}
                 className={className}
                 fullWidth={fullWidth}
@@ -382,10 +442,27 @@ const MuiTextField = ({
                 }}
                 InputLabelProps={{
                     sx: {
-                        color: 'var(--color-text-secondary)',
+                        color: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
                         fontFamily: 'var(--font-family-base)',
+                        fontWeight: 500,
+                        fontSize: '0.95rem',
+                        textAlign: 'right',
+                        direction: 'rtl',
+                        right: 0,
+                        left: 'auto',
+                        transformOrigin: 'top right',
+                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                        position: 'absolute',
+                        top: '-8px',
                         '&.Mui-focused': {
-                            color: error ? 'var(--color-error-500)' : 'var(--color-primary-500)',
+                            color: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
+                            fontWeight: 600,
+                        },
+                        '&.Mui-disabled': {
+                            color: 'rgba(255, 255, 255, 0.5) !important',
+                        },
+                        '&.Mui-error': {
+                            color: 'var(--color-error-500) !important',
                         },
                     },
                     className: labelClassName,

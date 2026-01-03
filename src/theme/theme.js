@@ -131,19 +131,43 @@ export const createAppTheme = (mode = 'dark') => createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
+          borderRadius: '12px !important',
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'var(--color-border-dark)',
+            borderColor: 'rgba(216, 185, 138, 0.3) !important',
+            borderWidth: '1px !important',
+            borderRadius: '12px !important',
           },
-          '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'var(--color-primary-500)',
+          '&:hover:not(.Mui-disabled):not(.Mui-error) .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'var(--color-primary-500) !important',
           },
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'var(--color-primary-500)',
+          '&.Mui-focused:not(.Mui-error) .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'var(--color-primary-500) !important',
+            borderWidth: '1px !important',
+          },
+          '&.Mui-error .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'var(--color-error-500) !important',
+          },
+          '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'var(--color-border-dark) !important',
           },
         },
         input: {
           '&::placeholder': {
-            color: 'var(--color-text-muted)',
+            color: 'rgba(255, 255, 255, 0.2) !important',
+            WebkitTextFillColor: 'rgba(255, 255, 255, 0.2) !important',
+            opacity: 1,
+          },
+          '&::-webkit-input-placeholder': {
+            color: 'rgba(255, 255, 255, 0.2) !important',
+            WebkitTextFillColor: 'rgba(255, 255, 255, 0.2) !important',
+            opacity: 1,
+          },
+          '&::-moz-placeholder': {
+            color: 'rgba(255, 255, 255, 0.2) !important',
+            opacity: 1,
+          },
+          '&:-ms-input-placeholder': {
+            color: 'rgba(255, 255, 255, 0.2) !important',
             opacity: 1,
           },
         }

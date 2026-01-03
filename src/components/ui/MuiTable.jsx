@@ -8,6 +8,34 @@ const StyledTable = styled(Table)(() => ({
   borderCollapse: 'separate',
   borderSpacing: 0,
   position: 'relative',
+  '@keyframes moveUp': {
+    '0%': {
+      transform: 'translateY(0)',
+      opacity: 1,
+    },
+    '50%': {
+      transform: 'translateY(-60px)',
+      opacity: 0.7,
+    },
+    '100%': {
+      transform: 'translateY(0)',
+      opacity: 1,
+    },
+  },
+  '@keyframes moveDown': {
+    '0%': {
+      transform: 'translateY(0)',
+      opacity: 1,
+    },
+    '50%': {
+      transform: 'translateY(60px)',
+      opacity: 0.7,
+    },
+    '100%': {
+      transform: 'translateY(0)',
+      opacity: 1,
+    },
+  },
   '& .MuiTableCell-root': {
     fontFamily: 'var(--font-family-base)',
     color: 'var(--color-text-primary)',

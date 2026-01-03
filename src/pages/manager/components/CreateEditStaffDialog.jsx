@@ -1,10 +1,11 @@
 // src\pages\manager\components\CreateEditStaffDialog.jsx
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiTypography from '@/components/ui/MuiTypography'
-import { BaseFormDialog, FormField } from '@/components/shared'
+import MuiTextField from '@/components/ui/MuiTextField'
+import { BaseFormDialog } from '@/components/shared'
 import { useNotification } from '@/hooks'
 import { createStaffSchema } from '@/utils/validations'
 
@@ -99,48 +100,78 @@ export default function CreateEditStaffDialog({ open, onClose, onSubmit, editing
                     </MuiTypography>
                 </MuiGrid>
 
-                <FormField
-                    name="name"
-                    control={control}
-                    label="اسم الموظف"
-                    errors={errors}
-                    required
-                    fullWidth
-                    gridItemProps={{ xs: 12 }}
-                />
+                <MuiGrid item xs={12}>
+                    <Controller
+                        name="name"
+                        control={control}
+                        render={({ field, fieldState: { error } }) => (
+                            <MuiTextField
+                                {...field}
+                                label="اسم الموظف"
+                                required
+                                fullWidth
+                                error={!!error}
+                                helperText={error?.message}
+                            />
+                        )}
+                    />
+                </MuiGrid>
 
-                <FormField
-                    name="phone"
-                    control={control}
-                    label="رقم الهاتف"
-                    errors={errors}
-                    required
-                    fullWidth
-                    gridItemProps={{ xs: 12 }}
-                />
+                <MuiGrid item xs={12}>
+                    <Controller
+                        name="phone"
+                        control={control}
+                        render={({ field, fieldState: { error } }) => (
+                            <MuiTextField
+                                {...field}
+                                label="رقم الهاتف"
+                                type="tel"
+                                required
+                                fullWidth
+                                error={!!error}
+                                helperText={error?.message}
+                                inputMode="tel"
+                            />
+                        )}
+                    />
+                </MuiGrid>
 
-                <FormField
-                    name="username"
-                    control={control}
-                    label="اسم المستخدم"
-                    errors={errors}
-                    required={!isEdit}
-                    fullWidth
-                    helperText={isEdit ? 'اتركه فارغاً إذا لم ترد تغييره' : ''}
-                    gridItemProps={{ xs: 12 }}
-                />
+                <MuiGrid item xs={12}>
+                    <Controller
+                        name="username"
+                        control={control}
+                        render={({ field, fieldState: { error } }) => (
+                            <MuiTextField
+                                {...field}
+                                label="اسم المستخدم"
+                                required={!isEdit}
+                                fullWidth
+                                placeholder={isEdit ? 'اتركه فارغاً إذا لم ترد تغييره' : ''}
+                                error={!!error}
+                                helperText={error?.message || (isEdit ? 'اتركه فارغاً إذا لم ترد تغييره' : '')}
+                            />
+                        )}
+                    />
+                </MuiGrid>
 
-                <FormField
-                    name="password"
-                    control={control}
-                    label={isEdit ? 'كلمة المرور (اتركه فارغاً إذا لم ترد تغييره)' : 'كلمة المرور'}
-                    errors={errors}
-                    type="password"
-                    required={!isEdit}
-                    fullWidth
-                    helperText={isEdit ? 'اتركه فارغاً إذا لم ترد تغييره' : ''}
-                    gridItemProps={{ xs: 12 }}
-                />
+                <MuiGrid item xs={12}>
+                    <Controller
+                        name="password"
+                        control={control}
+                        render={({ field, fieldState: { error } }) => (
+                            <MuiTextField
+                                {...field}
+                                label={isEdit ? 'كلمة المرور (اتركه فارغاً إذا لم ترد تغييره)' : 'كلمة المرور'}
+                                type="password"
+                                required={!isEdit}
+                                fullWidth
+                                placeholder={!isEdit ? 'يجب أن تحتوي على حرف كبير وصغير ورقم' : ''}
+                                error={!!error}
+                                helperText={error?.message || (isEdit ? 'اتركه فارغاً إذا لم ترد تغييره' : 'يجب أن تحتوي على حرف كبير وصغير ورقم')}
+                            />
+                        )}
+                    />
+                </MuiGrid>
             </MuiGrid>
         </BaseFormDialog>
     )

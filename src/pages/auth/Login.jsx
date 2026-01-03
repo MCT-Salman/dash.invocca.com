@@ -163,11 +163,17 @@ export default function Login() {
                                 }
                             },
                             '& .MuiInputLabel-root': {
-                                color: 'rgba(0, 0, 0, 0.85) !important',
-                                fontWeight: 700,
+                                color: 'var(--color-primary-500) !important',
+                                fontWeight: 500,
                                 fontSize: '0.95rem',
+                                textAlign: 'right',
+                                direction: 'rtl',
+                                right: 0,
+                                left: 'auto',
+                                transformOrigin: 'top right',
                                 '&.Mui-focused': {
-                                    color: 'var(--color-primary-600) !important',
+                                    color: 'var(--color-primary-500) !important',
+                                    fontWeight: 600,
                                 }
                             },
                             '& .MuiFormHelperText-root': {
@@ -260,11 +266,17 @@ export default function Login() {
                                 }
                             },
                             '& .MuiInputLabel-root': {
-                                color: 'rgba(0, 0, 0, 0.85) !important',
-                                fontWeight: 700,
+                                color: 'var(--color-primary-500) !important',
+                                fontWeight: 500,
                                 fontSize: '0.95rem',
+                                textAlign: 'right',
+                                direction: 'rtl',
+                                right: 0,
+                                left: 'auto',
+                                transformOrigin: 'top right',
                                 '&.Mui-focused': {
-                                    color: 'var(--color-primary-600) !important',
+                                    color: 'var(--color-primary-500) !important',
+                                    fontWeight: 600,
                                 }
                             },
                             '& .MuiFormHelperText-root': {
