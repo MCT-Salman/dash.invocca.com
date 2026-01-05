@@ -1,4 +1,4 @@
-// src/api/events.js
+// src\api\events.js
 import api from './apiClient'
 
 /**

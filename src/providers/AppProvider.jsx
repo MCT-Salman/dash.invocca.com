@@ -1,3 +1,4 @@
+// src\providers\AppProvider.jsx
 /**
  * App Provider
  * يجمع جميع الـ Providers في مكان واحد

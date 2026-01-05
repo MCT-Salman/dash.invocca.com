@@ -202,7 +202,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                 price: s.price || 0
             })) || [],
             specialRequests: editingEvent?.specialRequests || '',
-            templateId: editingEvent?.templateId?._id || editingEvent?.templateId || null,
+            templateId: editingEvent?.template?._id || editingEvent?.templateId?._id || editingEvent?.templateId || null,
             clientSelection: 'existing',
             clientId: editingEvent?.clientId?._id || editingEvent?.clientId || editingEvent?.client?._id || '',
             clientName: '',
@@ -240,7 +240,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                         price: s.price || 0
                     })) || [],
                     specialRequests: editingEvent.specialRequests || '',
-                    templateId: editingEvent.templateId?._id || editingEvent.templateId || null,
+                    templateId: editingEvent.template?._id || editingEvent.templateId?._id || editingEvent.templateId || null,
                     clientSelection: 'existing',
                     clientId: editingEvent.clientId?._id || editingEvent.clientId || editingEvent.client?._id || '',
                     clientName: '',
@@ -412,37 +412,46 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                     <Controller
                         name="templateId"
                         control={control}
-                        render={({ field, fieldState: { error } }) => (
-                            <MuiBox>
-                                <MuiSelect
-                                    {...field}
-                                    label="القالب (اختياري)"
-                                    value={field.value || ''}
-                                    disabled={templatesLoading}
-                                    error={!!error}
-                                    fullWidth
-                                    onChange={(e) => {
-                                        // Convert empty string to null for proper API handling
-                                        const value = e.target.value === '' ? null : e.target.value
-                                        field.onChange(value)
-                                    }}
-                                >
-                                    <MuiMenuItem value="">
-                                        <em>بدون قالب</em>
-                                    </MuiMenuItem>
-                                    {templates.map((template) => (
-                                        <MuiMenuItem key={template._id || template.id} value={template._id || template.id}>
-                                            {template.templateName || template.name || 'قالب بدون اسم'}
+                        render={({ field, fieldState: { error } }) => {
+                            // Normalize the value to string for MuiSelect comparison
+                            const templateValue = field.value 
+                                ? (typeof field.value === 'string' ? field.value : (field.value._id || field.value.id || String(field.value)))
+                                : ''
+                            
+                            return (
+                                <MuiBox>
+                                    <MuiSelect
+                                        label="القالب (اختياري)"
+                                        value={templateValue}
+                                        disabled={templatesLoading}
+                                        error={!!error}
+                                        fullWidth
+                                        onChange={(e) => {
+                                            // Convert empty string to null for proper API handling
+                                            const value = e.target.value === '' ? null : e.target.value
+                                            field.onChange(value)
+                                        }}
+                                    >
+                                        <MuiMenuItem value="">
+                                            <em>بدون قالب</em>
                                         </MuiMenuItem>
-                                    ))}
-                                </MuiSelect>
-                                {error && (
-                                    <MuiFormHelperText sx={{ color: 'var(--color-error-500)', mt: 0.5, mx: 1.75 }}>
-                                        {error.message}
-                                    </MuiFormHelperText>
-                                )}
-                            </MuiBox>
-                        )}
+                                        {templates.map((template) => {
+                                            const templateId = template._id || template.id
+                                            return (
+                                                <MuiMenuItem key={templateId} value={String(templateId)}>
+                                                    {template.templateName || template.name || 'قالب بدون اسم'}
+                                                </MuiMenuItem>
+                                            )
+                                        })}
+                                    </MuiSelect>
+                                    {error && (
+                                        <MuiFormHelperText sx={{ color: 'var(--color-error-500)', mt: 0.5, mx: 1.75 }}>
+                                            {error.message}
+                                        </MuiFormHelperText>
+                                    )}
+                                </MuiBox>
+                            )
+                        }}
                     />
                 </MuiGrid>
 

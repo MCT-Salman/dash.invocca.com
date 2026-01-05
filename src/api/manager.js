@@ -1,4 +1,4 @@
-// src/api/manager.js
+// src\api\manager.js
 import api from './apiClient'
 
 // ==================== Hall Management ====================

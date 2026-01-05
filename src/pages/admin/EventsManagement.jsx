@@ -164,7 +164,7 @@ export default function EventsManagement() {
             align: 'center',
             format: (value) => (
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                    {formatDate(value, 'DD/MM/YYYY')}
+                    {formatDate(value, 'MM/DD/YYYY')}
                 </MuiTypography>
             )
         },

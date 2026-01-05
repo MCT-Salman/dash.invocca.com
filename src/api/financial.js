@@ -1,4 +1,4 @@
-// src/api/financial.js
+// src\api\financial.js
 import api from './apiClient'
 
 // ==================== Invoices Management ====================

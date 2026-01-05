@@ -1,4 +1,4 @@
-// src/api/scanner.js
+// src\api\scanner.js
 import api from './apiClient'
 
 /**

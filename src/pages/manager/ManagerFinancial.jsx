@@ -1,4 +1,4 @@
-// src/pages/manager/ManagerFinancial.jsx
+// src\pages\manager\ManagerFinancial.jsx
 import MuiBox from '@/components/ui/MuiBox'
 import MuiTypography from '@/components/ui/MuiTypography'
 import MuiPaper from '@/components/ui/MuiPaper'
@@ -45,12 +45,18 @@ export default function ManagerFinancial() {
     })
 
     // Payment mutation - separate because it's a different operation
+    // We need to wrap recordInvoicePayment to match useCRUD's expected signature
+    const paymentMutationWrapper = async (data) => {
+        const { id, ...paymentData } = data
+        return recordInvoicePayment(id, paymentData)
+    }
+    
     const {
         createMutation: paymentMutation,
         handleCreate: handlePaymentCreate,
         isLoading: paymentLoading,
     } = useCRUD({
-        createFn: recordInvoicePayment,
+        createFn: paymentMutationWrapper,
         updateFn: null,
         deleteFn: null,
         queryKey: ['manager-invoices', page, statusFilter],

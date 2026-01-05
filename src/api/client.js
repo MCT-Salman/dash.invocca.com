@@ -20,7 +20,7 @@ export const getInvitations = async () => {
  * POST - إضافة دعوة
  * POST /client/invitations/add
  */
-export const createInvitation = async (invitationData) => {
+export const createInvitation = async invitationData => {
   try {
     const response = await api.post('/client/invitations/add', invitationData)
     return response.data
@@ -46,7 +46,7 @@ export const updateInvitation = async (invitationId, invitationData) => {
  * DELETE - حذف دعوة
  * DELETE /client/invitations/delete/:id
  */
-export const deleteInvitation = async (invitationId) => {
+export const deleteInvitation = async invitationId => {
   try {
     const response = await api.delete(`/client/invitations/delete/${invitationId}`)
     return response.data
@@ -61,7 +61,7 @@ export const deleteInvitation = async (invitationId) => {
  * GET - عرض أغاني الحدث
  * GET /client/events/:eventId/songs
  */
-export const getEventSongs = async (eventId) => {
+export const getEventSongs = async eventId => {
   try {
     const response = await api.get(`/client/events/${eventId}/songs`)
     return response.data
@@ -98,7 +98,7 @@ export const addSongToEvent = async (eventIdOrData, songData) => {
  * GET - تفاصيل أغنية
  * GET /client/events/songs/:songId
  */
-export const getSongById = async (songId) => {
+export const getSongById = async songId => {
   try {
     const response = await api.get(`/client/events/songs/${songId}`)
     return response.data
@@ -124,7 +124,7 @@ export const updateSong = async (songId, songData) => {
  * DELETE - حذف أغنية
  * DELETE /client/events/songs/:songId
  */
-export const deleteSong = async (songId) => {
+export const deleteSong = async songId => {
   try {
     const response = await api.delete(`/client/events/songs/${songId}`)
     return response.data
@@ -156,9 +156,14 @@ export const getBookings = async (params = {}) => {
   try {
     // Only use params if it's a plain object with query parameters
     // Ignore React Query's internal parameters (queryKey, signal, etc.)
-    const queryParams = params && typeof params === 'object' && !Array.isArray(params) && !params.queryKey && !params.signal
-      ? params
-      : {}
+    const queryParams =
+      params &&
+      typeof params === 'object' &&
+      !Array.isArray(params) &&
+      !params.queryKey &&
+      !params.signal
+        ? params
+        : {}
     const response = await api.get('/client/bookings', { params: queryParams })
     return response.data
   } catch (error) {
@@ -170,7 +175,7 @@ export const getBookings = async (params = {}) => {
  * GET - تفاصيل حجز
  * GET /client/bookings/:id
  */
-export const getBookingById = async (bookingId) => {
+export const getBookingById = async bookingId => {
   try {
     const response = await api.get(`/client/bookings/${bookingId}`)
     return response.data
@@ -183,7 +188,7 @@ export const getBookingById = async (bookingId) => {
  * POST - إضافة حجز جديد
  * POST /client/bookings
  */
-export const createBooking = async (bookingData) => {
+export const createBooking = async bookingData => {
   try {
     const response = await api.post('/client/bookings', bookingData)
     return response.data
@@ -209,7 +214,7 @@ export const updateBooking = async (bookingId, bookingData) => {
  * DELETE - حذف حجز
  * DELETE /client/bookings/:id
  */
-export const deleteBooking = async (bookingId) => {
+export const deleteBooking = async bookingId => {
   try {
     const response = await api.delete(`/client/bookings/${bookingId}`)
     return response.data
@@ -275,5 +280,5 @@ export default {
   getClientDashboard,
 
   // Reports
-  getClientReports
+  getClientReports,
 }

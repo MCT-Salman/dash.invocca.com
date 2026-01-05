@@ -20,6 +20,7 @@ import MuiAvatar from '@/components/ui/MuiAvatar'
 import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog } from '@/components/common'
 import { QUERY_KEYS } from '@/config/constants'
 import { getManagerEvents, deleteEvent, createEvent, updateEvent } from '@/api/manager'
+import { formatDate } from '@/utils/helpers'
 import ViewEventDialog from './components/ViewEventDialog'
 import CreateEditEventDialog from './components/CreateEditEventDialog'
 import {
@@ -159,7 +160,7 @@ function EventCard({ event, onEdit, onView }) {
                             fontSize: '0.9rem'
                         }}
                     >
-                        {event.eventDate || event.date}
+                        {formatDate(event.eventDate || event.date, 'MM/DD/YYYY')}
                     </MuiTypography>
                 </MuiBox>
 
@@ -417,7 +418,7 @@ export default function EventsManagement() {
             format: (value, row) => (
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Calendar size={14} style={{ color: 'var(--color-primary-400)' }} />
-                    <MuiTypography variant="body2">{value || row.date || '---'}</MuiTypography>
+                    <MuiTypography variant="body2">{formatDate(value || row.date, 'MM/DD/YYYY') || '---'}</MuiTypography>
                 </MuiBox>
             )
         },

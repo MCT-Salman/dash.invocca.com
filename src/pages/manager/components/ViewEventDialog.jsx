@@ -30,6 +30,7 @@ import {
 import { formatDate, formatNumber } from '@/utils/helpers'
 import { useQuery } from '@tanstack/react-query'
 import { listManagerTemplates } from '@/api/manager'
+import { SERVICE_CATEGORY_LABELS, SERVICE_UNIT_LABELS } from '@/config/constants'
 
 export default function ViewEventDialog({ open, onClose, event }) {
     if (!event) return null
@@ -364,7 +365,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
                                                             </MuiTypography>
                                                             {service.category && (
                                                                 <MuiChip
-                                                                    label={service.category}
+                                                                    label={SERVICE_CATEGORY_LABELS[service.category] || service.category}
                                                                     size="small"
                                                                     sx={{
                                                                         mt: 0.5,
@@ -377,7 +378,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
                                                             )}
                                                             {service.unit && (
                                                                 <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.7rem', mt: 0.5 }}>
-                                                                    الوحدة: {service.unit}
+                                                                    الوحدة: {SERVICE_UNIT_LABELS[service.unit] || service.unit}
                                                                 </MuiTypography>
                                                             )}
                                                         </MuiBox>

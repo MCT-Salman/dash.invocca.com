@@ -14,7 +14,7 @@ import { getInvitations, createInvitation, updateInvitation, deleteInvitation, g
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Mail, Plus, UserCheck, Users, Edit2, Trash2, X, UserPlus, Download, Calendar, MapPin, Clock, Eye, ArrowLeft, Image as ImageIcon, FileImage, FileText } from 'lucide-react'
+import { Mail, Plus, UserCheck, Users, Edit2, Trash2, X, UserPlus, Download, Calendar, MapPin, Clock, Eye, ArrowLeft, Image as ImageIcon, FileImage, FileText, CheckCircle } from 'lucide-react'
 import { useEffect, useMemo, useState, useRef } from 'react'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
@@ -532,11 +532,16 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
   }, [dashboardData, allEvents, currentEvent, invitation, event])
 
   // Get selected template - prioritize template from the current event
-  // First check if user selected a template from dropdown
+  // First check if user selected a template from dropdown (null means no template)
   // Otherwise, use the template from the current event
   const selectedTemplate = useMemo(() => {
+    // If selectedTemplateId is explicitly null, return null (no template)
+    if (selectedTemplateId === null) {
+      return null
+    }
+    // If a template ID is selected, find it
     if (selectedTemplateId) {
-      return availableTemplates.find(t => (t._id || t.id) === selectedTemplateId)
+      return availableTemplates.find(t => (t._id || t.id) === selectedTemplateId) || null
     }
     // Priority order: currentEvent template > invitation.eventId template > first available template
     if (currentEvent?.template && typeof currentEvent.template === 'object') return currentEvent.template
@@ -778,15 +783,58 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
   const eventDate = eventData?.date || eventData?.eventDate || invitation.eventDate || invitation.eventId?.date || invitation.eventId?.eventDate
   const startTime = eventData?.startTime || invitation.eventId?.startTime || ''
   const endTime = eventData?.endTime || invitation.eventId?.endTime || ''
-  // Format time - ensure both times are shown
-  const eventTime = startTime && endTime ? `${endTime} - ${startTime}` : (startTime || endTime || '')
+  
+  // Helper function to convert 24-hour time to 12-hour format
+  const convertTo12Hour = (time24) => {
+    if (!time24) return ''
+    try {
+      // Handle different time formats (HH:mm, HH:mm:ss, etc.)
+      const [hours, minutes] = time24.split(':').map(Number)
+      if (isNaN(hours) || isNaN(minutes)) return time24
+      
+      const period = hours >= 12 ? 'PM' : 'AM'
+      const hours12 = hours % 12 || 12
+      const minutesStr = minutes.toString().padStart(2, '0')
+      
+      return `${hours12}:${minutesStr} ${period}`
+    } catch {
+      return time24
+    }
+  }
+  
+  // Format time - ensure both times are shown in 12-hour format
+  const formattedStartTime = startTime ? convertTo12Hour(startTime) : ''
+  const formattedEndTime = endTime ? convertTo12Hour(endTime) : ''
+  const eventTime = formattedStartTime && formattedEndTime 
+    ? `من ${formattedStartTime} إلى ${formattedEndTime}` 
+    : (formattedStartTime || formattedEndTime || '')
   const eventType = eventData?.type || eventData?.eventType || invitation.eventId?.type || ''
   
   // Hall data - check if hall is populated or just an ID
-  const hallData = eventData?.hallId || eventData?.hall || invitation.eventId?.hallId || invitation.eventId?.hall
-  const hallName = typeof hallData === 'object' ? (hallData?.name || '') : ''
-  const hallLocation = typeof hallData === 'object' ? (hallData?.location || '') : ''
-  const hallCapacity = typeof hallData === 'object' ? (hallData?.capacity || '') : ''
+  const hallData = eventData?.hallId || eventData?.hall || invitation.eventId?.hallId || invitation.eventId?.hall || event?.hallId || event?.hall
+  
+  // Extract hall name - handle both object and string ID cases, check all possible sources
+  let hallName = ''
+  if (hallData) {
+    if (typeof hallData === 'object') {
+      hallName = hallData?.name || hallData?.hallName || ''
+    }
+  }
+  // If hallName is still empty, try to get it from event data directly
+  if (!hallName) {
+    hallName = eventData?.hallName || 
+               eventData?.hall?.name || 
+               invitation.eventId?.hallName || 
+               invitation.eventId?.hall?.name ||
+               event?.hallName ||
+               event?.hall?.name ||
+               currentEvent?.hallName ||
+               currentEvent?.hall?.name ||
+               ''
+  }
+  
+  const hallLocation = typeof hallData === 'object' ? (hallData?.location || '') : (eventData?.hallLocation || event?.hallLocation || '')
+  const hallCapacity = typeof hallData === 'object' ? (hallData?.capacity || '') : (eventData?.hallCapacity || event?.hallCapacity || '')
   
   // Event type labels
   const eventTypeLabels = {
@@ -801,17 +849,17 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
   // Invitation details
   const invitationGuests = invitation?.guests || []
 
-  // Format date - ensure it's always displayed
+  // Format date - ensure it's always displayed (US-en format: MM/DD/YYYY)
   const formattedDate = eventDate 
-    ? new Date(eventDate).toLocaleDateString('ar-SA', {
+    ? new Date(eventDate).toLocaleDateString('en-US', {
         year: 'numeric',
-        month: 'long',
+        month: 'numeric',
         day: 'numeric'
       })
     : (invitation.eventDate 
-        ? new Date(invitation.eventDate).toLocaleDateString('ar-SA', {
+        ? new Date(invitation.eventDate).toLocaleDateString('en-US', {
             year: 'numeric',
-            month: 'long',
+            month: 'numeric',
             day: 'numeric'
           })
         : '')
@@ -1035,16 +1083,8 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                     height: '100%',
                     objectFit: 'contain',
                     borderRadius: '4px',
-                    mixBlendMode: 'multiply',
-                    filter: 'brightness(0) saturate(100%)',
-                    backgroundColor: 'transparent',
+                    backgroundColor: '#ffffff',
                     imageRendering: 'crisp-edges',
-                  }}
-                  onLoad={(e) => {
-                    // Make white transparent and keep black
-                    e.target.style.mixBlendMode = 'multiply'
-                    e.target.style.filter = 'brightness(0) saturate(100%)'
-                    e.target.style.backgroundColor = 'transparent'
                   }}
                 />
               </MuiBox>
@@ -1266,22 +1306,60 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                     mb: 0.4,
                   }}
                 />
-                <MuiTypography
-                  variant="body2"
-                  sx={{
-                    color: '#fff',
-                    fontSize: { xs: '0.6rem', sm: '0.65rem' },
-                    textAlign: 'center',
-                    textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
-                    maxWidth: '80px',
-                    lineHeight: 1.2,
-                    fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
-                    direction: 'rtl',
-                    unicodeBidi: 'embed',
-                  }}
-                >
-                  {eventTime || (startTime ? startTime : endTime) || '—'}
-                </MuiTypography>
+                {formattedStartTime && formattedEndTime ? (
+                  <MuiBox sx={{ textAlign: 'center' }}>
+                    <MuiTypography
+                      variant="body2"
+                      sx={{
+                        color: '#fff',
+                        fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                        textAlign: 'center',
+                        textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
+                        maxWidth: '80px',
+                        lineHeight: 1.3,
+                        fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                        direction: 'rtl',
+                        unicodeBidi: 'embed',
+                        mb: 0.3,
+                      }}
+                    >
+                      من {formattedStartTime}
+                    </MuiTypography>
+                    <MuiTypography
+                      variant="body2"
+                      sx={{
+                        color: '#fff',
+                        fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                        textAlign: 'center',
+                        textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
+                        maxWidth: '80px',
+                        lineHeight: 1.3,
+                        fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                        direction: 'rtl',
+                        unicodeBidi: 'embed',
+                      }}
+                    >
+                      إلى {formattedEndTime}
+                    </MuiTypography>
+                  </MuiBox>
+                ) : (
+                  <MuiTypography
+                    variant="body2"
+                    sx={{
+                      color: '#fff',
+                      fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                      textAlign: 'center',
+                      textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
+                      maxWidth: '80px',
+                      lineHeight: 1.2,
+                      fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                      direction: 'rtl',
+                      unicodeBidi: 'embed',
+                    }}
+                  >
+                    {formattedStartTime || formattedEndTime || '—'}
+                  </MuiTypography>
+                )}
               </MuiBox>
             )}
 
@@ -1571,36 +1649,112 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
           </MuiBox>
 
           {/* Templates Grid */}
-          {availableTemplates.length > 0 ? (
+          <MuiBox
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(2, 1fr)', md: 'repeat(2, 1fr)' },
+              gap: 2,
+              overflowY: 'auto',
+              pr: 1,
+              pb: 2,
+              '&::-webkit-scrollbar': {
+                width: '8px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '4px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: 'rgba(216, 185, 138, 0.4)',
+                borderRadius: '4px',
+                '&:hover': {
+                  background: 'rgba(216, 185, 138, 0.6)',
+                },
+              },
+            }}
+          >
+            {/* No Template Option */}
             <MuiBox
+              onClick={() => onTemplateChange(null)}
               sx={{
-                display: 'grid',
-                gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(2, 1fr)', md: 'repeat(2, 1fr)' },
-                gap: 2,
-                overflowY: 'auto',
-                pr: 1,
-                pb: 2,
-                '&::-webkit-scrollbar': {
-                  width: '8px',
-                },
-                '&::-webkit-scrollbar-track': {
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  borderRadius: '4px',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  background: 'rgba(216, 185, 138, 0.4)',
-                  borderRadius: '4px',
-                  '&:hover': {
-                    background: 'rgba(216, 185, 138, 0.6)',
-                  },
+                position: 'relative',
+                width: '100%',
+                aspectRatio: '3/4',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                border: selectedTemplateId === null 
+                  ? '3px solid var(--color-primary-500)' 
+                  : '2px solid rgba(216, 185, 138, 0.3)',
+                backgroundColor: 'var(--color-surface-dark)',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: selectedTemplateId === null 
+                  ? '0 12px 32px rgba(216, 185, 138, 0.5), 0 0 0 4px rgba(216, 185, 138, 0.1)' 
+                  : '0 4px 16px rgba(0, 0, 0, 0.3)',
+                '&:hover': {
+                  transform: 'translateY(-6px) scale(1.02)',
+                  borderColor: 'var(--color-primary-500)',
+                  boxShadow: '0 16px 40px rgba(216, 185, 138, 0.6), 0 0 0 4px rgba(216, 185, 138, 0.15)',
                 },
               }}
             >
-              {availableTemplates.map((template) => {
+              <MuiBox
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(10, 10, 10, 0.95) 100%)',
+                  gap: 1.5,
+                  border: '2px dashed rgba(216, 185, 138, 0.3)',
+                  borderRadius: '16px',
+                }}
+              >
+                <ImageIcon size={48} style={{ color: 'var(--color-primary-500)', opacity: 0.7 }} />
+                <MuiTypography 
+                  variant="body2" 
+                  sx={{ 
+                    color: 'var(--color-text-primary)', 
+                    fontWeight: 600,
+                    fontSize: { xs: '0.75rem', sm: '0.85rem' },
+                    textAlign: 'center',
+                    px: 2,
+                  }}
+                >
+                  بدون قالب
+                </MuiTypography>
+              </MuiBox>
+              
+              {/* Selected Indicator */}
+              {selectedTemplateId === null && (
+                <MuiBox
+                  sx={{
+                    position: 'absolute',
+                    top: { xs: 8, sm: 10 },
+                    right: { xs: 8, sm: 10 },
+                    width: { xs: 28, sm: 32 },
+                    height: { xs: 28, sm: 32 },
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--color-primary-500)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(216, 185, 138, 0.6), 0 0 0 3px rgba(216, 185, 138, 0.2)',
+                  }}
+                >
+                  <CheckCircle size={18} style={{ color: '#fff' }} />
+                </MuiBox>
+              )}
+            </MuiBox>
+
+            {/* Available Templates */}
+            {availableTemplates.length > 0 && availableTemplates.map((template) => {
                 const templateId = template._id || template.id
                 const isSelected = selectedTemplateId === templateId || 
-                                  (!selectedTemplateId && selectedTemplate?._id === templateId) ||
-                                  (!selectedTemplateId && selectedTemplate?.id === templateId)
+                                  (selectedTemplateId === null ? false : !selectedTemplateId && selectedTemplate?._id === templateId) ||
+                                  (selectedTemplateId === null ? false : !selectedTemplateId && selectedTemplate?.id === templateId)
                 const templateImg = template.imageUrl || template.image
                 const templateImgUrl = templateImg
                   ? (templateImg.startsWith('http') ? templateImg : `http://82.137.244.167:5001${templateImg}`)
@@ -1746,30 +1900,6 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                 )
               })}
             </MuiBox>
-          ) : (
-            <MuiBox
-              sx={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                p: 4,
-                borderRadius: '12px',
-                backgroundColor: 'rgba(216, 185, 138, 0.08)',
-                border: '2px dashed rgba(216, 185, 138, 0.3)',
-                textAlign: 'center',
-              }}
-            >
-              <ImageIcon size={64} style={{ color: 'var(--color-primary-500)', opacity: 0.4, marginBottom: '16px' }} />
-              <MuiTypography variant="h6" sx={{ color: 'var(--color-text-secondary)', fontWeight: 600, mb: 1 }}>
-                لا توجد قوالب متاحة
-              </MuiTypography>
-              <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', opacity: 0.7 }}>
-                سيتم إضافة القوالب قريباً
-              </MuiTypography>
-            </MuiBox>
-          )}
         </MuiBox>
       </MuiBox>
     </MuiBox>
