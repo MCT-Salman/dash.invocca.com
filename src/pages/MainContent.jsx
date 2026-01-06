@@ -1,4 +1,4 @@
-// import MuiBox from '@/components/ui/MuiBox'
+// src\pages\MainContent.jsx
 // import MuiTypography from '@/components/ui/MuiTypography'
 // import MuiButton from '@mui/material/Button'
 

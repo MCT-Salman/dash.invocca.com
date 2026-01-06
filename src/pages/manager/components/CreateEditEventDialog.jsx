@@ -18,7 +18,7 @@ import MuiDatePicker from '@/components/ui/MuiDatePicker'
 import MuiTimePicker from '@/components/ui/MuiTimePicker'
 import { FormDialog } from '@/components/common'
 import { useNotification } from '@/hooks'
-import { getClients, getManagerHall, listManagerTemplates } from '@/api/manager'
+import { getClients, getManagerHall, listManagerTemplates, getStaff } from '@/api/manager'
 import { QUERY_KEYS } from '@/config/constants'
 import { Plus, Trash2 } from 'lucide-react'
 
@@ -39,6 +39,9 @@ const createEventSchema = (editingEvent = null) => {
         })).optional().default([]),
         specialRequests: z.string().optional(),
         templateId: z.string().optional().nullable(),
+        scanners: z.array(z.object({
+            scannerId: z.string().min(1, 'الماسح مطلوب')
+        })).optional().default([]),
         clientSelection: z.enum(['existing', 'new']).default('existing'),
         clientId: z.string().optional(),
         clientName: z.string().optional(),
@@ -146,7 +149,21 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
         staleTime: 5 * 60 * 1000
     })
 
+    // Fetch staff to get scanners
+    const { data: staffData, isLoading: scannersLoading } = useQuery({
+        queryKey: [QUERY_KEYS.MANAGER_STAFF],
+        queryFn: getStaff,
+        enabled: open,
+        staleTime: 5 * 60 * 1000
+    })
+
     const clients = clientsData?.clients || clientsData?.data || []
+    
+    // Get scanners from staff - filter by role 'scanner'
+    const staff = staffData?.staff || staffData?.data || []
+    const scanners = Array.isArray(staff) 
+        ? staff.filter(s => s.role === 'scanner' || s.position === 'scanner')
+        : []
     
     // Get templates from response - handle different response structures
     const templates = Array.isArray(templatesData?.templates) 
@@ -203,6 +220,9 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
             })) || [],
             specialRequests: editingEvent?.specialRequests || '',
             templateId: editingEvent?.template?._id || editingEvent?.templateId?._id || editingEvent?.templateId || null,
+            scanners: editingEvent?.scanners?.map(s => ({
+                scannerId: s.scannerId?._id || s.scannerId || s._id || ''
+            })) || [],
             clientSelection: 'existing',
             clientId: editingEvent?.clientId?._id || editingEvent?.clientId || editingEvent?.client?._id || '',
             clientName: '',
@@ -215,6 +235,11 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'services'
+    })
+
+    const { fields: scannerFields, append: appendScanner, remove: removeScanner } = useFieldArray({
+        control,
+        name: 'scanners'
     })
 
     const watchedClientSelection = watch('clientSelection')
@@ -241,6 +266,9 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                     })) || [],
                     specialRequests: editingEvent.specialRequests || '',
                     templateId: editingEvent.template?._id || editingEvent.templateId?._id || editingEvent.templateId || null,
+                    scanners: editingEvent.scanners?.map(s => ({
+                        scannerId: s.scannerId?._id || s.scannerId || s._id || ''
+                    })) || [],
                     clientSelection: 'existing',
                     clientId: editingEvent.clientId?._id || editingEvent.clientId || editingEvent.client?._id || '',
                     clientName: '',
@@ -260,6 +288,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                     services: [],
                     specialRequests: '',
                     templateId: null,
+                    scanners: [],
                     clientSelection: 'existing',
                     clientId: '',
                     clientName: '',
@@ -289,7 +318,11 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                 ? data.templateId.trim() 
                 : (data.templateId && typeof data.templateId === 'object' && data.templateId._id)
                     ? String(data.templateId._id).trim()
-                    : null
+                    : null,
+            // Scanners - format as array of objects with scannerId
+            scanners: (data.scanners || []).filter(s => s.scannerId && s.scannerId.trim()).map(s => ({
+                scannerId: s.scannerId.trim()
+            }))
         }
 
         // Add client data based on selection
@@ -788,6 +821,73 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                         sx={{ borderRadius: '12px', borderColor: 'var(--color-border-glass)', color: 'var(--color-text-secondary)' }}
                     >
                         إضافة خدمة
+                    </MuiButton>
+                </MuiGrid>
+
+                {/* Scanners Selection */}
+                <MuiGrid item xs={12}>
+                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 1, color: 'var(--color-primary-500)' }}>
+                        الماسحات
+                    </MuiTypography>
+                </MuiGrid>
+
+                {scannerFields.map((item, index) => (
+                    <MuiGrid item xs={12} container spacing={2} key={item.id} sx={{ alignItems: 'flex-start' }}>
+                        <MuiGrid item xs={12} sm={11}>
+                            <Controller
+                                name={`scanners.${index}.scannerId`}
+                                control={control}
+                                render={({ field, fieldState: { error } }) => (
+                                    <MuiBox>
+                                        <MuiSelect
+                                            {...field}
+                                            label="الماسح"
+                                            disabled={scannersLoading}
+                                            error={!!error}
+                                            fullWidth
+                                        >
+                                            {scannersLoading ? (
+                                                <MuiMenuItem value="" disabled>جاري التحميل...</MuiMenuItem>
+                                            ) : scanners.length === 0 ? (
+                                                <MuiMenuItem value="" disabled>لا توجد ماسحات متاحة</MuiMenuItem>
+                                            ) : (
+                                                scanners.map(scanner => (
+                                                    <MuiMenuItem key={scanner._id || scanner.id} value={scanner._id || scanner.id}>
+                                                        {scanner.name || scanner.username || 'ماسح بدون اسم'}
+                                                    </MuiMenuItem>
+                                                ))
+                                            )}
+                                        </MuiSelect>
+                                        {error && (
+                                            <MuiFormHelperText sx={{ color: 'var(--color-error-500)', mt: 0.5, mx: 1.75 }}>
+                                                {error.message}
+                                            </MuiFormHelperText>
+                                        )}
+                                    </MuiBox>
+                                )}
+                            />
+                        </MuiGrid>
+                        <MuiGrid item xs={12} sm={1}>
+                            <MuiIconButton
+                                onClick={() => removeScanner(index)}
+                                color="error"
+                                sx={{ mt: 1 }}
+                            >
+                                <Trash2 size={20} />
+                            </MuiIconButton>
+                        </MuiGrid>
+                    </MuiGrid>
+                ))}
+
+                <MuiGrid item xs={12}>
+                    <MuiButton
+                        startIcon={<Plus size={20} />}
+                        onClick={() => appendScanner({ scannerId: '' })}
+                        variant="outlined"
+                        disabled={scanners.length === 0}
+                        sx={{ borderRadius: '12px', borderColor: 'var(--color-border-glass)', color: 'var(--color-text-secondary)' }}
+                    >
+                        إضافة ماسح
                     </MuiButton>
                 </MuiGrid>
 

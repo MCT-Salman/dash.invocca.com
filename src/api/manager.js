@@ -362,6 +362,47 @@ export const deleteEvent = async (eventId) => {
   }
 }
 
+// ==================== Event Scanners Management ====================
+
+/**
+ * POST - إضافة ماسحات للفعالية (bulk)
+ * POST /manager/events/:eventId/scanners/bulk
+ */
+export const addEventScanners = async (eventId, scannersData) => {
+  try {
+    const response = await api.post(`/manager/events/${eventId}/scanners/bulk`, scannersData)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * GET - عرض الماسحات المرتبطة بالفعالية
+ * GET /manager/events/:eventId/scanners
+ */
+export const getEventScanners = async (eventId) => {
+  try {
+    const response = await api.get(`/manager/events/${eventId}/scanners`)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * DELETE - حذف ماسح من الفعالية
+ * DELETE /manager/events/scanners/:assignmentId
+ */
+export const removeEventScanner = async (assignmentId) => {
+  try {
+    const response = await api.delete(`/manager/events/scanners/${assignmentId}`)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
 // ==================== Clients Management ====================
 
 /**
@@ -528,6 +569,11 @@ export default {
   createEvent,
   updateEvent,
   deleteEvent,
+  
+  // Event Scanners
+  addEventScanners,
+  getEventScanners,
+  removeEventScanner,
 
   // Clients
   getClients,

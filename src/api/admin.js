@@ -222,12 +222,12 @@ export const updateUser = async (id, userData) => {
 }
 
 /**
- * POST - تفعيل/تعطيل المستخدم
- * POST /admin/users/:id/activate
+ * PUT - تفعيل/تعطيل المستخدم
+ * PUT /admin/users/:id/activate
  */
 export const toggleUserStatus = async (id) => {
   try {
-    const response = await api.post(`/admin/users/${id}/activate`)
+    const response = await api.put(`/admin/users/${id}/activate`)
     return response.data
   } catch (error) {
     throw error

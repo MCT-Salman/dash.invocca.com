@@ -50,6 +50,7 @@ export const createAppTheme = (mode = 'dark') => createTheme({
   },
   typography: {
     fontFamily: [
+      'Alexandria',
       'Montserrat',
       'system-ui',
       'sans-serif',
@@ -57,14 +58,14 @@ export const createAppTheme = (mode = 'dark') => createTheme({
     button: {
       textTransform: 'none',
       fontWeight: 600,
-      fontFamily: 'Montserrat',
+      fontFamily: 'Alexandria, Montserrat',
     },
-    h1: { fontFamily: 'Montserrat', fontWeight: 700 },
-    h2: { fontFamily: 'Montserrat', fontWeight: 700 },
-    h3: { fontFamily: 'Montserrat', fontWeight: 700 },
-    h4: { fontFamily: 'Montserrat', fontWeight: 700 },
-    h5: { fontFamily: 'Montserrat', fontWeight: 600 },
-    h6: { fontFamily: 'Montserrat', fontWeight: 600 },
+    h1: { fontFamily: 'Alexandria, Montserrat', fontWeight: 700 },
+    h2: { fontFamily: 'Alexandria, Montserrat', fontWeight: 700 },
+    h3: { fontFamily: 'Alexandria, Montserrat', fontWeight: 700 },
+    h4: { fontFamily: 'Alexandria, Montserrat', fontWeight: 700 },
+    h5: { fontFamily: 'Alexandria, Montserrat', fontWeight: 600 },
+    h6: { fontFamily: 'Alexandria, Montserrat', fontWeight: 600 },
   },
   shape: {
     borderRadius: 12,

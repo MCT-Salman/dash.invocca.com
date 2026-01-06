@@ -9,6 +9,7 @@ import MuiIconButton from '@/components/ui/MuiIconButton'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiChip from '@/components/ui/MuiChip'
 import MuiDivider from '@/components/ui/MuiDivider'
+import { translatePermission } from '@/utils/helpers'
 import { X, Shield, User, Phone, CheckCircle, XCircle, Calendar, Mail } from 'lucide-react'
 
 export default function ViewUserDialog({ open, onClose, user }) {
@@ -159,7 +160,7 @@ export default function ViewUserDialog({ open, onClose, user }) {
                                             {user.permissions.map((permission, index) => (
                                                 <MuiChip
                                                     key={index}
-                                                    label={permission}
+                                                    label={translatePermission(permission)}
                                                     size="small"
                                                     sx={{
                                                         backgroundColor: 'rgba(216, 185, 138, 0.1)',

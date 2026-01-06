@@ -1,3 +1,4 @@
+// src\pages\admin\ClientsManagement.jsx
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTheme, useMediaQuery } from '@mui/material'
@@ -17,10 +18,10 @@ import MuiInputAdornment from '@/components/ui/MuiInputAdornment'
 import { LoadingScreen, EmptyState, SEOHead, DataTable } from '@/components/common'
 
 // Hooks & Utilities
-import { useDebounce, useCRUD } from '@/hooks'
-import { getUsers, deleteUser } from '@/api/admin'
+import { useDebounce, useCRUD, useNotification } from '@/hooks'
+import { getUsers, deleteUser, toggleUserStatus } from '@/api/admin'
 import { USER_ROLES, QUERY_KEYS } from '@/config/constants'
-import { formatPhoneNumber } from '@/utils/helpers'
+import { formatPhoneNumber, formatDate } from '@/utils/helpers'
 
 // Icons
 import {
@@ -47,6 +48,7 @@ export default function ClientsManagement() {
     // State
     const [searchTerm, setSearchTerm] = useState('')
     const debouncedSearch = useDebounce(searchTerm, 500)
+    const { showNotification } = useNotification()
 
     // CRUD operations
     const {
@@ -77,19 +79,33 @@ export default function ClientsManagement() {
         if (debouncedSearch) {
             filtered = filtered.filter(client =>
                 client.name?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-                client.phone?.includes(debouncedSearch) ||
-                client.email?.toLowerCase().includes(debouncedSearch.toLowerCase())
+                client.username?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+                client.phone?.includes(debouncedSearch)
             )
         }
 
         return filtered
     }, [clients, debouncedSearch])
 
+    // Handle toggle user status
+    const handleToggleStatus = async (client) => {
+        try {
+            const id = client.id || client._id
+            if (!id) return
+            
+            await toggleUserStatus(id)
+            showNotification('success', `تم ${client.isActive !== false ? 'تعطيل' : 'تفعيل'} حساب العميل بنجاح`)
+            refetch()
+        } catch (error) {
+            showNotification('error', 'حدث خطأ أثناء تغيير حالة الحساب')
+        }
+    }
+
     // Table Columns
     const columns = [
         {
             id: 'name',
-            label: 'العميل',
+            label: 'الاسم',
             align: 'right',
             format: (value, row) => (
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -107,13 +123,23 @@ export default function ClientsManagement() {
                     </MuiAvatar>
                     <MuiBox>
                         <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
-                            {value}
+                            {value || '—'}
                         </MuiTypography>
                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
-                            {row.email || '—'}
+                            @{row.username || '—'}
                         </MuiTypography>
                     </MuiBox>
                 </MuiBox>
+            )
+        },
+        {
+            id: 'username',
+            label: 'اسم المستخدم',
+            align: 'right',
+            format: (value) => (
+                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)' }}>
+                    {value || '—'}
+                </MuiTypography>
             )
         },
         {
@@ -128,38 +154,55 @@ export default function ClientsManagement() {
             )
         },
         {
-            id: 'totalEvents',
-            label: 'إجمالي الحجوزات',
+            id: 'createdAt',
+            label: 'تاريخ الإنشاء',
             align: 'center',
             format: (value) => (
-                <MuiChip
-                    label={`${value || 0} مناسبة`}
-                    size="small"
-                    sx={{
-                        backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                        color: 'var(--color-primary-300)',
-                        fontWeight: 600,
-                        border: '1px solid rgba(216, 185, 138, 0.2)',
-                    }}
-                />
+                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Calendar size={14} style={{ color: 'var(--color-primary-400)' }} />
+                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
+                        {formatDate(value) || '—'}
+                    </MuiTypography>
+                </MuiBox>
             )
         },
         {
             id: 'isActive',
             label: 'الحالة',
             align: 'center',
-            format: (value) => (
-                <MuiChip
-                    label={value !== false ? 'نشط' : 'غير نشط'}
-                    size="small"
-                    sx={{
-                        backgroundColor: value !== false ? 'rgba(22, 163, 74, 0.1)' : 'rgba(220, 38, 38, 0.1)',
-                        color: value !== false ? '#16a34a' : '#dc2626',
-                        fontWeight: 600,
-                        border: `1px solid ${value !== false ? '#16a34a' : '#dc2626'}33`,
-                    }}
-                    icon={value !== false ? <CheckCircle size={14} /> : <XCircle size={14} />}
-                />
+            format: (value, row) => (
+                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <MuiChip
+                        label={value !== false ? 'نشط' : 'غير نشط'}
+                        size="small"
+                        sx={{
+                            backgroundColor: value !== false ? 'rgba(22, 163, 74, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                            color: value !== false ? '#16a34a' : '#dc2626',
+                            fontWeight: 600,
+                            border: `1px solid ${value !== false ? '#16a34a' : '#dc2626'}33`,
+                        }}
+                        icon={value !== false ? <CheckCircle size={14} /> : <XCircle size={14} />}
+                    />
+                    <MuiButton
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleToggleStatus(row)}
+                        sx={{
+                            minWidth: 'auto',
+                            px: 1.5,
+                            py: 0.5,
+                            fontSize: '0.75rem',
+                            borderColor: value !== false ? '#dc2626' : '#16a34a',
+                            color: value !== false ? '#dc2626' : '#16a34a',
+                            '&:hover': {
+                                borderColor: value !== false ? '#dc2626' : '#16a34a',
+                                backgroundColor: value !== false ? 'rgba(220, 38, 38, 0.1)' : 'rgba(22, 163, 74, 0.1)',
+                            }
+                        }}
+                    >
+                        {value !== false ? 'تعطيل' : 'تفعيل'}
+                    </MuiButton>
+                </MuiBox>
             )
         }
     ]
@@ -254,7 +297,7 @@ export default function ClientsManagement() {
                     <MuiGrid item xs={12} md={9}>
                         <MuiTextField
                             fullWidth
-                            placeholder="البحث بالاسم، الهاتف، أو البريد الإلكتروني..."
+                            placeholder="البحث بالاسم، اسم المستخدم، أو رقم الهاتف..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             InputProps={{

@@ -27,6 +27,7 @@ import { SEOHead, ButtonLoading } from '@/components/common'
 import { VALIDATION } from '@/config/constants'
 import { updateProfile } from '@/api/auth'
 import { useAuth, useNotification } from '@/hooks'
+import { translatePermission } from '@/utils/helpers'
 import { User, Phone, Lock, Save, Edit, Camera, Settings, Shield, Crown, Activity, Database, Globe, X } from 'lucide-react'
 
 // Validation Schemas
@@ -466,7 +467,7 @@ export default function AdminProfile() {
                     color: 'var(--color-text-primary-dark)',
                     fontWeight: 500
                   }}>
-                    {permission.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    {translatePermission(permission)}
                   </MuiTypography>
                 </MuiCard>
               </MuiGrid>
