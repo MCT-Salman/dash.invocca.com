@@ -6,6 +6,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { useAuth, useCRUD, useDialogState } from '@/hooks'
+import { formatDate } from '@/utils/helpers'
 import MuiBox from '@/components/ui/MuiBox'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiPaper from '@/components/ui/MuiPaper'
@@ -35,7 +36,13 @@ import {
     Info,
     Phone,
     Mail,
-    Tag
+    Tag,
+    DollarSign,
+    Image as ImageIcon,
+    Calendar,
+    Clock,
+    Hash,
+    UserCheck
 } from 'lucide-react'
 
 /**
@@ -112,15 +119,13 @@ function InfoCard({ icon: Icon, label, value, color = 'var(--color-primary-500)'
                 </MuiBox>
                 <MuiBox sx={{ flex: 1 }}>
                     <MuiTypography 
-                        variant="caption" 
+                        variant="body2" 
                         sx={{ 
                             color: 'var(--color-text-secondary)', 
-                            mb: 1.5, 
-                            fontWeight: 500,
-                            fontSize: '0.875rem',
-                            letterSpacing: '0.3px',
+                            mb: 1, 
+                            fontWeight: 600,
+                            fontSize: '0.8rem',
                             display: 'block',
-                            textTransform: 'uppercase'
                         }}
                     >
                         {label}
@@ -128,12 +133,9 @@ function InfoCard({ icon: Icon, label, value, color = 'var(--color-primary-500)'
                     <MuiTypography 
                         variant="h4" 
                         sx={{ 
-                            fontWeight: 800,
-                            fontSize: '2rem',
-                            background: `linear-gradient(135deg, var(--color-text-primary-dark), ${color})`,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text',
+                            fontWeight: 700,
+                            fontSize: typeof value === 'string' && (value.includes('/') || value.includes('ر.س')) ? '1rem' : '1.75rem',
+                            color: color,
                         }}
                     >
                         {value}
@@ -699,20 +701,11 @@ export default function HallManagement() {
                         <MuiGrid container spacing={3} sx={{ mb: 4 }}>
                             <MuiGrid item xs={12} sm={6} md={3}>
                                 <InfoCard
-                                    icon={Table}
-                                    label="عدد الطاولات"
-                                    value={hall.tables || 0}
-                                    color="var(--color-primary-500)"
-                                    gradient="linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))"
-                                />
-                            </MuiGrid>
-                            <MuiGrid item xs={12} sm={6} md={3}>
-                                <InfoCard
-                                    icon={Armchair}
-                                    label="عدد الكراسي"
-                                    value={hall.chairs || 0}
-                                    color="#FFE36C"
-                                    gradient="linear-gradient(135deg, #FFE36C, #ffd93d)"
+                                    icon={Users}
+                                    label="الحد الأقصى للموظفين"
+                                    value={hall.maxEmployees || 0}
+                                    color="#9333ea"
+                                    gradient="linear-gradient(135deg, #9333ea, #7e22ce)"
                                 />
                             </MuiGrid>
                             <MuiGrid item xs={12} sm={6} md={3}>
@@ -726,11 +719,56 @@ export default function HallManagement() {
                             </MuiGrid>
                             <MuiGrid item xs={12} sm={6} md={3}>
                                 <InfoCard
-                                    icon={Star}
-                                    label="التقييم"
-                                    value={hall.rating ? `${hall.rating}/5` : '—'}
+                                    icon={Armchair}
+                                    label="عدد الكراسي"
+                                    value={hall.chairs || 0}
+                                    color="#FFE36C"
+                                    gradient="linear-gradient(135deg, #FFE36C, #ffd93d)"
+                                />
+                            </MuiGrid>
+                            <MuiGrid item xs={12} sm={6} md={3}>
+                                <InfoCard
+                                    icon={Table}
+                                    label="عدد الطاولات"
+                                    value={hall.tables || 0}
+                                    color="var(--color-primary-500)"
+                                    gradient="linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))"
+                                />
+                            </MuiGrid>
+                            <MuiGrid item xs={12} sm={6} md={3}>
+                                <InfoCard
+                                    icon={DollarSign}
+                                    label="السعر الافتراضي"
+                                    value={hall.defaultPrices ? `${hall.defaultPrices.toLocaleString()} ر.س` : '—'}
+                                    color="#16a34a"
+                                    gradient="linear-gradient(135deg, #16a34a, #15803d)"
+                                />
+                            </MuiGrid>
+                            <MuiGrid item xs={12} sm={6} md={3}>
+                                <InfoCard
+                                    icon={Clock}
+                                    label="آخر تحديث"
+                                    value={hall.updatedAt ? new Date(hall.updatedAt).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) : '—'}
                                     color="#f59e0b"
                                     gradient="linear-gradient(135deg, #f59e0b, #d97706)"
+                                />
+                            </MuiGrid>
+                            <MuiGrid item xs={12} sm={6} md={3}>
+                                <InfoCard
+                                    icon={Calendar}
+                                    label="تاريخ الإنشاء"
+                                    value={hall.createdAt ? new Date(hall.createdAt).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) : '—'}
+                                    color="#3b82f6"
+                                    gradient="linear-gradient(135deg, #3b82f6, #2563eb)"
+                                />
+                            </MuiGrid>
+                            <MuiGrid item xs={12} sm={6} md={3}>
+                                <InfoCard
+                                    icon={UserCheck}
+                                    label="الحالة"
+                                    value={hall.isActive !== false ? 'نشط' : 'غير نشط'}
+                                    color={hall.isActive !== false ? '#16a34a' : '#dc2626'}
+                                    gradient={hall.isActive !== false ? 'linear-gradient(135deg, #16a34a, #15803d)' : 'linear-gradient(135deg, #dc2626, #b91c1c)'}
                                 />
                             </MuiGrid>
                         </MuiGrid>
@@ -756,6 +794,118 @@ export default function HallManagement() {
                                     <MuiTypography variant="body1" sx={{ color: 'var(--color-text-secondary)', lineHeight: 1.8 }}>
                                         {hall.description}
                                     </MuiTypography>
+                                </MuiBox>
+                            </>
+                        )}
+
+
+                        {/* Amenities */}
+                        {hall.amenities && Array.isArray(hall.amenities) && hall.amenities.length > 0 && (
+                            <>
+                                <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)', mb: 3, mt: 3 }} />
+                                <MuiBox
+                                    sx={{
+                                        p: 3,
+                                        borderRadius: '16px',
+                                        background: 'rgba(216, 185, 138, 0.05)',
+                                        border: '1px solid rgba(216, 185, 138, 0.15)',
+                                    }}
+                                >
+                                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                                        <Award size={20} style={{ color: 'var(--color-primary-500)' }} />
+                                        <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary-dark)' }}>
+                                            المرافق ({hall.amenities.length})
+                                        </MuiTypography>
+                                    </MuiBox>
+                                    <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                        {hall.amenities.map((amenity, index) => (
+                                            <MuiChip
+                                                key={index}
+                                                label={typeof amenity === 'string' ? amenity : amenity.name || amenity}
+                                                size="small"
+                                                sx={{
+                                                    backgroundColor: 'rgba(216, 185, 138, 0.1)',
+                                                    color: 'var(--color-primary-400)',
+                                                    border: '1px solid rgba(216, 185, 138, 0.3)',
+                                                    fontWeight: 500,
+                                                }}
+                                            />
+                                        ))}
+                                    </MuiBox>
+                                </MuiBox>
+                            </>
+                        )}
+
+                        {/* Images */}
+                        {hall.images && Array.isArray(hall.images) && hall.images.length > 0 && (
+                            <>
+                                <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)', mb: 3, mt: 3 }} />
+                                <MuiBox>
+                                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                                        <ImageIcon size={20} style={{ color: 'var(--color-primary-500)' }} />
+                                        <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary-dark)' }}>
+                                            الصور ({hall.images.length})
+                                        </MuiTypography>
+                                    </MuiBox>
+                                    <MuiGrid container spacing={2}>
+                                        {hall.images.map((image, index) => {
+                                            const imageUrl = image.url?.startsWith('http') 
+                                                ? image.url 
+                                                : `http://82.137.244.167:5001${image.url}`
+                                            return (
+                                                <MuiGrid item xs={12} sm={6} md={4} key={image._id || index}>
+                                                    <MuiPaper
+                                                        sx={{
+                                                            p: 2,
+                                                            borderRadius: '12px',
+                                                            background: 'rgba(255,255,255,0.03)',
+                                                            border: '1px solid rgba(216, 185, 138, 0.15)',
+                                                            position: 'relative',
+                                                            overflow: 'hidden',
+                                                        }}
+                                                    >
+                                                        <MuiBox
+                                                            component="img"
+                                                            src={imageUrl}
+                                                            alt={image.caption || `صورة ${index + 1}`}
+                                                            onClick={() => window.open(imageUrl, '_blank')}
+                                                            sx={{
+                                                                width: '100%',
+                                                                height: '200px',
+                                                                objectFit: 'cover',
+                                                                borderRadius: '8px',
+                                                                mb: 1,
+                                                                cursor: 'pointer',
+                                                                transition: 'transform 0.3s ease',
+                                                                '&:hover': {
+                                                                    transform: 'scale(1.05)',
+                                                                }
+                                                            }}
+                                                        />
+                                                        {image.isPrimary && (
+                                                            <MuiChip
+                                                                label="رئيسية"
+                                                                size="small"
+                                                                sx={{
+                                                                    position: 'absolute',
+                                                                    top: 12,
+                                                                    right: 12,
+                                                                    backgroundColor: 'rgba(22, 163, 74, 0.9)',
+                                                                    color: '#fff',
+                                                                    fontWeight: 600,
+                                                                }}
+                                                            />
+                                                        )}
+                                                        {image.caption && (
+                                                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.75rem' }}>
+                                                                {image.caption}
+                                                            </MuiTypography>
+                                                        )}
+                                                    </MuiPaper>
+                                                </MuiGrid>
+                                            )
+                                        })}
+                                    </MuiGrid>
                                 </MuiBox>
                             </>
                         )}

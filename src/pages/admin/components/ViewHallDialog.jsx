@@ -54,7 +54,19 @@ export default function ViewHallDialog({ open, onClose, hall }) {
                             <img
                                 src={getImageUrl(hall.primaryImage)}
                                 alt={hall.name}
-                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                onClick={() => {
+                                    const imageUrl = getImageUrl(hall.primaryImage)
+                                    if (imageUrl) window.open(imageUrl, '_blank')
+                                }}
+                                style={{ 
+                                    width: '100%', 
+                                    height: '100%', 
+                                    objectFit: 'cover',
+                                    cursor: 'pointer',
+                                    transition: 'opacity 0.2s ease',
+                                }}
+                                onMouseEnter={(e) => e.target.style.opacity = '0.9'}
+                                onMouseLeave={(e) => e.target.style.opacity = '1'}
                             />
                         ) : (
                             <MuiBox sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(216, 185, 138, 0.1)' }}>
@@ -193,15 +205,36 @@ export default function ViewHallDialog({ open, onClose, hall }) {
                             <MuiGrid item xs={12}>
                                 <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>معرض الصور</MuiTypography>
                                 <MuiGrid container spacing={2}>
-                                    {hall.images.map((img, index) => (
-                                        <MuiGrid item xs={6} sm={4} md={3} key={index}>
-                                            <img
-                                                src={getImageUrl(img)}
-                                                alt={`Gallery ${index}`}
-                                                style={{ width: '100%', height: '96px', objectFit: 'cover', borderRadius: '8px' }}
-                                            />
-                                        </MuiGrid>
-                                    ))}
+                                    {hall.images.map((img, index) => {
+                                        const imageUrl = getImageUrl(img)
+                                        return (
+                                            <MuiGrid item xs={6} sm={4} md={3} key={index}>
+                                                <img
+                                                    src={imageUrl}
+                                                    alt={`Gallery ${index}`}
+                                                    onClick={() => {
+                                                        if (imageUrl) window.open(imageUrl, '_blank')
+                                                    }}
+                                                    style={{ 
+                                                        width: '100%', 
+                                                        height: '96px', 
+                                                        objectFit: 'cover', 
+                                                        borderRadius: '8px',
+                                                        cursor: 'pointer',
+                                                        transition: 'all 0.2s ease',
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        e.target.style.opacity = '0.8'
+                                                        e.target.style.transform = 'scale(1.05)'
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.target.style.opacity = '1'
+                                                        e.target.style.transform = 'scale(1)'
+                                                    }}
+                                                />
+                                            </MuiGrid>
+                                        )
+                                    })}
                                 </MuiGrid>
                             </MuiGrid>
                         )}

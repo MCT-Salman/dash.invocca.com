@@ -5,8 +5,8 @@
  */
 
 import { useState, useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { useDebounce, useDialogState, useCRUD } from '@/hooks'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useDebounce, useDialogState, useCRUD, useNotification } from '@/hooks'
 import MuiBox from '@/components/ui/MuiBox'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiPaper from '@/components/ui/MuiPaper'
@@ -19,7 +19,7 @@ import MuiInputAdornment from '@/components/ui/MuiInputAdornment'
 import MuiAvatar from '@/components/ui/MuiAvatar'
 import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog } from '@/components/common'
 import { QUERY_KEYS } from '@/config/constants'
-import { getManagerEvents, deleteEvent, createEvent, updateEvent } from '@/api/manager'
+import { getManagerEvents, deleteEvent, createEvent, updateEvent, getEventScanners, addEventScanners, removeEventScanner } from '@/api/manager'
 import { formatDate } from '@/utils/helpers'
 import ViewEventDialog from './components/ViewEventDialog'
 import CreateEditEventDialog from './components/CreateEditEventDialog'
@@ -309,6 +309,8 @@ function EventCard({ event, onEdit, onView }) {
 export default function EventsManagement() {
     const [searchQuery, setSearchQuery] = useState('')
     const debouncedSearch = useDebounce(searchQuery, 500)
+    const queryClient = useQueryClient()
+    const { success, error: showError } = useNotification()
 
     // Dialog state management
     const {
@@ -465,8 +467,78 @@ export default function EventsManagement() {
     const handleUpdateSubmit = async (data) => {
         const id = selectedEvent?._id || selectedEvent?.id
         if (!id) return
-        const result = await handleUpdate(id, data)
+
+        // Separate scanners from other data
+        const scanners = data.scanners || []
+        const eventDataWithoutScanners = { ...data }
+        delete eventDataWithoutScanners.scanners
+
+        // Update event data (without scanners)
+        const result = await handleUpdate(id, eventDataWithoutScanners)
+        
         if (result.success) {
+            // Get current scanners from API
+            try {
+                const currentScannersResponse = await getEventScanners(id)
+                const currentScanners = Array.isArray(currentScannersResponse?.scanners)
+                    ? currentScannersResponse.scanners
+                    : Array.isArray(currentScannersResponse?.data)
+                        ? currentScannersResponse.data
+                        : Array.isArray(currentScannersResponse)
+                            ? currentScannersResponse
+                            : []
+
+                // Extract current scanner IDs
+                const currentScannerIds = currentScanners
+                    .map(s => (s.scanner?._id || s.scanner?.id || s.scannerId?._id || s.scannerId || s._id)?.toString())
+                    .filter(Boolean)
+
+                // Extract new scanner IDs from form
+                const newScannerIds = scanners
+                    .map(s => (s.scannerId || '').toString().trim())
+                    .filter(Boolean)
+
+                // Find scanners to add (in new but not in current)
+                const scannersToAdd = newScannerIds.filter(id => !currentScannerIds.includes(id))
+                
+                // Find scanners to remove (in current but not in new)
+                const scannersToRemove = currentScanners.filter(s => {
+                    const scannerId = (s.scanner?._id || s.scanner?.id || s.scannerId?._id || s.scannerId || s._id)?.toString()
+                    return scannerId && !newScannerIds.includes(scannerId)
+                })
+
+                // Remove scanners
+                for (const scannerAssignment of scannersToRemove) {
+                    const assignmentId = scannerAssignment._id || scannerAssignment.id
+                    if (assignmentId) {
+                        try {
+                            await removeEventScanner(assignmentId)
+                        } catch (error) {
+                            console.error('Error removing scanner:', error)
+                        }
+                    }
+                }
+
+                // Add new scanners
+                if (scannersToAdd.length > 0) {
+                    try {
+                        await addEventScanners(id, {
+                            scanners: scannersToAdd.map(scannerId => ({ scannerId }))
+                        })
+                    } catch (error) {
+                        console.error('Error adding scanners:', error)
+                        showError('تم تحديث الفعالية لكن حدث خطأ في تحديث الماسحات')
+                    }
+                }
+
+                // Invalidate queries to refresh data
+                queryClient.invalidateQueries({ queryKey: ['manager', 'events', id, 'scanners'] })
+                queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MANAGER_EVENTS })
+            } catch (error) {
+                console.error('Error updating scanners:', error)
+                showError('تم تحديث الفعالية لكن حدث خطأ في تحديث الماسحات')
+            }
+
             closeDialog()
         }
     }

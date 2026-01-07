@@ -41,7 +41,7 @@ import ViewHallDialog from './components/ViewHallDialog'
 
 // Hooks & Utilities
 import { useNotification, useDebounce, useDialogState, useCRUD } from '@/hooks'
-import { QUERY_KEYS } from '@/config/constants'
+import { QUERY_KEYS, API_CONFIG } from '@/config/constants'
 import { getAllHalls, createHall, updateHall, deleteHall, getServicesList } from '@/api/admin'
 import { formatCurrency, formatPhoneNumber, generateExportFileName } from '@/utils/helpers'
 
@@ -324,35 +324,65 @@ const HallsManagement = () => {
       id: 'name',
       label: 'اسم القاعة',
       align: 'right',
-      format: (value, row) => (
-        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {row.primaryImage || row.images?.[0] ? (
-            <MuiAvatar
-              src={row.primaryImage || row.images[0]}
-              alt={value}
-              sx={{ width: 40, height: 40, border: '1px solid var(--color-border-glass)' }}
-            />
-          ) : (
-            <MuiBox
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '10px',
-                background: 'rgba(216, 185, 138, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: '1px solid rgba(216, 185, 138, 0.4)',
-              }}
-            >
-              <Building2 size={20} style={{ color: '#D8B98A' }} />
-            </MuiBox>
-          )}
-          <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 500 }}>
-            {value}
-          </MuiTypography>
-        </MuiBox>
-      )
+      format: (value, row) => {
+        const imageUrl = row.primaryImage || row.images?.[0]
+        const getFullImageUrl = (img) => {
+          if (!img) return null
+          if (typeof img === 'string') {
+            if (img.startsWith('http')) return img
+            return `${API_CONFIG.BASE_URL}${img.startsWith('/') ? '' : '/'}${img}`
+          }
+          if (img.url) {
+            if (img.url.startsWith('http')) return img.url
+            return `${API_CONFIG.BASE_URL}${img.url.startsWith('/') ? '' : '/'}${img.url}`
+          }
+          return null
+        }
+        const fullImageUrl = getFullImageUrl(imageUrl)
+        
+        return (
+          <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {imageUrl ? (
+              <MuiAvatar
+                src={imageUrl}
+                alt={value}
+                onClick={() => {
+                  if (fullImageUrl) window.open(fullImageUrl, '_blank')
+                }}
+                sx={{ 
+                  width: 40, 
+                  height: 40, 
+                  border: '1px solid var(--color-border-glass)',
+                  cursor: fullImageUrl ? 'pointer' : 'default',
+                  transition: 'all 0.2s ease',
+                  '&:hover': fullImageUrl ? {
+                    opacity: 0.8,
+                    transform: 'scale(1.1)',
+                  } : {}
+                }}
+              />
+            ) : (
+              <MuiBox
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: '10px',
+                  background: 'rgba(216, 185, 138, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '1px solid rgba(216, 185, 138, 0.4)',
+                }}
+              >
+                <Building2 size={20} style={{ color: '#D8B98A' }} />
+              </MuiBox>
+            )}
+            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 500 }}>
+              {value}
+            </MuiTypography>
+          </MuiBox>
+        )
+      }
     },
     {
       id: 'capacity',

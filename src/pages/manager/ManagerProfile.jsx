@@ -27,7 +27,7 @@ import { SEOHead, ButtonLoading } from '@/components/common'
 import { VALIDATION } from '@/config/constants'
 import { updateProfile } from '@/api/auth'
 import { useAuth, useNotification } from '@/hooks'
-import { User, Phone, Lock, Save, Edit, Camera, Settings, Shield, Briefcase, Activity, Building2, Globe, X } from 'lucide-react'
+import { User, Phone, Lock, Save, Edit, Shield, Briefcase } from 'lucide-react'
 
 // Validation Schemas
 const profileSchema = z.object({
@@ -229,7 +229,7 @@ export default function ManagerProfile() {
           {/* Profile Information Display */}
           <MuiGrid container spacing={3}>
             {/* Name */}
-            <MuiGrid item xs={12} md={6}>
+            <MuiGrid item xs={12} md={4}>
               <MuiBox>
                 <MuiTypography variant="caption" sx={{ 
                   color: 'var(--color-text-secondary)', 
@@ -259,7 +259,7 @@ export default function ManagerProfile() {
             </MuiGrid>
 
             {/* Phone */}
-            <MuiGrid item xs={12} md={6}>
+            <MuiGrid item xs={12} md={4}>
               <MuiBox>
                 <MuiTypography variant="caption" sx={{ 
                   color: 'var(--color-text-secondary)', 
@@ -289,7 +289,7 @@ export default function ManagerProfile() {
             </MuiGrid>
 
             {/* Role */}
-            <MuiGrid item xs={12} md={6}>
+            <MuiGrid item xs={12} md={4}>
               <MuiBox>
                 <MuiTypography variant="caption" sx={{ 
                   color: 'var(--color-text-secondary)', 
@@ -317,222 +317,10 @@ export default function ManagerProfile() {
                 </MuiCard>
               </MuiBox>
             </MuiGrid>
-
-            {/* Hall */}
-            <MuiGrid item xs={12} md={6}>
-              <MuiBox>
-                <MuiTypography variant="caption" sx={{ 
-                  color: 'var(--color-text-secondary)', 
-                  mb: 1, 
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5
-                }}>
-                  <Building2 size={14} />
-                  القاعة
-                </MuiTypography>
-                <MuiCard sx={{ 
-                  background: 'rgba(59, 130, 246, 0.1)',
-                  border: '1px solid rgba(59, 130, 246, 0.2)',
-                  borderRadius: '12px'
-                }}>
-                  <MuiCardContent sx={{ py: 2 }}>
-                    <MuiTypography variant="body1" sx={{ 
-                      fontWeight: 600, 
-                      color: 'var(--color-text-primary-dark)' 
-                    }}>
-                      {user?.hall?.name || '—'}
-                    </MuiTypography>
-                  </MuiCardContent>
-                </MuiCard>
-              </MuiBox>
-            </MuiGrid>
-
-            {/* Status */}
-            <MuiGrid item xs={12} md={6}>
-              <MuiBox>
-                <MuiTypography variant="caption" sx={{ 
-                  color: 'var(--color-text-secondary)', 
-                  mb: 1, 
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5
-                }}>
-                  <Globe size={14} />
-                  الحالة
-                </MuiTypography>
-                <MuiCard sx={{ 
-                  background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05))',
-                  border: '1px solid rgba(34, 197, 94, 0.2)',
-                  borderRadius: '12px'
-                }}>
-                  <MuiCardContent sx={{ py: 2 }}>
-                    <MuiTypography variant="body1" sx={{ 
-                      fontWeight: 600, 
-                      color: 'var(--color-text-primary-dark)' 
-                    }}>
-                      {user?.isActive ? 'نشط' : 'غير نشط'}
-                    </MuiTypography>
-                  </MuiCardContent>
-                </MuiCard>
-              </MuiBox>
-            </MuiGrid>
-
-            {/* Language */}
-            <MuiGrid item xs={12} md={6}>
-              <MuiBox>
-                <MuiTypography variant="caption" sx={{ 
-                  color: 'var(--color-text-secondary)', 
-                  mb: 1, 
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5
-                }}>
-                  <Settings size={14} />
-                  اللغة
-                </MuiTypography>
-                <MuiCard sx={{ 
-                  background: 'rgba(168, 85, 247, 0.1)',
-                  border: '1px solid rgba(168, 85, 247, 0.2)',
-                  borderRadius: '12px'
-                }}>
-                  <MuiCardContent sx={{ py: 2 }}>
-                    <MuiTypography variant="body1" sx={{ 
-                      fontWeight: 600, 
-                      color: 'var(--color-text-primary-dark)' 
-                    }}>
-                      {user?.settings?.language === 'ar' ? 'العربية' : 'English'}
-                    </MuiTypography>
-                  </MuiCardContent>
-                </MuiCard>
-              </MuiBox>
-            </MuiGrid>
           </MuiGrid>
         </MuiBox>
       </MuiPaper>
 
-      {/* Manager Stats */}
-      <MuiGrid container spacing={3} mb={6}>
-        <MuiGrid item xs={12} sm={6} md={3}>
-          <MuiCard sx={{ 
-            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05))',
-            border: '1px solid rgba(59, 130, 246, 0.2)',
-            borderRadius: '16px',
-            textAlign: 'center',
-            p: 3
-          }}>
-            <MuiBox sx={{ 
-              width: 48, 
-              height: 48, 
-              borderRadius: '12px', 
-              background: 'rgba(59, 130, 246, 0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              mx: 'auto',
-              mb: 2
-            }}>
-              <Briefcase size={24} style={{ color: '#3b82f6' }} />
-            </MuiBox>
-            <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-              مدير
-            </MuiTypography>
-            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-              الصلاحية
-            </MuiTypography>
-          </MuiCard>
-        </MuiGrid>
-
-        <MuiGrid item xs={12} sm={6} md={3}>
-          <MuiCard sx={{ 
-            background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05))',
-            border: '1px solid rgba(34, 197, 94, 0.2)',
-            borderRadius: '16px',
-            textAlign: 'center',
-            p: 3
-          }}>
-            <MuiBox sx={{ 
-              width: 48, 
-              height: 48, 
-              borderRadius: '12px', 
-              background: 'rgba(34, 197, 94, 0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              mx: 'auto',
-              mb: 2
-            }}>
-              <Building2 size={24} style={{ color: '#22c55e' }} />
-            </MuiBox>
-            <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-              {user?.hall?.name ? 'قاعة' : '—'}
-            </MuiTypography>
-            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-              القاعة
-            </MuiTypography>
-          </MuiCard>
-        </MuiGrid>
-
-        <MuiGrid item xs={12} sm={6} md={3}>
-          <MuiCard sx={{ 
-            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05))',
-            border: '1px solid rgba(59, 130, 246, 0.2)',
-            borderRadius: '16px',
-            textAlign: 'center',
-            p: 3
-          }}>
-            <MuiBox sx={{ 
-              width: 48, 
-              height: 48, 
-              borderRadius: '12px', 
-              background: 'rgba(59, 130, 246, 0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              mx: 'auto',
-              mb: 2
-            }}>
-              <Globe size={24} style={{ color: '#3b82f6' }} />
-            </MuiBox>
-            <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-              نشط
-            </MuiTypography>
-            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-              الحالة
-            </MuiTypography>
-          </MuiCard>
-        </MuiGrid>
-
-        <MuiGrid item xs={12} sm={6} md={3}>
-          <MuiCard sx={{ 
-            background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(168, 85, 247, 0.05))',
-            border: '1px solid rgba(168, 85, 247, 0.2)',
-            borderRadius: '16px',
-            textAlign: 'center',
-            p: 3
-          }}>
-            <MuiBox sx={{ 
-              width: 48, 
-              height: 48, 
-              borderRadius: '12px', 
-              background: 'rgba(168, 85, 247, 0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              mx: 'auto',
-              mb: 2
-            }}>
-              <Activity size={24} style={{ color: '#a855f7' }} />
-            </MuiBox>
-            <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-              نشط
-            </MuiTypography>
-            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-              الحساب
-            </MuiTypography>
-          </MuiCard>
-        </MuiGrid>
-      </MuiGrid>
 
       {/* Change Password */}
       <MuiPaper

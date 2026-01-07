@@ -5,7 +5,9 @@
  */
 
 import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import { useAuth } from '@/hooks'
+import { normalizeDashboardStats, computeStatsFromEvents } from '@/api/utils/normalizers'
 import MuiBox from '@/components/ui/MuiBox'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiTypography from '@/components/ui/MuiTypography'
@@ -14,7 +16,7 @@ import MuiChip from '@/components/ui/MuiChip'
 import MuiDivider from '@/components/ui/MuiDivider'
 import { LoadingScreen, EmptyState, SEOHead } from '@/components/common'
 import { QUERY_KEYS } from '@/config/constants'
-import { getManagerDashboard } from '@/api/manager'
+import { getManagerDashboard, getManagerEvents } from '@/api/manager'
 import { formatNumber, formatCurrency } from '@/utils/helpers'
 import {
     Building2,
@@ -83,6 +85,22 @@ function ManagerDashboardContent() {
         queryFn: getManagerDashboard,
     })
 
+    // Normalize dashboard stats
+    const normalizedStats = useMemo(() => normalizeDashboardStats(data), [data])
+    
+    // Check if totalEvents needs to be calculated from events
+    const needsEventsData = useMemo(() => {
+        if (isLoading || !data) return false
+        return !normalizedStats.totalEvents || normalizedStats.totalEvents === 0
+    }, [isLoading, data, normalizedStats.totalEvents])
+
+    // Fetch events to calculate totalEvents if not provided by dashboard API
+    const { data: eventsData } = useQuery({
+        queryKey: [QUERY_KEYS.MANAGER_EVENTS],
+        queryFn: getManagerEvents,
+        enabled: needsEventsData, // Only fetch if totalEvents is missing or 0
+    })
+
     if (isLoading) {
         return <LoadingScreen message="جاري تحميل البيانات..." fullScreen={false} />
     }
@@ -98,7 +116,32 @@ function ManagerDashboardContent() {
         )
     }
 
-    const stats = data || {}
+    // If totalEvents is missing or 0, calculate it from events
+    const stats = useMemo(() => {
+        let finalStats = { ...normalizedStats }
+        
+        if (needsEventsData && eventsData) {
+            const events = Array.isArray(eventsData?.events) 
+                ? eventsData.events 
+                : Array.isArray(eventsData?.data) 
+                    ? eventsData.data 
+                    : Array.isArray(eventsData) 
+                        ? eventsData 
+                        : []
+            
+            if (events.length > 0) {
+                const computedStats = computeStatsFromEvents(events)
+                finalStats = {
+                    ...finalStats,
+                    totalEvents: computedStats.totalEvents || events.length,
+                    todayBookings: finalStats.todayBookings || computedStats.todayBookings || 0,
+                    activeBookings: finalStats.activeBookings || computedStats.activeBookings || 0,
+                }
+            }
+        }
+        
+        return finalStats
+    }, [normalizedStats, needsEventsData, eventsData])
 
     return (
         <MuiBox sx={{ p: { xs: 2, sm: 3, md: 4 }, minHeight: '100vh', background: 'var(--color-bg-dark)' }}>

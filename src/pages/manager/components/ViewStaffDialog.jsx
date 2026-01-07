@@ -3,9 +3,22 @@ import MuiTypography from '@/components/ui/MuiTypography'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiChip from '@/components/ui/MuiChip'
 import MuiDivider from '@/components/ui/MuiDivider'
+import MuiPaper from '@/components/ui/MuiPaper'
 import { BaseViewDialog } from '@/components/shared'
-import { formatEmptyValue } from '@/utils/helpers'
-import { Phone, Calendar, CheckCircle, XCircle, Briefcase, Shield, Award } from 'lucide-react'
+import { formatEmptyValue, formatDate, translatePermission } from '@/utils/helpers'
+import { 
+    Phone, 
+    Calendar, 
+    CheckCircle, 
+    XCircle, 
+    Briefcase, 
+    Shield, 
+    Award, 
+    User,
+    Hash,
+    TrendingUp,
+    Clock
+} from 'lucide-react'
 
 const roleIcons = {
     manager: Shield,
@@ -17,6 +30,7 @@ const roleLabels = {
     manager: 'مدير',
     employee: 'موظف',
     supervisor: 'مشرف',
+    scanner: 'ماسح',
 }
 
 export default function ViewStaffDialog({ open, onClose, staff }) {
@@ -83,20 +97,95 @@ export default function ViewStaffDialog({ open, onClose, staff }) {
                     <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)' }} />
                 </MuiGrid>
 
-                {/* Staff Details */}
+                {/* Basic Information */}
                 <MuiGrid item xs={12}>
-                    <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>معلومات الموظف</MuiTypography>
+                    <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>المعلومات الأساسية</MuiTypography>
                     <MuiGrid container spacing={2}>
                         {[
+                            { icon: User, label: 'اسم المستخدم', value: formatEmptyValue(staff.username) },
                             { icon: Phone, label: 'الهاتف', value: formatEmptyValue(staff.phone) },
-                            { icon: Calendar, label: 'تاريخ الانضمام', value: staff.joinDate ? new Date(staff.joinDate).toLocaleDateString('ar-SA') : '—' }
+                            { icon: Hash, label: 'رقم الموظف', value: staff._id ? staff._id.slice(-8) : '—' },
+                            { icon: Calendar, label: 'تاريخ التوظيف', value: staff.staffInfo?.hireDate ? formatDate(staff.staffInfo.hireDate, 'MM/DD/YYYY') : (staff.joinDate ? formatDate(staff.joinDate, 'MM/DD/YYYY') : '—') }
+                        ].map((item, idx) => (
+                            <MuiGrid item xs={12} sm={6} md={3} key={idx}>
+                                <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', textAlign: 'center', border: '1px solid rgba(216, 185, 138, 0.15)' }}>
+                                    <item.icon size={20} style={{ margin: '0 auto 8px', color: 'var(--color-primary-500)' }} />
+                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, fontSize: '0.75rem' }}>{item.label}</MuiTypography>
+                                    <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>{item.value}</MuiTypography>
+                                </MuiPaper>
+                            </MuiGrid>
+                        ))}
+                    </MuiGrid>
+                </MuiGrid>
+
+                {/* Permissions */}
+                {staff.permissions && staff.permissions.length > 0 && (
+                    <>
+                        <MuiGrid item xs={12}>
+                            <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)' }} />
+                        </MuiGrid>
+                        <MuiGrid item xs={12}>
+                            <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>الصلاحيات</MuiTypography>
+                            <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                {staff.permissions.map((permission, index) => (
+                                    <MuiChip
+                                        key={index}
+                                        label={translatePermission(permission)}
+                                        size="small"
+                                        sx={{
+                                            backgroundColor: 'rgba(216, 185, 138, 0.1)',
+                                            color: 'var(--color-primary-400)',
+                                            border: '1px solid rgba(216, 185, 138, 0.3)',
+                                            fontWeight: 500,
+                                        }}
+                                    />
+                                ))}
+                            </MuiBox>
+                        </MuiGrid>
+                    </>
+                )}
+
+                {/* Client Info */}
+                {staff.clientInfo && (
+                    <>
+                        <MuiGrid item xs={12}>
+                            <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)' }} />
+                        </MuiGrid>
+                        <MuiGrid item xs={12}>
+                            <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>معلومات العميل</MuiTypography>
+                            <MuiGrid container spacing={2}>
+                                <MuiGrid item xs={12} sm={6} md={3}>
+                                    <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', textAlign: 'center', border: '1px solid rgba(216, 185, 138, 0.15)' }}>
+                                        <TrendingUp size={20} style={{ margin: '0 auto 8px', color: 'var(--color-primary-500)' }} />
+                                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, fontSize: '0.75rem' }}>عدد الفعاليات</MuiTypography>
+                                        <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                            {staff.clientInfo.totalEvents || 0}
+                                        </MuiTypography>
+                                    </MuiPaper>
+                                </MuiGrid>
+                            </MuiGrid>
+                        </MuiGrid>
+                    </>
+                )}
+
+
+                {/* Additional Information */}
+                <MuiGrid item xs={12}>
+                    <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)' }} />
+                </MuiGrid>
+                <MuiGrid item xs={12}>
+                    <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>معلومات إضافية</MuiTypography>
+                    <MuiGrid container spacing={2}>
+                        {[
+                            { icon: Calendar, label: 'تاريخ الإنشاء', value: staff.createdAt ? formatDate(staff.createdAt, 'MM/DD/YYYY HH:mm') : '—' },
+                            { icon: Clock, label: 'آخر تحديث', value: staff.updatedAt ? formatDate(staff.updatedAt, 'MM/DD/YYYY HH:mm') : '—' }
                         ].map((item, idx) => (
                             <MuiGrid item xs={12} sm={6} key={idx}>
-                                <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', textAlign: 'center', border: '1px solid rgba(216, 185, 138, 0.15)' }}>
-                                    <item.icon size={24} style={{ margin: '0 auto 8px', color: 'var(--color-primary-500)' }} />
-                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>{item.label}</MuiTypography>
-                                    <MuiTypography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary-dark)' }}>{item.value}</MuiTypography>
-                                </MuiBox>
+                                <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', textAlign: 'center', border: '1px solid rgba(216, 185, 138, 0.15)' }}>
+                                    <item.icon size={20} style={{ margin: '0 auto 8px', color: 'var(--color-primary-500)' }} />
+                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, fontSize: '0.75rem' }}>{item.label}</MuiTypography>
+                                    <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>{item.value}</MuiTypography>
+                                </MuiPaper>
                             </MuiGrid>
                         ))}
                     </MuiGrid>

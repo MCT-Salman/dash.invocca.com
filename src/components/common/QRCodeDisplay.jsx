@@ -55,7 +55,7 @@ export default function QRCodeDisplay({
               align-items: center;
               justify-content: center;
               min-height: 100vh;
-              font-family: 'Montserrat', sans-serif;
+              font-family: 'Alexandria', 'Montserrat', sans-serif;
               margin: 0;
               padding: 20px;
             }

@@ -751,7 +751,9 @@ export function translatePermission(permission) {
         
         // Scanner
         'scan_qr': 'مسح QR',
+        'scan_qr_codes': 'مسح رموز QR',
         'view_scanner': 'عرض الماسح',
+        'view_event_invitations': 'عرض دعوات الفعاليات',
         
         // Admin
         'admin_access': 'وصول إداري',

@@ -197,6 +197,8 @@ export default function AdminDashboard() {
             newUsersThisMonth: summary.users?.newThisMonth || 0,
             adminUsers: summary.users?.byRole?.admin || 0,
             managerUsers: summary.users?.byRole?.manager || 0,
+            clientUsers: summary.users?.byRole?.client || 0,
+            scannerUsers: summary.users?.byRole?.scanner || 0,
             
             // Events
             totalEvents: summary.events?.total || 0,
@@ -205,18 +207,22 @@ export default function AdminDashboard() {
             thisMonthEvents: summary.events?.thisMonth || 0,
             completedEvents: summary.events?.completed || 0,
             cancelledEvents: summary.events?.cancelled || 0,
+            eventsByStatus: summary.events?.byStatus || {},
+            eventsByType: summary.events?.byType || {},
             
             // Invitations
             totalInvitations: summary.invitations?.total || 0,
             usedInvitations: summary.invitations?.used || 0,
             pendingInvitations: summary.invitations?.pending || 0,
             todayInvitations: summary.invitations?.todayCreated || 0,
-            invitationUsageRate: summary.invitations?.usageRate || 0,
+            invitationUsageRate: summary.invitations?.usageRate || '0.00',
             
             // Complaints
             totalComplaints: summary.complaints?.total || 0,
             openComplaints: summary.complaints?.open || 0,
             resolvedComplaints: summary.complaints?.resolved || 0,
+            complaintsByStatus: summary.complaints?.byStatus || {},
+            complaintsByPriority: summary.complaints?.byPriority || {},
             
             // Financial
             totalRevenue: summary.financial?.totalRevenue || 0,
@@ -224,7 +230,10 @@ export default function AdminDashboard() {
             yearRevenue: summary.financial?.yearRevenue || 0,
             pendingPayments: summary.financial?.pendingPayments || 0,
             completedPayments: summary.financial?.completedPayments || 0,
-            currency: summary.financial?.currency || 'SAR'
+            currency: summary.financial?.currency || 'SAR',
+            
+            // Top Performers
+            topPerformers: dashboardData.topPerformers || {}
         }
     }, [data])
 
@@ -236,9 +245,10 @@ export default function AdminDashboard() {
         const events = (recentActivity.events || []).map(event => ({
             ...event,
             type: 'event',
-            title: event.title || 'فعالية جديدة',
-            time: event.time || 'الآن',
-            status: event.status || 'pending'
+            title: event.name || event.title || 'فعالية جديدة',
+            time: event.date ? new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'الآن',
+            status: event.status || 'pending',
+            id: event._id || event.id
         }))
         
         const complaints = (recentActivity.complaints || []).map(complaint => ({
@@ -246,7 +256,8 @@ export default function AdminDashboard() {
             type: 'complaint',
             title: complaint.title || 'شكوى جديدة',
             time: complaint.time || 'الآن',
-            status: complaint.status || 'open'
+            status: complaint.status || 'open',
+            id: complaint._id || complaint.id
         }))
         
         return [...events, ...complaints]
@@ -391,6 +402,22 @@ export default function AdminDashboard() {
                         color="var(--color-info-500)"
                     />
                 </MuiGrid>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <StatCard
+                        title="العملاء"
+                        value={stats.clientUsers || 0}
+                        icon={Users}
+                        color="var(--color-secondary-500)"
+                    />
+                </MuiGrid>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <StatCard
+                        title="الماسحات"
+                        value={stats.scannerUsers || 0}
+                        icon={Users}
+                        color="var(--color-primary-500)"
+                    />
+                </MuiGrid>
             </MuiGrid>
 
             {/* Stats Grid - Events & Invitations */}
@@ -425,6 +452,22 @@ export default function AdminDashboard() {
                         value={stats.completedEvents || 0}
                         icon={CheckCircle}
                         color="var(--color-success-500)"
+                    />
+                </MuiGrid>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <StatCard
+                        title="فعاليات هذا الشهر"
+                        value={stats.thisMonthEvents || 0}
+                        icon={Calendar}
+                        color="var(--color-info-500)"
+                    />
+                </MuiGrid>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <StatCard
+                        title="فعاليات ملغاة"
+                        value={stats.cancelledEvents || 0}
+                        icon={AlertCircle}
+                        color="var(--color-error-500)"
                     />
                 </MuiGrid>
             </MuiGrid>
@@ -463,6 +506,51 @@ export default function AdminDashboard() {
                         color="var(--color-info-500)"
                     />
                 </MuiGrid>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <MuiPaper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            height: '100%',
+                            background: 'var(--color-surface-dark)',
+                            border: '1px solid var(--color-border-glass)',
+                            borderRadius: '16px',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                                transform: 'translateY(-4px)',
+                                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
+                                borderColor: 'var(--color-primary-500)',
+                            },
+                        }}
+                    >
+                        <MuiBox sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
+                            <MuiBox>
+                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1, fontWeight: 500 }}>
+                                    معدل استخدام الدعوات
+                                </MuiTypography>
+                                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
+                                    {stats.invitationUsageRate}%
+                                </MuiTypography>
+                            </MuiBox>
+                            <MuiBox
+                                sx={{
+                                    width: 56,
+                                    height: 56,
+                                    borderRadius: '12px',
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: '1px solid var(--color-primary-500)',
+                                }}
+                            >
+                                <TrendingUp size={28} style={{ color: 'var(--color-primary-500)' }} />
+                            </MuiBox>
+                        </MuiBox>
+                    </MuiPaper>
+                </MuiGrid>
             </MuiGrid>
 
             {/* Stats Grid - Complaints */}
@@ -492,20 +580,190 @@ export default function AdminDashboard() {
                     />
                 </MuiGrid>
                 <MuiGrid item xs={12} sm={6} md={3}>
-                    <StatCard
-                        title="الإيرادات الشهرية"
-                        value={stats.monthRevenue || 0}
-                        icon={DollarSign}
-                        trend
-                        trendValue="+23%"
-                        color="var(--color-success-500)"
-                    />
+                    <MuiPaper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            height: '100%',
+                            background: 'var(--color-surface-dark)',
+                            border: '1px solid var(--color-border-glass)',
+                            borderRadius: '16px',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                                transform: 'translateY(-4px)',
+                                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
+                                borderColor: 'var(--color-success-500)',
+                            },
+                        }}
+                    >
+                        <MuiBox sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
+                            <MuiBox>
+                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1, fontWeight: 500 }}>
+                                    الإيرادات الشهرية
+                                </MuiTypography>
+                                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
+                                    {formatNumber(stats.monthRevenue || 0)} {stats.currency || 'ر.س'}
+                                </MuiTypography>
+                            </MuiBox>
+                            <MuiBox
+                                sx={{
+                                    width: 56,
+                                    height: 56,
+                                    borderRadius: '12px',
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: '1px solid var(--color-success-500)',
+                                }}
+                            >
+                                <DollarSign size={28} style={{ color: 'var(--color-success-500)' }} />
+                            </MuiBox>
+                        </MuiBox>
+                    </MuiPaper>
+                </MuiGrid>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <MuiPaper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            height: '100%',
+                            background: 'var(--color-surface-dark)',
+                            border: '1px solid var(--color-border-glass)',
+                            borderRadius: '16px',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                                transform: 'translateY(-4px)',
+                                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
+                                borderColor: 'var(--color-primary-500)',
+                            },
+                        }}
+                    >
+                        <MuiBox sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
+                            <MuiBox>
+                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1, fontWeight: 500 }}>
+                                    الإيرادات السنوية
+                                </MuiTypography>
+                                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
+                                    {formatNumber(stats.yearRevenue || 0)} {stats.currency || 'ر.س'}
+                                </MuiTypography>
+                            </MuiBox>
+                            <MuiBox
+                                sx={{
+                                    width: 56,
+                                    height: 56,
+                                    borderRadius: '12px',
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: '1px solid var(--color-primary-500)',
+                                }}
+                            >
+                                <TrendingUp size={28} style={{ color: 'var(--color-primary-500)' }} />
+                            </MuiBox>
+                        </MuiBox>
+                    </MuiPaper>
+                </MuiGrid>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <MuiPaper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            height: '100%',
+                            background: 'var(--color-surface-dark)',
+                            border: '1px solid var(--color-border-glass)',
+                            borderRadius: '16px',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                                transform: 'translateY(-4px)',
+                                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
+                                borderColor: 'var(--color-warning-500)',
+                            },
+                        }}
+                    >
+                        <MuiBox sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
+                            <MuiBox>
+                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1, fontWeight: 500 }}>
+                                    مدفوعات معلقة
+                                </MuiTypography>
+                                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
+                                    {formatNumber(stats.pendingPayments || 0)} {stats.currency || 'ر.س'}
+                                </MuiTypography>
+                            </MuiBox>
+                            <MuiBox
+                                sx={{
+                                    width: 56,
+                                    height: 56,
+                                    borderRadius: '12px',
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: '1px solid var(--color-warning-500)',
+                                }}
+                            >
+                                <CreditCard size={28} style={{ color: 'var(--color-warning-500)' }} />
+                            </MuiBox>
+                        </MuiBox>
+                    </MuiPaper>
+                </MuiGrid>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <MuiPaper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            height: '100%',
+                            background: 'var(--color-surface-dark)',
+                            border: '1px solid var(--color-border-glass)',
+                            borderRadius: '16px',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                                transform: 'translateY(-4px)',
+                                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
+                                borderColor: 'var(--color-success-500)',
+                            },
+                        }}
+                    >
+                        <MuiBox sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
+                            <MuiBox>
+                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1, fontWeight: 500 }}>
+                                    مدفوعات مكتملة
+                                </MuiTypography>
+                                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
+                                    {formatNumber(stats.completedPayments || 0)} {stats.currency || 'ر.س'}
+                                </MuiTypography>
+                            </MuiBox>
+                            <MuiBox
+                                sx={{
+                                    width: 56,
+                                    height: 56,
+                                    borderRadius: '12px',
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: '1px solid var(--color-success-500)',
+                                }}
+                            >
+                                <CheckCircle size={28} style={{ color: 'var(--color-success-500)' }} />
+                            </MuiBox>
+                        </MuiBox>
+                    </MuiPaper>
                 </MuiGrid>
             </MuiGrid>
 
             <MuiGrid container spacing={3}>
                 {/* Recent Activities */}
-                <MuiGrid item xs={12}>
+                <MuiGrid item xs={12} md={8}>
                     <MuiPaper
                         elevation={0}
                         sx={{
@@ -523,7 +781,7 @@ export default function AdminDashboard() {
                             {recentActivities.length > 0 ? (
                                 recentActivities.map((activity, index) => (
                                     <ActivityItem
-                                        key={activity.id || index} // استخدام معرف فريد أو الفهرس
+                                        key={activity.id || index}
                                         type={activity.type}
                                         title={activity.title}
                                         time={activity.time}
@@ -540,6 +798,69 @@ export default function AdminDashboard() {
                         </MuiBox>
                     </MuiPaper>
                 </MuiGrid>
+
+                {/* Top Performers */}
+                {stats.topPerformers?.halls && stats.topPerformers.halls.length > 0 && (
+                    <MuiGrid item xs={12} md={4}>
+                        <MuiPaper
+                            elevation={0}
+                            sx={{
+                                p: 3,
+                                borderRadius: '16px',
+                                border: '1px solid var(--color-border-glass)',
+                                height: '100%',
+                                background: 'var(--color-surface-dark)',
+                            }}
+                        >
+                            <MuiTypography variant="h6" sx={{ mb: 3, fontWeight: 700, color: 'var(--color-text-primary-dark)' }}>
+                                أفضل القاعات
+                            </MuiTypography>
+                            <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {stats.topPerformers.halls.map((hall, index) => (
+                                    <MuiBox
+                                        key={hall._id || index}
+                                        sx={{
+                                            p: 2,
+                                            borderRadius: '12px',
+                                            background: 'rgba(255, 255, 255, 0.03)',
+                                            border: '1px solid var(--color-border-glass)',
+                                            transition: 'all 0.2s ease',
+                                            '&:hover': {
+                                                background: 'rgba(255, 255, 255, 0.05)',
+                                                borderColor: 'var(--color-primary-500)',
+                                            }
+                                        }}
+                                    >
+                                        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                            <Building2 size={16} style={{ color: 'var(--color-primary-500)' }} />
+                                            <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                                                {hall.hallName || '—'}
+                                            </MuiTypography>
+                                        </MuiBox>
+                                        <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+                                            <MuiBox>
+                                                <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block' }}>
+                                                    عدد الفعاليات
+                                                </MuiTypography>
+                                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                                                    {hall.eventCount || 0}
+                                                </MuiTypography>
+                                            </MuiBox>
+                                            <MuiBox>
+                                                <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block' }}>
+                                                    الإيرادات
+                                                </MuiTypography>
+                                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                                                    {formatNumber(hall.totalRevenue || 0)} {stats.currency || 'ر.س'}
+                                                </MuiTypography>
+                                            </MuiBox>
+                                        </MuiBox>
+                                    </MuiBox>
+                                ))}
+                            </MuiBox>
+                        </MuiPaper>
+                    </MuiGrid>
+                )}
             </MuiGrid>
         </MuiBox>
     )

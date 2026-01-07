@@ -28,7 +28,7 @@ import {
     editManagerTemplate,
     deleteManagerTemplate,
 } from '@/api/manager'
-import { Plus, Search, Image as ImageIcon, RefreshCw, Calendar, Tag } from 'lucide-react'
+import { Plus, Search, Image as ImageIcon, RefreshCw, Calendar, Tag, Hash, Clock } from 'lucide-react'
 import { formatDate } from '@/utils/helpers'
 import CreateEditTemplateDialog from './components/CreateEditTemplateDialog'
 import ViewTemplateDialog from './components/ViewTemplateDialog'
@@ -141,7 +141,20 @@ export default function ManagerTemplates() {
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
                     <Calendar size={16} style={{ color: 'var(--color-primary-400)' }} />
                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                        {formatDate(value, 'DD/MM/YYYY')}
+                        {formatDate(value, 'MM/DD/YYYY')}
+                    </MuiTypography>
+                </MuiBox>
+            )
+        },
+        {
+            id: 'updatedAt',
+            label: 'آخر تحديث',
+            align: 'center',
+            format: (value) => (
+                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
+                    <Clock size={16} style={{ color: 'var(--color-primary-400)' }} />
+                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
+                        {formatDate(value, 'MM/DD/YYYY')}
                     </MuiTypography>
                 </MuiBox>
             )

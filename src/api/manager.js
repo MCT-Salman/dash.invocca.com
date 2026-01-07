@@ -457,6 +457,7 @@ export const updateClient = async (clientId, clientData) => {
   }
 }
 
+
 // ==================== Complaints Management ====================
 
 /**

@@ -18,7 +18,7 @@ import MuiDatePicker from '@/components/ui/MuiDatePicker'
 import MuiTimePicker from '@/components/ui/MuiTimePicker'
 import { FormDialog } from '@/components/common'
 import { useNotification } from '@/hooks'
-import { getClients, getManagerHall, listManagerTemplates, getStaff } from '@/api/manager'
+import { getClients, getManagerHall, listManagerTemplates, getStaff, getEventScanners } from '@/api/manager'
 import { QUERY_KEYS } from '@/config/constants'
 import { Plus, Trash2 } from 'lucide-react'
 
@@ -157,6 +157,15 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
         staleTime: 5 * 60 * 1000
     })
 
+    // Fetch event scanners when editing
+    const eventId = editingEvent?._id || editingEvent?.id
+    const { data: eventScannersData } = useQuery({
+        queryKey: ['manager', 'events', eventId, 'scanners'],
+        queryFn: () => getEventScanners(eventId),
+        enabled: open && !!editingEvent && !!eventId,
+        staleTime: 2 * 60 * 1000
+    })
+
     const clients = clientsData?.clients || clientsData?.data || []
     
     // Get scanners from staff - filter by role 'scanner'
@@ -164,6 +173,15 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
     const scanners = Array.isArray(staff) 
         ? staff.filter(s => s.role === 'scanner' || s.position === 'scanner')
         : []
+
+    // Get event scanners from API response
+    const eventScanners = Array.isArray(eventScannersData?.scanners)
+        ? eventScannersData.scanners
+        : Array.isArray(eventScannersData?.data)
+            ? eventScannersData.data
+            : Array.isArray(eventScannersData)
+                ? eventScannersData
+                : []
     
     // Get templates from response - handle different response structures
     const templates = Array.isArray(templatesData?.templates) 
@@ -220,9 +238,13 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
             })) || [],
             specialRequests: editingEvent?.specialRequests || '',
             templateId: editingEvent?.template?._id || editingEvent?.templateId?._id || editingEvent?.templateId || null,
-            scanners: editingEvent?.scanners?.map(s => ({
-                scannerId: s.scannerId?._id || s.scannerId || s._id || ''
-            })) || [],
+            scanners: eventScanners.length > 0
+                ? eventScanners.map(s => ({
+                    scannerId: (s.scanner?._id || s.scanner?.id || s.scannerId?._id || s.scannerId || s._id || '').toString()
+                })).filter(s => s.scannerId)
+                : (editingEvent?.scanners?.map(s => ({
+                    scannerId: (s.scannerId?._id || s.scannerId || s.scanner?._id || s.scanner?.id || s._id || '').toString()
+                })).filter(s => s.scannerId) || []),
             clientSelection: 'existing',
             clientId: editingEvent?.clientId?._id || editingEvent?.clientId || editingEvent?.client?._id || '',
             clientName: '',
@@ -266,9 +288,13 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                     })) || [],
                     specialRequests: editingEvent.specialRequests || '',
                     templateId: editingEvent.template?._id || editingEvent.templateId?._id || editingEvent.templateId || null,
-                    scanners: editingEvent.scanners?.map(s => ({
-                        scannerId: s.scannerId?._id || s.scannerId || s._id || ''
-                    })) || [],
+                    scanners: eventScanners.length > 0
+                        ? eventScanners.map(s => ({
+                            scannerId: (s.scanner?._id || s.scanner?.id || s.scannerId?._id || s.scannerId || s._id || '').toString()
+                        })).filter(s => s.scannerId)
+                        : (editingEvent.scanners?.map(s => ({
+                            scannerId: (s.scannerId?._id || s.scannerId || s.scanner?._id || s.scanner?.id || s._id || '').toString()
+                        })).filter(s => s.scannerId) || []),
                     clientSelection: 'existing',
                     clientId: editingEvent.clientId?._id || editingEvent.clientId || editingEvent.client?._id || '',
                     clientName: '',
@@ -298,7 +324,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                 })
             }
         }
-    }, [open, editingEvent, reset])
+    }, [open, editingEvent, reset, eventScanners])
 
     const handleFormSubmit = (data) => {
         // Prepare the data according to API requirements

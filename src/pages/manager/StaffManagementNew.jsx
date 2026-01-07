@@ -691,14 +691,17 @@ export default function StaffManagement() {
             id: 'joinDate',
             label: 'تاريخ الانضمام',
             align: 'right',
-            format: (value) => (
-                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Calendar size={14} style={{ color: '#FFE36C' }} />
-                    <MuiTypography variant="body2">
-                        {value ? new Date(value).toLocaleDateString('ar-SA') : '—'}
-                    </MuiTypography>
-                </MuiBox>
-            )
+            format: (value, row) => {
+                const hireDate = row.staffInfo?.hireDate || value
+                return (
+                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Calendar size={14} style={{ color: '#FFE36C' }} />
+                        <MuiTypography variant="body2">
+                            {hireDate ? formatDate(hireDate, 'MM/DD/YYYY') : '—'}
+                        </MuiTypography>
+                    </MuiBox>
+                )
+            }
         },
         {
             id: 'isActive',

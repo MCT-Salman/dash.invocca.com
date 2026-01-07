@@ -6,15 +6,17 @@ import MuiPaper from '@/components/ui/MuiPaper'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiButton from '@/components/ui/MuiButton'
 import MuiIconButton from '@/components/ui/MuiIconButton'
+import MuiChip from '@/components/ui/MuiChip'
 import { LoadingScreen, EmptyState, SEOHead, ConfirmDialog } from '@/components/common'
 import { BaseFormDialog, FormField } from '@/components/shared'
 import { useDialogState, useCRUD, useNotification } from '@/hooks'
 import { QUERY_KEYS } from '@/config/constants'
 import { getInvitations, createInvitation, updateInvitation, deleteInvitation, getClientDashboard } from '@/api/client'
+import { formatDate } from '@/utils/helpers'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Mail, Plus, UserCheck, Users, Edit2, Trash2, X, UserPlus, Download, Calendar, MapPin, Clock, Eye, ArrowLeft, Image as ImageIcon, FileImage, FileText, CheckCircle } from 'lucide-react'
+import { Mail, Plus, UserCheck, Users, Edit2, Trash2, X, UserPlus, Download, Calendar, MapPin, Clock, Eye, ArrowLeft, Image as ImageIcon, FileImage, FileText, CheckCircle, QrCode, Send, CheckCircle2, XCircle } from 'lucide-react'
 import { useEffect, useMemo, useState, useRef } from 'react'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
@@ -294,19 +296,103 @@ export default function Invitations() {
                   </MuiBox>
                 </MuiBox>
 
-                <MuiBox sx={{ pt: 2, borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
-                    <Users size={14} />
-                    <MuiTypography variant="caption">
-                      {invitation.numOfPeople || invitation.guestCount || 0} مدعو
-                    </MuiTypography>
+                <MuiBox sx={{ pt: 2, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                  <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
+                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
+                      <Users size={14} />
+                      <MuiTypography variant="caption">
+                        عدد المدعوين: {invitation.numOfPeople || invitation.guestCount || 0}
+                      </MuiTypography>
+                    </MuiBox>
+                    {invitation.guests && invitation.guests.length > 0 && (
+                      <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, ml: 3 }}>
+                        {invitation.guests.map((guest, idx) => (
+                          <MuiBox key={guest._id || idx} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.7rem' }}>
+                              • {guest.name}
+                            </MuiTypography>
+                            {guest.checkedIn ? (
+                              <CheckCircle2 size={12} style={{ color: '#22c55e' }} />
+                            ) : (
+                              <XCircle size={12} style={{ color: 'var(--color-text-secondary)' }} />
+                            )}
+                          </MuiBox>
+                        ))}
+                      </MuiBox>
+                    )}
+                    {invitation.eventDate && (
+                      <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
+                        <Calendar size={14} />
+                        <MuiTypography variant="caption">
+                          تاريخ الفعالية: {formatDate(invitation.eventDate, 'MM/DD/YYYY')}
+                        </MuiTypography>
+                      </MuiBox>
+                    )}
+                    {invitation.qrCode && (
+                      <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
+                        <QrCode size={14} />
+                        <MuiTypography variant="caption">
+                          رمز QR: {invitation.qrCode}
+                        </MuiTypography>
+                      </MuiBox>
+                    )}
+                    {invitation.sentAt && (
+                      <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
+                        <Send size={14} />
+                        <MuiTypography variant="caption">
+                          تاريخ الإرسال: {formatDate(invitation.sentAt, 'MM/DD/YYYY HH:mm')}
+                        </MuiTypography>
+                      </MuiBox>
+                    )}
+                    {invitation.createdAt && (
+                      <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
+                        <Calendar size={14} />
+                        <MuiTypography variant="caption">
+                          تاريخ الإنشاء: {formatDate(invitation.createdAt, 'MM/DD/YYYY HH:mm')}
+                        </MuiTypography>
+                      </MuiBox>
+                    )}
+                    {invitation.updatedAt && invitation.updatedAt !== invitation.createdAt && (
+                      <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
+                        <Calendar size={14} />
+                        <MuiTypography variant="caption">
+                          آخر تحديث: {formatDate(invitation.updatedAt, 'MM/DD/YYYY HH:mm')}
+                        </MuiTypography>
+                      </MuiBox>
+                    )}
                   </MuiBox>
-                  <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
-                    <UserCheck size={14} />
-                    <MuiTypography variant="caption">
-                      {invitation.guests?.filter(g => g.checkedIn).length || invitation.confirmedCount || 0} مؤكد
-                    </MuiTypography>
+                  
+                  <MuiBox sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+                    <MuiChip
+                      label={invitation.status === 'sent' ? 'مرسلة' : invitation.status || '—'}
+                      size="small"
+                      sx={{
+                        backgroundColor: invitation.status === 'sent' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(216, 185, 138, 0.1)',
+                        color: invitation.status === 'sent' ? '#22c55e' : 'var(--color-primary-400)',
+                        fontSize: '0.7rem',
+                        height: 22
+                      }}
+                    />
+                    <MuiChip
+                      label={invitation.used ? 'مستخدمة' : 'غير مستخدمة'}
+                      size="small"
+                      sx={{
+                        backgroundColor: invitation.used ? 'rgba(249, 115, 22, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                        color: invitation.used ? '#f97316' : '#3b82f6',
+                        fontSize: '0.7rem',
+                        height: 22
+                      }}
+                    />
                   </MuiBox>
+                  
+                  {invitation.guests && invitation.guests.length > 0 && (
+                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)', mb: 1 }}>
+                      <UserCheck size={14} />
+                      <MuiTypography variant="caption">
+                        المؤكدون: {invitation.guests.filter(g => g.checkedIn).length} / {invitation.guests.length}
+                      </MuiTypography>
+                    </MuiBox>
+                  )}
                 </MuiBox>
 
                 {/* Actions */}
@@ -1054,7 +1140,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
             color: '#fff',
             flex: 1,
             direction: 'rtl',
-            fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+            fontFamily: "'Alexandria', 'Montserrat', sans-serif",
           }}
         >
           {/* Top Section - Golden Frame for QR Code or Image */}
@@ -1140,7 +1226,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                   fontWeight: 700,
                   color: '#fff',
                   fontSize: { xs: '1rem', sm: '1.15rem', md: '1.3rem' },
-                  fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                  fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                   letterSpacing: 'normal',
                   textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
                   lineHeight: 1.2,
@@ -1165,7 +1251,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                       fontWeight: 600,
                       color: '#D8B98A',
                       fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.95rem' },
-                      fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                      fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                       letterSpacing: 'normal',
                       textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
                       lineHeight: 1.2,
@@ -1188,7 +1274,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                 fontWeight: 800,
                 color: '#fff',
                 fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
-                fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                 mb: 0.5,
                 textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
                 letterSpacing: 'normal',
@@ -1208,7 +1294,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                   fontSize: { xs: '0.75rem', sm: '0.85rem' },
                   mt: 0.5,
                   textShadow: '0 1px 4px rgba(0, 0, 0, 0.6)',
-                  fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                  fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                   direction: 'rtl',
                   unicodeBidi: 'embed',
                 }}
@@ -1228,7 +1314,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                     textShadow: '0 1px 4px rgba(0, 0, 0, 0.6)',
                     display: 'block',
                     mb: 0.5,
-                    fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                    fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                     direction: 'rtl',
                     unicodeBidi: 'embed',
                   }}
@@ -1253,7 +1339,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                           color: '#D8B98A',
                           fontSize: { xs: '0.6rem', sm: '0.65rem' },
                           textShadow: '0 1px 4px rgba(0, 0, 0, 0.6)',
-                          fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                          fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                           direction: 'rtl',
                           unicodeBidi: 'embed',
                         }}
@@ -1317,7 +1403,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                         textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
                         maxWidth: '80px',
                         lineHeight: 1.3,
-                        fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                        fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                         direction: 'rtl',
                         unicodeBidi: 'embed',
                         mb: 0.3,
@@ -1334,7 +1420,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                         textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
                         maxWidth: '80px',
                         lineHeight: 1.3,
-                        fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                        fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                         direction: 'rtl',
                         unicodeBidi: 'embed',
                       }}
@@ -1352,7 +1438,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                       textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
                       maxWidth: '80px',
                       lineHeight: 1.2,
-                      fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                      fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                       direction: 'rtl',
                       unicodeBidi: 'embed',
                     }}
@@ -1411,7 +1497,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                     textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
                     maxWidth: '80px',
                     lineHeight: 1.2,
-                    fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                    fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                     direction: 'rtl',
                     unicodeBidi: 'embed',
                   }}
@@ -1472,7 +1558,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                       overflowWrap: 'break-word',
                       whiteSpace: 'normal',
                       lineHeight: 1.3,
-                      fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                      fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                       direction: 'rtl',
                       unicodeBidi: 'embed',
                     }}
@@ -1503,7 +1589,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                     mb: 0.4,
                     textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
                     fontWeight: 600,
-                    fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                    fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                     direction: 'rtl',
                     unicodeBidi: 'embed',
                   }}
@@ -1522,7 +1608,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                         color: 'rgba(255, 255, 255, 0.8)',
                         fontSize: { xs: '0.6rem', sm: '0.65rem' },
                         textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
-                        fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                        fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                         direction: 'rtl',
                         unicodeBidi: 'embed',
                       }}
@@ -1537,7 +1623,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                         color: 'rgba(255, 255, 255, 0.8)',
                         fontSize: { xs: '0.6rem', sm: '0.65rem' },
                         textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
-                        fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                        fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                         direction: 'rtl',
                         unicodeBidi: 'embed',
                       }}
@@ -1558,7 +1644,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
               sx={{
                 color: '#D8B98A',
                 fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
-                fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
+                fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                 fontWeight: 600,
                 letterSpacing: 'normal',
                 textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(216, 185, 138, 0.3)',

@@ -80,7 +80,7 @@ export const createStaffSchema = (isEdit = false, allowedRoles = []) => z.object
     role: allowedRoles.length > 0
         ? z.enum(allowedRoles, { errorMap: () => ({ message: 'المنصب غير صحيح' }) })
         : z.string().min(1, 'المنصب مطلوب'),
-})
+}) 
 
 /**
  * Event validation schema

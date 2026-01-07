@@ -111,6 +111,22 @@ export default function ClientReports() {
     return sum + (inv.guests?.filter(g => g.checkedIn).length || 0)
   }, 0)
 
+  // Create a map of service IDs to service names from hall.services
+  const serviceNameMap = {}
+  if (hall.services && Array.isArray(hall.services)) {
+    hall.services.forEach((hallService) => {
+      const serviceId = typeof hallService.service === 'string' 
+        ? hallService.service 
+        : (hallService.service?._id || hallService.service?.id)
+      const serviceName = typeof hallService.service === 'object' && hallService.service?.name
+        ? hallService.service.name
+        : null
+      if (serviceId && serviceName) {
+        serviceNameMap[serviceId] = serviceName
+      }
+    })
+  }
+
   return (
     <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
       <SEOHead title="التقارير - INVOCCA" />
@@ -173,7 +189,7 @@ export default function ClientReports() {
                   التاريخ
                 </MuiTypography>
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
-                  {formatDate(event.date || event.eventDate, 'DD/MM/YYYY')}
+                  {formatDate(event.date || event.eventDate, 'MM/DD/YYYY')}
                 </MuiTypography>
               </MuiBox>
             </MuiBox>
@@ -250,6 +266,7 @@ export default function ClientReports() {
             </MuiBox>
           </>
         )}
+
       </MuiPaper>
 
       {/* Financial Summary */}
@@ -481,6 +498,26 @@ export default function ClientReports() {
                 </MuiTypography>
               </MuiGrid>
             )}
+            {hall.maxEmployees !== undefined && (
+              <MuiGrid item xs={12} sm={6} md={4}>
+                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
+                  الحد الأقصى للموظفين
+                </MuiTypography>
+                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                  {formatEmptyValue(hall.maxEmployees)}
+                </MuiTypography>
+              </MuiGrid>
+            )}
+            {hall.defaultPrices !== undefined && (
+              <MuiGrid item xs={12} sm={6} md={4}>
+                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
+                  الأسعار الافتراضية
+                </MuiTypography>
+                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                  {formatCurrency(hall.defaultPrices)}
+                </MuiTypography>
+              </MuiGrid>
+            )}
             {hall.description && (
               <MuiGrid item xs={12}>
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
@@ -518,24 +555,70 @@ export default function ClientReports() {
                   صور القاعة
                 </MuiTypography>
                 <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                  {hall.images.slice(0, 4).map((image, index) => (
-                    <MuiBox
-                      key={index}
-                      sx={{
-                        width: 120,
-                        height: 120,
-                        borderRadius: '12px',
-                        overflow: 'hidden',
-                        border: '1px solid var(--color-border-glass)',
-                      }}
-                    >
-                      <img
-                        src={image.url?.startsWith('http') ? image.url : `http://82.137.244.167:5001${image.url}`}
-                        alt={image.caption || `صورة ${index + 1}`}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                    </MuiBox>
-                  ))}
+                  {hall.images.map((image, index) => {
+                    const imageUrl = image.url?.startsWith('http') ? image.url : `http://82.137.244.167:5001${image.url}`
+                    return (
+                      <MuiBox
+                        key={image._id || image.id || index}
+                        onClick={() => window.open(imageUrl, '_blank')}
+                        sx={{
+                          width: 120,
+                          height: 120,
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          border: '1px solid var(--color-border-glass)',
+                          cursor: 'pointer',
+                          transition: 'transform 0.2s, box-shadow 0.2s',
+                          '&:hover': {
+                            transform: 'scale(1.05)',
+                            boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
+                          }
+                        }}
+                      >
+                        <img
+                          src={imageUrl}
+                          alt={image.caption || `صورة ${index + 1}`}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      </MuiBox>
+                    )
+                  })}
+                </MuiBox>
+              </MuiGrid>
+            )}
+            {hall.primaryImage && (
+              <MuiGrid item xs={12}>
+                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1 }}>
+                  الصورة الرئيسية
+                </MuiTypography>
+                <MuiBox
+                  onClick={() => {
+                    const imageUrl = hall.primaryImage.url?.startsWith('http') 
+                      ? hall.primaryImage.url 
+                      : `http://82.137.244.167:5001${hall.primaryImage.url}`
+                    window.open(imageUrl, '_blank')
+                  }}
+                  sx={{
+                    width: 200,
+                    height: 200,
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    border: '1px solid var(--color-border-glass)',
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    '&:hover': {
+                      transform: 'scale(1.05)',
+                      boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
+                    }
+                  }}
+                >
+                  <img
+                    src={hall.primaryImage.url?.startsWith('http') 
+                      ? hall.primaryImage.url 
+                      : `http://82.137.244.167:5001${hall.primaryImage.url}`}
+                    alt={hall.primaryImage.caption || 'الصورة الرئيسية'}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
                 </MuiBox>
               </MuiGrid>
             )}
@@ -560,7 +643,14 @@ export default function ClientReports() {
           </MuiTypography>
           <MuiGrid container spacing={2}>
             {event.services.map((serviceItem, index) => {
-              const service = serviceItem.service || {}
+              const service = typeof serviceItem.service === 'object' ? serviceItem.service : {}
+              const serviceId = typeof serviceItem.service === 'string' 
+                ? serviceItem.service 
+                : (serviceItem.service?._id || serviceItem.service?.id)
+              
+              // Get service name from service object or from hall.services map
+              const serviceName = service.name || (serviceId ? serviceNameMap[serviceId] : null) || 'خدمة'
+              
               return (
                 <MuiGrid item xs={12} sm={6} md={4} key={serviceItem._id || index}>
                   <MuiPaper
@@ -574,7 +664,7 @@ export default function ClientReports() {
                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
                       <Sparkles size={18} style={{ color: 'var(--color-primary-400)' }} />
                       <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600, flex: 1 }}>
-                        {service.name || 'خدمة'}
+                        {serviceName}
                       </MuiTypography>
                     </MuiBox>
                     <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
@@ -721,17 +811,102 @@ export default function ClientReports() {
                     <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
                       المؤكدين: {invitation.guests?.filter(g => g.checkedIn).length || 0}
                     </MuiTypography>
-                    <MuiChip
-                      label={invitation.status === 'sent' ? 'مرسلة' : invitation.status}
-                      size="small"
-                      sx={{
-                        mt: 0.5,
-                        backgroundColor: invitation.status === 'sent' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(216, 185, 138, 0.1)',
-                        color: invitation.status === 'sent' ? '#22c55e' : 'var(--color-primary-400)',
-                        fontSize: '0.7rem',
-                        height: 20
-                      }}
-                    />
+                    {invitation.qrCode && (
+                      <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+                        رمز QR: {invitation.qrCode}
+                      </MuiTypography>
+                    )}
+                    {invitation.qrCodeImage && (
+                      <MuiBox
+                        onClick={() => window.open(invitation.qrCodeImage, '_blank')}
+                        sx={{
+                          width: 80,
+                          height: 80,
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          border: '1px solid var(--color-border-glass)',
+                          cursor: 'pointer',
+                          mt: 0.5,
+                          transition: 'transform 0.2s, box-shadow 0.2s',
+                          '&:hover': {
+                            transform: 'scale(1.1)',
+                            boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
+                          }
+                        }}
+                      >
+                        <img
+                          src={invitation.qrCodeImage}
+                          alt="QR Code"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      </MuiBox>
+                    )}
+                    {invitation.eventDate && (
+                      <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+                        تاريخ الفعالية: {formatDate(invitation.eventDate, 'MM/DD/YYYY')}
+                      </MuiTypography>
+                    )}
+                    {invitation.sentAt && (
+                      <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+                        تاريخ الإرسال: {formatDate(invitation.sentAt, 'MM/DD/YYYY')}
+                      </MuiTypography>
+                    )}
+                    {invitation.createdAt && (
+                      <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+                        تاريخ الإنشاء: {formatDate(invitation.createdAt, 'MM/DD/YYYY')}
+                      </MuiTypography>
+                    )}
+                    {invitation.updatedAt && (
+                      <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+                        آخر تحديث: {formatDate(invitation.updatedAt, 'MM/DD/YYYY')}
+                      </MuiTypography>
+                    )}
+                    {invitation.guests && invitation.guests.length > 0 && (
+                      <MuiBox sx={{ mt: 0.5 }}>
+                        <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, display: 'block' }}>
+                          الضيوف:
+                        </MuiTypography>
+                        {invitation.guests.map((guest, idx) => (
+                          <MuiChip
+                            key={guest._id || idx}
+                            label={`${guest.name} ${guest.checkedIn ? '✓' : ''}`}
+                            size="small"
+                            sx={{
+                              mr: 0.5,
+                              mb: 0.5,
+                              backgroundColor: guest.checkedIn ? 'rgba(34, 197, 94, 0.1)' : 'rgba(216, 185, 138, 0.1)',
+                              color: guest.checkedIn ? '#22c55e' : 'var(--color-primary-400)',
+                              fontSize: '0.65rem',
+                              height: 18
+                            }}
+                          />
+                        ))}
+                      </MuiBox>
+                    )}
+                    <MuiBox sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.5 }}>
+                      <MuiChip
+                        label={invitation.status === 'sent' ? 'مرسلة' : invitation.status}
+                        size="small"
+                        sx={{
+                          backgroundColor: invitation.status === 'sent' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(216, 185, 138, 0.1)',
+                          color: invitation.status === 'sent' ? '#22c55e' : 'var(--color-primary-400)',
+                          fontSize: '0.7rem',
+                          height: 20
+                        }}
+                      />
+                      {invitation.used !== undefined && (
+                        <MuiChip
+                          label={invitation.used ? 'مستخدمة' : 'غير مستخدمة'}
+                          size="small"
+                          sx={{
+                            backgroundColor: invitation.used ? 'rgba(249, 115, 22, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                            color: invitation.used ? '#f97316' : '#3b82f6',
+                            fontSize: '0.7rem',
+                            height: 20
+                          }}
+                        />
+                      )}
+                    </MuiBox>
                   </MuiBox>
                 </MuiPaper>
               </MuiGrid>

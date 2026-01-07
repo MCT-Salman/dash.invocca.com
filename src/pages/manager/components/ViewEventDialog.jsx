@@ -27,20 +27,29 @@ import {
     UserCheck,
     Sparkles
 } from 'lucide-react'
-import { formatDate, formatNumber } from '@/utils/helpers'
+import { formatDate } from '@/utils/helpers'
 import { useQuery } from '@tanstack/react-query'
-import { listManagerTemplates } from '@/api/manager'
+import { listManagerTemplates, getEventScanners } from '@/api/manager'
 import { SERVICE_CATEGORY_LABELS, SERVICE_UNIT_LABELS } from '@/config/constants'
+import { QrCode, Hash } from 'lucide-react'
 
 export default function ViewEventDialog({ open, onClose, event }) {
-    if (!event) return null
+    const eventId = event?._id || event?.id
 
     // Fetch templates to get full template details if needed
     const { data: templatesData } = useQuery({
         queryKey: ['manager', 'templates'],
         queryFn: listManagerTemplates,
-        enabled: open && !!event.template,
+        enabled: open && !!event?.template,
         staleTime: 5 * 60 * 1000
+    })
+
+    // Fetch event scanners
+    const { data: scannersData } = useQuery({
+        queryKey: ['manager', 'events', eventId, 'scanners'],
+        queryFn: () => getEventScanners(eventId),
+        enabled: open && !!eventId,
+        staleTime: 2 * 60 * 1000
     })
 
     // Get templates from response
@@ -52,9 +61,18 @@ export default function ViewEventDialog({ open, onClose, event }) {
                 ? templatesData 
                 : []
 
+    // Get scanners from response
+    const eventScanners = Array.isArray(scannersData?.scanners)
+        ? scannersData.scanners
+        : Array.isArray(scannersData?.data)
+            ? scannersData.data
+            : Array.isArray(scannersData)
+                ? scannersData
+                : []
+
     // Find full template details if template ID is available
-    const fullTemplate = event.template?._id 
-        ? templates.find(t => (t._id || t.id) === event.template._id)
+    const fullTemplate = event?.template?._id 
+        ? templates.find(t => (t._id || t.id) === event?.template?._id)
         : null
 
     const statusConfig = {
@@ -65,7 +83,9 @@ export default function ViewEventDialog({ open, onClose, event }) {
         cancelled: { label: 'ملغي', color: '#dc2626', bg: '#fee2e2', icon: XCircle }
     }
 
-    const status = statusConfig[event.status] || statusConfig.pending
+    if (!event) return null
+
+    const status = statusConfig[event?.status] || statusConfig.pending
     const StatusIcon = status.icon
 
     const eventTypeLabels = {
@@ -77,7 +97,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
         other: 'أخرى'
     }
 
-    const eventType = event.eventType || event.type || 'other'
+    const eventType = event?.eventType || event?.type || 'other'
     const eventTypeLabel = eventTypeLabels[eventType] || eventType
 
     return (
@@ -505,7 +525,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
                         )}
 
                         {/* Template */}
-                        {event.template && (
+                        {event?.template && (
                             <>
                                 <MuiGrid item xs={12}>
                                     <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)' }} />
@@ -515,13 +535,13 @@ export default function ViewEventDialog({ open, onClose, event }) {
                                         القالب
                                     </MuiTypography>
                                     <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
-                                        {(event.template.imageUrl || fullTemplate?.imageUrl) && (
+                                        {(event?.template?.imageUrl || fullTemplate?.imageUrl) && (
                                             <MuiBox sx={{ mb: 2 }}>
                                                 <img
-                                                    src={(event.template.imageUrl || fullTemplate?.imageUrl || '').startsWith('http') 
-                                                        ? (event.template.imageUrl || fullTemplate?.imageUrl) 
-                                                        : `http://82.137.244.167:5001${event.template.imageUrl || fullTemplate?.imageUrl}`}
-                                                    alt={fullTemplate?.templateName || event.template.templateName || event.template.name || 'قالب'}
+                                                    src={(event?.template?.imageUrl || fullTemplate?.imageUrl || '').startsWith('http') 
+                                                        ? (event?.template?.imageUrl || fullTemplate?.imageUrl) 
+                                                        : `http://82.137.244.167:5001${event?.template?.imageUrl || fullTemplate?.imageUrl}`}
+                                                    alt={fullTemplate?.templateName || event?.template?.templateName || event?.template?.name || 'قالب'}
                                                     style={{
                                                         width: '100%',
                                                         maxHeight: '300px',
@@ -533,7 +553,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
                                             </MuiBox>
                                         )}
                                         <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600, mb: 1 }}>
-                                            {fullTemplate?.templateName || event.template.templateName || event.template.name || `قالب #${event.template._id?.slice(-6) || ''}`}
+                                            {fullTemplate?.templateName || event?.template?.templateName || event?.template?.name || `قالب #${event?.template?._id?.slice(-6) || ''}`}
                                         </MuiTypography>
                                         {fullTemplate?.description && (
                                             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>
@@ -545,7 +565,85 @@ export default function ViewEventDialog({ open, onClose, event }) {
                             </>
                         )}
 
-                        {/* Dates */}
+                        {/* Notes */}
+                        {(event.notes || event.description) && (
+                            <>
+                                <MuiGrid item xs={12}>
+                                    <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)' }} />
+                                </MuiGrid>
+                                <MuiGrid item xs={12}>
+                                    <MuiTypography variant="h6" sx={{ fontWeight: 600, mb: 2, color: 'var(--color-primary-500)' }}>
+                                        {event.notes ? 'ملاحظات' : 'الوصف'}
+                                    </MuiTypography>
+                                    <MuiPaper sx={{ p: 3, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
+                                        <MuiBox sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                                            <FileText size={20} style={{ color: 'var(--color-primary-400)', marginTop: 2 }} />
+                                            <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+                                                {event.notes || event.description}
+                                            </MuiTypography>
+                                        </MuiBox>
+                                    </MuiPaper>
+                                </MuiGrid>
+                            </>
+                        )}
+
+                        {/* Scanners */}
+                        {eventScanners.length > 0 && (
+                            <>
+                                <MuiGrid item xs={12}>
+                                    <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)' }} />
+                                </MuiGrid>
+                                <MuiGrid item xs={12}>
+                                    <MuiTypography variant="h6" sx={{ fontWeight: 600, mb: 2, color: 'var(--color-primary-500)' }}>
+                                        الماسحات ({eventScanners.length})
+                                    </MuiTypography>
+                                    <MuiGrid container spacing={2}>
+                                        {eventScanners.map((scannerAssignment, index) => {
+                                            const scanner = scannerAssignment.scanner || {}
+                                            const assignmentId = scannerAssignment._id || scannerAssignment.id
+                                            return (
+                                                <MuiGrid item xs={12} sm={6} md={4} key={assignmentId || index}>
+                                                    <MuiPaper sx={{ p: 2.5, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
+                                                        <MuiBox sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                                                            <QrCode size={20} style={{ color: 'var(--color-primary-400)', marginTop: 2 }} />
+                                                            <MuiBox sx={{ flex: 1 }}>
+                                                                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600, mb: 1 }}>
+                                                                    {scanner.name || scanner.username || 'ماسح'}
+                                                                </MuiTypography>
+                                                                {scanner.username && scanner.name && (
+                                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', mb: 0.5 }}>
+                                                                        اسم المستخدم: {scanner.username}
+                                                                    </MuiTypography>
+                                                                )}
+                                                                {scanner.phone && (
+                                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', mb: 0.5 }}>
+                                                                        رقم الهاتف: {scanner.phone}
+                                                                    </MuiTypography>
+                                                                )}
+                                                                {scanner.email && (
+                                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', mb: 0.5 }}>
+                                                                        البريد الإلكتروني: {scanner.email}
+                                                                    </MuiTypography>
+                                                                )}
+                                                                {scannerAssignment.scannedCount !== undefined && (
+                                                                    <MuiBox sx={{ mt: 1.5, pt: 1.5, borderTop: '1px solid rgba(216, 185, 138, 0.15)' }}>
+                                                                        <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-400)', fontWeight: 600, fontSize: '0.85rem' }}>
+                                                                            عدد المسح: {scannerAssignment.scannedCount || 0}
+                                                                        </MuiTypography>
+                                                                    </MuiBox>
+                                                                )}
+                                                            </MuiBox>
+                                                        </MuiBox>
+                                                    </MuiPaper>
+                                                </MuiGrid>
+                                            )
+                                        })}
+                                    </MuiGrid>
+                                </MuiGrid>
+                            </>
+                        )}
+
+                        {/* Additional Information */}
                         <MuiGrid item xs={12}>
                             <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)' }} />
                         </MuiGrid>
@@ -554,8 +652,25 @@ export default function ViewEventDialog({ open, onClose, event }) {
                                 معلومات إضافية
                             </MuiTypography>
                             <MuiGrid container spacing={2}>
+                                {eventId && (
+                                    <MuiGrid item xs={12} sm={6} md={4}>
+                                        <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
+                                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                <Hash size={18} style={{ color: 'var(--color-primary-400)' }} />
+                                                <MuiBox>
+                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.75rem' }}>
+                                                        رقم الفعالية
+                                                    </MuiTypography>
+                                                    <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
+                                                        {String(eventId).slice(-8)}
+                                                    </MuiTypography>
+                                                </MuiBox>
+                                            </MuiBox>
+                                        </MuiPaper>
+                                    </MuiGrid>
+                                )}
                                 {event.createdAt && (
-                                    <MuiGrid item xs={12} sm={6}>
+                                    <MuiGrid item xs={12} sm={6} md={4}>
                                         <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
                                             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                                 <Calendar size={18} style={{ color: 'var(--color-primary-400)' }} />
@@ -564,7 +679,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
                                                         تاريخ الإنشاء
                                                     </MuiTypography>
                                                     <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
-                                                        {formatDate(event.createdAt, 'DD/MM/YYYY HH:mm')}
+                                                        {formatDate(event.createdAt, 'MM/DD/YYYY HH:mm')}
                                                     </MuiTypography>
                                                 </MuiBox>
                                             </MuiBox>
@@ -572,7 +687,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
                                     </MuiGrid>
                                 )}
                                 {event.updatedAt && (
-                                    <MuiGrid item xs={12} sm={6}>
+                                    <MuiGrid item xs={12} sm={6} md={4}>
                                         <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
                                             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                                 <Calendar size={18} style={{ color: 'var(--color-primary-400)' }} />
@@ -581,7 +696,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
                                                         آخر تحديث
                                                     </MuiTypography>
                                                     <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
-                                                        {formatDate(event.updatedAt, 'DD/MM/YYYY HH:mm')}
+                                                        {formatDate(event.updatedAt, 'MM/DD/YYYY HH:mm')}
                                                     </MuiTypography>
                                                 </MuiBox>
                                             </MuiBox>

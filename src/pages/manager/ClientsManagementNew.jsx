@@ -19,6 +19,7 @@ import MuiChip from '@/components/ui/MuiChip'
 import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog } from '@/components/common'
 import { QUERY_KEYS } from '@/config/constants'
 import { getClients, deleteClient, createClient, updateClient } from '@/api/manager'
+import { formatDate } from '@/utils/helpers'
 import ViewClientDialog from './components/ViewClientDialog'
 import CreateEditClientDialog from './components/CreateEditClientDialog'
 import {
@@ -90,12 +91,14 @@ export default function ClientsManagement() {
         if (debouncedSearch) {
             filtered = filtered.filter(client =>
                 client.name?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+                client.username?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
                 client.phone?.includes(debouncedSearch)
             )
         }
 
         return filtered
     }, [clients, debouncedSearch])
+
 
     // Stats
     const stats = {
@@ -108,9 +111,9 @@ export default function ClientsManagement() {
     const columns = [
         {
             id: 'name',
-            label: 'العميل',
+            label: 'الاسم',
             align: 'right',
-            format: (value) => (
+            format: (value, row) => (
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <MuiAvatar
                         sx={{
@@ -126,10 +129,25 @@ export default function ClientsManagement() {
                     </MuiAvatar>
                     <MuiBox>
                         <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
-                            {value}
+                            {value || '—'}
                         </MuiTypography>
+                        {row.username && (
+                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+                                @{row.username}
+                            </MuiTypography>
+                        )}
                     </MuiBox>
                 </MuiBox>
+            )
+        },
+        {
+            id: 'username',
+            label: 'اسم المستخدم',
+            align: 'right',
+            format: (value) => (
+                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)' }}>
+                    {value || '—'}
+                </MuiTypography>
             )
         },
         {
@@ -144,13 +162,15 @@ export default function ClientsManagement() {
             )
         },
         {
-            id: 'eventsCount',
-            label: 'عدد الفعاليات',
+            id: 'createdAt',
+            label: 'تاريخ الإنشاء',
             align: 'center',
             format: (value) => (
-                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
-                    <Calendar size={14} style={{ color: '#FFE36C' }} />
-                    <MuiTypography variant="body2">{value || 0}</MuiTypography>
+                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Calendar size={14} style={{ color: 'var(--color-primary-400)' }} />
+                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
+                        {formatDate(value, 'MM/DD/YYYY') || '—'}
+                    </MuiTypography>
                 </MuiBox>
             )
         },

@@ -9,7 +9,8 @@ import MuiIconButton from '@/components/ui/MuiIconButton'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiChip from '@/components/ui/MuiChip'
 import MuiPaper from '@/components/ui/MuiPaper'
-import { X, Tag, FileText, Calendar, Expand, ZoomIn, ZoomOut, RotateCw } from 'lucide-react'
+import MuiDivider from '@/components/ui/MuiDivider'
+import { X, Tag, FileText, Calendar, Expand, ZoomIn, ZoomOut, RotateCw, Clock, Building2, MapPin, Users, Table, Armchair } from 'lucide-react'
 import { formatDate } from '@/utils/helpers'
 
 export default function ViewTemplateDialog({ open, onClose, template }) {
@@ -182,36 +183,81 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                         <MuiDialogContent sx={{ p: 3 }}>
                             <MuiGrid container spacing={3}>
                                 {/* Hall Information */}
-                                <MuiGrid item xs={12}>
-                                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                        <MuiChip
-                                            label="معلومات القاعة"
-                                            size="small"
-                                            sx={{
-                                                backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                                                color: 'var(--color-primary-400)',
-                                                fontWeight: 600,
-                                                border: '1px solid rgba(216, 185, 138, 0.3)',
-                                            }}
-                                        />
-                                    </MuiBox>
-                                </MuiGrid>
-
-                                <MuiGrid item xs={12}>
-                                    <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', mb: 2 }}>
-                                        {template.hallId?.name || '—'}
-                                    </MuiTypography>
-                                    {template.hallId?.location && (
-                                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1 }}>
-                                            الموقع: {template.hallId.location}
-                                        </MuiTypography>
-                                    )}
-                                    {template.hallId?.capacity && (
-                                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                                            السعة: {template.hallId.capacity} شخص
-                                        </MuiTypography>
-                                    )}
-                                </MuiGrid>
+                                {template.hallId && (
+                                    <>
+                                        <MuiGrid item xs={12}>
+                                            <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)', mb: 2 }} />
+                                        </MuiGrid>
+                                        <MuiGrid item xs={12}>
+                                            <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <Building2 size={20} style={{ color: 'var(--color-primary-500)' }} />
+                                                معلومات القاعة
+                                            </MuiTypography>
+                                            <MuiGrid container spacing={2}>
+                                                {typeof template.hallId === 'object' && template.hallId.name && (
+                                                    <MuiGrid item xs={12} sm={6} md={4}>
+                                                        <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
+                                                            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, fontSize: '0.75rem' }}>
+                                                                اسم القاعة
+                                                            </MuiTypography>
+                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                                {template.hallId.name}
+                                                            </MuiTypography>
+                                                        </MuiPaper>
+                                                    </MuiGrid>
+                                                )}
+                                                {typeof template.hallId === 'object' && template.hallId.location && (
+                                                    <MuiGrid item xs={12} sm={6} md={4}>
+                                                        <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
+                                                            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, fontSize: '0.75rem' }}>
+                                                                الموقع
+                                                            </MuiTypography>
+                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                                {template.hallId.location}
+                                                            </MuiTypography>
+                                                        </MuiPaper>
+                                                    </MuiGrid>
+                                                )}
+                                                {typeof template.hallId === 'object' && template.hallId.capacity && (
+                                                    <MuiGrid item xs={12} sm={6} md={4}>
+                                                        <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
+                                                            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, fontSize: '0.75rem' }}>
+                                                                السعة القصوى
+                                                            </MuiTypography>
+                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                                {template.hallId.capacity} شخص
+                                                            </MuiTypography>
+                                                        </MuiPaper>
+                                                    </MuiGrid>
+                                                )}
+                                                {typeof template.hallId === 'object' && template.hallId.tables && (
+                                                    <MuiGrid item xs={12} sm={6} md={4}>
+                                                        <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
+                                                            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, fontSize: '0.75rem' }}>
+                                                                عدد الطاولات
+                                                            </MuiTypography>
+                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                                {template.hallId.tables}
+                                                            </MuiTypography>
+                                                        </MuiPaper>
+                                                    </MuiGrid>
+                                                )}
+                                                {typeof template.hallId === 'object' && template.hallId.chairs && (
+                                                    <MuiGrid item xs={12} sm={6} md={4}>
+                                                        <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
+                                                            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, fontSize: '0.75rem' }}>
+                                                                عدد الكراسي
+                                                            </MuiTypography>
+                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                                {template.hallId.chairs}
+                                                            </MuiTypography>
+                                                        </MuiPaper>
+                                                    </MuiGrid>
+                                                )}
+                                            </MuiGrid>
+                                        </MuiGrid>
+                                    </>
+                                )}
 
                                 {/* Template Details */}
                                 <MuiGrid item xs={12}>
@@ -235,7 +281,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                             </MuiPaper>
                                         </MuiGrid>
 
-                                        <MuiGrid item xs={12} sm={6} md={3}>
+                                        <MuiGrid item xs={12} sm={6} md={4}>
                                             <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--color-border-glass)', borderRadius: '12px' }}>
                                                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                                     <Calendar size={20} style={{ color: 'var(--color-primary-400)' }} />
@@ -244,23 +290,23 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                                             تاريخ الإنشاء
                                                         </MuiTypography>
                                                         <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
-                                                            {formatDate(template.createdAt, 'DD/MM/YYYY')}
+                                                            {formatDate(template.createdAt, 'MM/DD/YYYY')}
                                                         </MuiTypography>
                                                     </MuiBox>
                                                 </MuiBox>
                                             </MuiPaper>
                                         </MuiGrid>
 
-                                        <MuiGrid item xs={12} sm={6} md={3}>
+                                        <MuiGrid item xs={12} sm={6} md={4}>
                                             <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--color-border-glass)', borderRadius: '12px' }}>
                                                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                    <FileText size={20} style={{ color: 'var(--color-primary-400)' }} />
+                                                    <Clock size={20} style={{ color: 'var(--color-primary-400)' }} />
                                                     <MuiBox>
                                                         <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.75rem' }}>
-                                                            الحالة
+                                                            آخر تحديث
                                                         </MuiTypography>
                                                         <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
-                                                            نشط
+                                                            {formatDate(template.updatedAt, 'MM/DD/YYYY')}
                                                         </MuiTypography>
                                                     </MuiBox>
                                                 </MuiBox>

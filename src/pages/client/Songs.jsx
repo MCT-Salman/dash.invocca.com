@@ -326,7 +326,7 @@ export default function ClientSongs() {
       format: (value) => {
         if (!value) return '—'
         try {
-          return formatDate(value, 'DD/MM/YYYY HH:mm')
+          return formatDate(value, 'MM/DD/YYYY HH:mm')
         } catch {
           return formatEmptyValue(value)
         }
@@ -355,17 +355,6 @@ export default function ClientSongs() {
             }}
           />
         )
-      },
-    },
-    {
-      id: 'addedBy',
-      label: 'أضيف بواسطة',
-      format: (value, row) => {
-        const addedBy = row.addedBy || value
-        if (typeof addedBy === 'object' && addedBy.name) {
-          return formatEmptyValue(addedBy.name)
-        }
-        return '—'
       },
     },
   ]
@@ -1018,7 +1007,7 @@ function ViewSongDialog({ open, onClose, song }) {
               <Calendar size={16} style={{ color: 'var(--color-primary-500)' }} />
               <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 500 }}>
                 {song.scheduledTime
-                  ? formatDate(song.scheduledTime, 'DD/MM/YYYY HH:mm')
+                  ? formatDate(song.scheduledTime, 'MM/DD/YYYY HH:mm')
                   : '—'}
               </MuiTypography>
             </MuiBox>
@@ -1072,6 +1061,125 @@ function ViewSongDialog({ open, onClose, song }) {
             )}
           </MuiBox>
         </MuiGrid>
+
+        {/* Play Status */}
+        <MuiGrid item xs={12} sm={6}>
+          <MuiBox>
+            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
+              حالة التشغيل
+            </MuiTypography>
+            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              {song.playStatus && (
+                <MuiChip
+                  label={
+                    song.playStatus === 'playing' ? 'قيد التشغيل' :
+                    song.playStatus === 'paused' ? 'متوقف' :
+                    song.playStatus === 'played' ? 'تم تشغيلها' :
+                    song.playStatus === 'pending' ? 'في الانتظار' :
+                    song.playStatus
+                  }
+                  size="small"
+                  sx={{
+                    backgroundColor: song.playStatus === 'playing' ? 'rgba(34, 197, 94, 0.1)' :
+                                    song.playStatus === 'played' ? 'rgba(2, 132, 199, 0.1)' :
+                                    song.playStatus === 'paused' ? 'rgba(249, 115, 22, 0.1)' :
+                                    'rgba(216, 185, 138, 0.1)',
+                    color: song.playStatus === 'playing' ? '#22c55e' :
+                           song.playStatus === 'played' ? '#0284c7' :
+                           song.playStatus === 'paused' ? '#f97316' :
+                           'var(--color-primary-400)',
+                    fontWeight: 600,
+                  }}
+                />
+              )}
+            </MuiBox>
+          </MuiBox>
+        </MuiGrid>
+
+        {/* Order in Event */}
+        {song.orderInEvent !== undefined && (
+          <MuiGrid item xs={12} sm={6}>
+            <MuiBox>
+              <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
+                ترتيب في الفعالية
+              </MuiTypography>
+              <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 500 }}>
+                {song.orderInEvent}
+              </MuiTypography>
+            </MuiBox>
+          </MuiGrid>
+        )}
+
+        {/* Is Explicit */}
+        {song.isExplicit !== undefined && (
+          <MuiGrid item xs={12} sm={6}>
+            <MuiBox>
+              <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
+                محتوى صريح
+              </MuiTypography>
+              <MuiChip
+                label={song.isExplicit ? 'نعم' : 'لا'}
+                size="small"
+                sx={{
+                  backgroundColor: song.isExplicit ? 'rgba(220, 38, 38, 0.1)' : 'rgba(34, 197, 94, 0.1)',
+                  color: song.isExplicit ? '#dc2626' : '#22c55e',
+                  fontWeight: 600,
+                }}
+              />
+            </MuiBox>
+          </MuiGrid>
+        )}
+
+        {/* Added By */}
+        {song.addedBy && (
+          <MuiGrid item xs={12} sm={6}>
+            <MuiBox>
+              <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
+                أضيف بواسطة
+              </MuiTypography>
+              <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Users size={16} style={{ color: 'var(--color-primary-500)' }} />
+                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 500 }}>
+                  {typeof song.addedBy === 'object' ? song.addedBy.name : song.addedBy}
+                </MuiTypography>
+              </MuiBox>
+            </MuiBox>
+          </MuiGrid>
+        )}
+
+        {/* Created At */}
+        {song.createdAt && (
+          <MuiGrid item xs={12} sm={6}>
+            <MuiBox>
+              <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
+                تاريخ الإنشاء
+              </MuiTypography>
+              <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Calendar size={16} style={{ color: 'var(--color-primary-500)' }} />
+                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 500 }}>
+                  {formatDate(song.createdAt, 'MM/DD/YYYY HH:mm')}
+                </MuiTypography>
+              </MuiBox>
+            </MuiBox>
+          </MuiGrid>
+        )}
+
+        {/* Updated At */}
+        {song.updatedAt && song.updatedAt !== song.createdAt && (
+          <MuiGrid item xs={12} sm={6}>
+            <MuiBox>
+              <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
+                آخر تحديث
+              </MuiTypography>
+              <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Calendar size={16} style={{ color: 'var(--color-primary-500)' }} />
+                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 500 }}>
+                  {formatDate(song.updatedAt, 'MM/DD/YYYY HH:mm')}
+                </MuiTypography>
+              </MuiBox>
+            </MuiBox>
+          </MuiGrid>
+        )}
 
         {/* Notes */}
         {song.notes && (
