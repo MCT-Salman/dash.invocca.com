@@ -13,8 +13,11 @@ import MuiIconButton from '@/components/ui/MuiIconButton'
 import MuiSelect from '@/components/ui/MuiSelect'
 import MuiMenuItem from '@/components/ui/MuiMenuItem'
 import MuiSwitch from '@/components/ui/MuiSwitch'
+import MuiFormControl from '@/components/ui/MuiFormControl'
+import MuiInputLabel from '@/components/ui/MuiInputLabel'
+import MuiChip from '@/components/ui/MuiChip'
 import { FormDialog } from '@/components/common'
-import { getServicesList } from '@/api/admin'
+import { getServicesList, getTemplates } from '@/api/admin'
 import { Plus, Trash2, UploadCloud, X } from 'lucide-react'
 import { FILE_UPLOAD } from '@/config/constants'
 import { useNotification } from '@/hooks'
@@ -28,7 +31,6 @@ const createHallSchema = (editingHall = null) => z.object({
     capacity: z.coerce.number().min(1, 'السعة مطلوبة').max(10000, 'السعة كبيرة جداً'),
     tables: z.coerce.number().min(1, 'عدد الطاولات مطلوب').max(1000, 'عدد الطاولات كبير جداً'),
     chairs: z.coerce.number().min(1, 'عدد الكراسي مطلوب').max(10000, 'عدد الكراسي كبير جداً'),
-    maxEmployees: z.coerce.number().min(1, 'الحد الأقصى للموظفين مطلوب').max(1000, 'الحد الأقصى للموظفين كبير جداً'),
     defaultPrices: z.coerce.number().min(0, 'السعر مطلوب').max(1000000, 'السعر كبير جداً'),
 
     managerName: z.string().min(3, 'اسم المدير مطلوب').max(100, 'اسم المدير طويل جداً'),
@@ -43,9 +45,14 @@ const createHallSchema = (editingHall = null) => z.object({
     isActive: z.boolean().default(true),
 
     services: z.array(z.object({
-        service: z.string().min(1, 'الخدمة مطلوبة'),
-        customPrice: z.coerce.number().min(0, 'السعر مطلوب')
-    })).optional().default([])
+        service: z.string().min(1, 'الخدمة مطلوبة')
+    })).optional().default([]),
+    
+    templates: z.array(z.string())
+        .optional()
+        .default([]),
+
+    newTemplateName: z.string().optional().or(z.literal(''))
 })
 
 export default function CreateEditHallDialog({ open, onClose, onSubmit, editingHall, loading }) {
@@ -60,6 +67,7 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
     const [primaryImage, setPrimaryImage] = useState(null)
     const [galleryImages, setGalleryImages] = useState([])
     const [existingGalleryImages, setExistingGalleryImages] = useState([])
+    const [newTemplateImage, setNewTemplateImage] = useState(null)
 
     const { data: servicesData } = useQuery({
         queryKey: ['admin', 'services-list'],
@@ -67,9 +75,19 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
         staleTime: 5 * 60 * 1000
     })
 
+    const { data: templatesData } = useQuery({
+        queryKey: ['admin', 'templates-list'],
+        queryFn: getTemplates,
+        staleTime: 5 * 60 * 1000
+    })
+
     const servicesList = Array.isArray(servicesData)
         ? servicesData
         : (Array.isArray(servicesData?.data) ? servicesData.data : (servicesData?.services || []))
+
+    const templatesList = Array.isArray(templatesData)
+        ? templatesData
+        : (Array.isArray(templatesData?.data) ? templatesData.data : (Array.isArray(templatesData?.templates) ? templatesData.templates : []))
 
     const {
         control,
@@ -85,7 +103,6 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
             capacity: editingHall?.capacity || '',
             tables: editingHall?.tables || '',
             chairs: editingHall?.chairs || '',
-            maxEmployees: editingHall?.maxEmployees || '',
             defaultPrices: editingHall?.defaultPrices || '',
             managerName: editingHall?.generalManager?.name || editingHall?.managerName || '',
             managerUsername: editingHall?.generalManager?.username || editingHall?.managerUsername || '',
@@ -97,7 +114,8 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
             services: editingHall?.services?.map(s => ({
                 service: s.service?._id || s.service,
                 customPrice: s.customPrice || 0
-            })) || []
+            })) || [],
+            templates: editingHall?.templates?.map(t => t._id || t) || []
         }
     })
 
@@ -116,7 +134,6 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                     capacity: editingHall.capacity,
                     tables: editingHall.tables || '',
                     chairs: editingHall.chairs || '',
-                    maxEmployees: editingHall.maxEmployees || '',
                     defaultPrices: editingHall.defaultPrices,
                     managerName: editingHall.generalManager?.name || editingHall.managerName || '',
                     managerUsername: editingHall.generalManager?.username || editingHall.managerUsername || '',
@@ -128,7 +145,8 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                     services: editingHall.services?.map(s => ({
                         service: s.service?._id || s.service,
                         customPrice: s.customPrice || 0
-                    })) || []
+                    })) || [],
+                    templates: editingHall.templates?.map(t => t._id || t) || []
                 })
                 // Set existing gallery images after reset to avoid cascading renders
                 setTimeout(() => {
@@ -142,7 +160,6 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                     capacity: '',
                     tables: '',
                     chairs: '',
-                    maxEmployees: '',
                     defaultPrices: '',
                     managerName: '',
                     managerUsername: '',
@@ -151,7 +168,8 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                     managerPassword: '',
                     description: '',
                     isActive: true,
-                    services: []
+                    services: [],
+                    templates: []
                 })
                 // Set state after reset to avoid cascading renders
                 setTimeout(() => {
@@ -187,6 +205,15 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                         }
                         if (svc.customPrice !== undefined && svc.customPrice !== null) {
                             formData.append(`services[${index}][customPrice]`, String(svc.customPrice))
+                        }
+                    })
+                }
+            } else if (key === 'templates') {
+                // Handle templates array
+                if (Array.isArray(data.templates)) {
+                    data.templates.forEach((templateId, index) => {
+                        if (templateId) {
+                            formData.append(`templates[${index}]`, String(templateId))
                         }
                     })
                 }
@@ -378,23 +405,6 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                     />
                 </MuiGrid>
 
-                <MuiGrid item xs={6} md={3}>
-                    <Controller
-                        name="maxEmployees"
-                        control={control}
-                        render={({ field }) => (
-                            <MuiTextField
-                                {...field}
-                                label="الحد الأقصى للموظفين"
-                                type="number"
-                                fullWidth
-                                error={!!errors.maxEmployees}
-                                helperText={errors.maxEmployees?.message}
-                            />
-                        )}
-                    />
-                </MuiGrid>
-
                 <MuiGrid item xs={12} md={6}>
                     <Controller
                         name="defaultPrices"
@@ -563,6 +573,61 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                             </MuiIconButton>
                         </MuiBox>
                     ))}
+                </MuiGrid>
+
+                {/* Templates */}
+                <MuiGrid item xs={12}>
+                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 1, color: 'var(--color-primary-500)' }}>
+                        القوالب المتاحة
+                    </MuiTypography>
+                    <Controller
+                        name="templates"
+                        control={control}
+                        render={({ field }) => (
+                            <MuiFormControl fullWidth>
+                                <MuiSelect
+                                    {...field}
+                                    multiple
+                                    displayEmpty
+                                    renderValue={(selected) => {
+                                        if (!selected || selected.length === 0) {
+                                            return <span style={{ color: 'var(--color-text-secondary)' }}>اختر القوالب</span>
+                                        }
+                                        return (
+                                            <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                {selected.map((templateId) => {
+                                                    const template = templatesList.find(t => (t._id || t.id) === templateId)
+                                                    return (
+                                                        <MuiChip
+                                                            key={templateId}
+                                                            label={template?.templateName || template?.name || templateId}
+                                                            size="small"
+                                                            sx={{
+                                                                backgroundColor: 'rgba(216, 185, 138, 0.2)',
+                                                                color: 'var(--color-primary-500)',
+                                                                height: 24,
+                                                                fontSize: '0.75rem'
+                                                            }}
+                                                        />
+                                                    )
+                                                })}
+                                            </MuiBox>
+                                        )
+                                    }}
+                                >
+                                    {Array.isArray(templatesList) && templatesList.length > 0 ? (
+                                        templatesList.map(template => (
+                                            <MuiMenuItem key={template._id || template.id} value={template._id || template.id}>
+                                                {template.templateName || template.name || template._id || template.id}
+                                            </MuiMenuItem>
+                                        ))
+                                    ) : (
+                                        <MuiMenuItem disabled>لا توجد قوالب متاحة</MuiMenuItem>
+                                    )}
+                                </MuiSelect>
+                            </MuiFormControl>
+                        )}
+                    />
                 </MuiGrid>
 
                 {/* Images */}

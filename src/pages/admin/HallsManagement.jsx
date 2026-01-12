@@ -115,10 +115,6 @@ const createHallSchema = (editingHall = null) => z.object({
     .min(1, 'عدد الكراسي مطلوب')
     .max(10000, 'عدد الكراسي كبير جداً'),
 
-  maxEmployees: z.coerce.number()
-    .min(1, 'الحد الأقصى للموظفين مطلوب')
-    .max(1000, 'الحد الأقصى للموظفين كبير جداً'),
-
   defaultPrices: z.coerce.number()
     .min(0, 'السعر مطلوب')
     .max(1000000, 'السعر كبير جداً'),
@@ -423,6 +419,7 @@ const HallsManagement = () => {
       align: 'right',
       format: (value, row) => {
         const name = value?.name || row.managerName || '—'
+        const username = value?.username
         const phone = value?.phone || row.managerPhone
 
         return (
@@ -430,6 +427,11 @@ const HallsManagement = () => {
             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 500 }}>
               {name}
             </MuiTypography>
+            {username && (
+              <MuiTypography variant="caption" sx={{ color: 'var(--color-primary-500)', fontWeight: 500, display: 'block' }}>
+                @{username}
+              </MuiTypography>
+            )}
             {phone && (
               <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
                 {formatPhoneNumber(phone) || phone}

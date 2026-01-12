@@ -11,7 +11,7 @@ import { LoadingScreen, EmptyState, SEOHead, ConfirmDialog } from '@/components/
 import { BaseFormDialog, FormField } from '@/components/shared'
 import { useDialogState, useCRUD, useNotification } from '@/hooks'
 import { QUERY_KEYS } from '@/config/constants'
-import { getInvitations, createInvitation, updateInvitation, deleteInvitation, getClientDashboard } from '@/api/client'
+import { getInvitations, createInvitation, updateInvitation, deleteInvitation, getClientDashboard, getClientTemplates, getTemplateById } from '@/api/client'
 import { formatDate } from '@/utils/helpers'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -31,8 +31,9 @@ import MuiTextField from '@/components/ui/MuiTextField'
 import { Controller } from 'react-hook-form'
 
 // Validation schema - will be created dynamically with eventGuestCount and totalInvitedPeople
-const createInvitationSchema = (eventGuestCount, totalInvitedPeople, isEdit, currentInvitationCount) => {
+const createInvitationSchema = (eventGuestCount, totalInvitedPeople, isEdit, currentInvitationCount, isCreate) => {
   return z.object({
+    eventId: isCreate ? z.string().min(1, 'يجب اختيار فعالية') : z.string().optional(),
     guestName: z.string().min(1, 'اسم الضيف مطلوب'),
     numOfPeople: z.coerce.number()
       .min(1, 'عدد الأشخاص يجب أن يكون على الأقل 1')
@@ -88,7 +89,7 @@ export default function Invitations() {
     queryFn: getClientDashboard,
   })
 
-  // Fetch dashboard to get templates
+  // Fetch dashboard to get templates from events
   const { data: dashboardData } = useQuery({
     queryKey: QUERY_KEYS.CLIENT_DASHBOARD,
     queryFn: getClientDashboard,
@@ -137,18 +138,52 @@ export default function Invitations() {
     }, 0)
 
   const handleSubmit = async (formData) => {
+    // Get event guest count based on selected event (for create) or invitation's event (for edit)
+    let currentEventGuestCount = eventGuestCount
+    let currentTotalInvited = totalInvitedPeople
+    let eventIdForValidation = currentEventId
+    
+    if (!isEdit && formData.eventId) {
+      // For create, get guest count from selected event
+      const selectedEvent = bookings.find(b => (b._id || b.id)?.toString() === formData.eventId?.toString())
+      if (selectedEvent) {
+        currentEventGuestCount = selectedEvent.guestCount || 0
+        eventIdForValidation = selectedEvent._id || selectedEvent.id
+        // Calculate total invited for this specific event
+        currentTotalInvited = invitations
+          .filter(inv => {
+            const invEvtId = inv.eventId?._id || inv.eventId || null
+            return invEvtId?.toString() === eventIdForValidation?.toString()
+          })
+          .reduce((sum, inv) => sum + (inv.numOfPeople || 0), 0)
+      }
+    } else if (isEdit && editingInvitation) {
+      // For edit, use invitation's event
+      eventIdForValidation = editingInvitation.eventId?._id || editingInvitation.eventId || null
+      const event = bookings.find(b => (b._id || b.id)?.toString() === eventIdForValidation?.toString())
+      if (event) {
+        currentEventGuestCount = event.guestCount || 0
+      }
+      currentTotalInvited = invitations
+        .filter(inv => {
+          const invEvtId = inv.eventId?._id || inv.eventId || null
+          return invEvtId?.toString() === eventIdForValidation?.toString()
+        })
+        .reduce((sum, inv) => sum + (inv.numOfPeople || 0), 0)
+    }
+    
     // Validate total guests count BEFORE submitting
-    if (eventGuestCount > 0) {
+    if (currentEventGuestCount > 0) {
       const currentInvitationCount = editingInvitation?.numOfPeople || 0
       const newTotal = isEdit 
-        ? totalInvitedPeople - currentInvitationCount + formData.numOfPeople
-        : totalInvitedPeople + formData.numOfPeople
+        ? currentTotalInvited - currentInvitationCount + formData.numOfPeople
+        : currentTotalInvited + formData.numOfPeople
       
-      if (newTotal > eventGuestCount) {
-        const remaining = eventGuestCount - (isEdit ? totalInvitedPeople - currentInvitationCount : totalInvitedPeople)
+      if (newTotal > currentEventGuestCount) {
+        const remaining = currentEventGuestCount - (isEdit ? currentTotalInvited - currentInvitationCount : currentTotalInvited)
         showNotification({
           title: 'خطأ',
-          message: `عدد الضيوف في الفعالية هو ${eventGuestCount} فقط. المدعوون الحاليون: ${totalInvitedPeople - (isEdit ? currentInvitationCount : 0)}. يمكنك إضافة ${remaining > 0 ? remaining : 0} ضيف فقط.`,
+          message: `عدد الضيوف في الفعالية هو ${currentEventGuestCount} فقط. المدعوون الحاليون: ${currentTotalInvited - (isEdit ? currentInvitationCount : 0)}. يمكنك إضافة ${remaining > 0 ? remaining : 0} ضيف فقط.`,
           type: 'error'
         })
         return // Stop execution - don't submit
@@ -159,6 +194,11 @@ export default function Invitations() {
     const submitData = {
       guestName: String(formData.guestName || '').trim(),
       numOfPeople: Number(formData.numOfPeople) || 1,
+    }
+    
+    // Add eventId for create operation only (required)
+    if (!isEdit && formData.eventId) {
+      submitData.eventId = formData.eventId
     }
     
     // Validate required fields
@@ -175,6 +215,16 @@ export default function Invitations() {
       showNotification({
         title: 'خطأ',
         message: 'عدد الأشخاص يجب أن يكون على الأقل 1',
+        type: 'error'
+      })
+      return
+    }
+    
+    // Validate eventId for create operation
+    if (!isEdit && !submitData.eventId) {
+      showNotification({
+        title: 'خطأ',
+        message: 'يجب اختيار فعالية',
         type: 'error'
       })
       return
@@ -461,6 +511,8 @@ export default function Invitations() {
         loading={crudLoading}
         eventGuestCount={eventGuestCount}
         totalInvitedPeople={totalInvitedPeople}
+        bookings={bookings}
+        invitations={invitations}
       />
 
       {/* Delete Confirmation */}
@@ -505,164 +557,508 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                 ? invitation.eventId 
                 : (bookings?.find(b => (b._id || b.id) === eventId) || null)
   
+  // Fetch templates for this event/user
+  const { data: templatesData } = useQuery({
+    queryKey: ['client', 'templates'],
+    queryFn: () => getClientTemplates(),
+    enabled: open, // Only fetch when dialog is open
+  })
+  
+  // Get template ID from invitation event
+  const templateIdFromEvent = useMemo(() => {
+    if (invitation?.eventId?.template) {
+      if (typeof invitation.eventId.template === 'string') {
+        return invitation.eventId.template
+      } else if (typeof invitation.eventId.template === 'object') {
+        return invitation.eventId.template._id || invitation.eventId.template.id
+      }
+    }
+    return null
+  }, [invitation])
+  
+  // Fetch full template data if we only have an ID
+  const { data: fullTemplateData, isLoading: isLoadingTemplate } = useQuery({
+    queryKey: ['client', 'template', templateIdFromEvent],
+    queryFn: () => getTemplateById(templateIdFromEvent),
+    enabled: open && !!templateIdFromEvent, // Only fetch when dialog is open and we have a template ID
+  })
+  
+  // Debug: log template fetching
+  console.log('🔍 Template Fetching Debug:', {
+    'templateIdFromEvent': templateIdFromEvent,
+    'fullTemplateData': fullTemplateData,
+    'isLoadingTemplate': isLoadingTemplate,
+    'open': open
+  })
+  
   // Get available templates from dashboard or event
   const allEvents = useMemo(() => {
     const responseData = dashboardData?.data || dashboardData || {}
     return responseData.allEvents || responseData.recentActivity?.events || responseData.events || []
   }, [dashboardData])
   
+  // Get current event from available data
   const currentEvent = useMemo(() => {
     return allEvents.find(e => (e._id || e.id) === eventId) || event
   }, [allEvents, eventId, event])
   
-  // Extract templates from multiple sources
+  // Extract templates from API and events - prioritize API templates
   const availableTemplates = useMemo(() => {
     const templates = []
     const responseData = dashboardData?.data || dashboardData || {}
+    
+    // Priority 0: Get full template data if we fetched it by ID
+    if (fullTemplateData) {
+      console.log('🔍 Full Template Data from API:', JSON.stringify(fullTemplateData, null, 2))
+      const template = fullTemplateData.template || fullTemplateData.data || fullTemplateData
+      if (template && (template._id || template.id)) {
+        const templateId = template._id || template.id
+        const existingIndex = templates.findIndex(t => {
+          const tId = t._id || t.id
+          return tId && templateId && tId.toString() === templateId.toString()
+        })
+        
+        const fullTemplate = {
+          _id: templateId,
+          id: templateId,
+          templateName: template.templateName || template.name || `Template ${templateId}`,
+          imageUrl: template.imageUrl || template.image || '',
+          ...template
+        }
+        
+        console.log('🔍 Full Template Object:', JSON.stringify(fullTemplate, null, 2))
+        
+        if (existingIndex >= 0) {
+          // Update existing template with full data
+          templates[existingIndex] = fullTemplate
+        } else {
+          // Add new template
+          templates.push(fullTemplate)
+        }
+      }
+    }
+    
+    // Priority 1: Get templates from API (templatesData)
+    const apiTemplates = templatesData?.templates || templatesData?.data?.templates || templatesData?.data || []
+    
+    // Debug: log API response
+    console.log('🔍 Templates API Response:', {
+      'templatesData': templatesData,
+      'apiTemplates': apiTemplates,
+      'isArray': Array.isArray(apiTemplates),
+      'length': Array.isArray(apiTemplates) ? apiTemplates.length : 'not array'
+    })
+    console.log('🔍 Templates API Response (Full):', JSON.stringify({
+      'templatesData': templatesData,
+      'apiTemplates': apiTemplates
+    }, null, 2))
+    
+    if (Array.isArray(apiTemplates) && apiTemplates.length > 0) {
+      apiTemplates.forEach(template => {
+        if (template && typeof template === 'object') {
+          // Accept templates even if they don't have both image and name (for now)
+          const hasImage = !!(template.imageUrl || template.image)
+          const hasName = !!(template.templateName || template.name || template._id || template.id)
+          
+          // Add template if it has at least an ID (required) and preferably an image
+          if (hasName) {
+            const templateId = template._id || template.id
+            if (templateId && !templates.find(t => (t._id || t.id) === templateId)) {
+              templates.push(template)
+            }
+          }
+        }
+      })
+    }
+    
+    // Priority 2: Extract templates from events (fallback)
+    // Collect all events from different sources
+    const allEventsList = [
+      ...(Array.isArray(allEvents) ? allEvents : []),
+      ...(Array.isArray(responseData.recentActivity?.events) ? responseData.recentActivity.events : []),
+      ...(Array.isArray(responseData.allEvents) ? responseData.allEvents : []),
+      ...(Array.isArray(responseData.events) ? responseData.events : []),
+      ...(currentEvent ? [currentEvent] : []),
+      ...(event ? [event] : []),
+      ...(invitation?.eventId && typeof invitation.eventId === 'object' ? [invitation.eventId] : []),
+      ...(responseData.nextEvent ? [responseData.nextEvent] : []),
+    ]
+    
+    // Helper function to find full template object by ID in all events
+    const findFullTemplateById = (templateId) => {
+      if (!templateId) return null
+      
+      // Search through all events to find the full template object
+      for (const evt of allEventsList) {
+        const evtTemplate = evt.template || evt.templateId
+        if (evtTemplate && typeof evtTemplate === 'object') {
+          const evtTemplateId = evtTemplate._id || evtTemplate.id
+          if (evtTemplateId && evtTemplateId.toString() === templateId.toString()) {
+            // Check if this template has full data (imageUrl and templateName)
+            if (evtTemplate.imageUrl || evtTemplate.image || evtTemplate.templateName || evtTemplate.name) {
+              return evtTemplate
+            }
+          }
+        }
+      }
+      
+      // Also check dashboard response for templates
+      if (responseData.templates && Array.isArray(responseData.templates)) {
+        for (const template of responseData.templates) {
+          const templateIdCheck = template._id || template.id
+          if (templateIdCheck && templateIdCheck.toString() === templateId.toString()) {
+            return template
+          }
+        }
+      }
+      
+      // Check nextEvent template
+      if (responseData.nextEvent?.template && typeof responseData.nextEvent.template === 'object') {
+        const nextEventTemplateId = responseData.nextEvent.template._id || responseData.nextEvent.template.id
+        if (nextEventTemplateId && nextEventTemplateId.toString() === templateId.toString()) {
+          return responseData.nextEvent.template
+        }
+      }
+      
+      // Check if template is nested in event data (e.g., event.template as object with full data)
+      // Sometimes the template might be populated in some events but not others
+      for (const evt of allEventsList) {
+        // Check if event has a populated template field
+        if (evt.template && typeof evt.template === 'object' && evt.template._id) {
+          const evtTemplateId = evt.template._id || evt.template.id
+          if (evtTemplateId && evtTemplateId.toString() === templateId.toString()) {
+            // Return if it has at least imageUrl or templateName
+            if (evt.template.imageUrl || evt.template.image || evt.template.templateName || evt.template.name) {
+              return evt.template
+            }
+          }
+        }
+      }
+      
+      return null
+    }
     
     // Helper function to add template if not already exists
     const addTemplate = (template) => {
       if (!template) return
       
-      // Handle both object and string ID cases
-      let templateObj = null
-      if (typeof template === 'string') {
-        // If it's a string ID, try to find the full template object in nextEvent
-        if (responseData.nextEvent?.template && typeof responseData.nextEvent.template === 'object') {
-          const nextEventTemplateId = responseData.nextEvent.template._id || responseData.nextEvent.template.id
-          if (nextEventTemplateId === template) {
-            templateObj = responseData.nextEvent.template
+      // If it's a full object
+      if (typeof template === 'object') {
+        // Check if template has required fields (at least an ID)
+        const templateId = template._id || template.id
+        if (!templateId) return // Must have an ID
+        
+        // Check if already added
+        const existingTemplate = templates.find(t => {
+          const tId = t._id || t.id
+          return tId && templateId && tId.toString() === templateId.toString()
+        })
+        
+        if (existingTemplate) {
+          // If already exists but incomplete, try to enrich it
+          if (!existingTemplate.imageUrl && !existingTemplate.templateName) {
+            const fullTemplate = findFullTemplateById(templateId)
+            if (fullTemplate) {
+              // Update existing template with full data
+              const index = templates.indexOf(existingTemplate)
+              templates[index] = {
+                ...existingTemplate,
+                templateName: fullTemplate.templateName || fullTemplate.name || existingTemplate.templateName,
+                imageUrl: fullTemplate.imageUrl || fullTemplate.image || existingTemplate.imageUrl,
+                ...fullTemplate // Include all other properties
+              }
+            }
+          }
+          return // Already added
+        }
+        
+        // Check if this template has full data (imageUrl and templateName)
+        const hasFullData = !!(template.imageUrl || template.image) && !!(template.templateName || template.name)
+        
+        if (hasFullData) {
+          // Add template with full data
+          templates.push({
+            _id: templateId,
+            id: templateId,
+            templateName: template.templateName || template.name,
+            imageUrl: template.imageUrl || template.image,
+            ...template // Include all other properties
+          })
+        } else {
+          // Try to find full template data
+          const fullTemplate = findFullTemplateById(templateId)
+          if (fullTemplate) {
+            templates.push({
+              _id: templateId,
+              id: templateId,
+              templateName: fullTemplate.templateName || fullTemplate.name || template.templateName || template.name || `Template ${templateId}`,
+              imageUrl: fullTemplate.imageUrl || fullTemplate.image || template.imageUrl || template.image || '',
+              ...fullTemplate, // Include all properties from full template
+              ...template // Override with any properties from current template
+            })
+          } else {
+            // Add template even if incomplete (will be enriched later if found)
+            templates.push({
+              _id: templateId,
+              id: templateId,
+              templateName: template.templateName || template.name || `Template ${templateId}`,
+              imageUrl: template.imageUrl || template.image || '',
+              ...template // Include all other properties
+            })
           }
         }
-        // If not found, create a minimal template object with the ID
-        if (!templateObj) {
-          templateObj = { _id: template, id: template }
+      } else if (typeof template === 'string') {
+        // If it's a string ID, search for full template object
+        const fullTemplate = findFullTemplateById(template)
+        
+        if (fullTemplate) {
+          const templateId = fullTemplate._id || fullTemplate.id || template
+          if (!templates.find(t => {
+            const tId = t._id || t.id
+            return tId && tId.toString() === templateId.toString()
+          })) {
+            templates.push({
+              _id: templateId,
+              id: templateId,
+              templateName: fullTemplate.templateName || fullTemplate.name || `Template ${templateId}`,
+              imageUrl: fullTemplate.imageUrl || fullTemplate.image || '',
+              ...fullTemplate
+            })
+          }
+        } else {
+          // If not found, add as a minimal template object
+          // But try to enrich it later by searching again
+          if (!templates.find(t => {
+            const tId = t._id || t.id
+            return tId && tId.toString() === template.toString()
+          })) {
+            templates.push({
+              _id: template,
+              id: template,
+              templateName: `Template ${template}`,
+              imageUrl: ''
+            })
+          }
         }
-      } else if (typeof template === 'object') {
-        templateObj = template
-      }
-      
-      if (templateObj) {
-        const templateId = templateObj._id || templateObj.id
-        if (templateId && !templates.find(t => (t._id || t.id) === templateId)) {
-          templates.push(templateObj)
-        }
       }
     }
     
-    // 1. First, check if templates are directly in the response
-    if (responseData.templates && Array.isArray(responseData.templates)) {
-      responseData.templates.forEach(template => addTemplate(template))
-    }
-    
-    // 2. Check nextEvent (this is where the full template object is!)
-    if (responseData.nextEvent) {
-      if (responseData.nextEvent.template) {
-        addTemplate(responseData.nextEvent.template)
-      }
-      if (responseData.nextEvent.templateId) {
-        addTemplate(responseData.nextEvent.templateId)
-      }
-    }
-    
-    // 3. Check templates in allEvents array
-    if (Array.isArray(allEvents)) {
-      allEvents.forEach(evt => {
-        if (evt.template) addTemplate(evt.template)
-        if (evt.templateId) addTemplate(evt.templateId)
-      })
-    }
-    
-    // 4. Check recentActivity events
-    if (responseData.recentActivity?.events && Array.isArray(responseData.recentActivity.events)) {
-      responseData.recentActivity.events.forEach(evt => {
-        if (evt.template) addTemplate(evt.template)
-        if (evt.templateId) addTemplate(evt.templateId)
-      })
-    }
-    
-    // 5. Check current event for template
+    // Priority 2: Extract templates from events (always check, not just if API failed)
+    // First, prioritize the current event's template
     if (currentEvent) {
+      console.log('🔍 Current Event Template:', {
+        'currentEvent': currentEvent,
+        'template': currentEvent.template,
+        'templateId': currentEvent.templateId
+      })
+      console.log('🔍 Current Event Template (Full):', JSON.stringify({
+        'currentEvent': currentEvent,
+        'template': currentEvent.template,
+        'templateId': currentEvent.templateId
+      }, null, 2))
       if (currentEvent.template) addTemplate(currentEvent.template)
       if (currentEvent.templateId) addTemplate(currentEvent.templateId)
     }
     
-    // 6. Check invitation event for template
-    if (invitation?.eventId) {
-      const eventData = typeof invitation.eventId === 'object' ? invitation.eventId : null
-      if (eventData) {
-        if (eventData.template) addTemplate(eventData.template)
-        if (eventData.templateId) addTemplate(eventData.templateId)
-      }
+    // Then check invitation's event template
+    if (invitation?.eventId && typeof invitation.eventId === 'object') {
+      console.log('🔍 Invitation Event Template:', {
+        'invitation.eventId': invitation.eventId,
+        'template': invitation.eventId.template,
+        'templateId': invitation.eventId.templateId
+      })
+      console.log('🔍 Invitation Event Template (Full):', JSON.stringify({
+        'invitation.eventId': invitation.eventId,
+        'template': invitation.eventId.template,
+        'templateId': invitation.eventId.templateId
+      }, null, 2))
+      if (invitation.eventId.template) addTemplate(invitation.eventId.template)
+      if (invitation.eventId.templateId) addTemplate(invitation.eventId.templateId)
     }
     
-    // 7. Check event prop directly
-    if (event) {
-      if (event.template) addTemplate(event.template)
-      if (event.templateId) addTemplate(event.templateId)
+    // Then extract from all other events
+    allEventsList.forEach(evt => {
+      // Skip if this is the current event (already processed)
+      const evtId = evt._id || evt.id
+      const currentEventId = currentEvent?._id || currentEvent?.id
+      if (evtId && currentEventId && evtId.toString() === currentEventId.toString()) {
+        return // Skip current event
+      }
+      
+      if (evt.template) addTemplate(evt.template)
+      if (evt.templateId) addTemplate(evt.templateId)
+    })
+    
+    // Also check if templates are directly in dashboard response
+    if (responseData.templates && Array.isArray(responseData.templates)) {
+      responseData.templates.forEach(template => addTemplate(template))
     }
+    
+    // After extracting all templates, try to enrich incomplete ones
+    // Note: This is async but we can't use await in useMemo, so we'll handle it differently
+    // For now, we'll enrich synchronously from available data
+    templates.forEach((template, index) => {
+      if (!template.imageUrl || !template.templateName || template.templateName.startsWith('Template ')) {
+        const templateId = template._id || template.id
+        // Try to find in local data first (synchronous)
+        let fullTemplate = null
+        
+        // Search through all events
+        for (const evt of allEventsList) {
+          const evtTemplate = evt.template || evt.templateId
+          if (evtTemplate && typeof evtTemplate === 'object') {
+            const evtTemplateId = evtTemplate._id || evtTemplate.id
+            if (evtTemplateId && evtTemplateId.toString() === templateId.toString()) {
+              if (evtTemplate.imageUrl || evtTemplate.image || evtTemplate.templateName || evtTemplate.name) {
+                fullTemplate = evtTemplate
+                break
+              }
+            }
+          }
+        }
+        
+        // Check dashboard templates
+        if (!fullTemplate && responseData.templates && Array.isArray(responseData.templates)) {
+          for (const t of responseData.templates) {
+            const tId = t._id || t.id
+            if (tId && tId.toString() === templateId.toString()) {
+              fullTemplate = t
+              break
+            }
+          }
+        }
+        
+        if (fullTemplate) {
+          templates[index] = {
+            ...template,
+            templateName: fullTemplate.templateName || fullTemplate.name || template.templateName,
+            imageUrl: fullTemplate.imageUrl || fullTemplate.image || template.imageUrl,
+            ...fullTemplate // Include all properties from full template
+          }
+        }
+      }
+    })
     
     // Debug: log for troubleshooting
     console.log('🔍 Template Extraction Debug:', {
+      'Templates Data (API)': templatesData,
+      'API Templates': apiTemplates,
       'Dashboard Data': responseData,
-      'Next Event': responseData.nextEvent,
-      'Next Event Template': responseData.nextEvent?.template,
-      'Direct Templates': responseData.templates,
-      'All Events': allEvents,
+      'All Events List': allEventsList,
       'Current Event': currentEvent,
+      'Current Event Template': currentEvent?.template,
+      'Current Event TemplateId': currentEvent?.templateId,
       'Invitation Event': invitation?.eventId,
+      'Invitation Event Template': invitation?.eventId?.template,
+      'Invitation Event TemplateId': invitation?.eventId?.templateId,
       'Extracted Templates': templates,
+      'Available Templates Count': templates.length,
     })
+    console.log('🔍 Template Extraction Debug (Full):', JSON.stringify({
+      'Extracted Templates': templates,
+      'Available Templates Count': templates.length,
+      'First Template': templates[0],
+      'All Events Templates': allEventsList.map(evt => ({
+        'eventId': evt._id || evt.id,
+        'template': evt.template,
+        'templateId': evt.templateId
+      }))
+    }, null, 2))
     
     return templates
-  }, [dashboardData, allEvents, currentEvent, invitation, event])
+  }, [templatesData, dashboardData, allEvents, currentEvent, invitation, event, fullTemplateData])
 
-  // Get selected template - prioritize template from the current event
-  // First check if user selected a template from dropdown (null means no template)
-  // Otherwise, use the template from the current event
+  // Get selected template - prioritize user selection, then API templates, then event templates
   const selectedTemplate = useMemo(() => {
     // If selectedTemplateId is explicitly null, return null (no template)
     if (selectedTemplateId === null) {
       return null
     }
-    // If a template ID is selected, find it
+    // Priority 1: If a template ID is selected from dropdown, find it in availableTemplates (from API)
     if (selectedTemplateId) {
-      return availableTemplates.find(t => (t._id || t.id) === selectedTemplateId) || null
+      const found = availableTemplates.find(t => {
+        const tId = t._id || t.id
+        return tId && tId.toString() === selectedTemplateId.toString()
+      })
+      if (found) return found
     }
-    // Priority order: currentEvent template > invitation.eventId template > first available template
-    if (currentEvent?.template && typeof currentEvent.template === 'object') return currentEvent.template
-    if (currentEvent?.templateId && typeof currentEvent.templateId === 'object') return currentEvent.templateId
-    if (invitation?.eventId?.template && typeof invitation.eventId.template === 'object') return invitation.eventId.template
-    if (invitation?.eventId?.templateId && typeof invitation.eventId.templateId === 'object') return invitation.eventId.templateId
-    if (event?.template && typeof event.template === 'object') return event.template
-    if (event?.templateId && typeof event.templateId === 'object') return event.templateId
+    // Priority 2: Check if current event has a template and find it in availableTemplates
+    const eventTemplateId = currentEvent?.template?._id || currentEvent?.template?.id || 
+                           currentEvent?.templateId?._id || currentEvent?.templateId?.id ||
+                           currentEvent?.templateId
+    if (eventTemplateId) {
+      const found = availableTemplates.find(t => {
+        const tId = t._id || t.id
+        return tId && tId.toString() === eventTemplateId.toString()
+      })
+      if (found) return found
+    }
+    // Priority 3: Check invitation event template
+    const invitationTemplateId = invitation?.eventId?.template?._id || invitation?.eventId?.template?.id ||
+                                 invitation?.eventId?.templateId?._id || invitation?.eventId?.templateId?.id ||
+                                 invitation?.eventId?.templateId
+    if (invitationTemplateId) {
+      const found = availableTemplates.find(t => {
+        const tId = t._id || t.id
+        return tId && tId.toString() === invitationTemplateId.toString()
+      })
+      if (found) return found
+    }
+    // Priority 4: Use first available template from API (if any)
     return availableTemplates[0] || null
   }, [selectedTemplateId, availableTemplates, currentEvent, invitation, event])
   
   // Get template image - check multiple possible locations with priority
   const templateImage = useMemo(() => {
-    return selectedTemplate?.imageUrl || 
-           selectedTemplate?.image || 
-           currentEvent?.template?.imageUrl || 
-           currentEvent?.template?.image ||
-           currentEvent?.templateId?.imageUrl || 
-           currentEvent?.templateId?.image ||
-           currentEvent?.templateImage || 
-           invitation?.eventId?.template?.imageUrl ||
-           invitation?.eventId?.template?.image ||
-           invitation?.eventId?.templateId?.imageUrl ||
-           invitation?.eventId?.templateId?.image ||
-           event?.template?.imageUrl ||
-           event?.template?.image ||
-           event?.templateId?.imageUrl ||
-           event?.templateId?.image ||
-           null
-  }, [selectedTemplate, currentEvent, invitation, event])
+    // Priority 1: Selected template from dropdown
+    if (selectedTemplate) {
+      const img = selectedTemplate.imageUrl || selectedTemplate.image
+      if (img) return img
+    }
+    
+    // Priority 2: Template from current event
+    if (currentEvent?.template && typeof currentEvent.template === 'object') {
+      const img = currentEvent.template.imageUrl || currentEvent.template.image
+      if (img) return img
+    }
+    
+    // Priority 3: Template from invitation event
+    if (invitation?.eventId?.template && typeof invitation.eventId.template === 'object') {
+      const img = invitation.eventId.template.imageUrl || invitation.eventId.template.image
+      if (img) return img
+    }
+    
+    // Priority 4: Template from event prop
+    if (event?.template && typeof event.template === 'object') {
+      const img = event.template.imageUrl || event.template.image
+      if (img) return img
+    }
+    
+    // Priority 5: Template from nextEvent
+    const responseData = dashboardData?.data || dashboardData || {}
+    if (responseData.nextEvent?.template && typeof responseData.nextEvent.template === 'object') {
+      const img = responseData.nextEvent.template.imageUrl || responseData.nextEvent.template.image
+      if (img) return img
+    }
+    
+    return null
+  }, [selectedTemplate, currentEvent, invitation, event, dashboardData])
   
   const templateImageUrl = useMemo(() => {
-    return templateImage 
-      ? (templateImage.startsWith('http') ? templateImage : `http://82.137.244.167:5001${templateImage}`)
-      : null
+    if (!templateImage) return null
+    
+    // If already a full URL, return as is
+    if (templateImage.startsWith('http://') || templateImage.startsWith('https://')) {
+      return templateImage
+    }
+    
+    // If starts with /, add base URL
+    if (templateImage.startsWith('/')) {
+      return `http://82.137.244.167:5001${templateImage}`
+    }
+    
+    // Otherwise, assume it's a relative path and add base URL with /
+    return `http://82.137.244.167:5001/${templateImage}`
   }, [templateImage])
   
   if (!open || !invitation) return null
@@ -1067,15 +1463,16 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
             height: 'fit-content',
             maxHeight: 'calc(100vh - 120px)',
             background: templateImageUrl
-              ? `url(${templateImageUrl}) center/cover no-repeat`
+              ? `url("${templateImageUrl}") center/cover no-repeat`
               : 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)',
             borderRadius: '20px',
             overflow: 'hidden',
             border: '3px solid rgba(216, 185, 138, 0.5)',
             boxShadow: '0 30px 100px rgba(0, 0, 0, 0.5), 0 0 60px rgba(216, 185, 138, 0.3), inset 0 0 40px rgba(0, 0, 0, 0.2)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
+            backgroundSize: templateImageUrl ? 'cover' : 'auto',
+            backgroundPosition: templateImageUrl ? 'center' : 'top',
+            backgroundRepeat: templateImageUrl ? 'no-repeat' : 'repeat',
+            backgroundAttachment: 'local',
             mx: 'auto',
             display: 'flex',
             flexDirection: 'column',
@@ -1836,15 +2233,32 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
             </MuiBox>
 
             {/* Available Templates */}
-            {availableTemplates.length > 0 && availableTemplates.map((template) => {
+            {console.log('🔍 Rendering Templates:', JSON.stringify({ 
+              'availableTemplates.length': availableTemplates.length, 
+              'availableTemplates': availableTemplates 
+            }, null, 2))}
+            {availableTemplates.length > 0 ? availableTemplates.map((template) => {
                 const templateId = template._id || template.id
                 const isSelected = selectedTemplateId === templateId || 
                                   (selectedTemplateId === null ? false : !selectedTemplateId && selectedTemplate?._id === templateId) ||
                                   (selectedTemplateId === null ? false : !selectedTemplateId && selectedTemplate?.id === templateId)
                 const templateImg = template.imageUrl || template.image
                 const templateImgUrl = templateImg
-                  ? (templateImg.startsWith('http') ? templateImg : `http://82.137.244.167:5001${templateImg}`)
+                  ? (templateImg.startsWith('http://') || templateImg.startsWith('https://') 
+                      ? templateImg 
+                      : (templateImg.startsWith('/') 
+                          ? `http://82.137.244.167:5001${templateImg}` 
+                          : `http://82.137.244.167:5001/${templateImg}`))
                   : null
+                
+                console.log('🔍 Template Image Debug:', {
+                  'templateId': templateId,
+                  'template.imageUrl': template.imageUrl,
+                  'template.image': template.image,
+                  'templateImg': templateImg,
+                  'templateImgUrl': templateImgUrl,
+                  'fullTemplate': template
+                })
                 
                 return (
                   <MuiBox
@@ -1984,7 +2398,21 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                     )}
                   </MuiBox>
                 )
-              })}
+              }) : (
+                <MuiBox
+                  sx={{
+                    gridColumn: '1 / -1',
+                    textAlign: 'center',
+                    py: 4,
+                    color: 'var(--color-text-secondary)',
+                  }}
+                >
+                  <ImageIcon size={48} style={{ opacity: 0.5, marginBottom: 16 }} />
+                  <MuiTypography variant="body2">
+                    لا توجد قوالب متاحة
+                  </MuiTypography>
+                </MuiBox>
+              )}
             </MuiBox>
         </MuiBox>
       </MuiBox>
@@ -1993,19 +2421,65 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 }
 
 // Create/Edit Invitation Dialog Component
-function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit, loading, eventGuestCount, totalInvitedPeople }) {
+function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit, loading, eventGuestCount, totalInvitedPeople, bookings = [], invitations = [] }) {
   const isEdit = !!editingInvitation
+  const isCreate = !isEdit
+  
+  // Watch selected eventId to update eventGuestCount dynamically
+  const [selectedEventId, setSelectedEventId] = useState(null)
+  
+  // Get selected event details
+  const selectedEvent = useMemo(() => {
+    if (!selectedEventId) return null
+    return bookings.find(b => (b._id || b.id)?.toString() === selectedEventId?.toString())
+  }, [selectedEventId, bookings])
+  
+  // Calculate eventGuestCount and totalInvitedPeople based on selected event
+  const currentEventGuestCount = useMemo(() => {
+    if (isEdit && editingInvitation) {
+      // For edit, use the invitation's event
+      const invEventId = editingInvitation.eventId?._id || editingInvitation.eventId || null
+      const event = bookings.find(b => (b._id || b.id)?.toString() === invEventId?.toString())
+      return event?.guestCount || 0
+    } else if (selectedEvent) {
+      // For create, use selected event
+      return selectedEvent.guestCount || 0
+    }
+    return eventGuestCount || 0
+  }, [selectedEvent, eventGuestCount, isEdit, editingInvitation, bookings])
+  
+  const currentTotalInvitedPeople = useMemo(() => {
+    if (isEdit && editingInvitation) {
+      // For edit, calculate based on invitation's event
+      const invEventId = editingInvitation.eventId?._id || editingInvitation.eventId || null
+      return invitations
+        .filter(inv => {
+          const invEvtId = inv.eventId?._id || inv.eventId || null
+          return invEvtId?.toString() === invEventId?.toString()
+        })
+        .reduce((sum, inv) => sum + (inv.numOfPeople || 0), 0)
+    } else if (selectedEventId) {
+      // For create, calculate based on selected event
+      return invitations
+        .filter(inv => {
+          const invEvtId = inv.eventId?._id || inv.eventId || null
+          return invEvtId?.toString() === selectedEventId?.toString()
+        })
+        .reduce((sum, inv) => sum + (inv.numOfPeople || 0), 0)
+    }
+    return totalInvitedPeople || 0
+  }, [selectedEventId, invitations, totalInvitedPeople, isEdit, editingInvitation])
   
   // Calculate remaining available guests
   const currentInvitationCount = editingInvitation?.numOfPeople || 0
-  const remainingGuests = eventGuestCount > 0 
-    ? eventGuestCount - (totalInvitedPeople - (isEdit ? currentInvitationCount : 0))
+  const remainingGuests = currentEventGuestCount > 0 
+    ? currentEventGuestCount - (currentTotalInvitedPeople - (isEdit ? currentInvitationCount : 0))
     : null
   
   // Create schema with validation - recreate on each render to get latest values
   const schema = useMemo(() => {
-    return createInvitationSchema(eventGuestCount, totalInvitedPeople, isEdit, currentInvitationCount)
-  }, [eventGuestCount, totalInvitedPeople, isEdit, currentInvitationCount])
+    return createInvitationSchema(currentEventGuestCount, currentTotalInvitedPeople, isEdit, currentInvitationCount, isCreate)
+  }, [currentEventGuestCount, currentTotalInvitedPeople, isEdit, currentInvitationCount, isCreate])
   
   const {
     control,
@@ -2015,6 +2489,7 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
+      eventId: isEdit ? (editingInvitation?.eventId?._id || editingInvitation?.eventId || '') : '',
       guestName: editingInvitation?.guestName || '',
       numOfPeople: editingInvitation?.numOfPeople || 1,
       guests: editingInvitation?.guests?.map(g => ({ name: g.name || '' })) || [],
@@ -2022,6 +2497,14 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
   })
 
   const numOfPeopleValue = watch('numOfPeople')
+  const selectedEventIdValue = watch('eventId')
+  
+  // Update selectedEventId when form value changes
+  useEffect(() => {
+    if (selectedEventIdValue && selectedEventIdValue !== selectedEventId) {
+      setSelectedEventId(selectedEventIdValue)
+    }
+  }, [selectedEventIdValue, selectedEventId])
 
   // Use field array for guests
   const { fields, append, remove } = useFieldArray({
@@ -2032,13 +2515,20 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
   useEffect(() => {
     if (open) {
       const initialGuests = editingInvitation?.guests?.map(g => ({ name: g.name || '' })) || []
+      const initialEventId = isEdit ? (editingInvitation?.eventId?._id || editingInvitation?.eventId || '') : ''
       reset({
+        eventId: initialEventId,
         guestName: editingInvitation?.guestName || '',
         numOfPeople: editingInvitation?.numOfPeople || 1,
         guests: initialGuests,
       })
+      if (initialEventId) {
+        setSelectedEventId(initialEventId)
+      } else {
+        setSelectedEventId(null)
+      }
     }
-  }, [open, editingInvitation, reset])
+  }, [open, editingInvitation, reset, isEdit])
 
   return (
     <BaseFormDialog
@@ -2052,6 +2542,78 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
       maxWidth="sm"
     >
       <MuiGrid container spacing={3}>
+        {/* Event Selection - Only show for create */}
+        {isCreate && (
+          <MuiGrid item xs={12}>
+            <Controller
+              name="eventId"
+              control={control}
+              render={({ field, fieldState: { error } }) => {
+                const selectId = `event-select-${field.name}`
+                return (
+                  <MuiBox>
+                    <MuiTypography 
+                      variant="body2" 
+                      component="label"
+                      sx={{ 
+                        mb: 1,
+                        display: 'block',
+                        color: error ? 'var(--color-error-500)' : 'var(--color-primary-500)',
+                        fontFamily: 'var(--font-family-base)',
+                        fontWeight: 500,
+                        fontSize: '0.95rem',
+                        textAlign: 'right',
+                        direction: 'rtl',
+                      }}
+                    >
+                      اختر الفعالية <span style={{ color: 'var(--color-error-500)' }}>*</span>
+                    </MuiTypography>
+                    <MuiFormControl fullWidth required error={!!error}>
+                      <MuiSelect
+                        {...field}
+                        id={selectId}
+                        displayEmpty
+                        onChange={(e) => {
+                          field.onChange(e)
+                          setSelectedEventId(e.target.value)
+                        }}
+                        sx={{
+                          '& .MuiSelect-select': {
+                            py: 1.5
+                          }
+                        }}
+                      >
+                        <MuiMenuItem value="" disabled>
+                          <em>اختر الفعالية</em>
+                        </MuiMenuItem>
+                        {bookings.length > 0 ? (
+                          bookings.map((booking) => {
+                            const eventId = booking._id || booking.id
+                            const eventName = booking.name || 'فعالية بدون اسم'
+                            const eventDate = booking.date ? formatDate(booking.date, 'MM/DD/YYYY') : ''
+                            return (
+                              <MuiMenuItem key={eventId} value={eventId}>
+                                {eventName} {eventDate && `- ${eventDate}`}
+                              </MuiMenuItem>
+                            )
+                          })
+                        ) : (
+                          <MuiMenuItem disabled>لا توجد فعاليات متاحة</MuiMenuItem>
+                        )}
+                      </MuiSelect>
+                      {error && (
+                        <MuiTypography variant="caption" sx={{ color: 'var(--color-error-500)', mt: 0.5, display: 'block' }}>
+                          {error.message}
+                        </MuiTypography>
+                      )}
+                    </MuiFormControl>
+                  </MuiBox>
+                )
+              }}
+            />
+          </MuiGrid>
+        )}
+
         <MuiGrid item xs={12}>
           <Controller
             name="guestName"
@@ -2085,7 +2647,7 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
               />
             )}
           />
-          {eventGuestCount > 0 && remainingGuests !== null && (
+          {currentEventGuestCount > 0 && remainingGuests !== null && (
             <MuiBox sx={{ mt: 1.5 }}>
               <MuiTypography 
                 variant="caption" 
@@ -2096,7 +2658,7 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
                   mb: 0.5
                 }}
               >
-                عدد الضيوف في الفعالية: <strong>{eventGuestCount}</strong> | المتبقي: <strong>{remainingGuests}</strong> | المدعوون الحاليون: <strong>{totalInvitedPeople - (isEdit ? currentInvitationCount : 0)}</strong>
+                عدد الضيوف في الفعالية: <strong>{currentEventGuestCount}</strong> | المتبقي: <strong>{remainingGuests}</strong> | المدعوون الحاليون: <strong>{currentTotalInvitedPeople - (isEdit ? currentInvitationCount : 0)}</strong>
               </MuiTypography>
               {remainingGuests < (numOfPeopleValue || 0) && (
                 <MuiTypography 
@@ -2214,3 +2776,4 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
     </BaseFormDialog>
   )
 }
+

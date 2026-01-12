@@ -19,7 +19,6 @@ export const ROLE_MENUS = {
     { label: 'الرئيسية', path: '/admin/dashboard', icon: LayoutDashboard },
     { label: 'التقارير', path: '/admin/reports', icon: BarChart3 },
     { label: 'الصالات', path: '/admin/halls', icon: Building2 },
-    { label: 'الخدمات', path: '/admin/services', icon: ClipboardList },
     { label: 'القوالب', path: '/admin/templates', icon: Image },
     { label: 'المستخدمون', path: '/admin/users', icon: Users },
     { label: 'المدراء', path: '/admin/managers', icon: UserPlus },

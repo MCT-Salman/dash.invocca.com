@@ -101,10 +101,6 @@ export default function ClientDashboard() {
     queryFn: getClientDashboard,
   })
 
-  if (isLoading) {
-    return <LoadingScreen message="جاري تحميل لوحة التحكم..." fullScreen={false} />
-  }
-
   // Extract data from the actual API response structure
   const responseData = data?.data || data || {}
   const summary = responseData.summary || {}
@@ -119,9 +115,9 @@ export default function ClientDashboard() {
   const bookings = responseData.allEvents || recentActivity.events || responseData.events || []
   const invitations = recentActivity.invitations || responseData.invitations || []
   
-  // Auto scroll for events
+  // Auto scroll for events - Must be called before any conditional returns
   useEffect(() => {
-    if (bookings.length <= 3 || !eventsScrollRef.current) return
+    if (isLoading || bookings.length <= 3 || !eventsScrollRef.current) return
     
     const container = eventsScrollRef.current
     const itemHeight = 150 // Approximate height of each item including gap
@@ -145,11 +141,11 @@ export default function ClientDashboard() {
     }, 3000) // Change every 3 seconds
     
     return () => clearInterval(interval)
-  }, [bookings.length])
+  }, [bookings.length, isLoading])
   
-  // Auto scroll for invitations
+  // Auto scroll for invitations - Must be called before any conditional returns
   useEffect(() => {
-    if (invitations.length <= 3 || !invitationsScrollRef.current) return
+    if (isLoading || invitations.length <= 3 || !invitationsScrollRef.current) return
     
     const container = invitationsScrollRef.current
     const itemHeight = 150 // Approximate height of each item including gap
@@ -173,7 +169,11 @@ export default function ClientDashboard() {
     }, 3000) // Change every 3 seconds
     
     return () => clearInterval(interval)
-  }, [invitations.length])
+  }, [invitations.length, isLoading])
+
+  if (isLoading) {
+    return <LoadingScreen message="جاري تحميل لوحة التحكم..." fullScreen={false} />
+  }
   
   // Event type labels
   const eventTypeLabels = {

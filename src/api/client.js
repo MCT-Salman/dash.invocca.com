@@ -238,6 +238,99 @@ export const getClientDashboard = async () => {
   }
 }
 
+// ==================== Templates Management ====================
+
+/**
+ * GET - جلب قالب واحد بالـ ID
+ * GET /manager/templates/:id or /admin/templates/:id
+ * أو جلب جميع القوالب والبحث عن القالب المطلوب
+ */
+export const getTemplateById = async (templateId) => {
+  if (!templateId) return null
+  
+  // Try manager endpoint first (client may have access to their hall's templates)
+  try {
+    const response = await api.get(`/manager/templates/${templateId}`)
+    return response.data
+  } catch {
+    // Try admin endpoint as fallback
+    try {
+      const response = await api.get(`/admin/templates/${templateId}`)
+      return response.data
+    } catch {
+      // If single template endpoint doesn't work, try to get all templates and find the one we need
+      try {
+        const response = await api.get('/manager/templates')
+        const templates = response.data?.templates || response.data?.data?.templates || response.data?.data || []
+        if (Array.isArray(templates)) {
+          const foundTemplate = templates.find(t => {
+            const tId = t._id || t.id
+            return tId && tId.toString() === templateId.toString()
+          })
+          if (foundTemplate) {
+            return { template: foundTemplate, data: foundTemplate }
+          }
+        }
+      } catch {
+        // Try admin templates as last resort
+        try {
+          const response = await api.get('/admin/templates')
+          const templates = response.data?.templates || response.data?.data?.templates || response.data?.data || []
+          if (Array.isArray(templates)) {
+            const foundTemplate = templates.find(t => {
+              const tId = t._id || t.id
+              return tId && tId.toString() === templateId.toString()
+            })
+            if (foundTemplate) {
+              return { template: foundTemplate, data: foundTemplate }
+            }
+          }
+        } catch (error) {
+          console.warn(`Template ${templateId} not found:`, error)
+          return null
+        }
+      }
+      return null
+    }
+  }
+}
+
+/**
+ * GET - عرض القوالب الخاصة بالدعوات/الفعالية
+ * GET /client/templates
+ * GET /client/events/:eventId/templates
+ */
+export const getClientTemplates = async () => {
+  try {
+    // Try different possible endpoints - client may have access to manager templates
+    const endpoints = [
+      '/client/templates',
+      '/client/invitations/templates',
+      '/client/events/templates',
+      '/manager/templates', // Client may have access to manager templates for their hall
+    ]
+    
+    for (const endpoint of endpoints) {
+      try {
+        const response = await api.get(endpoint)
+        console.log(`✅ Templates found at: ${endpoint}`, response.data)
+        return response.data
+      } catch {
+        // Try next endpoint
+        continue
+      }
+    }
+    
+    // If all endpoints fail, return empty array
+    console.warn('Client templates endpoint not available. Tried:', endpoints)
+    return { templates: [], data: { templates: [] } }
+  } catch (error) {
+    // If endpoint doesn't exist, return empty array
+    console.warn('Client templates endpoint not available:', error)
+    return { templates: [], data: { templates: [] } }
+  }
+}
+
 // ==================== Reports ====================
 
 /**
@@ -278,6 +371,10 @@ export default {
 
   // Dashboard
   getClientDashboard,
+
+  // Templates
+  getClientTemplates,
+  getTemplateById,
 
   // Reports
   getClientReports,

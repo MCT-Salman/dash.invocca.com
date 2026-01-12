@@ -125,7 +125,8 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
                 fontWeight: 700,
                 color: 'var(--color-text-primary)',
                 fontSize: '1.25rem',
-                letterSpacing: '0.05em'
+                letterSpacing: '0.05em',
+                fontFamily: 'var(--font-family-base)'
               }}
             >
               INVOCCA
@@ -211,11 +212,13 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
                     color: isActive
                       ? 'var(--color-primary-100)'
                       : 'var(--color-text-secondary)',
+                    fontFamily: 'var(--font-family-base)',
                   }}
                   sx={{
                     textAlign: 'right',
                     '& .MuiListItemText-primary': {
                       textAlign: 'right',
+                      fontFamily: 'var(--font-family-base)',
                     }
                   }}
                 />
@@ -281,6 +284,12 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
                   primaryTypographyProps={{
                     fontSize: '0.9rem',
                     fontWeight: 500,
+                    fontFamily: 'var(--font-family-base)',
+                  }}
+                  sx={{
+                    '& .MuiListItemText-primary': {
+                      fontFamily: 'var(--font-family-base)',
+                    }
                   }}
                 />
               )}
