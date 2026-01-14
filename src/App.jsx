@@ -29,6 +29,7 @@ import AdminProfile from './pages/admin/AdminProfile'
 // Manager Pages
 import ManagerDashboard from './pages/manager/ManagerDashboard'
 import HallManagement from './pages/manager/HallManagementNew'
+import ManagerServicesManagement from './pages/manager/ServicesManagement'
 import EventsManagement from './pages/manager/EventsManagementNew'
 import ClientsManagement from './pages/manager/ClientsManagementNew'
 import StaffManagement from './pages/manager/StaffManagementNew'
@@ -36,6 +37,7 @@ import ManagerReports from './pages/manager/ManagerReports'
 import ManagerTemplates from './pages/manager/ManagerTemplates'
 import ManagerComplaints from './pages/manager/ManagerComplaints'
 import ManagerProfile from './pages/manager/ManagerProfile'
+import ManagerSongsManagement from './pages/manager/SongsManagement'
 
 // Client Pages
 import ClientDashboard from './pages/client/ClientDashboard'
@@ -90,6 +92,8 @@ export default function App() {
                 <Route path="/manager" element={<Navigate to={ROUTES.MANAGER.DASHBOARD} replace />} />
                 <Route path={ROUTES.MANAGER.DASHBOARD} element={<ManagerDashboard />} />
                 <Route path={ROUTES.MANAGER.HALL} element={<HallManagement />} />
+                <Route path={ROUTES.MANAGER.SERVICES} element={<ManagerServicesManagement />} />
+                <Route path={ROUTES.MANAGER.SONGS} element={<ManagerSongsManagement />} />
                 <Route path={ROUTES.MANAGER.EVENTS} element={<EventsManagement />} />
                 <Route path={ROUTES.MANAGER.CLIENTS} element={<ClientsManagement />} />
                 <Route path={ROUTES.MANAGER.STAFF} element={<StaffManagement />} />

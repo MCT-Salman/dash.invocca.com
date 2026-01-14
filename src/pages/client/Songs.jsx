@@ -15,6 +15,7 @@ import MuiSelect from '@/components/ui/MuiSelect'
 import MuiMenuItem from '@/components/ui/MuiMenuItem'
 import MuiFormControl from '@/components/ui/MuiFormControl'
 import MuiIconButton from '@/components/ui/MuiIconButton'
+import MuiTabs from '@/components/ui/MuiTabs'
 import Tooltip from '@mui/material/Tooltip'
 import { SEOHead, LoadingScreen, EmptyState, ConfirmDialog } from '@/components/common'
 import { BaseFormDialog, BaseViewDialog } from '@/components/shared'
@@ -26,10 +27,11 @@ import { formatDate, formatEmptyValue } from '@/utils/helpers'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Plus, Edit2, Trash2, Music, GripVertical, ArrowUp, ArrowDown, Calendar, Clock, Users, Building2, ExternalLink, Eye, Link as LinkIcon, FileText } from 'lucide-react'
+import { Plus, Edit2, Trash2, Music, GripVertical, ArrowUp, ArrowDown, Calendar, Clock, Users, Building2, ExternalLink, Eye, Link as LinkIcon, FileText, Link2 } from 'lucide-react'
 import MuiChip from '@/components/ui/MuiChip'
 import MuiDivider from '@/components/ui/MuiDivider'
 import { DataTable } from '@/components/common'
+import ClientSongsConnectionTab from './components/ClientSongsConnectionTab'
 
 // Validation schema
 const songSchema = z.object({
@@ -37,12 +39,22 @@ const songSchema = z.object({
   artist: z.string().min(1, 'اسم الفنان مطلوب'),
   url: z.string().url('رابط غير صحيح').min(1, 'رابط الأغنية مطلوب'),
   duration: z.string().regex(/^\d{2}:\d{2}$/, 'المدة يجب أن تكون بصيغة MM:SS'),
+  category: z.string().optional(),
   scheduledTime: z.string().optional(),
   notes: z.string().optional(),
+  order: z.number().optional(),
 })
+
+const categoryConfig = {
+  wedding: { label: 'زفاف', color: 'error' },
+  party: { label: 'حفلة', color: 'warning' },
+  slow: { label: 'هادئة', color: 'info' },
+  other: { label: 'أخرى', color: 'default' },
+}
 
 export default function ClientSongs() {
   const [selectedEventId, setSelectedEventId] = useState('')
+  const [activeTab, setActiveTab] = useState(0)
   const { addNotification: showNotification } = useNotification()
   const queryClient = useQueryClient()
 
@@ -94,8 +106,8 @@ export default function ClientSongs() {
     isLoading: crudLoading,
   } = useCRUD({
     createFn: (data) => addSong(selectedEventId, data),
-    updateFn: (songId, data) => updateSong(songId, data),
-    deleteFn: deleteSong,
+    updateFn: (songId, data) => updateSong(selectedEventId, songId, data),
+    deleteFn: (songId) => deleteSong(selectedEventId, songId),
     queryKey: [QUERY_KEYS.CLIENT_SONGS, selectedEventId],
     successMessage: 'تمت العملية بنجاح',
     errorMessage: 'حدث خطأ أثناء العملية',
@@ -184,15 +196,16 @@ export default function ClientSongs() {
     // currentIndex is 0-based, so:
     // - currentIndex = 0 means position 1 (1-based)
     // - currentIndex = 1 means position 2 (1-based)
-    // To move current up: newOrder = currentIndex (which is previous position in 1-based)
-    // To move previous down: newOrder = currentIndex + 1 (which is current position in 1-based)
+    // To move current up: newOrder = currentIndex + 1 (which is previous position in 1-based)
+    // To move previous down: newOrder = currentIndex + 2 (which is current position in 1-based)
+    // Use playlistItemId (_id) not songId
     const songOrders = [
       {
-        songId: currentSong._id || currentSong.id,
+        playlistItemId: currentSong._id || currentSong.id,
         newOrder: currentIndex, // Move to previous position (1-based: currentIndex = previous position)
       },
       {
-        songId: previousSong._id || previousSong.id,
+        playlistItemId: previousSong._id || previousSong.id,
         newOrder: currentIndex + 1, // Move to current position (1-based: currentIndex + 1 = current position)
       },
     ]
@@ -231,13 +244,14 @@ export default function ClientSongs() {
     // - currentIndex = 1 means position 2 (1-based)
     // To move current down: newOrder = currentIndex + 2 (which is next position in 1-based)
     // To move next up: newOrder = currentIndex + 1 (which is current position in 1-based)
+    // Use playlistItemId (_id) not songId
     const songOrders = [
       {
-        songId: currentSong._id || currentSong.id,
+        playlistItemId: currentSong._id || currentSong.id,
         newOrder: currentIndex + 2, // Move to next position (1-based: currentIndex + 2 = next position)
       },
       {
-        songId: nextSong._id || nextSong.id,
+        playlistItemId: nextSong._id || nextSong.id,
         newOrder: currentIndex + 1, // Move to current position (1-based: currentIndex + 1 = current position)
       },
     ]
@@ -272,6 +286,24 @@ export default function ClientSongs() {
       id: 'artist',
       label: 'الفنان',
       format: (value) => formatEmptyValue(value),
+    },
+    {
+      id: 'category',
+      label: 'الفئة',
+      align: 'center',
+      format: (value) => {
+        const config = categoryConfig[value]
+        if (!config && !value) return '—'
+        return (
+          <MuiChip
+            label={config?.label || value}
+            color={config?.color}
+            variant="outlined"
+            size="small"
+            sx={{ fontWeight: 600 }}
+          />
+        )
+      },
     },
     {
       id: 'duration',
@@ -340,10 +372,10 @@ export default function ClientSongs() {
           playing: 'قيد التشغيل',
           paused: 'متوقف',
           played: 'تم تشغيلها',
-          pending: 'في الانتظار',
+          pending: 'قيد الانتظار',
         }
         const statusLabel = statusMap[value] || formatEmptyValue(value)
-        const statusColor = value === 'playing' ? '#22c55e' : value === 'played' ? '#0284c7' : value === 'paused' ? '#f97316' : 'var(--color-text-secondary)'
+        const statusColor = value === 'playing' ? '#22c55e' : value === 'played' ? '#0284c7' : value === 'paused' ? '#f97316' : value === 'pending' ? '#d99b3d' : 'var(--color-text-secondary)'
         return (
           <MuiChip
             label={statusLabel}
@@ -360,22 +392,22 @@ export default function ClientSongs() {
   ]
 
   const handleSubmit = async (data) => {
-    // Prepare data with only required fields
+    // Body shape when client adds a song:
+    // {
+    //   "order": 1,
+    //   "category": "entrance",
+    //   "notes": "أغنية الدخول",
+    //   "title" : "jsj",
+    //   "artist" : "qweqwe"
+    // }
+    const nextOrder = (songsTableData?.length || 0) + 1
     const submitData = {
       title: data.title,
       artist: data.artist,
-      url: data.url,
-      duration: data.duration,
-      scheduledTime: data.scheduledTime ? new Date(data.scheduledTime).toISOString() : undefined,
-      notes: data.notes || undefined,
+      order: data.order || nextOrder,
+      category: data.category || 'other',
+      notes: data.notes || '',
     }
-    
-    // Remove undefined fields
-    Object.keys(submitData).forEach(key => {
-      if (submitData[key] === undefined) {
-        delete submitData[key]
-      }
-    })
 
     if (isEdit && editingSong) {
       const result = await handleUpdate(editingSong.id || editingSong._id, submitData)
@@ -436,6 +468,40 @@ export default function ClientSongs() {
           </MuiSelect>
         </MuiFormControl>
       </MuiBox>
+
+      {selectedEventId && (
+        <MuiPaper
+          elevation={0}
+          sx={{
+            mb: 4.5,
+            background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(216, 185, 138, 0.15)',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+          }}
+        >
+          <MuiTabs
+            value={activeTab}
+            onChange={(e, newValue) => setActiveTab(newValue)}
+            tabs={[
+              { label: 'إدارة الأغاني', icon: <Music size={18} /> },
+              { label: 'ربط الأغاني', icon: <Link2 size={18} /> }
+            ]}
+            sx={{
+              borderBottom: '1px solid rgba(216, 185, 138, 0.15)',
+              '& .MuiTab-root': {
+                color: 'var(--color-text-secondary)',
+                '&.Mui-selected': {
+                  color: 'var(--color-primary-500)',
+                }
+              }
+            }}
+          />
+        </MuiPaper>
+      )}
 
       {selectedEventId ? (
         <>
@@ -548,7 +614,7 @@ export default function ClientSongs() {
                         <Building2 size={20} style={{ color: 'var(--color-primary-500)' }} />
                         <MuiBox>
                           <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
-                            القاعة
+                            قاعة/صالة
                           </MuiTypography>
                           <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
                             {formatEmptyValue(selectedEvent.hall?.name || selectedEvent.hallId?.name)}
@@ -685,6 +751,10 @@ export default function ClientSongs() {
               )}
             </>
           )}
+
+          {activeTab === 1 && (
+            <ClientSongsConnectionTab selectedEventId={selectedEventId} />
+          )}
         </>
       ) : (
         <EmptyState
@@ -740,6 +810,7 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
       artist: editingSong?.artist || '',
       url: editingSong?.url || '',
       duration: editingSong?.duration || '',
+      category: editingSong?.category || '',
       scheduledTime: editingSong?.scheduledTime
         ? new Date(editingSong.scheduledTime).toISOString().slice(0, 16)
         : '',
@@ -774,6 +845,7 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
           artist: editingSong.artist || '',
           url: editingSong.url || '',
           duration: editingSong.duration || '',
+          category: editingSong.category || '',
           scheduledTime: formattedScheduledTime,
           notes: editingSong.notes || '',
         }, {
@@ -786,6 +858,7 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
           artist: '',
           url: '',
           duration: '',
+          category: '',
           scheduledTime: '',
           notes: '',
         }, {
@@ -875,6 +948,27 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
                 error={!!errors.duration}
                 helperText={errors.duration?.message}
               />
+            )}
+          />
+        </MuiGrid>
+
+        <MuiGrid item xs={12}>
+          <Controller
+            name="category"
+            control={control}
+            render={({ field }) => (
+              <MuiFormControl fullWidth>
+                <MuiSelect
+                  {...field}
+                  displayEmpty
+                >
+                  <MuiMenuItem value="">بدون فئة</MuiMenuItem>
+                  <MuiMenuItem value="wedding">زفاف</MuiMenuItem>
+                  <MuiMenuItem value="party">حفلة</MuiMenuItem>
+                  <MuiMenuItem value="slow">هادئة</MuiMenuItem>
+                  <MuiMenuItem value="other">أخرى</MuiMenuItem>
+                </MuiSelect>
+              </MuiFormControl>
             )}
           />
         </MuiGrid>
@@ -1001,6 +1095,27 @@ function ViewSongDialog({ open, onClose, song }) {
         <MuiGrid item xs={12} sm={6}>
           <MuiBox>
             <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
+              الفئة
+            </MuiTypography>
+            <MuiBox sx={{ mt: 0.5 }}>
+              {song.category ? (
+                <MuiChip
+                  label={categoryConfig[song.category]?.label || song.category}
+                  color={categoryConfig[song.category]?.color}
+                  variant="outlined"
+                  size="small"
+                  sx={{ fontWeight: 600 }}
+                />
+              ) : (
+                <MuiTypography variant="body1">—</MuiTypography>
+              )}
+            </MuiBox>
+          </MuiBox>
+        </MuiGrid>
+
+        <MuiGrid item xs={12} sm={6}>
+          <MuiBox>
+            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
               وقت التشغيل
             </MuiTypography>
             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -1075,7 +1190,7 @@ function ViewSongDialog({ open, onClose, song }) {
                     song.playStatus === 'playing' ? 'قيد التشغيل' :
                     song.playStatus === 'paused' ? 'متوقف' :
                     song.playStatus === 'played' ? 'تم تشغيلها' :
-                    song.playStatus === 'pending' ? 'في الانتظار' :
+                    song.playStatus === 'pending' ? 'قيد الانتظار' :
                     song.playStatus
                   }
                   size="small"
@@ -1083,10 +1198,12 @@ function ViewSongDialog({ open, onClose, song }) {
                     backgroundColor: song.playStatus === 'playing' ? 'rgba(34, 197, 94, 0.1)' :
                                     song.playStatus === 'played' ? 'rgba(2, 132, 199, 0.1)' :
                                     song.playStatus === 'paused' ? 'rgba(249, 115, 22, 0.1)' :
+                                    song.playStatus === 'pending' ? 'rgba(217, 155, 61, 0.1)' :
                                     'rgba(216, 185, 138, 0.1)',
                     color: song.playStatus === 'playing' ? '#22c55e' :
                            song.playStatus === 'played' ? '#0284c7' :
                            song.playStatus === 'paused' ? '#f97316' :
+                           song.playStatus === 'pending' ? '#d99b3d' :
                            'var(--color-primary-400)',
                     fontWeight: 600,
                   }}

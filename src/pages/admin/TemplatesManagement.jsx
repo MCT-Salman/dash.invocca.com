@@ -176,14 +176,14 @@ export default function TemplatesManagement() {
         },
         {
             id: 'hallId',
-            label: 'القاعة',
+            label: 'قاعة/صالة',
             align: 'right',
             format: (value) => (
                 <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Building2 size={16} style={{ color: 'var(--color-primary-400)' }} />
                         <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                            {value?.name || 'قاعة غير محددة'}
+                            {value?.name || 'قاعة/صالة غير محددة'}
                         </MuiTypography>
                     </MuiBox>
                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -265,8 +265,8 @@ export default function TemplatesManagement() {
             const worksheet = XLSX.utils.json_to_sheet(
                 filteredTemplates.map(template => ({
                     'اسم القالب': template.templateName,
-                    'القاعة': template.hallId?.name || '—',
-                    'موقع القاعة': template.hallId?.location || '—',
+                    'قاعة/صالة': template.hallId?.name || '—',
+                    'موقع قاعة/صالة': template.hallId?.location || '—',
                     'السعة': template.hallId?.capacity || '—',
                     'الطاولات': template.hallId?.tables || '—',
                     'الكراسي': template.hallId?.chairs || '—',
@@ -276,7 +276,7 @@ export default function TemplatesManagement() {
                     'تاريخ الإضافة': formatDate(template.createdAt, 'DD/MM/YYYY'),
                     'تاريخ التحديث': formatDate(template.updatedAt, 'DD/MM/YYYY'),
                     'معرّف القالب': template._id,
-                    'معرّف القاعة': template.hallId?._id || '—'
+                    'معرّف قاعة/صالة': template.hallId?._id || '—'
                 }))
             )
             const workbook = XLSX.utils.book_new()

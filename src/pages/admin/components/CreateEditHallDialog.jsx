@@ -1,6 +1,6 @@
 // src\pages\admin\components\CreateEditHallDialog.jsx
 import { useState, useEffect } from 'react'
-import { useForm, useFieldArray, Controller } from 'react-hook-form'
+import { useForm, useFieldArray, Controller, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useQuery } from '@tanstack/react-query'
@@ -15,17 +15,27 @@ import MuiMenuItem from '@/components/ui/MuiMenuItem'
 import MuiSwitch from '@/components/ui/MuiSwitch'
 import MuiFormControl from '@/components/ui/MuiFormControl'
 import MuiInputLabel from '@/components/ui/MuiInputLabel'
-import MuiChip from '@/components/ui/MuiChip'
 import { FormDialog } from '@/components/common'
-import { getServicesList, getTemplates } from '@/api/admin'
+import { getTemplates } from '@/api/admin'
 import { Plus, Trash2, UploadCloud, X } from 'lucide-react'
 import { FILE_UPLOAD } from '@/config/constants'
 import { useNotification } from '@/hooks'
 import { getImageUrl } from '@/utils/helpers'
+import { API_CONFIG } from '@/config/constants'
+
+// Helper function to get template image URL
+const getTemplateImageUrl = (imageUrl) => {
+    if (!imageUrl) return null
+    if (typeof imageUrl === 'string') {
+        if (imageUrl.startsWith('http')) return imageUrl
+        return `${API_CONFIG.BASE_URL}${imageUrl}`
+    }
+    return null
+}
 
 // Validation Schema
 const createHallSchema = (editingHall = null) => z.object({
-    name: z.string().min(3, 'اسم القاعة يجب أن يكون 3 أحرف على الأقل').max(100, 'اسم القاعة طويل جداً'),
+    name: z.string().min(3, 'اسم قاعة/صالة يجب أن يكون 3 أحرف على الأقل').max(100, 'اسم قاعة/صالة طويل جداً'),
     location: z.string().min(3, 'الموقع مطلوب').max(100, 'الموقع طويل جداً'),
 
     capacity: z.coerce.number().min(1, 'السعة مطلوبة').max(10000, 'السعة كبيرة جداً'),
@@ -44,15 +54,7 @@ const createHallSchema = (editingHall = null) => z.object({
     description: z.string().optional(),
     isActive: z.boolean().default(true),
 
-    services: z.array(z.object({
-        service: z.string().min(1, 'الخدمة مطلوبة')
-    })).optional().default([]),
-    
-    templates: z.array(z.string())
-        .optional()
-        .default([]),
-
-    newTemplateName: z.string().optional().or(z.literal(''))
+    templates: z.array(z.string()).optional().default([])
 })
 
 export default function CreateEditHallDialog({ open, onClose, onSubmit, editingHall, loading }) {
@@ -67,23 +69,12 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
     const [primaryImage, setPrimaryImage] = useState(null)
     const [galleryImages, setGalleryImages] = useState([])
     const [existingGalleryImages, setExistingGalleryImages] = useState([])
-    const [newTemplateImage, setNewTemplateImage] = useState(null)
-
-    const { data: servicesData } = useQuery({
-        queryKey: ['admin', 'services-list'],
-        queryFn: getServicesList,
-        staleTime: 5 * 60 * 1000
-    })
 
     const { data: templatesData } = useQuery({
         queryKey: ['admin', 'templates-list'],
         queryFn: getTemplates,
         staleTime: 5 * 60 * 1000
     })
-
-    const servicesList = Array.isArray(servicesData)
-        ? servicesData
-        : (Array.isArray(servicesData?.data) ? servicesData.data : (servicesData?.services || []))
 
     const templatesList = Array.isArray(templatesData)
         ? templatesData
@@ -111,18 +102,19 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
             managerPassword: '',
             description: editingHall?.description || '',
             isActive: editingHall?.isActive ?? true,
-            services: editingHall?.services?.map(s => ({
-                service: s.service?._id || s.service,
-                customPrice: s.customPrice || 0
-            })) || [],
-            templates: editingHall?.templates?.map(t => t._id || t) || []
+            templates: editingHall?.templates?.map(t => t.template?._id || t.template || t._id || t).filter(Boolean) || []
         }
     })
 
-    const { fields, append, remove } = useFieldArray({
+    const { fields: templateFields, append: appendTemplate, remove: removeTemplate } = useFieldArray({
         control,
-        name: 'services'
+        name: 'templates'
     })
+
+    const watchedTemplates = useWatch({
+        control,
+        name: 'templates'
+    }) || []
 
     useEffect(() => {
         if (open) {
@@ -142,11 +134,7 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                     managerPassword: '',
                     description: editingHall.description || '',
                     isActive: editingHall.isActive,
-                    services: editingHall.services?.map(s => ({
-                        service: s.service?._id || s.service,
-                        customPrice: s.customPrice || 0
-                    })) || [],
-                    templates: editingHall.templates?.map(t => t._id || t) || []
+                    templates: editingHall.templates?.map(t => t.template?._id || t.template || t._id || t).filter(Boolean) || []
                 })
                 // Set existing gallery images after reset to avoid cascading renders
                 setTimeout(() => {
@@ -168,7 +156,6 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                     managerPassword: '',
                     description: '',
                     isActive: true,
-                    services: [],
                     templates: []
                 })
                 // Set state after reset to avoid cascading renders
@@ -186,7 +173,7 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
         if (!editingHall && !primaryImage) {
             showNotification({
                 title: 'خطأ',
-                message: 'يرجى اختيار صورة رئيسية للقاعة',
+                message: 'يرجى اختيار صورة رئيسية لقاعة/صالة',
                 type: 'error'
             })
             return
@@ -196,28 +183,7 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
 
         // Append simple fields - convert all values to strings to avoid circular references
         Object.keys(data).forEach(key => {
-            if (key === 'services') {
-                // Handle services array - try bracket notation which is common for multipart/form-data
-                if (Array.isArray(data.services)) {
-                    data.services.forEach((svc, index) => {
-                        if (svc.service) {
-                            formData.append(`services[${index}][service]`, String(svc.service))
-                        }
-                        if (svc.customPrice !== undefined && svc.customPrice !== null) {
-                            formData.append(`services[${index}][customPrice]`, String(svc.customPrice))
-                        }
-                    })
-                }
-            } else if (key === 'templates') {
-                // Handle templates array
-                if (Array.isArray(data.templates)) {
-                    data.templates.forEach((templateId, index) => {
-                        if (templateId) {
-                            formData.append(`templates[${index}]`, String(templateId))
-                        }
-                    })
-                }
-            } else if (key === 'managerPassword') {
+            if (key === 'managerPassword') {
                 if (data[key] && String(data[key]).trim()) {
                     formData.append(key, String(data[key]))
                 }
@@ -247,6 +213,14 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
             formData.append('images', image)
         })
 
+        if (Array.isArray(data.templates) && data.templates.length > 0) {
+            data.templates.forEach((templateId, index) => {
+                if (templateId) {
+                    formData.append(`templates[${index}]`, String(templateId))
+                }
+            })
+        }
+
         onSubmit(formData)
     }
 
@@ -275,7 +249,7 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
         <FormDialog
             open={open}
             onClose={onClose}
-            title={editingHall ? 'تعديل القاعة' : 'إضافة قاعة جديدة'}
+            title={editingHall ? 'تعديل قاعة/صالة' : 'إضافة قاعة/صالة جديدة'}
             onSubmit={handleSubmit(handleFormSubmit, (errors) => {
                 const firstError = Object.values(errors)[0]
                 showNotification({
@@ -304,7 +278,7 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                         render={({ field }) => (
                             <MuiTextField
                                 {...field}
-                                label="اسم القاعة"
+                                label="اسم قاعة/صالة"
                                 fullWidth
                                 error={!!errors.name}
                                 helperText={errors.name?.message}
@@ -434,7 +408,7 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                                 checked={field.value}
                                 onChange={field.onChange}
                                 color="success"
-                                label="القاعة نشطة"
+                                label="قاعة/صالة نشطة"
                             />
                         )}
                     />
@@ -513,58 +487,133 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                     />
                 </MuiGrid>
 
-                {/* Services */}
+                {/* Templates */}
                 <MuiGrid item xs={12}>
-                    <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, mt: 1 }}>
+                    <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1, mt: 1 }}>
                         <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--color-primary-500)' }}>
-                            الخدمات المتاحة
+                            القوالب
                         </MuiTypography>
                         <MuiButton
                             size="small"
                             startIcon={<Plus size={16} />}
-                            onClick={() => append({ service: '', customPrice: 0 })}
+                            onClick={() => appendTemplate('')}
                             variant="outlined"
                         >
-                            إضافة خدمة
+                            إضافة قالب
                         </MuiButton>
                     </MuiBox>
 
-                    {fields.map((field, index) => (
-                        <MuiBox key={field.id} sx={{ display: 'flex', gap: 2, mb: 1.5, alignItems: 'flex-start' }}>
+                    {templateFields.map((field, index) => {
+                        const selectedTemplateId = watchedTemplates[index] || ''
+                        const selectedTemplate = templatesList.find(t => (t._id || t.id) === selectedTemplateId)
+                        const selectedTemplateImageUrl = selectedTemplate ? getTemplateImageUrl(selectedTemplate.imageUrl) : null
+                        
+                        return (
+                            <MuiBox key={field.id} sx={{ mb: 2 }}>
+                                <MuiBox sx={{ display: 'flex', gap: 2, mb: 1.5, alignItems: 'flex-start' }}>
                             <Controller
-                                name={`services.${index}.service`}
+                                        name={`templates.${index}`}
                                 control={control}
                                 render={({ field: selectField }) => (
                                     <MuiSelect
                                         {...selectField}
                                         sx={{ flexGrow: 1 }}
                                         size="small"
-                                        error={!!errors.services?.[index]?.service}
-                                    >
-                                        {Array.isArray(servicesList) && servicesList.map(service => (
-                                            <MuiMenuItem key={service._id || service.id} value={service._id || service.id}>
-                                                {service.name}
+                                                displayEmpty
+                                                error={!!errors.templates?.[index]}
+                                                renderValue={(value) => {
+                                                    if (!value) return <em>اختر قالباً</em>
+                                                    const template = templatesList.find(t => (t._id || t.id) === value)
+                                                    if (!template) return value
+                                                    return (
+                                                        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                            {template.imageUrl && (
+                                                                <img 
+                                                                    src={getTemplateImageUrl(template.imageUrl)} 
+                                                                    alt={template.templateName || ''}
+                                                                    style={{ 
+                                                                        width: 24, 
+                                                                        height: 24, 
+                                                                        objectFit: 'cover', 
+                                                                        borderRadius: '4px' 
+                                                                    }}
+                                                                />
+                                                            )}
+                                                            <span>{template.templateName || template.name || value}</span>
+                                                        </MuiBox>
+                                                    )
+                                                }}
+                                            >
+                                                <MuiMenuItem value="">
+                                                    <em>اختر قالباً</em>
+                                                </MuiMenuItem>
+                                                {Array.isArray(templatesList) && templatesList.map(template => {
+                                                    const templateImageUrl = getTemplateImageUrl(template.imageUrl)
+                                                    return (
+                                                        <MuiMenuItem key={template._id || template.id} value={template._id || template.id}>
+                                                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: '100%', py: 0.5 }}>
+                                                                {templateImageUrl ? (
+                                                                    <img 
+                                                                        src={templateImageUrl} 
+                                                                        alt={template.templateName || ''}
+                                                                        style={{ 
+                                                                            width: 50, 
+                                                                            height: 50, 
+                                                                            objectFit: 'cover', 
+                                                                            borderRadius: '6px',
+                                                                            border: '1px solid var(--color-border-glass)',
+                                                                            flexShrink: 0
+                                                                        }}
+                                                                    />
+                                                                ) : (
+                                                                    <MuiBox 
+                                                                        sx={{ 
+                                                                            width: 50, 
+                                                                            height: 50, 
+                                                                            borderRadius: '6px',
+                                                                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                                                            border: '1px solid var(--color-border-glass)',
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            justifyContent: 'center',
+                                                                            flexShrink: 0
+                                                                        }}
+                                                                    >
+                                                                        <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', fontSize: '9px', textAlign: 'center', px: 0.5 }}>
+                                                                            بدون صورة
+                                                                        </MuiTypography>
+                                                                    </MuiBox>
+                                                                )}
+                                                                <MuiBox sx={{ flex: 1, minWidth: 0 }}>
+                                                                    <MuiTypography variant="body2" sx={{ fontWeight: 600, mb: 0.25 }}>
+                                                                        {template.templateName || template.name || template._id || template.id}
+                                                                    </MuiTypography>
+                                                                    {template.description && (
+                                                                        <MuiTypography 
+                                                                            variant="caption" 
+                                                                            sx={{ 
+                                                                                color: 'var(--color-text-secondary)',
+                                                                                overflow: 'hidden',
+                                                                                textOverflow: 'ellipsis',
+                                                                                display: '-webkit-box',
+                                                                                WebkitLineClamp: 1,
+                                                                                WebkitBoxOrient: 'vertical',
+                                                                                lineHeight: 1.3
+                                                                            }}
+                                                                        >
+                                                                            {template.description}
+                                                                        </MuiTypography>
+                                                                    )}
+                                                                </MuiBox>
+                                                            </MuiBox>
                                             </MuiMenuItem>
-                                        ))}
+                                                    )
+                                                })}
                                     </MuiSelect>
                                 )}
                             />
-                            <Controller
-                                name={`services.${index}.customPrice`}
-                                control={control}
-                                render={({ field }) => (
-                                    <MuiTextField
-                                        {...field}
-                                        label="السعر"
-                                        type="number"
-                                        size="small"
-                                        sx={{ width: '120px' }}
-                                        error={!!errors.services?.[index]?.customPrice}
-                                    />
-                                )}
-                            />
                             <MuiIconButton
-                                onClick={() => remove(index)}
+                                        onClick={() => removeTemplate(index)}
                                 color="error"
                                 size="small"
                                 sx={{ mt: 0.5 }}
@@ -572,62 +621,104 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                                 <Trash2 size={20} />
                             </MuiIconButton>
                         </MuiBox>
-                    ))}
-                </MuiGrid>
-
-                {/* Templates */}
-                <MuiGrid item xs={12}>
-                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 1, color: 'var(--color-primary-500)' }}>
-                        القوالب المتاحة
-                    </MuiTypography>
-                    <Controller
-                        name="templates"
-                        control={control}
-                        render={({ field }) => (
-                            <MuiFormControl fullWidth>
-                                <MuiSelect
-                                    {...field}
-                                    multiple
-                                    displayEmpty
-                                    renderValue={(selected) => {
-                                        if (!selected || selected.length === 0) {
-                                            return <span style={{ color: 'var(--color-text-secondary)' }}>اختر القوالب</span>
-                                        }
-                                        return (
-                                            <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                {selected.map((templateId) => {
-                                                    const template = templatesList.find(t => (t._id || t.id) === templateId)
-                                                    return (
-                                                        <MuiChip
-                                                            key={templateId}
-                                                            label={template?.templateName || template?.name || templateId}
-                                                            size="small"
-                                                            sx={{
-                                                                backgroundColor: 'rgba(216, 185, 138, 0.2)',
-                                                                color: 'var(--color-primary-500)',
-                                                                height: 24,
-                                                                fontSize: '0.75rem'
-                                                            }}
-                                                        />
-                                                    )
-                                                })}
+                                
+                                {/* Preview of selected template */}
+                                {selectedTemplate && (
+                                    <MuiBox 
+                                        sx={{ 
+                                            mt: 1, 
+                                            p: 2, 
+                                            borderRadius: '12px', 
+                                            border: '1px solid var(--color-border-glass)',
+                                            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                                            transition: 'all 0.2s ease',
+                                            '&:hover': {
+                                                borderColor: 'var(--color-primary-500)',
+                                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                            }
+                                        }}
+                                    >
+                                        <MuiBox sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                                            {selectedTemplateImageUrl ? (
+                                                <img 
+                                                    src={selectedTemplateImageUrl} 
+                                                    alt={selectedTemplate.templateName || ''}
+                                                    style={{ 
+                                                        width: 120, 
+                                                        height: 120, 
+                                                        objectFit: 'cover', 
+                                                        borderRadius: '8px',
+                                                        border: '1px solid var(--color-border-glass)',
+                                                        flexShrink: 0
+                                                    }}
+                                                />
+                                            ) : (
+                                                <MuiBox 
+                                                    sx={{ 
+                                                        width: 120, 
+                                                        height: 120, 
+                                                        borderRadius: '8px',
+                                                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                                        border: '1px solid var(--color-border-glass)',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        flexShrink: 0
+                                                    }}
+                                                >
+                                                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', textAlign: 'center', px: 1 }}>
+                                                        بدون صورة
+                                                    </MuiTypography>
+                                                </MuiBox>
+                                            )}
+                                            <MuiBox sx={{ flex: 1, minWidth: 0 }}>
+                                                <MuiTypography 
+                                                    variant="body1" 
+                                                    sx={{ 
+                                                        fontWeight: 600, 
+                                                        mb: 1,
+                                                        color: 'var(--color-text-primary)',
+                                                        fontSize: '1rem'
+                                                    }}
+                                                >
+                                                    {selectedTemplate.templateName || selectedTemplate.name || 'قالب بدون اسم'}
+                                                </MuiTypography>
+                                                {selectedTemplate.description ? (
+                                                    <MuiTypography 
+                                                        variant="body2" 
+                                                        sx={{ 
+                                                            color: 'var(--color-text-secondary)',
+                                                            lineHeight: 1.6,
+                                                            whiteSpace: 'pre-wrap',
+                                                            wordBreak: 'break-word'
+                                                        }}
+                                                    >
+                                                        {selectedTemplate.description}
+                                                    </MuiTypography>
+                                                ) : (
+                                                    <MuiTypography 
+                                                        variant="caption" 
+                                                        sx={{ 
+                                                            color: 'var(--color-text-secondary)',
+                                                            fontStyle: 'italic'
+                                                        }}
+                                                    >
+                                                        لا يوجد وصف
+                                                    </MuiTypography>
+                                                )}
                                             </MuiBox>
-                                        )
-                                    }}
-                                >
-                                    {Array.isArray(templatesList) && templatesList.length > 0 ? (
-                                        templatesList.map(template => (
-                                            <MuiMenuItem key={template._id || template.id} value={template._id || template.id}>
-                                                {template.templateName || template.name || template._id || template.id}
-                                            </MuiMenuItem>
-                                        ))
-                                    ) : (
-                                        <MuiMenuItem disabled>لا توجد قوالب متاحة</MuiMenuItem>
-                                    )}
-                                </MuiSelect>
-                            </MuiFormControl>
-                        )}
-                    />
+                                        </MuiBox>
+                                    </MuiBox>
+                                )}
+                            </MuiBox>
+                        )
+                    })}
+
+                    {templateFields.length === 0 && (
+                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
+                            لا توجد قوالب مضافة. اضغط على "إضافة قالب" لإضافة قالب.
+                        </MuiTypography>
+                    )}
                 </MuiGrid>
 
                 {/* Images */}

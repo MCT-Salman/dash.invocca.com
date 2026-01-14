@@ -75,6 +75,87 @@ export const deleteHallService = async (serviceId) => {
   }
 }
 
+/**
+ * GET - الحصول على خدمات القاعة
+ * GET /manager/hall/services
+ */
+export const getHallServices = async () => {
+  try {
+    const response = await api.get('/manager/hall/services')
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+// ==================== Songs Management (Hall) ====================
+
+/**
+ * GET - عرض أغاني القاعة
+ * GET /manager/hall/songs
+ */
+export const getHallSongs = async () => {
+  try {
+    const response = await api.get('/manager/hall/songs')
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * POST - إضافة أغنية للقاعة
+ * POST /manager/hall/songs
+ */
+export const addHallSong = async (songData) => {
+  try {
+    const response = await api.post('/manager/hall/songs', songData)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * PUT - تعديل أغنية في القاعة
+ * PUT /manager/hall/songs/:id
+ */
+export const updateHallSong = async (songId, songData) => {
+  try {
+    const response = await api.put(`/manager/hall/songs/${songId}`, songData)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * DELETE - حذف أغنية من القاعة
+ * DELETE /manager/hall/songs/:id
+ */
+export const deleteHallSong = async (songId) => {
+  try {
+    const response = await api.delete(`/manager/hall/songs/${songId}`)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * PUT - تفعيل/تعطيل أغنية
+ * PUT /manager/hall/songs/:id
+ * (نفس endpoint التعديل، لكن نرسل isActive فقط أو مع باقي البيانات)
+ */
+export const toggleHallSongActive = async (songId, isActive) => {
+  try {
+    const response = await api.put(`/manager/hall/songs/${songId}`, { isActive })
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
 // ==================== Clients Management ====================
 
 /**
@@ -403,6 +484,47 @@ export const removeEventScanner = async (assignmentId) => {
   }
 }
 
+// ==================== Event Playlist (Songs) ====================
+
+/**
+ * GET - عرض قائمة تشغيل الأغاني للفعالية
+ * GET /manager/events/:eventId/playlist
+ */
+export const getEventPlaylist = async (eventId) => {
+  try {
+    const response = await api.get(`/manager/events/${eventId}/playlist`)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * POST - إضافة أغنية إلى قائمة تشغيل الفعالية
+ * POST /manager/events/:eventId/playlist
+ */
+export const addEventPlaylistSong = async (eventId, payload) => {
+  try {
+    const response = await api.post(`/manager/events/${eventId}/playlist`, payload)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * DELETE - حذف أغنية من قائمة تشغيل الفعالية
+ * DELETE /manager/events/:eventId/playlist/:playlistId
+ */
+export const deleteEventPlaylistSong = async (eventId, playlistId) => {
+  try {
+    const response = await api.delete(`/manager/events/${eventId}/playlist/${playlistId}`)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
 // ==================== Clients Management ====================
 
 /**
@@ -560,9 +682,15 @@ export default {
   // Hall
   getManagerHall,
   updateHallInfo,
+  getHallServices,
   addHallService,
   updateHallService,
   deleteHallService,
+  getHallSongs,
+  addHallSong,
+  updateHallSong,
+  deleteHallSong,
+  toggleHallSongActive,
 
   // Events
   getManagerEvents,
@@ -575,6 +703,9 @@ export default {
   addEventScanners,
   getEventScanners,
   removeEventScanner,
+  getEventPlaylist,
+  addEventPlaylistSong,
+  deleteEventPlaylistSong,
 
   // Clients
   getClients,

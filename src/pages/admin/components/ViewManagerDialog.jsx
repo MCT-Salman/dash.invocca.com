@@ -64,7 +64,7 @@ export default function ViewManagerDialog({ open, onClose, manager }) {
                             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
                                 <User size={16} style={{ color: 'rgba(255,255,255,0.8)' }} />
                                 <MuiTypography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>
-                                    مدير قاعة
+                                    مدير قاعة/صالة
                                 </MuiTypography>
                             </MuiBox>
                         </MuiBox>
@@ -120,7 +120,7 @@ export default function ViewManagerDialog({ open, onClose, manager }) {
                                         <MuiDivider sx={{ borderColor: 'var(--color-border-glass)' }} />
                                     </MuiGrid>
                                     <MuiGrid item xs={12}>
-                                        <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>القاعة المرتبطة</MuiTypography>
+                                        <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>قاعة/صالة المرتبطة</MuiTypography>
                                         <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
                                             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                 <Building2 size={20} style={{ color: 'var(--color-primary-400)' }} />

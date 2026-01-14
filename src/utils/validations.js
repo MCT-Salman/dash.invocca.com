@@ -34,7 +34,7 @@ export const commonValidations = {
         
         return required ? schema : schema.optional().or(z.literal(''))
     },
-    
+ 
     email: z.string()
         .email('البريد الإلكتروني غير صحيح')
         .optional()

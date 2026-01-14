@@ -42,7 +42,7 @@ import {
 const UserRoleBadge = ({ role }) => {
   const roleConfig = {
     [USER_ROLES.ADMIN]: { label: 'مدير نظام', color: '#dc2626', bg: 'rgba(220, 38, 38, 0.1)', icon: Shield },
-    [USER_ROLES.MANAGER]: { label: 'مدير قاعة', color: '#9333ea', bg: 'rgba(147, 51, 234, 0.1)', icon: Users },
+    [USER_ROLES.MANAGER]: { label: 'مدير قاعة/صالة', color: '#9333ea', bg: 'rgba(147, 51, 234, 0.1)', icon: Users },
     [USER_ROLES.CLIENT]: { label: 'عميل', color: '#0284c7', bg: 'rgba(2, 132, 199, 0.1)', icon: User },
     [USER_ROLES.EMPLOYEE]: { label: 'موظف', color: '#16a34a', bg: 'rgba(22, 163, 74, 0.1)', icon: Users }
   }
@@ -449,7 +449,7 @@ export default function UsersManagement() {
                   {users.filter(u => u.role === USER_ROLES.MANAGER).length}
                 </MuiTypography>
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                  مدراء القاعات
+                  مدراء قاعات/صالات
                 </MuiTypography>
               </MuiBox>
               <MuiBox
@@ -571,7 +571,7 @@ export default function UsersManagement() {
             >
               <MuiMenuItem value="all">الكل</MuiMenuItem>
               <MuiMenuItem value={USER_ROLES.ADMIN}>مدير نظام</MuiMenuItem>
-              <MuiMenuItem value={USER_ROLES.MANAGER}>مدير قاعة</MuiMenuItem>
+              <MuiMenuItem value={USER_ROLES.MANAGER}>مدير قاعة/صالة</MuiMenuItem>
               <MuiMenuItem value={USER_ROLES.CLIENT}>عميل</MuiMenuItem>
               <MuiMenuItem value={USER_ROLES.EMPLOYEE}>موظف</MuiMenuItem>
             </MuiSelect>

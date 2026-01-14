@@ -4,16 +4,16 @@
  * صفحة التقارير للعميل
  */
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import MuiBox from '@/components/ui/MuiBox'
 import MuiTypography from '@/components/ui/MuiTypography'
 import MuiPaper from '@/components/ui/MuiPaper'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiChip from '@/components/ui/MuiChip'
 import MuiDivider from '@/components/ui/MuiDivider'
-import { LoadingScreen, SEOHead, EmptyState } from '@/components/common'
+import { LoadingScreen, SEOHead, EmptyState, FormDialog } from '@/components/common'
 import { QUERY_KEYS } from '@/config/constants'
-import { getClientReports } from '@/api/client'
+import { getClientReports, getEventRating, addEventRating, updateEventRating } from '@/api/client'
 import { formatDate, formatCurrency, formatEmptyValue, formatNumber } from '@/utils/helpers'
 import { 
   BarChart3, 
@@ -33,10 +33,18 @@ import {
   Package,
   Image as ImageIcon,
   UserCheck,
-  Sparkles
+  Sparkles,
+  Star
 } from 'lucide-react'
+import MuiButton from '@/components/ui/MuiButton'
+import MuiSlider from '@/components/ui/MuiSlider'
+import MuiTextField from '@/components/ui/MuiTextField'
+import { useNotification } from '@/hooks'
 
 export default function ClientReports() {
+  const { addNotification } = useNotification()
+  const queryClient = useQueryClient()
+
   const { data, isLoading } = useQuery({
     queryKey: QUERY_KEYS.CLIENT_REPORTS,
     queryFn: getClientReports,
@@ -70,6 +78,140 @@ export default function ClientReports() {
   const totalPrice = event.totalPrice || 0
   const paidAmount = event.paidAmount || 0
   const remainingBalance = event.remainingBalance || (totalPrice - paidAmount)
+
+  const eventId = event._id || event.id
+
+  // Rating state
+  const [ratingDialogOpen, setRatingDialogOpen] = React.useState(false)
+  const [ratingData, setRatingData] = React.useState({
+    overallRating: 5,
+    hallRating: 5,
+    serviceRating: 5,
+    foodRating: 5,
+    staffRating: 5,
+    comment: '',
+  })
+  const [hasExistingRating, setHasExistingRating] = React.useState(false)
+
+  // Fetch existing rating
+  const { data: ratingResponse } = useQuery({
+    queryKey: [QUERY_KEYS.CLIENT_EVENT_RATING, eventId],
+    queryFn: () => getEventRating(eventId),
+    enabled: !!eventId,
+  })
+
+  React.useEffect(() => {
+    const rating = ratingResponse?.data
+    if (rating && typeof rating === 'object') {
+      setHasExistingRating(true)
+      setRatingData({
+        overallRating: rating.overallRating ?? 5,
+        hallRating: rating.hallRating ?? 5,
+        serviceRating: rating.serviceRating ?? 5,
+        foodRating: rating.foodRating ?? 5,
+        staffRating: rating.staffRating ?? 5,
+        comment: rating.comment || '',
+      })
+    } else {
+      setHasExistingRating(false)
+    }
+  }, [ratingResponse])
+
+  const ratingDefaultMarks = [
+    { value: 1, label: '1' },
+    { value: 2, label: '2' },
+    { value: 3, label: '3' },
+    { value: 4, label: '4' },
+    { value: 5, label: '5' },
+  ]
+
+  const addRatingMutation = useMutation({
+    mutationFn: (payload) => addEventRating(eventId, payload),
+    onSuccess: (res) => {
+      addNotification({
+        type: 'success',
+        title: 'تم بنجاح',
+        message: res?.message || 'تم إضافة التقييم بنجاح',
+      })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CLIENT_EVENT_RATING, eventId] })
+      setRatingDialogOpen(false)
+    },
+    onError: (error) => {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'حدث خطأ أثناء إرسال التقييم'
+      addNotification({
+        type: 'error',
+        title: 'خطأ',
+        message,
+      })
+    },
+  })
+
+  const updateRatingMutation = useMutation({
+    mutationFn: (payload) => updateEventRating(eventId, payload),
+    onSuccess: (res) => {
+      addNotification({
+        type: 'success',
+        title: 'تم بنجاح',
+        message: res?.message || 'تم تحديث التقييم بنجاح',
+      })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CLIENT_EVENT_RATING, eventId] })
+      setRatingDialogOpen(false)
+    },
+    onError: (error) => {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'حدث خطأ أثناء تحديث التقييم'
+      addNotification({
+        type: 'error',
+        title: 'خطأ',
+        message,
+      })
+    },
+  })
+
+  const handleOpenRatingDialog = () => {
+    setRatingDialogOpen(true)
+  }
+
+  const handleCloseRatingDialog = () => {
+    setRatingDialogOpen(false)
+  }
+
+  const handleRatingChange = (field) => (_, value) => {
+    setRatingData((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
+
+  const handleRatingCommentChange = (e) => {
+    const { value } = e.target
+    setRatingData((prev) => ({
+      ...prev,
+      comment: value,
+    }))
+  }
+
+  const handleSubmitRating = () => {
+    const payload = {
+      overallRating: ratingData.overallRating,
+      hallRating: ratingData.hallRating,
+      serviceRating: ratingData.serviceRating,
+      foodRating: ratingData.foodRating,
+      staffRating: ratingData.staffRating,
+      comment: ratingData.comment?.trim() || '',
+    }
+
+    if (hasExistingRating) {
+      updateRatingMutation.mutate(payload)
+    } else {
+      addRatingMutation.mutate(payload)
+    }
+  }
   
   // Event type labels
   const eventTypeLabels = {
@@ -141,7 +283,7 @@ export default function ClientReports() {
         </MuiTypography>
       </MuiBox>
 
-      {/* Event Info Card */}
+      {/* Event Info Card + Rating */}
       <MuiPaper
         elevation={0}
         sx={{
@@ -177,6 +319,36 @@ export default function ClientReports() {
                 }}
               />
             </MuiBox>
+          </MuiBox>
+
+          {/* Rating summary + button */}
+          <MuiBox sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
+            {hasExistingRating && ratingResponse?.data && (
+              <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Star size={20} style={{ color: '#facc15' }} />
+                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
+                  تقييمك العام:{' '}
+                  <MuiTypography component="span" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                    {ratingResponse.data.overallRating}/5
+                  </MuiTypography>
+                </MuiTypography>
+              </MuiBox>
+            )}
+            <MuiButton
+              variant="contained"
+              onClick={handleOpenRatingDialog}
+              startIcon={<Star size={18} />}
+              sx={{
+                borderRadius: '999px',
+                px: 3,
+                py: 1,
+                background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
+                color: '#111827',
+                fontWeight: 600,
+              }}
+            >
+              {hasExistingRating ? 'تعديل التقييم' : 'إضافة تقييم للفعالية'}
+            </MuiButton>
           </MuiBox>
         </MuiBox>
 
@@ -268,6 +440,107 @@ export default function ClientReports() {
         )}
 
       </MuiPaper>
+
+      {/* Rating Dialog */}
+      <FormDialog
+        open={ratingDialogOpen}
+        onClose={handleCloseRatingDialog}
+        title={hasExistingRating ? 'تعديل تقييم الفعالية' : 'إضافة تقييم للفعالية'}
+        onSubmit={handleSubmitRating}
+        loading={addRatingMutation.isPending || updateRatingMutation.isPending}
+        submitText={hasExistingRating ? 'تحديث التقييم' : 'إرسال التقييم'}
+        cancelText="إلغاء"
+        maxWidth="sm"
+      >
+        <MuiGrid container spacing={3}>
+          <MuiGrid item xs={12}>
+            <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-text-primary-dark)', mb: 1 }}>
+              التقييم العام
+            </MuiTypography>
+            <MuiSlider
+              value={ratingData.overallRating}
+              onChange={handleRatingChange('overallRating')}
+              step={1}
+              min={1}
+              max={5}
+              marks={ratingDefaultMarks}
+              valueLabelDisplay="auto"
+            />
+          </MuiGrid>
+
+          <MuiGrid item xs={12} sm={6}>
+            <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-text-primary-dark)', mb: 1 }}>
+              تقييم القاعة/الصالة
+            </MuiTypography>
+            <MuiSlider
+              value={ratingData.hallRating}
+              onChange={handleRatingChange('hallRating')}
+              step={1}
+              min={1}
+              max={5}
+              marks={ratingDefaultMarks}
+              valueLabelDisplay="auto"
+            />
+          </MuiGrid>
+
+          <MuiGrid item xs={12} sm={6}>
+            <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-text-primary-dark)', mb: 1 }}>
+              تقييم الخدمات
+            </MuiTypography>
+            <MuiSlider
+              value={ratingData.serviceRating}
+              onChange={handleRatingChange('serviceRating')}
+              step={1}
+              min={1}
+              max={5}
+              marks={ratingDefaultMarks}
+              valueLabelDisplay="auto"
+            />
+          </MuiGrid>
+
+          <MuiGrid item xs={12} sm={6}>
+            <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-text-primary-dark)', mb: 1 }}>
+              تقييم الطعام
+            </MuiTypography>
+            <MuiSlider
+              value={ratingData.foodRating}
+              onChange={handleRatingChange('foodRating')}
+              step={1}
+              min={1}
+              max={5}
+              marks={ratingDefaultMarks}
+              valueLabelDisplay="auto"
+            />
+          </MuiGrid>
+
+          <MuiGrid item xs={12} sm={6}>
+            <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-text-primary-dark)', mb: 1 }}>
+              تقييم الموظفين
+            </MuiTypography>
+            <MuiSlider
+              value={ratingData.staffRating}
+              onChange={handleRatingChange('staffRating')}
+              step={1}
+              min={1}
+              max={5}
+              marks={ratingDefaultMarks}
+              valueLabelDisplay="auto"
+            />
+          </MuiGrid>
+
+          <MuiGrid item xs={12}>
+            <MuiTextField
+              fullWidth
+              multiline
+              minRows={3}
+              maxRows={6}
+              label="تعليقك على التجربة"
+              value={ratingData.comment}
+              onChange={handleRatingCommentChange}
+            />
+          </MuiGrid>
+        </MuiGrid>
+      </FormDialog>
 
       {/* Financial Summary */}
       <MuiGrid container spacing={3} sx={{ mb: 4 }}>
@@ -447,12 +720,12 @@ export default function ClientReports() {
           }}
         >
           <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 3 }}>
-            معلومات القاعة
+            معلومات قاعة/صالة
           </MuiTypography>
           <MuiGrid container spacing={2}>
             <MuiGrid item xs={12} sm={6} md={4}>
               <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
-                اسم القاعة
+                اسم قاعة/صالة
               </MuiTypography>
               <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
                 {formatEmptyValue(hall.name)}
@@ -552,7 +825,7 @@ export default function ClientReports() {
             {hall.images && hall.images.length > 0 && (
               <MuiGrid item xs={12}>
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1 }}>
-                  صور القاعة
+                  صور قاعة/صالة
                 </MuiTypography>
                 <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
                   {hall.images.map((image, index) => {

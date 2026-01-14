@@ -152,7 +152,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                 <MuiGrid item xs={12}>
                                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                                         <MuiChip
-                                            label="معلومات القاعة"
+                                            label="معلومات قاعة/صالة"
                                             size="small"
                                             sx={{
                                                 backgroundColor: 'rgba(216, 185, 138, 0.1)',

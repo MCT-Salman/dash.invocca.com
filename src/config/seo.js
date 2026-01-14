@@ -12,7 +12,7 @@ import { APP_INFO } from './constants'
 export const DEFAULT_SEO = {
     title: APP_INFO.FULL_NAME,
     description: APP_INFO.DESCRIPTION,
-    keywords: 'تطبيق حفلات, تنظيم مناسبات, إدارة صالات, لوحة تحكم حفلات, منظم حفلات, حجز قاعات, دعوات إلكترونية',
+    keywords: 'تطبيق حفلات, تنظيم مناسبات, إدارة قاعة/صالة, لوحة تحكم حفلات, منظم حفلات, حجز قاعة/صالة, دعوات إلكترونية',
     author: APP_INFO.AUTHOR,
     language: APP_INFO.LANGUAGE,
     direction: APP_INFO.DIRECTION,
@@ -49,22 +49,22 @@ export const PAGE_SEO = {
     // ─────────────────────────────────────────────────────────
 
     landing: {
-        title: 'INVOCCA - الحل الأمثل لتنظيم حفلات الصالات',
-        description: 'نظام متكامل لإدارة وتنظيم حفلات الصالات بكل سهولة واحترافية. احجز قاعتك، أدر دعواتك، وتابع فعالياتك من مكان واحد',
-        keywords: 'حجز قاعات, تنظيم حفلات, إدارة مناسبات, دعوات إلكترونية, قاعات أفراح, صالات مناسبات',
+        title: 'INVOCCA - الحل الأمثل لتنظيم حفلات قاعة/صالة',
+        description: 'نظام متكامل لإدارة وتنظيم حفلات قاعة/صالة بكل سهولة واحترافية. احجز قاعتك، أدر دعواتك، وتابع فعالياتك من مكان واحد',
+        keywords: 'حجز قاعة/صالة, تنظيم حفلات, إدارة مناسبات, دعوات إلكترونية, قاعة/صالة أفراح',
         canonical: '/',
     },
 
     privacyPolicy: {
         title: 'سياسة الخصوصية - INVOCCA',
-        description: 'سياسة الخصوصية وحماية البيانات في تطبيق INVOCCA لتنظيم حفلات الصالات',
+        description: 'سياسة الخصوصية وحماية البيانات في تطبيق INVOCCA لتنظيم حفلات قاعة/صالة',
         keywords: 'سياسة الخصوصية, حماية البيانات, أمان المعلومات',
         canonical: '/privacy-policy',
     },
 
     termsOfService: {
         title: 'الشروط والأحكام - INVOCCA',
-        description: 'شروط وأحكام استخدام تطبيق INVOCCA لتنظيم حفلات الصالات',
+        description: 'شروط وأحكام استخدام تطبيق INVOCCA لتنظيم حفلات قاعة/صالة',
         keywords: 'شروط الاستخدام, أحكام الخدمة, قواعد التطبيق',
         canonical: '/terms-of-service',
     },
@@ -120,13 +120,13 @@ export const PAGE_SEO = {
 
     adminManagers: {
         title: 'إدارة المديرين - INVOCCA',
-        description: 'إدارة مديري القاعات',
+        description: 'إدارة مديري قاعة/صالة',
         noIndex: true,
     },
 
     adminHalls: {
-        title: 'إدارة القاعات - INVOCCA',
-        description: 'إدارة جميع القاعات والصالات',
+        title: 'إدارة قاعة/صالة - INVOCCA',
+        description: 'إدارة جميع قاعات/صالات',
         noIndex: true,
     },
 
@@ -160,13 +160,13 @@ export const PAGE_SEO = {
 
     managerDashboard: {
         title: 'لوحة تحكم المدير - INVOCCA',
-        description: 'لوحة التحكم الرئيسية لمدير القاعة',
+        description: 'لوحة التحكم الرئيسية لمدير قاعة/صالة',
         noIndex: true,
     },
 
     managerHall: {
-        title: 'إدارة القاعة - INVOCCA',
-        description: 'إدارة معلومات وإعدادات القاعة',
+        title: 'إدارة قاعة/صالة - INVOCCA',
+        description: 'إدارة معلومات وإعدادات قاعة/صالة',
         noIndex: true,
     },
 
@@ -178,7 +178,7 @@ export const PAGE_SEO = {
 
     managerStaff: {
         title: 'إدارة الموظفين - INVOCCA',
-        description: 'إدارة موظفي القاعة',
+        description: 'إدارة موظفي قاعة/صالة',
         noIndex: true,
     },
 
@@ -190,7 +190,7 @@ export const PAGE_SEO = {
 
     managerTemplates: {
         title: 'إدارة القوالب - INVOCCA',
-        description: 'إدارة قوالب الدعوات الخاصة بالقاعة',
+        description: 'إدارة قوالب الدعوات الخاصة بقاعة/صالة',
         noIndex: true,
     },
 
@@ -202,7 +202,7 @@ export const PAGE_SEO = {
 
     managerReports: {
         title: 'التقارير - INVOCCA',
-        description: 'تقارير وإحصائيات القاعة',
+        description: 'تقارير وإحصائيات قاعة/صالة',
         noIndex: true,
     },
 

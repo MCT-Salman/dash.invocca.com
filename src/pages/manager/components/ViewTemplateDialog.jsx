@@ -191,14 +191,14 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                         <MuiGrid item xs={12}>
                                             <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                                                 <Building2 size={20} style={{ color: 'var(--color-primary-500)' }} />
-                                                معلومات القاعة
+                                                معلومات قاعة/صالة
                                             </MuiTypography>
                                             <MuiGrid container spacing={2}>
                                                 {typeof template.hallId === 'object' && template.hallId.name && (
                                                     <MuiGrid item xs={12} sm={6} md={4}>
                                                         <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
                                                             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, fontSize: '0.75rem' }}>
-                                                                اسم القاعة
+                                                                اسم قاعة/صالة
                                                             </MuiTypography>
                                                             <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
                                                                 {template.hallId.name}

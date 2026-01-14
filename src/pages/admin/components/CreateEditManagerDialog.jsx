@@ -186,7 +186,7 @@ export default function CreateEditManagerDialog({ open, onClose, onSubmit, editi
                 {/* Hall Assignment */}
                 <MuiGrid item xs={12}>
                     <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 1, color: 'var(--color-primary-500)' }}>
-                        القاعة المسؤول عنها
+                        قاعة/صالة المسؤول عنها
                     </MuiTypography>
                 </MuiGrid>
 
@@ -197,7 +197,7 @@ export default function CreateEditManagerDialog({ open, onClose, onSubmit, editi
                         render={({ field }) => (
                             <MuiSelect
                                 {...field}
-                                label="القاعة"
+                                label="قاعة/صالة"
                                 error={!!errors.hallId}
                                 fullWidth
                             >

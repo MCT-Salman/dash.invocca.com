@@ -204,7 +204,7 @@ export default function ManagerProfile() {
                   gap: 1
                 }}>
                   <Shield size={16} />
-                  مدير صالة
+                  مدير قاعة/صالة
                 </MuiTypography>
               </MuiBox>
             </MuiBox>
@@ -311,7 +311,7 @@ export default function ManagerProfile() {
                       fontWeight: 600, 
                       color: 'var(--color-text-primary-dark)' 
                     }}>
-                      {user?.role === 'manager' ? 'مدير صالة' : user?.role}
+                      {user?.role === 'manager' ? 'مدير قاعة/صالة' : user?.role}
                     </MuiTypography>
                   </MuiCardContent>
                 </MuiCard>

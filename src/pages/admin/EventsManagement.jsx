@@ -254,7 +254,7 @@ export default function EventsManagement() {
                                 إدارة الفعاليات ({filteredEvents.length})
                             </MuiTypography>
                             <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                                نظرة شاملة على جميع الفعاليات والحجوزات المقامة في جميع الصالات
+                                نظرة شاملة على جميع الفعاليات والحجوزات المقامة في جميع قاعات/صالات
                             </MuiTypography>
                         </MuiBox>
                     </MuiBox>
@@ -277,7 +277,7 @@ export default function EventsManagement() {
                     <MuiGrid item xs={12} md={6}>
                         <MuiTextField
                             fullWidth
-                            placeholder="البحث باسم الفعالية، العميل، أو القاعة..."
+                            placeholder="البحث باسم الفعالية، العميل، أو قاعة/صالة..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             InputProps={{

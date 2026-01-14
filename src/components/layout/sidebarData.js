@@ -61,13 +61,13 @@ const ADMIN_MENU_ITEMS = [
     ]
   },
   
-  // قسم الصالات
+  // قسم قاعة/صالة
   { 
     id: 'halls', 
-    label: 'الصالات', 
+    label: 'قاعة/صالة', 
     icon: Building, 
     path: '/admin/halls',
-    badge: 5 // عدد الصالات الجديدة
+    badge: 5 // عدد قاعات/صالات الجديدة
   },
   
   // قسم الخدمات
@@ -112,7 +112,7 @@ const ADMIN_MENU_ITEMS = [
     icon: Shield, 
     path: '/admin/managers',
     subItems: [
-      { id: 'hall-managers', label: 'مدراء الصالات', path: '/admin/managers/halls' },
+      { id: 'hall-managers', label: 'مدراء قاعة/صالة', path: '/admin/managers/halls' },
       { id: 'service-managers', label: 'مدراء الخدمات', path: '/admin/managers/services' },
       { id: 'event-managers', label: 'مدراء الفعاليات', path: '/admin/managers/events' }
     ]
@@ -198,7 +198,7 @@ const ADMIN_MENU_ITEMS = [
 // قائمة المدراء (نسخة مختصرة)
 const MANAGER_MENU_ITEMS = [
   { id: 'dashboard', label: 'الرئيسية', icon: Home, path: '/manager' },
-  { id: 'halls', label: 'صالاتي', icon: Building, path: '/manager/halls' },
+  { id: 'halls', label: 'قاعة/صالة', icon: Building, path: '/manager/halls' },
   { id: 'events', label: 'فعالياتي', icon: Calendar, path: '/manager/events' },
   { id: 'services', label: 'خدماتي', icon: Palette, path: '/manager/services' },
   { id: 'invitations', label: 'الدعوات', icon: Gift, path: '/manager/invitations' },
@@ -212,7 +212,7 @@ const USER_MENU_ITEMS = [
   { id: 'dashboard', label: 'الرئيسية', icon: Home, path: '/user' },
   { id: 'my-events', label: 'فعالياتي', icon: Calendar, path: '/user/events' },
   { id: 'my-invitations', label: 'دعواتي', icon: Gift, path: '/user/invitations' },
-  { id: 'halls', label: 'استعرض الصالات', icon: Building, path: '/user/halls' },
+  { id: 'halls', label: 'استعرض قاعة/صالة', icon: Building, path: '/user/halls' },
   { id: 'services', label: 'خدمات إضافية', icon: Palette, path: '/user/services' },
   ...COMMON_MENU_ITEMS,
   { id: 'help', label: 'المساعدة', icon: HelpCircle, path: '/user/help' },

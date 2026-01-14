@@ -16,7 +16,7 @@
 //           <MuiButton variant="contained" color="primary">
 //             عرض الفواتير
 //           </MuiButton>
-//         </MuiBox>
+//         </MuiBox> 
         
 //         <MuiBox className="bg-white p-6 rounded-2xl shadow-md">
 //           <h3 className="text-lg font-semibold mb-2">العملاء</h3>

@@ -20,7 +20,7 @@ import { getHallsList } from '@/api/admin'
 // Validation Schema
 const createTemplateSchema = (editingTemplate = null) => z.object({
     templateName: z.string().min(3, 'اسم القالب يجب أن يكون 3 أحرف على الأقل').max(100, 'اسم القالب طويل جداً'),
-    hallId: z.string().min(1, 'القاعة مطلوبة'),
+    hallId: z.string().min(1, 'قاعة/صالة مطلوبة'),
     description: z.string().optional(),
 })
 
@@ -161,7 +161,7 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
                         render={({ field }) => (
                             <MuiSelect
                                 {...field}
-                                label="القاعة"
+                                label="قاعة/صالة"
                                 fullWidth
                                 error={!!errors.hallId}
                                 helperText={errors.hallId?.message}

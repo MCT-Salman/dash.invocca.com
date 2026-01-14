@@ -1,7 +1,7 @@
 // src/pages/manager/HallManagementNew.jsx
 /**
  * Hall Management Page - Enhanced Design
- * إدارة القاعة - تصميم محسّن ومتجاوب
+ * إدارة قاعة/صالة - تصميم محسّن ومتجاوب
  */
 
 import { useQuery } from '@tanstack/react-query'
@@ -15,9 +15,10 @@ import MuiButton from '@/components/ui/MuiButton'
 import MuiChip from '@/components/ui/MuiChip'
 import MuiDivider from '@/components/ui/MuiDivider'
 import { LoadingScreen, EmptyState, SEOHead } from '@/components/common'
-import { QUERY_KEYS } from '@/config/constants'
+import { QUERY_KEYS, API_CONFIG } from '@/config/constants'
 import { getManagerHall, updateHallInfo } from '@/api/manager'
 import { listServices } from '@/api/services'
+import { getImageUrl } from '@/utils/helpers'
 import EditHallDialog from './components/EditHallDialog'
 import {
     Building2,
@@ -42,7 +43,10 @@ import {
     Calendar,
     Clock,
     Hash,
-    UserCheck
+    UserCheck,
+    User,
+    Music,
+    FileImage
 } from 'lucide-react'
 
 /**
@@ -390,8 +394,8 @@ export default function HallManagement() {
         updateFn: updateHallInfo,
         deleteFn: null, // Not used
         queryKey: QUERY_KEYS.MANAGER_HALL,
-        successMessage: 'تم تحديث معلومات القاعة بنجاح',
-        errorMessage: 'حدث خطأ أثناء تحديث معلومات القاعة',
+        successMessage: 'تم تحديث معلومات قاعة/صالة بنجاح',
+        errorMessage: 'حدث خطأ أثناء تحديث معلومات قاعة/صالة',
     })
 
     // Fetch hall info
@@ -482,7 +486,7 @@ export default function HallManagement() {
 
     return (
         <>
-            <SEOHead title="إدارة القاعة" />
+            <SEOHead title="إدارة قاعة/صالة" />
 
             <MuiBox sx={{ p: { xs: 2, sm: 3, md: 4 }, minHeight: '100vh', background: 'var(--color-bg-dark)' }}>
                 {/* Header Section - Premium Welcome Card */}
@@ -553,7 +557,7 @@ export default function HallManagement() {
                                         backgroundClip: 'text',
                                     }}
                                 >
-                                    إدارة القاعة
+                                    إدارة قاعة/صالة
                                 </MuiTypography>
                                 <MuiTypography 
                                     variant="body1" 
@@ -564,7 +568,7 @@ export default function HallManagement() {
                                         letterSpacing: '0.3px'
                                     }}
                                 >
-                                    عرض وتحديث معلومات القاعة والخدمات
+                                    عرض وتحديث معلومات قاعة/صالة والخدمات
                                 </MuiTypography>
                             </MuiBox>
                         </MuiBox>
@@ -676,7 +680,7 @@ export default function HallManagement() {
                                         textShadow: '0 2px 8px rgba(0,0,0,0.3)'
                                     }}
                                 >
-                                    {hall.name || 'قاعة الأفراح'}
+                                    {hall.name || 'قاعة/صالة الأفراح'}
                                 </MuiTypography>
                                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                     <MapPin size={18} style={{ color: 'rgba(255, 255, 255, 0.9)' }} />
@@ -739,7 +743,7 @@ export default function HallManagement() {
                                 <InfoCard
                                     icon={DollarSign}
                                     label="السعر الافتراضي"
-                                    value={hall.defaultPrices ? `${hall.defaultPrices.toLocaleString()} ر.س` : '—'}
+                                    value={hall.defaultPrices ? `${hall.defaultPrices.toLocaleString()} ل.س` : '—'}
                                     color="#16a34a"
                                     gradient="linear-gradient(135deg, #16a34a, #15803d)"
                                 />
@@ -985,13 +989,391 @@ export default function HallManagement() {
                         ) : (
                             <EmptyState
                                 title="لا توجد خدمات"
-                                description="لم يتم إضافة أي خدمات للقاعة بعد"
+                                description="لم يتم إضافة أي خدمات لقاعة/صالة بعد"
                                 icon={Sparkles}
                                 showPaper={false}
                             />
                         )}
                     </MuiBox>
                 </MuiPaper>
+
+                {/* Manager Info Section */}
+                {hall.generalManager && (
+                    <MuiPaper
+                        elevation={0}
+                        sx={{
+                            borderRadius: '24px',
+                            border: '1px solid rgba(216, 185, 138, 0.15)',
+                            background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                            backdropFilter: 'blur(20px)',
+                            WebkitBackdropFilter: 'blur(20px)',
+                            overflow: 'hidden',
+                            mb: 4.5,
+                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                        }}
+                    >
+                        <MuiBox 
+                            sx={{ 
+                                p: { xs: 3, sm: 4, md: 5 },
+                                background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.1), rgba(255, 227, 108, 0.05))',
+                                borderBottom: '1px solid rgba(216, 185, 138, 0.15)',
+                            }}
+                        >
+                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                <MuiBox 
+                                    sx={{ 
+                                        width: { xs: 56, sm: 64 },
+                                        height: { xs: 56, sm: 64 },
+                                        borderRadius: '16px',
+                                        background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        boxShadow: '0 8px 20px rgba(216, 185, 138, 0.3)',
+                                        border: '2px solid rgba(216, 185, 138, 0.3)',
+                                    }}
+                                >
+                                    <User size={28} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                                </MuiBox>
+                                <MuiBox>
+                                    <MuiTypography 
+                                        variant="h5" 
+                                        sx={{ 
+                                            fontWeight: 800, 
+                                            color: 'var(--color-text-primary-dark)',
+                                            mb: 0.5,
+                                            fontSize: { xs: '1.25rem', sm: '1.5rem' }
+                                        }}
+                                    >
+                                        معلومات المدير
+                                    </MuiTypography>
+                                    <MuiTypography 
+                                        variant="body2" 
+                                        sx={{ 
+                                            color: 'var(--color-text-secondary)',
+                                            fontSize: '0.9rem'
+                                        }}
+                                    >
+                                        {typeof hall.generalManager === 'object' 
+                                            ? (hall.generalManager.name || hall.generalManager.username || '—')
+                                            : hall.generalManager
+                                        }
+                                    </MuiTypography>
+                                </MuiBox>
+                            </MuiBox>
+                        </MuiBox>
+                        <MuiBox sx={{ p: { xs: 3, sm: 4, md: 5 } }}>
+                            <MuiGrid container spacing={3}>
+                                {typeof hall.generalManager === 'object' && (
+                                    <>
+                                        {hall.generalManager.name && (
+                                            <MuiGrid item xs={12} md={6}>
+                                                <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
+                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>الاسم</MuiTypography>
+                                                    <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                        {hall.generalManager.name}
+                                                    </MuiTypography>
+                                                </MuiBox>
+                                            </MuiGrid>
+                                        )}
+                                        {hall.generalManager.username && (
+                                            <MuiGrid item xs={12} md={6}>
+                                                <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
+                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>اسم المستخدم</MuiTypography>
+                                                    <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                        {hall.generalManager.username}
+                                                    </MuiTypography>
+                                                </MuiBox>
+                                            </MuiGrid>
+                                        )}
+                                        {hall.generalManager.phone && (
+                                            <MuiGrid item xs={12} md={6}>
+                                                <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
+                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>رقم الهاتف</MuiTypography>
+                                                    <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                        {hall.generalManager.phone}
+                                                    </MuiTypography>
+                                                </MuiBox>
+                                            </MuiGrid>
+                                        )}
+                                    </>
+                                )}
+                            </MuiGrid>
+                        </MuiBox>
+                    </MuiPaper>
+                )}
+
+                {/* Templates Section */}
+                {hall.templates && Array.isArray(hall.templates) && hall.templates.length > 0 && (
+                    <MuiPaper
+                        elevation={0}
+                        sx={{
+                            borderRadius: '24px',
+                            border: '1px solid rgba(216, 185, 138, 0.15)',
+                            background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                            backdropFilter: 'blur(20px)',
+                            WebkitBackdropFilter: 'blur(20px)',
+                            overflow: 'hidden',
+                            mb: 4.5,
+                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                        }}
+                    >
+                        <MuiBox 
+                            sx={{ 
+                                p: { xs: 3, sm: 4, md: 5 },
+                                background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.1), rgba(255, 227, 108, 0.05))',
+                                borderBottom: '1px solid rgba(216, 185, 138, 0.15)',
+                            }}
+                        >
+                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                <MuiBox 
+                                    sx={{ 
+                                        width: { xs: 56, sm: 64 },
+                                        height: { xs: 56, sm: 64 },
+                                        borderRadius: '16px',
+                                        background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        boxShadow: '0 8px 20px rgba(216, 185, 138, 0.3)',
+                                        border: '2px solid rgba(216, 185, 138, 0.3)',
+                                    }}
+                                >
+                                    <FileImage size={28} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                                </MuiBox>
+                                <MuiBox>
+                                    <MuiTypography 
+                                        variant="h5" 
+                                        sx={{ 
+                                            fontWeight: 800, 
+                                            color: 'var(--color-text-primary-dark)',
+                                            mb: 0.5,
+                                            fontSize: { xs: '1.25rem', sm: '1.5rem' }
+                                        }}
+                                    >
+                                        القوالب ({hall.templates.length})
+                                    </MuiTypography>
+                                    <MuiTypography 
+                                        variant="body2" 
+                                        sx={{ 
+                                            color: 'var(--color-text-secondary)',
+                                            fontSize: '0.9rem'
+                                        }}
+                                    >
+                                        قوالب بطاقات الدعوة المتاحة
+                                    </MuiTypography>
+                                </MuiBox>
+                            </MuiBox>
+                        </MuiBox>
+                        <MuiBox sx={{ p: { xs: 3, sm: 4, md: 5 } }}>
+                            <MuiGrid container spacing={2}>
+                                {hall.templates.map((templateAssignment, index) => {
+                                    const template = templateAssignment.template || {}
+                                    const templateImageUrl = template.imageUrl 
+                                        ? (template.imageUrl.startsWith('http') 
+                                            ? template.imageUrl 
+                                            : `${API_CONFIG.BASE_URL}${template.imageUrl}`)
+                                        : null
+                                    return (
+                                        <MuiGrid item xs={12} sm={6} md={4} key={templateAssignment._id || index}>
+                                            <MuiBox
+                                                sx={{
+                                                    position: 'relative',
+                                                    borderRadius: '12px',
+                                                    overflow: 'hidden',
+                                                    border: '1px solid var(--color-border-glass)',
+                                                    backgroundColor: 'rgba(255,255,255,0.03)',
+                                                    cursor: templateImageUrl ? 'pointer' : 'default',
+                                                    transition: 'all 0.2s ease',
+                                                    height: '100%',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    '&:hover': templateImageUrl ? {
+                                                        transform: 'scale(1.02)',
+                                                        borderColor: 'var(--color-primary-500)',
+                                                    } : {}
+                                                }}
+                                                onClick={() => {
+                                                    if (templateImageUrl) window.open(templateImageUrl, '_blank')
+                                                }}
+                                            >
+                                                {templateImageUrl ? (
+                                                    <img
+                                                        src={templateImageUrl}
+                                                        alt={template.templateName || `قالب ${index + 1}`}
+                                                        style={{
+                                                            width: '100%',
+                                                            height: '160px',
+                                                            objectFit: 'cover',
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <MuiBox sx={{ width: '100%', height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(216, 185, 138, 0.1)' }}>
+                                                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
+                                                            بدون صورة
+                                                        </MuiTypography>
+                                                    </MuiBox>
+                                                )}
+                                                <MuiBox sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                                    <MuiTypography 
+                                                        variant="body1" 
+                                                        sx={{ 
+                                                            fontWeight: 600, 
+                                                            color: 'var(--color-text-primary-dark)', 
+                                                            mb: 0.5,
+                                                            fontSize: '1rem'
+                                                        }}
+                                                    >
+                                                        {template.templateName || template.name || `قالب ${index + 1}`}
+                                                    </MuiTypography>
+                                                    {template.description && (
+                                                        <MuiTypography 
+                                                            variant="body2" 
+                                                            sx={{ 
+                                                                color: 'var(--color-text-secondary)',
+                                                                mb: template.category ? 1 : 0,
+                                                                lineHeight: 1.5,
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis',
+                                                                display: '-webkit-box',
+                                                                WebkitLineClamp: 2,
+                                                                WebkitBoxOrient: 'vertical',
+                                                                flex: 1
+                                                            }}
+                                                        >
+                                                            {template.description}
+                                                        </MuiTypography>
+                                                    )}
+                                                    {templateAssignment.isPrimary && (
+                                                        <MuiChip
+                                                            label="رئيسي"
+                                                            size="small"
+                                                            sx={{
+                                                                height: 24,
+                                                                fontSize: '0.75rem',
+                                                                backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                                                                color: '#16a34a',
+                                                                alignSelf: 'flex-start',
+                                                                mt: 'auto'
+                                                            }}
+                                                        />
+                                                    )}
+                                                </MuiBox>
+                                            </MuiBox>
+                                        </MuiGrid>
+                                    )
+                                })}
+                            </MuiGrid>
+                        </MuiBox>
+                    </MuiPaper>
+                )}
+
+                {/* Songs Section */}
+                {hall.songs && Array.isArray(hall.songs) && hall.songs.length > 0 && (
+                    <MuiPaper
+                        elevation={0}
+                        sx={{
+                            borderRadius: '24px',
+                            border: '1px solid rgba(216, 185, 138, 0.15)',
+                            background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                            backdropFilter: 'blur(20px)',
+                            WebkitBackdropFilter: 'blur(20px)',
+                            overflow: 'hidden',
+                            mb: 4.5,
+                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                        }}
+                    >
+                        <MuiBox 
+                            sx={{ 
+                                p: { xs: 3, sm: 4, md: 5 },
+                                background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.1), rgba(255, 227, 108, 0.05))',
+                                borderBottom: '1px solid rgba(216, 185, 138, 0.15)',
+                            }}
+                        >
+                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                <MuiBox 
+                                    sx={{ 
+                                        width: { xs: 56, sm: 64 },
+                                        height: { xs: 56, sm: 64 },
+                                        borderRadius: '16px',
+                                        background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        boxShadow: '0 8px 20px rgba(216, 185, 138, 0.3)',
+                                        border: '2px solid rgba(216, 185, 138, 0.3)',
+                                    }}
+                                >
+                                    <Music size={28} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                                </MuiBox>
+                                <MuiBox>
+                                    <MuiTypography 
+                                        variant="h5" 
+                                        sx={{ 
+                                            fontWeight: 800, 
+                                            color: 'var(--color-text-primary-dark)',
+                                            mb: 0.5,
+                                            fontSize: { xs: '1.25rem', sm: '1.5rem' }
+                                        }}
+                                    >
+                                        الأغاني ({hall.songs.length})
+                                    </MuiTypography>
+                                    <MuiTypography 
+                                        variant="body2" 
+                                        sx={{ 
+                                            color: 'var(--color-text-secondary)',
+                                            fontSize: '0.9rem'
+                                        }}
+                                    >
+                                        قائمة الأغاني المتاحة
+                                    </MuiTypography>
+                                </MuiBox>
+                            </MuiBox>
+                        </MuiBox>
+                        <MuiBox sx={{ p: { xs: 3, sm: 4, md: 5 } }}>
+                            <MuiGrid container spacing={2}>
+                                {hall.songs.map((song, index) => (
+                                    <MuiGrid item xs={12} sm={6} md={4} key={song._id || index}>
+                                        <MuiBox
+                                            sx={{
+                                                p: 2,
+                                                borderRadius: '12px',
+                                                border: '1px solid var(--color-border-glass)',
+                                                backgroundColor: 'rgba(255,255,255,0.03)',
+                                                transition: 'all 0.2s ease',
+                                                '&:hover': {
+                                                    borderColor: 'var(--color-primary-500)',
+                                                    backgroundColor: 'rgba(255,255,255,0.05)',
+                                                }
+                                            }}
+                                        >
+                                            <MuiTypography 
+                                                variant="body1" 
+                                                sx={{ 
+                                                    fontWeight: 600, 
+                                                    color: 'var(--color-text-primary-dark)', 
+                                                    mb: 0.5
+                                                }}
+                                            >
+                                                {song.name || song.title || `أغنية ${index + 1}`}
+                                            </MuiTypography>
+                                            {song.artist && (
+                                                <MuiTypography 
+                                                    variant="body2" 
+                                                    sx={{ 
+                                                        color: 'var(--color-text-secondary)'
+                                                    }}
+                                                >
+                                                    {song.artist}
+                                                </MuiTypography>
+                                            )}
+                                        </MuiBox>
+                                    </MuiGrid>
+                                ))}
+                            </MuiGrid>
+                        </MuiBox>
+                    </MuiPaper>
+                )}
 
                 {/* Edit Dialog */}
                 <EditHallDialog

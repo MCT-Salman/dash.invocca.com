@@ -67,7 +67,7 @@ export default function ViewUserDialog({ open, onClose, user }) {
                             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
                                 <Shield size={16} style={{ color: 'rgba(255,255,255,0.8)' }} />
                                 <MuiTypography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>
-                                    {user.role === 'admin' ? 'مدير نظام' : user.role === 'manager' ? 'مدير قاعة' : user.role === 'client' ? 'عميل' : 'موظف'}
+                                    {user.role === 'admin' ? 'مدير نظام' : user.role === 'manager' ? 'مدير قاعة/صالة' : user.role === 'client' ? 'عميل' : 'موظف'}
                                 </MuiTypography>
                             </MuiBox>
                         </MuiBox>
@@ -110,7 +110,7 @@ export default function ViewUserDialog({ open, onClose, user }) {
                                 <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>معلومات المستخدم</MuiTypography>
                                 <MuiGrid container spacing={2}>
                                     {[
-                                        { icon: User, label: 'الدور', value: user.role === 'admin' ? 'مدير نظام' : user.role === 'manager' ? 'مدير قاعة' : user.role === 'client' ? 'عميل' : 'موظف' },
+                                        { icon: User, label: 'الدور', value: user.role === 'admin' ? 'مدير نظام' : user.role === 'manager' ? 'مدير قاعة/صالة' : user.role === 'client' ? 'عميل' : 'موظف' },
                                         { icon: Phone, label: 'الهاتف', value: user.phone },
                                         { icon: Calendar, label: 'تاريخ الإنشاء', value: new Date(user.createdAt).toLocaleDateString('ar-SA') }
                                     ].map((item, idx) => (
@@ -132,7 +132,7 @@ export default function ViewUserDialog({ open, onClose, user }) {
                                         <MuiDivider sx={{ borderColor: 'var(--color-border-glass)' }} />
                                     </MuiGrid>
                                     <MuiGrid item xs={12}>
-                                        <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>القاعة المرتبطة</MuiTypography>
+                                        <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>قاعة/صالة المرتبطة</MuiTypography>
                                         <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
                                             <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 'bold' }}>{user.hallId.name}</MuiTypography>
                                             {user.hallId.location && (

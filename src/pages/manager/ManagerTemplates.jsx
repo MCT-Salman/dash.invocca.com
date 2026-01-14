@@ -74,7 +74,23 @@ export default function ManagerTemplates() {
 
     // Memoize templates to avoid dependency issues
     const templates = useMemo(() => {
-        return templatesData?.templates || templatesData?.data || templatesData || []
+        const data = templatesData?.templates || templatesData?.data || templatesData || []
+        return Array.isArray(data) ? data.map(item => {
+            if (item.template) {
+                return {
+                    _id: item._id,
+                    templateName: item.template.templateName,
+                    imageUrl: item.template.imageUrl,
+                    isActive: item.template.isActive,
+                    createdAt: item.createdAt,
+                    updatedAt: item.updatedAt,
+                    hall: item.hall,
+                    isPrimary: item.isPrimary,
+                    displayOrder: item.displayOrder,
+                }
+            }
+            return item
+        }) : []
     }, [templatesData])
 
     // Filtered Templates
@@ -250,7 +266,7 @@ export default function ManagerTemplates() {
                                 إدارة القوالب ({filteredTemplates.length})
                             </MuiTypography>
                             <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                                إدارة قوالب بطاقات الدعوة الخاصة بالصالة
+                                إدارة قوالب بطاقات الدعوة الخاصة بقاعة/صالة
                             </MuiTypography>
                         </MuiBox>
                     </MuiBox>

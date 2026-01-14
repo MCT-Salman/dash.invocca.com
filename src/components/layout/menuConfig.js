@@ -11,6 +11,7 @@ import {
   User,
   Calendar,
   Image,
+  Music,
 } from 'lucide-react'
 import { ROUTES } from '@/config/constants'
 
@@ -18,7 +19,7 @@ export const ROLE_MENUS = {
   admin: [
     { label: 'الرئيسية', path: '/admin/dashboard', icon: LayoutDashboard },
     { label: 'التقارير', path: '/admin/reports', icon: BarChart3 },
-    { label: 'الصالات', path: '/admin/halls', icon: Building2 },
+    { label: 'قاعة/صالة', path: '/admin/halls', icon: Building2 },
     { label: 'القوالب', path: '/admin/templates', icon: Image },
     { label: 'المستخدمون', path: '/admin/users', icon: Users },
     { label: 'المدراء', path: '/admin/managers', icon: UserPlus },
@@ -30,7 +31,9 @@ export const ROLE_MENUS = {
     { label: 'الفعاليات', path: ROUTES.MANAGER.EVENTS, icon: ClipboardList },
     { label: 'العملاء', path: ROUTES.MANAGER.CLIENTS, icon: UserPlus },
     { label: 'الموظفون', path: ROUTES.MANAGER.STAFF, icon: Users },
-    { label: 'القاعة', path: ROUTES.MANAGER.HALL, icon: Building2 },
+    { label: 'قاعة/صالة', path: ROUTES.MANAGER.HALL, icon: Building2 },
+    { label: 'الخدمات', path: ROUTES.MANAGER.SERVICES, icon: ClipboardList },
+    { label: 'الأغاني', path: ROUTES.MANAGER.SONGS, icon: Music },
     { label: 'التقارير', path: ROUTES.MANAGER.REPORTS, icon: BarChart3 },
     { label: 'قوالب الدعوات', path: ROUTES.MANAGER.TEMPLATES, icon: Image },
     { label: 'الشكاوى', path: ROUTES.MANAGER.COMPLAINTS, icon: MessageCircle },

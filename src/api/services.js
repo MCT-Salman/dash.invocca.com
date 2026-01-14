@@ -21,9 +21,10 @@ export const listServices = (params = {}) => {
 export const addService = (payload) => {
   const body = {
     name: payload.name,
-    category: payload.category, // catering, decoration, photography, entertainment, other
-    basePrice: Number(payload.basePrice) || 0,
-    description: payload.description || ''
+    category: payload.category, // scanner, catering, decoration, entertainment, photography, music, security, cleaning, other
+    price: Number(payload.price) || 0,
+    description: payload.description || '',
+    unit: payload.unit || 'per_event'
   }
   return api.post('/admin/services', body).then(r => r.data)
 }
@@ -33,8 +34,9 @@ export const updateService = (id, payload) => {
   const body = {
     name: payload.name,
     category: payload.category,
-    basePrice: Number(payload.basePrice) || 0,
-    description: payload.description,
+    price: Number(payload.price) || 0,
+    description: payload.description || '',
+    unit: payload.unit || 'per_event',
     isActive: payload.isActive
   }
   return api.put(`/admin/services/${id}`, body).then(r => r.data)
@@ -58,10 +60,11 @@ export const getService = (id) => {
 // الحصول على فئات الخدمات
 export const getServiceCategories = () => {
   return [
-    { value: 'catering', label: 'الضيافة' },
+    { value: 'scanner', label: 'الماسح' },
+    { value: 'catering', label: 'تقديم الطعام' },
     { value: 'decoration', label: 'الديكور' },
-    { value: 'photography', label: 'التصوير' },
     { value: 'entertainment', label: 'الترفيه' },
+    { value: 'photography', label: 'التصوير' },
     { value: 'music', label: 'الموسيقى' },
     { value: 'security', label: 'الأمان' },
     { value: 'cleaning', label: 'التنظيف' },

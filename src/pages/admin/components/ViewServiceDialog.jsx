@@ -1,3 +1,4 @@
+// src\pages\admin\components\ViewServiceDialog.jsx
 import MuiDialog from '@/components/ui/MuiDialog'
 import MuiDialogTitle from '@/components/ui/MuiDialogTitle'
 import MuiDialogContent from '@/components/ui/MuiDialogContent'
@@ -95,7 +96,7 @@ export default function ViewServiceDialog({ open, onClose, service }) {
                                     }}
                                 />
                                 <MuiTypography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--color-primary-500)' }}>
-                                    {formatCurrency(service.basePrice)}
+                                    {formatCurrency(service.price ?? service.basePrice)}
                                 </MuiTypography>
                             </MuiGrid>
 
@@ -118,7 +119,7 @@ export default function ViewServiceDialog({ open, onClose, service }) {
                                 <MuiGrid container spacing={2}>
                                     {[
                                         { icon: Tag, label: 'الفئة', value: SERVICE_CATEGORY_LABELS[service.category] || service.category },
-                                        { icon: DollarSign, label: 'السعر', value: formatCurrency(service.basePrice) },
+                                        { icon: DollarSign, label: 'السعر', value: formatCurrency(service.price ?? service.basePrice) },
                                         { icon: FileText, label: 'الوحدة', value: SERVICE_UNIT_LABELS[service.unit] || service.unit },
                                         { icon: Package, label: 'الحالة', value: service.isActive ? 'نشطة' : 'غير نشطة' }
                                     ].map((item, idx) => (

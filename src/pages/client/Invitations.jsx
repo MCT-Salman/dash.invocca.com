@@ -348,12 +348,12 @@ export default function Invitations() {
 
                 <MuiBox sx={{ pt: 2, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                   <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
-                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
-                      <Users size={14} />
-                      <MuiTypography variant="caption">
+                  <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
+                    <Users size={14} />
+                    <MuiTypography variant="caption">
                         عدد المدعوين: {invitation.numOfPeople || invitation.guestCount || 0}
-                      </MuiTypography>
-                    </MuiBox>
+                    </MuiTypography>
+                  </MuiBox>
                     {invitation.guests && invitation.guests.length > 0 && (
                       <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, ml: 3 }}>
                         {invitation.guests.map((guest, idx) => (
@@ -371,7 +371,7 @@ export default function Invitations() {
                       </MuiBox>
                     )}
                     {invitation.eventDate && (
-                      <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
+                  <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
                         <Calendar size={14} />
                         <MuiTypography variant="caption">
                           تاريخ الفعالية: {formatDate(invitation.eventDate, 'MM/DD/YYYY')}
@@ -437,11 +437,11 @@ export default function Invitations() {
                   
                   {invitation.guests && invitation.guests.length > 0 && (
                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)', mb: 1 }}>
-                      <UserCheck size={14} />
-                      <MuiTypography variant="caption">
+                    <UserCheck size={14} />
+                    <MuiTypography variant="caption">
                         المؤكدون: {invitation.guests.filter(g => g.checkedIn).length} / {invitation.guests.length}
-                      </MuiTypography>
-                    </MuiBox>
+                    </MuiTypography>
+                  </MuiBox>
                   )}
                 </MuiBox>
 
@@ -663,10 +663,10 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
           // Add template if it has at least an ID (required) and preferably an image
           if (hasName) {
             const templateId = template._id || template.id
-            if (templateId && !templates.find(t => (t._id || t.id) === templateId)) {
+        if (templateId && !templates.find(t => (t._id || t.id) === templateId)) {
               templates.push(template)
-            }
-          }
+        }
+      }
         }
       })
     }
@@ -703,23 +703,23 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
       }
       
       // Also check dashboard response for templates
-      if (responseData.templates && Array.isArray(responseData.templates)) {
+    if (responseData.templates && Array.isArray(responseData.templates)) {
         for (const template of responseData.templates) {
           const templateIdCheck = template._id || template.id
           if (templateIdCheck && templateIdCheck.toString() === templateId.toString()) {
             return template
           }
         }
-      }
-      
+    }
+    
       // Check nextEvent template
       if (responseData.nextEvent?.template && typeof responseData.nextEvent.template === 'object') {
         const nextEventTemplateId = responseData.nextEvent.template._id || responseData.nextEvent.template.id
         if (nextEventTemplateId && nextEventTemplateId.toString() === templateId.toString()) {
           return responseData.nextEvent.template
-        }
       }
-      
+    }
+    
       // Check if template is nested in event data (e.g., event.template as object with full data)
       // Sometimes the template might be populated in some events but not others
       for (const evt of allEventsList) {
@@ -823,8 +823,8 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
               templateName: fullTemplate.templateName || fullTemplate.name || `Template ${templateId}`,
               imageUrl: fullTemplate.imageUrl || fullTemplate.image || '',
               ...fullTemplate
-            })
-          }
+      })
+    }
         } else {
           // If not found, add as a minimal template object
           // But try to enrich it later by searching again
@@ -892,7 +892,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
     // Also check if templates are directly in dashboard response
     if (responseData.templates && Array.isArray(responseData.templates)) {
       responseData.templates.forEach(template => addTemplate(template))
-    }
+      }
     
     // After extracting all templates, try to enrich incomplete ones
     // Note: This is async but we can't use await in useMemo, so we'll handle it differently
@@ -1049,7 +1049,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
     
     // If already a full URL, return as is
     if (templateImage.startsWith('http://') || templateImage.startsWith('https://')) {
-      return templateImage
+    return templateImage 
     }
     
     // If starts with /, add base URL
@@ -1826,22 +1826,22 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                     </MuiTypography>
                   </MuiBox>
                 ) : (
-                  <MuiTypography
-                    variant="body2"
-                    sx={{
-                      color: '#fff',
-                      fontSize: { xs: '0.6rem', sm: '0.65rem' },
-                      textAlign: 'center',
-                      textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
-                      maxWidth: '80px',
-                      lineHeight: 1.2,
+                <MuiTypography
+                  variant="body2"
+                  sx={{
+                    color: '#fff',
+                    fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                    textAlign: 'center',
+                    textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
+                    maxWidth: '80px',
+                    lineHeight: 1.2,
                       fontFamily: "'Alexandria', 'Montserrat', sans-serif",
-                      direction: 'rtl',
-                      unicodeBidi: 'embed',
-                    }}
-                  >
+                    direction: 'rtl',
+                    unicodeBidi: 'embed',
+                  }}
+                >
                     {formattedStartTime || formattedEndTime || '—'}
-                  </MuiTypography>
+                </MuiTypography>
                 )}
               </MuiBox>
             )}
@@ -2132,30 +2132,30 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
           </MuiBox>
 
           {/* Templates Grid */}
-          <MuiBox
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(2, 1fr)', md: 'repeat(2, 1fr)' },
-              gap: 2,
-              overflowY: 'auto',
-              pr: 1,
-              pb: 2,
-              '&::-webkit-scrollbar': {
-                width: '8px',
-              },
-              '&::-webkit-scrollbar-track': {
-                background: 'rgba(255, 255, 255, 0.05)',
-                borderRadius: '4px',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: 'rgba(216, 185, 138, 0.4)',
-                borderRadius: '4px',
-                '&:hover': {
-                  background: 'rgba(216, 185, 138, 0.6)',
+            <MuiBox
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(2, 1fr)', md: 'repeat(2, 1fr)' },
+                gap: 2,
+                overflowY: 'auto',
+                pr: 1,
+                pb: 2,
+                '&::-webkit-scrollbar': {
+                  width: '8px',
                 },
-              },
-            }}
-          >
+                '&::-webkit-scrollbar-track': {
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: 'rgba(216, 185, 138, 0.4)',
+                  borderRadius: '4px',
+                  '&:hover': {
+                    background: 'rgba(216, 185, 138, 0.6)',
+                  },
+                },
+              }}
+            >
             {/* No Template Option */}
             <MuiBox
               onClick={() => onTemplateChange(null)}
@@ -2399,20 +2399,20 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                   </MuiBox>
                 )
               }) : (
-                <MuiBox
-                  sx={{
+            <MuiBox
+              sx={{
                     gridColumn: '1 / -1',
-                    textAlign: 'center',
+                textAlign: 'center',
                     py: 4,
                     color: 'var(--color-text-secondary)',
-                  }}
-                >
+              }}
+            >
                   <ImageIcon size={48} style={{ opacity: 0.5, marginBottom: 16 }} />
                   <MuiTypography variant="body2">
-                    لا توجد قوالب متاحة
-                  </MuiTypography>
-                </MuiBox>
-              )}
+                لا توجد قوالب متاحة
+              </MuiTypography>
+            </MuiBox>
+          )}
             </MuiBox>
         </MuiBox>
       </MuiBox>
@@ -2526,7 +2526,7 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
         setSelectedEventId(initialEventId)
       } else {
         setSelectedEventId(null)
-      }
+    }
     }
   }, [open, editingInvitation, reset, isEdit])
 

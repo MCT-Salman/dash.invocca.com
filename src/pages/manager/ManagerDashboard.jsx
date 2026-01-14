@@ -101,22 +101,8 @@ function ManagerDashboardContent() {
         enabled: needsEventsData, // Only fetch if totalEvents is missing or 0
     })
 
-    if (isLoading) {
-        return <LoadingScreen message="جاري تحميل البيانات..." fullScreen={false} />
-    }
-
-    if (error) {
-        return (
-            <EmptyState
-                title="حدث خطأ"
-                description={error.message || 'فشل تحميل البيانات'}
-                icon={AlertCircle}
-                showPaper
-            />
-        )
-    }
-
     // If totalEvents is missing or 0, calculate it from events
+    // This hook must be called before any early returns to maintain hooks order
     const stats = useMemo(() => {
         let finalStats = { ...normalizedStats }
         
@@ -142,6 +128,21 @@ function ManagerDashboardContent() {
         
         return finalStats
     }, [normalizedStats, needsEventsData, eventsData])
+
+    if (isLoading) {
+        return <LoadingScreen message="جاري تحميل البيانات..." fullScreen={false} />
+    }
+
+    if (error) {
+        return (
+            <EmptyState
+                title="حدث خطأ"
+                description={error.message || 'فشل تحميل البيانات'}
+                icon={AlertCircle}
+                showPaper
+            />
+        )
+    }
 
     return (
         <MuiBox sx={{ p: { xs: 2, sm: 3, md: 4 }, minHeight: '100vh', background: 'var(--color-bg-dark)' }}>
@@ -465,7 +466,7 @@ function ManagerDashboardContent() {
                                         fontWeight: 700, 
                                         color: '#fff'
                                     }}>
-                                        معلومات القاعة
+                                        معلومات قاعة/صالة
                                     </MuiTypography>
                                 </MuiBox>
                             </MuiBox>
@@ -481,7 +482,7 @@ function ManagerDashboardContent() {
                                         textTransform: 'uppercase',
                                         letterSpacing: 0.5
                                     }}>
-                                        اسم القاعة
+                                        اسم قاعة/صالة
                                     </MuiTypography>
                                     <MuiTypography variant="h6" sx={{ 
                                         fontWeight: 700, 

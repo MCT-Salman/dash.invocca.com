@@ -71,7 +71,7 @@ const createManagerSchema = (editingManager = null) => z.object({
             .max(50, 'كلمة المرور طويلة جداً'),
 
     hallId: z.string()
-        .min(1, 'معرف القاعة مطلوب')
+        .min(1, 'معرف قاعة/صالة مطلوب')
         .optional(),
 
     isActive: z.boolean()
@@ -269,7 +269,7 @@ export default function ManagersManagement() {
         },
         {
             id: 'hallId',
-            label: 'القاعة المسؤول عنها',
+            label: 'قاعة/صالة المسؤول عنها',
             align: 'right',
             format: (value, row) => (
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -464,7 +464,7 @@ export default function ManagersManagement() {
                                 إدارة المدراء ({filteredManagers.length})
                             </MuiTypography>
                             <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                                إدارة حسابات مدراء الصالات وربطهم مع القاعات المخصصة
+                                إدارة حسابات مدراء قاعة/صالة وربطهم مع قاعات/صالات المخصصة
                             </MuiTypography>
                         </MuiBox>
                     </MuiBox>
@@ -486,7 +486,7 @@ export default function ManagersManagement() {
                             }
                         }}
                     >
-                        إضافة مدير قاعة
+                        إضافة مدير قاعة/صالة
                     </MuiButton>
                 </MuiBox>
             </MuiBox>
@@ -637,7 +637,7 @@ export default function ManagersManagement() {
                                     {managers.filter(m => m.hallId).length}
                                 </MuiTypography>
                                 <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                                    مع قاعة
+                                    مع قاعة/صالة
                                 </MuiTypography>
                             </MuiBox>
                             <MuiBox
@@ -692,7 +692,7 @@ export default function ManagersManagement() {
                                     {managers.filter(m => !m.hallId).length}
                                 </MuiTypography>
                                 <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                                    بدون قاعة
+                                    بدون قاعة/صالة
                                 </MuiTypography>
                             </MuiBox>
                             <MuiBox
@@ -728,7 +728,7 @@ export default function ManagersManagement() {
                     <MuiGrid item xs={12} md={9}>
                         <MuiTextField
                             fullWidth
-                            placeholder="البحث بالاسم، الهاتف، أو اسم القاعة..."
+                            placeholder="البحث بالاسم، الهاتف، أو اسم قاعة/صالة..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             InputProps={{

@@ -531,7 +531,7 @@ export default function ClientDashboard() {
                   <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Building2 size={16} style={{ color: 'var(--color-primary-400)' }} />
                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                      القاعة: {nextEvent.hall.name || '—'}
+                      قاعة/صالة: {nextEvent.hall.name || '—'}
                     </MuiTypography>
                   </MuiBox>
                 )}

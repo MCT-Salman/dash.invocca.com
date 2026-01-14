@@ -65,7 +65,7 @@ export default function ManagerComplaints() {
                         لا توجد شكاوى
                     </MuiTypography>
                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-disabled)' }}>
-                        لم يتم تسجيل أي شكاوى لهذه القاعة بعد.
+                        لم يتم تسجيل أي شكاوى لقاعة/صالة هذه بعد.
                     </MuiTypography>
                 </MuiBox>
             </MuiPaper>

@@ -92,8 +92,8 @@ const truncateText = (text, maxLength = 50) => {
 // ====================== Validation Schema ======================
 const createHallSchema = (editingHall = null) => z.object({
   name: z.string()
-    .min(3, 'اسم القاعة يجب أن يكون 3 أحرف على الأقل')
-    .max(100, 'اسم القاعة طويل جداً'),
+    .min(3, 'اسم قاعة/صالة يجب أن يكون 3 أحرف على الأقل')
+    .max(100, 'اسم قاعة/صالة طويل جداً'),
 
   location: z.string()
     .min(3, 'الموقع مطلوب')
@@ -262,10 +262,10 @@ const HallsManagement = () => {
       setHalls(hallsData)
       setError(null)
     } catch (err) {
-      setError('حدث خطأ في جلب بيانات القاعات')
+      setError('حدث خطأ في جلب بيانات قاعات/صالات')
       showNotification({
         title: 'خطأ',
-        message: 'فشل في تحميل بيانات القاعات',
+        message: 'فشل في تحميل بيانات قاعات/صالات',
         type: 'error'
       })
     } finally {
@@ -318,7 +318,7 @@ const HallsManagement = () => {
   const columns = [
     {
       id: 'name',
-      label: 'اسم القاعة',
+      label: 'اسم قاعة/صالة',
       align: 'right',
       format: (value, row) => {
         const imageUrl = row.primaryImage || row.images?.[0]
@@ -475,13 +475,13 @@ const HallsManagement = () => {
 
       showNotification({
         title: 'تم التحديث',
-        message: `تم ${updatedHall.isActive ? 'تفعيل' : 'إلغاء تفعيل'} القاعة بنجاح`,
+        message: `تم ${updatedHall.isActive ? 'تفعيل' : 'إلغاء تفعيل'} قاعة/صالة بنجاح`,
         type: 'success'
       })
     } catch (err) {
       showNotification({
         title: 'خطأ',
-        message: 'فشل في تحديث حالة القاعة',
+        message: 'فشل في تحديث حالة قاعة/صالة',
         type: 'error'
       })
     }
@@ -521,7 +521,7 @@ const HallsManagement = () => {
   const handleExport = () => {
     try {
       const exportData = halls.map(hall => ({
-        'اسم القاعة': hall.name,
+        'اسم قاعة/صالة': hall.name,
         'الموقع': hall.location,
         'السعة': hall.capacity,
         'السعر الافتراضي': hall.defaultPrices,
@@ -536,7 +536,7 @@ const HallsManagement = () => {
 
       const worksheet = XLSX.utils.json_to_sheet(exportData)
       const workbook = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'القاعات')
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'قاعات/صالات')
 
       const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
       const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
@@ -545,7 +545,7 @@ const HallsManagement = () => {
 
       showNotification({
         title: 'تم التصدير',
-        message: 'تم تصدير بيانات القاعات بنجاح',
+        message: 'تم تصدير بيانات قاعات/صالات بنجاح',
         type: 'success'
       })
     } catch (err) {
@@ -559,7 +559,7 @@ const HallsManagement = () => {
 
   // Render Loading State
   if (loading && halls.length === 0) {
-    return <LoadingScreen message="جاري تحميل بيانات القاعات..." />
+    return <LoadingScreen message="جاري تحميل بيانات قاعات/صالات..." />
   }
 
   // Render Error State
@@ -586,7 +586,7 @@ const HallsManagement = () => {
 
   return (
     <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
-      <SEOHead pageKey="hallsManagement" title="إدارة القاعات | INVOCCA" />
+      <SEOHead pageKey="hallsManagement" title="إدارة قاعة/صالة | INVOCCA" />
 
       {/* Header Section */}
       <MuiBox
@@ -630,10 +630,10 @@ const HallsManagement = () => {
             </MuiBox>
             <MuiBox>
               <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 0.5 }}>
-                إدارة الصالات ({filteredHalls.length})
+                إدارة قاعة/صالة ({filteredHalls.length})
               </MuiTypography>
               <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                إدارة جميع صالات المناسبات في النظام
+                إدارة جميع قاعات/صالات المناسبات في النظام
               </MuiTypography>
             </MuiBox>
           </MuiBox>
@@ -676,7 +676,7 @@ const HallsManagement = () => {
                   {halls.length}
                 </MuiTypography>
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                  عدد القاعات
+                  عدد قاعات/صالات
                 </MuiTypography>
               </MuiBox>
               <MuiBox
@@ -730,7 +730,7 @@ const HallsManagement = () => {
                   {halls.filter(h => h.isActive).length}
                 </MuiTypography>
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                  القاعات النشطة
+                  قاعات/صالات النشطة
                 </MuiTypography>
               </MuiBox>
               <MuiBox
@@ -878,7 +878,7 @@ const HallsManagement = () => {
           <MuiGrid item xs={12} md={6}>
             <MuiTextField
               fullWidth
-              placeholder="ابحث (اسم القاعة، المدير، رقم الهاتف)..."
+              placeholder="ابحث (اسم قاعة/صالة، المدير، رقم الهاتف)..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
@@ -976,7 +976,7 @@ const HallsManagement = () => {
               onClick={handleCreateClick}
               color="primary"
             >
-              إضافة قاعة
+              إضافة قاعة/صالة
             </MuiButton>
           </MuiBox>
         </MuiBox>
@@ -991,7 +991,7 @@ const HallsManagement = () => {
         onView={openViewDialog}
         onToggleStatus={handleToggleStatus}
         loading={loading}
-        emptyMessage="لا توجد قاعات متاحة"
+        emptyMessage="لا توجد قاعات/صالات متاحة"
         showActions={true}
       />
 
@@ -1015,8 +1015,8 @@ const HallsManagement = () => {
         open={isDelete}
         onClose={closeDialog}
         onConfirm={handleDeleteConfirm}
-        title="حذف القاعة"
-        message={`هل أنت متأكد من حذف القاعة "${selectedHall?.name}"؟ لا يمكن التراجع عن هذا الإجراء.`}
+        title="حذف قاعة/صالة"
+        message={`هل أنت متأكد من حذف قاعة/صالة "${selectedHall?.name}"؟ لا يمكن التراجع عن هذا الإجراء.`}
         confirmLabel="حذف"
         cancelLabel="إلغاء"
         loading={crudLoading}

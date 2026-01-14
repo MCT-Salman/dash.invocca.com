@@ -216,7 +216,7 @@ export default function ReportsManagement() {
             <MuiGrid container spacing={3} sx={{ mb: 4 }}>
                 <MuiGrid item xs={12} sm={6} md={3}>
                     <StatCard
-                        title="إجمالي الصالات"
+                        title="إجمالي قاعات/صالات"
                         value={stats.totalHalls || 0}
                         icon={<Building2 size={24} />}
                         trend={{ value: 5, isPositive: true }}
@@ -225,7 +225,7 @@ export default function ReportsManagement() {
                 </MuiGrid>
                 <MuiGrid item xs={12} sm={6} md={3}>
                     <StatCard
-                        title="الصالات النشطة"
+                        title="قاعات/صالات النشطة"
                         value={stats.activeHalls || 0}
                         icon={<CheckCircle size={24} />}
                         trend={{ value: 8, isPositive: true }}
@@ -234,7 +234,7 @@ export default function ReportsManagement() {
                 </MuiGrid>
                 <MuiGrid item xs={12} sm={6} md={3}>
                     <StatCard
-                        title="الصالات غير نشطة"
+                        title="قاعات/صالات غير نشطة"
                         value={stats.inactiveHalls || 0}
                         icon={<XCircle size={24} />}
                         trend={{ value: 2, isPositive: false }}
@@ -344,11 +344,11 @@ export default function ReportsManagement() {
                     >
                         <MuiTypography variant="h6" sx={{ mb: 3, fontWeight: 700, color: 'var(--color-text-primary-dark)', display: 'flex', alignItems: 'center', gap: 1 }}>
                             <PieChart size={20} className="text-primary-500" />
-                            توزيع الصالات
+                            توزيع قاعات/صالات
                         </MuiTypography>
                         <MuiBox sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                             <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>الصالات النشطة</MuiTypography>
+                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>قاعات/صالات النشطة</MuiTypography>
                                 <MuiTypography variant="body2" sx={{ color: '#fff', fontWeight: 600 }}>
                                     {stats.activeHalls || 0} / {stats.totalHalls || 0}
                                 </MuiTypography>
@@ -358,7 +358,7 @@ export default function ReportsManagement() {
                             </MuiBox>
                             
                             <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>الصالات غير نشطة</MuiTypography>
+                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>قاعات/صالات غير نشطة</MuiTypography>
                                 <MuiTypography variant="body2" sx={{ color: '#fff', fontWeight: 600 }}>
                                     {stats.inactiveHalls || 0}
                                 </MuiTypography>
@@ -474,7 +474,7 @@ export default function ReportsManagement() {
                                         {stats.totalHalls || 0}
                                     </MuiTypography>
                                     <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                                        إجمالي الصالات
+                                        إجمالي قاعات/صالات
                                     </MuiTypography>
                                 </MuiBox>
                             </MuiGrid>

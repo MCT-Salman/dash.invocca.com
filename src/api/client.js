@@ -58,6 +58,19 @@ export const deleteInvitation = async invitationId => {
 // ==================== Songs Management ====================
 
 /**
+ * GET - عرض أغاني القاعة المتاحة
+ * GET /client/events/songs
+ */
+export const getHallSongsForClient = async () => {
+  try {
+    const response = await api.get('/client/events/songs')
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
  * GET - عرض أغاني الحدث
  * GET /client/events/:eventId/songs
  */
@@ -109,11 +122,11 @@ export const getSongById = async songId => {
 
 /**
  * PUT - تعديل أغنية
- * PUT /client/events/songs/:songId
+ * PUT /client/events/:eventId/songs/:songId
  */
-export const updateSong = async (songId, songData) => {
+export const updateSong = async (eventId, songId, songData) => {
   try {
-    const response = await api.put(`/client/events/songs/${songId}`, songData)
+    const response = await api.put(`/client/events/${eventId}/songs/${songId}`, songData)
     return response.data
   } catch (error) {
     throw error
@@ -121,12 +134,12 @@ export const updateSong = async (songId, songData) => {
 }
 
 /**
- * DELETE - حذف أغنية
- * DELETE /client/events/songs/:songId
+ * DELETE - حذف أغنية من قائمة تشغيل فعالية
+ * DELETE /client/events/:eventId/songs/:playlistItemId
  */
-export const deleteSong = async songId => {
+export const deleteSong = async (eventId, playlistItemId) => {
   try {
-    const response = await api.delete(`/client/events/songs/${songId}`)
+    const response = await api.delete(`/client/events/${eventId}/songs/${playlistItemId}`)
     return response.data
   } catch (error) {
     throw error
@@ -232,6 +245,50 @@ export const deleteBooking = async bookingId => {
 export const getClientDashboard = async () => {
   try {
     const response = await api.get('/client/dashboard')
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+// ==================== Event Ratings (Client) ====================
+
+/**
+ * GET - عرض تقييم الفعالية
+ * GET /client/events/:eventId/rating
+ */
+export const getEventRating = async (eventId) => {
+  if (!eventId) throw new Error('eventId is required to get rating')
+  try {
+    const response = await api.get(`/client/events/${eventId}/rating`)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * POST - إضافة تقييم للفعالية
+ * POST /client/events/:eventId/rating
+ */
+export const addEventRating = async (eventId, ratingData) => {
+  if (!eventId) throw new Error('eventId is required to add rating')
+  try {
+    const response = await api.post(`/client/events/${eventId}/rating`, ratingData)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * PUT - تعديل تقييم الفعالية
+ * PUT /client/events/:eventId/rating
+ */
+export const updateEventRating = async (eventId, ratingData) => {
+  if (!eventId) throw new Error('eventId is required to update rating')
+  try {
+    const response = await api.put(`/client/events/${eventId}/rating`, ratingData)
     return response.data
   } catch (error) {
     throw error
@@ -355,6 +412,7 @@ export default {
   deleteInvitation,
 
   // Songs
+  getHallSongsForClient,
   getEventSongs,
   addSong,
   getSongById,
@@ -371,6 +429,9 @@ export default {
 
   // Dashboard
   getClientDashboard,
+  getEventRating,
+  addEventRating,
+  updateEventRating,
 
   // Templates
   getClientTemplates,

@@ -1,577 +1,486 @@
-// src/pages/manager/ManagerSongs.jsx
+// src\pages\manager\ManagerSongs.jsx
+/**
+ * Manager Songs Playlist Management Page
+ * إدارة قائمة التشغيل للأغاني في الفعاليات
+ */
+
 import MuiBox from '@/components/ui/MuiBox'
 import MuiTypography from '@/components/ui/MuiTypography'
 import MuiPaper from '@/components/ui/MuiPaper'
 import MuiButton from '@/components/ui/MuiButton'
 import MuiTextField from '@/components/ui/MuiTextField'
 import MuiGrid from '@/components/ui/MuiGrid'
-import MuiTable from '@/components/ui/MuiTable'
-import MuiTableBody from '@/components/ui/MuiTableBody'
-import MuiTableCell from '@/components/ui/MuiTableCell'
-import MuiTableContainer from '@/components/ui/MuiTableContainer'
-import MuiTableHead from '@/components/ui/MuiTableHead'
-import MuiTableRow from '@/components/ui/MuiTableRow'
-import MuiChip from '@/components/ui/MuiChip'
-import MuiIconButton from '@/components/ui/MuiIconButton'
 import MuiSelect from '@/components/ui/MuiSelect'
 import MuiMenuItem from '@/components/ui/MuiMenuItem'
 import MuiFormControl from '@/components/ui/MuiFormControl'
-import { SEOHead, LoadingScreen, ConfirmDialog } from '@/components/common'
-import { useQuery } from '@tanstack/react-query'
-import { getEventSongs, addSong, updateSong, deleteSong } from '@/api/client'
-import { useState } from 'react'
-import { Plus, Edit2, Trash2, Music, Play, Pause, Clock, User } from 'lucide-react'
-import { useDialogState, useCRUD } from '@/hooks'
+import MuiInputAdornment from '@/components/ui/MuiInputAdornment'
+import MuiTabs from '@/components/ui/MuiTabs'
+import MuiChip from '@/components/ui/MuiChip'
+import { SEOHead, LoadingScreen, EmptyState, DataTable, ConfirmDialog } from '@/components/common'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { getManagerEvents, getEventPlaylist, addEventPlaylistSong, deleteEventPlaylistSong, getHallSongs } from '@/api/manager'
+import { useState, useMemo } from 'react'
+import { Plus, Music, Trash2, Search, Link2 } from 'lucide-react'
+import { useNotification, useDialogState } from '@/hooks'
+import { formatDate } from '@/utils/helpers'
+import EventSongsConnectionTab from './components/EventSongsConnectionTab'
 
 export default function ManagerSongs() {
+    const { addNotification: showNotification } = useNotification()
+    const queryClient = useQueryClient()
+    const [activeTab, setActiveTab] = useState(0)
     const [selectedEvent, setSelectedEvent] = useState('')
 
     // Dialog state management
     const {
-        dialogOpen,
-        dialogType,
-        selectedItem: editingSong,
-        openCreateDialog,
-        openEditDialog,
+        selectedItem: songToDelete,
         openDeleteDialog,
         closeDialog,
-        isCreate,
-        isEdit,
         isDelete,
     } = useDialogState()
 
-    // CRUD operations - Wrapper functions to handle eventId
-    const createSongWithEvent = async (data) => {
-        return addSong({ eventId: selectedEvent, ...data })
-    }
-
-    const {
-        createMutation,
-        updateMutation,
-        deleteMutation,
-        handleCreate,
-        handleUpdate,
-        handleDelete,
-        isLoading: crudLoading,
-    } = useCRUD({
-        createFn: createSongWithEvent,
-        updateFn: updateSong,
-        deleteFn: deleteSong,
-        queryKey: ['manager-songs', selectedEvent],
-        successMessage: 'تمت العملية بنجاح',
-        errorMessage: 'حدث خطأ أثناء العملية',
+    // Form state for adding songs
+    const [formData, setFormData] = useState({
+        songId: '',
+        momentType: '',
+        notes: '',
     })
 
-    const { data: songsData, isLoading, refetch } = useQuery({
-        queryKey: ['manager-songs', selectedEvent],
-        queryFn: () => getEventSongs(selectedEvent),
-        enabled: !!selectedEvent
+    // Fetch all events
+    const { data: eventsData, isLoading: eventsLoading } = useQuery({
+        queryKey: ['manager', 'events'],
+        queryFn: () => getManagerEvents(),
+        staleTime: 5 * 60 * 1000,
     })
 
-    const handleSubmit = async (formData) => {
-        if (isEdit && editingSong) {
-            const result = await handleUpdate(editingSong.id, formData)
-            if (result.success) {
-                closeDialog()
-            }
-        } else {
-            const result = await handleCreate(formData)
-            if (result.success) {
-                closeDialog()
-            }
-        }
-    }
+    const events = useMemo(() => {
+        if (Array.isArray(eventsData?.events)) return eventsData.events
+        if (Array.isArray(eventsData?.data)) return eventsData.data
+        if (Array.isArray(eventsData)) return eventsData
+        return []
+    }, [eventsData])
 
-    const handleDeleteConfirm = async () => {
-        const id = editingSong?.id
-        if (!id) return
-        const result = await handleDelete(id)
-        if (result.success) {
+    // Fetch playlist for selected event
+    const { data: playlistData, isLoading: playlistLoading } = useQuery({
+        queryKey: ['manager', 'events', selectedEvent, 'playlist'],
+        queryFn: () => getEventPlaylist(selectedEvent),
+        enabled: !!selectedEvent,
+        staleTime: 2 * 60 * 1000,
+    })
+
+    const playlist = useMemo(() => {
+        if (Array.isArray(playlistData?.data)) return playlistData.data
+        if (Array.isArray(playlistData?.songs)) return playlistData.songs
+        if (Array.isArray(playlistData)) return playlistData
+        return []
+    }, [playlistData])
+
+    // Fetch all hall songs to pick from
+    const { data: hallSongsData } = useQuery({
+        queryKey: ['manager', 'hall-songs'],
+        queryFn: getHallSongs,
+        enabled: !!selectedEvent,
+        staleTime: 5 * 60 * 1000,
+    })
+
+    const hallSongs = useMemo(() => {
+        if (Array.isArray(hallSongsData?.data)) return hallSongsData.data
+        if (Array.isArray(hallSongsData?.songs)) return hallSongsData.songs
+        if (Array.isArray(hallSongsData)) return hallSongsData
+        return []
+    }, [hallSongsData])
+
+    // Mutations
+    const addMutation = useMutation({
+        mutationFn: (payload) => addEventPlaylistSong(selectedEvent, payload),
+        onSuccess: () => {
+            showNotification({
+                title: 'نجاح',
+                message: 'تم إضافة الأغنية لقائمة التشغيل بنجاح',
+                type: 'success',
+            })
+            queryClient.invalidateQueries({ queryKey: ['manager', 'events', selectedEvent, 'playlist'] })
+            setFormData({ songId: '', momentType: '', notes: '' })
+        },
+        onError: (error) => {
+            showNotification({
+                title: 'خطأ',
+                message: error?.response?.data?.message || 'فشل في إضافة الأغنية',
+                type: 'error',
+            })
+        },
+    })
+
+    const deleteMutation = useMutation({
+        mutationFn: ({ playlistId }) => deleteEventPlaylistSong(selectedEvent, playlistId),
+        onSuccess: () => {
+            showNotification({
+                title: 'نجاح',
+                message: 'تم حذف الأغنية من قائمة التشغيل بنجاح',
+                type: 'success',
+            })
+            queryClient.invalidateQueries({ queryKey: ['manager', 'events', selectedEvent, 'playlist'] })
             closeDialog()
+        },
+        onError: (error) => {
+            showNotification({
+                title: 'خطأ',
+                message: error?.response?.data?.message || 'فشل في حذف الأغنية',
+                type: 'error',
+            })
+        },
+    })
+
+    // Handlers
+    const handleAdd = (e) => {
+        e?.preventDefault?.()
+        if (!formData.songId) {
+            showNotification({
+                title: 'تنبيه',
+                message: 'يرجى اختيار أغنية',
+                type: 'warning',
+            })
+            return
         }
+
+        const payload = {
+            songId: formData.songId,
+            momentType: formData.momentType || undefined,
+            notes: formData.notes || undefined,
+        }
+
+        addMutation.mutate(payload)
     }
 
-    const handlePlayPause = async (song) => {
-        // Toggle play status
-        const newStatus = song.playStatus === 'playing' ? 'paused' : 'playing'
-        await handleUpdate(song.id, { playStatus: newStatus })
+    const handleDeleteConfirm = () => {
+        if (!songToDelete) return
+        deleteMutation.mutate({
+            playlistId: songToDelete?._id || songToDelete?.id,
+        })
     }
 
-    if (isLoading && selectedEvent) {
-        return <LoadingScreen message="جاري تحميل الأغاني..." fullScreen={false} />
-    }
+    // Table columns
+    const columns = [
+        {
+            id: 'title',
+            label: 'الأغنية',
+            align: 'right',
+            format: (value, row) => (
+                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Music size={18} style={{ color: 'var(--color-primary-400)' }} />
+                    <MuiBox sx={{ flex: 1, minWidth: 0 }}>
+                        <MuiTypography
+                            variant="body2"
+                            sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}
+                        >
+                            {value || row.song?.title || 'أغنية'}
+                        </MuiTypography>
+                        <MuiTypography
+                            variant="caption"
+                            sx={{ color: 'var(--color-text-secondary)' }}
+                        >
+                            {row.artist || row.song?.artist || ''}
+                        </MuiTypography>
+                    </MuiBox>
+                </MuiBox>
+            ),
+        },
+        {
+            id: 'momentType',
+            label: 'نوع اللحظة',
+            align: 'center',
+            format: (value) => {
+                const config = {
+                    entrance: { label: 'دخول', color: 'primary' },
+                    dance: { label: 'رقصة', color: 'secondary' },
+                    background: { label: 'خلفية', color: 'info' },
+                    other: { label: 'أخرى', color: 'default' },
+                }
+                const item = config[value]
+                if (!item && !value) return '—'
+                return (
+                    <MuiChip
+                        label={item?.label || value}
+                        color={item?.color}
+                        variant="outlined"
+                        size="small"
+                        sx={{ fontWeight: 600 }}
+                    />
+                )
+            },
+        },
+        {
+            id: 'notes',
+            label: 'ملاحظات',
+            align: 'left',
+            format: (value) => value || '—',
+        },
+        {
+            id: 'createdAt',
+            label: 'تاريخ الإضافة',
+            align: 'center',
+            format: (value) => (value ? formatDate(value, 'DD/MM/YYYY HH:mm') : '—'),
+        },
+    ]
 
-    const songs = songsData?.songs || []
+    if (eventsLoading) {
+        return <LoadingScreen message="جاري تحميل الفعاليات..." />
+    }
 
     return (
         <MuiBox sx={{ p: { xs: 2, sm: 3 }, minHeight: '100vh' }}>
-            <SEOHead title="إدارة الأغاني | INVOCCA" />
+            <SEOHead title="إدارة أغاني الفعاليات | INVOCCA" />
 
             {/* Header */}
-            <MuiBox sx={{ mb: 4, textAlign: 'center' }}>
-                <MuiTypography variant="h3" sx={{ 
-                    fontWeight: 800, 
-                    color: 'var(--color-text-primary-dark)', 
-                    mb: 1,
-                    background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text'
-                }}>
-                    إدارة الأغاني
-                </MuiTypography>
-                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-secondary)' }}>
-                    إدارة قائمة تشغيل الأغاني للفعاليات
-                </MuiTypography>
-            </MuiBox>
-
-            {/* Event Selection */}
-            <MuiBox sx={{ mb: 6, textAlign: 'center' }}>
-                <MuiFormControl size="small" sx={{ minWidth: 300 }}>
-                    <MuiSelect
-                        value={selectedEvent}
-                        onChange={(e) => setSelectedEvent(e.target.value)}
-                        displayEmpty
+            <MuiBox sx={{ mb: 4 }}>
+                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                    <MuiBox
                         sx={{
-                            borderRadius: '10px',
-                            background: 'var(--color-surface-dark)',
-                            border: '1px solid var(--color-border-glass)',
-                            '& .MuiOutlinedInput-root': {
-                                borderRadius: '10px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                            }
+                            width: 52,
+                            height: 52,
+                            borderRadius: '14px',
+                            background: 'linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800))',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: '1px solid var(--color-primary-500)',
                         }}
                     >
-                        <MuiMenuItem value="" disabled>
-                            اختر الفعالية لإدارة أغانيها
-                        </MuiMenuItem>
-                        {/* This would be populated with actual events from API */}
-                    </MuiSelect>
-                </MuiFormControl>
-            </MuiBox>
-
-            {selectedEvent ? (
-                <>
-                    {/* Controls */}
-                    <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 6, flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
-                        <MuiTypography variant="h6" sx={{ 
-                            fontWeight: 600, 
-                            color: 'var(--color-text-primary-dark)' 
-                        }}>
-                            الأغاني ({songs.length})
-                        </MuiTypography>
-                        <MuiButton
-                            variant="contained"
-                            startIcon={<Plus size={20} />}
-                            onClick={openCreateDialog}
-                            sx={{
-                                borderRadius: '12px',
-                                py: 2,
-                                background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
-                                color: '#1A1A1A',
-                                boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
-                                '&:hover': {
-                                    background: 'linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800))',
-                                }
-                            }}
+                        <Music size={26} style={{ color: '#fff' }} />
+                    </MuiBox>
+                    <MuiBox>
+                        <MuiTypography
+                            variant="h4"
+                            sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 0.5 }}
                         >
-                            أغنية جديدة
-                        </MuiButton>
-                    </MuiBox>
-
-                    {/* Songs Table */}
-                    <MuiPaper
-                        elevation={0}
-                        sx={{
-                            background: 'var(--color-surface-dark)',
-                            border: '1px solid var(--color-border-glass)',
-                            borderRadius: '24px',
-                            overflow: 'hidden'
-                        }}
-                    >
-                        <MuiTableContainer>
-                            <MuiTable>
-                                <MuiTableHead>
-                                    <MuiTableRow>
-                                        <MuiTableCell sx={{ fontWeight: 700, color: 'var(--color-text-primary-dark)' }}>الأغنية</MuiTableCell>
-                                        <MuiTableCell sx={{ fontWeight: 700, color: 'var(--color-text-primary-dark)' }}>الفنان</MuiTableCell>
-                                        <MuiTableCell sx={{ fontWeight: 700, color: 'var(--color-text-primary-dark)' }}>المدة</MuiTableCell>
-                                        <MuiTableCell sx={{ fontWeight: 700, color: 'var(--color-text-primary-dark)' }}>وقت التشغيل</MuiTableCell>
-                                        <MuiTableCell sx={{ fontWeight: 700, color: 'var(--color-text-primary-dark)' }}>الحالة</MuiTableCell>
-                                        <MuiTableCell sx={{ fontWeight: 700, color: 'var(--color-text-primary-dark)' }}>الإجراءات</MuiTableCell>
-                                    </MuiTableRow>
-                                </MuiTableHead>
-                                <MuiTableBody>
-                                    {songs.length === 0 ? (
-                                        <MuiTableRow>
-                                            <MuiTableCell colSpan={6} sx={{ textAlign: 'center', py: 8 }}>
-                                                <MuiBox sx={{ textAlign: 'center' }}>
-                                                    <Music size={64} style={{ 
-                                                        color: 'var(--color-text-disabled)', 
-                                                        opacity: 0.5,
-                                                        margin: '0 auto 1.5rem'
-                                                    }} />
-                                                    <MuiTypography variant="h6" sx={{ 
-                                                        color: 'var(--color-text-secondary)', 
-                                                        mb: 2, 
-                                                        fontWeight: 700 
-                                                    }}>
-                                                        لا توجد أغاني
-                                                    </MuiTypography>
-                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-disabled)' }}>
-                                                        لم يتم إضافة أي أغاني لهذه الفعالية بعد
-                                                    </MuiTypography>
-                                                </MuiBox>
-                                            </MuiTableCell>
-                                        </MuiTableRow>
-                                    ) : (
-                                        songs.map((song) => (
-                                            <MuiTableRow key={song.id} sx={{ '&:hover': { backgroundColor: 'rgba(216, 185, 138, 0.05)' } }}>
-                                                <MuiTableCell sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
-                                                    {song.title}
-                                                </MuiTableCell>
-                                                <MuiTableCell sx={{ color: 'var(--color-text-secondary)' }}>
-                                                    {song.artist}
-                                                </MuiTableCell>
-                                                <MuiTableCell sx={{ color: 'var(--color-text-secondary)' }}>
-                                                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                        <Clock size={16} style={{ color: 'var(--color-primary-500)' }} />
-                                                        {song.duration}
-                                                    </MuiBox>
-                                                </MuiTableCell>
-                                                <MuiTableCell sx={{ color: 'var(--color-text-secondary)' }}>
-                                                    {song.scheduledTime ? new Date(song.scheduledTime).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : '-'}
-                                                </MuiTableCell>
-                                                <MuiTableCell>
-                                                    <MuiChip
-                                                        label={
-                                                            song.playStatus === 'playing' ? 'قيد التشغيل' :
-                                                            song.playStatus === 'paused' ? 'متوقف' :
-                                                            song.playStatus === 'played' ? 'تم تشغيلها' : 'في الانتظار'
-                                                        }
-                                                        size="small"
-                                                        sx={{
-                                                            backgroundColor: 
-                                                                song.playStatus === 'playing' ? 'rgba(34, 197, 94, 0.1)' :
-                                                                song.playStatus === 'paused' ? 'rgba(249, 115, 22, 0.1)' :
-                                                                song.playStatus === 'played' ? 'rgba(107, 114, 128, 0.1)' : 'rgba(216, 185, 138, 0.1)',
-                                                            color: 
-                                                                song.playStatus === 'playing' ? '#22c55e' :
-                                                                song.playStatus === 'paused' ? '#f97316' :
-                                                                song.playStatus === 'played' ? 'var(--color-text-secondary)' : 'var(--color-primary-500)',
-                                                            fontWeight: 600,
-                                                            fontSize: '0.75rem',
-                                                            height: 28,
-                                                            borderRadius: '8px'
-                                                        }}
-                                                    />
-                                                </MuiTableCell>
-                                                <MuiTableCell>
-                                                    <MuiBox sx={{ display: 'flex', gap: 1 }}>
-                                                        <MuiIconButton
-                                                            size="small"
-                                                            onClick={() => handlePlayPause(song)}
-                                                            sx={{
-                                                                background: song.playStatus === 'playing' ? 'rgba(249, 115, 22, 0.1)' : 'rgba(34, 197, 94, 0.1)',
-                                                                '&:hover': {
-                                                                    background: song.playStatus === 'playing' ? 'rgba(249, 115, 22, 0.2)' : 'rgba(34, 197, 94, 0.2)',
-                                                                    color: song.playStatus === 'playing' ? '#f97316' : '#22c55e'
-                                                                }
-                                                            }}
-                                                        >
-                                                            {song.playStatus === 'playing' ? <Pause size={16} /> : <Play size={16} />}
-                                                        </MuiIconButton>
-                                                        <MuiIconButton
-                                                            size="small"
-                                                            onClick={() => openEditDialog(song)}
-                                                            sx={{
-                                                                background: 'rgba(216, 185, 138, 0.1)',
-                                                                '&:hover': {
-                                                                    background: 'rgba(216, 185, 138, 0.2)',
-                                                                    color: 'var(--color-primary-500)'
-                                                                }
-                                                            }}
-                                                        >
-                                                            <Edit2 size={16} />
-                                                        </MuiIconButton>
-                                                        <MuiIconButton
-                                                            size="small"
-                                                            onClick={() => openDeleteDialog(song)}
-                                                            sx={{
-                                                                background: 'rgba(220, 38, 38, 0.1)',
-                                                                '&:hover': {
-                                                                    background: 'rgba(220, 38, 38, 0.2)',
-                                                                    color: '#dc2626'
-                                                                }
-                                                            }}
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </MuiIconButton>
-                                                    </MuiBox>
-                                                </MuiTableCell>
-                                            </MuiTableRow>
-                                        ))
-                                    )}
-                                </MuiTableBody>
-                            </MuiTable>
-                        </MuiTableContainer>
-                    </MuiPaper>
-                </>
-            ) : (
-                <MuiPaper
-                    elevation={0}
-                    sx={{
-                        p: 6,
-                        background: 'var(--color-surface-dark)',
-                        border: '1px solid var(--color-border-glass)',
-                        borderRadius: '24px',
-                        textAlign: 'center',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        '&::before': {
-                            content: '""',
-                            position: 'absolute',
-                            top: 0,
-                            right: 0,
-                            width: '200px',
-                            height: '200px',
-                            background: 'radial-gradient(circle, rgba(216, 185, 138, 0.08) 0%, transparent 70%)',
-                            borderRadius: '50%',
-                        }
-                    }}
-                >
-                    <MuiBox sx={{ position: 'relative', zIndex: 1 }}>
-                        <Music size={64} style={{ 
-                            color: 'var(--color-text-disabled)', 
-                            opacity: 0.5,
-                            margin: '0 auto 1.5rem'
-                        }} />
-                        <MuiTypography variant="h6" sx={{ 
-                            color: 'var(--color-text-secondary)', 
-                            mb: 2, 
-                            fontWeight: 700 
-                        }}>
-                            اختر فعالية
+                            إدارة أغاني الفعاليات
                         </MuiTypography>
-                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-disabled)' }}>
-                            يرجى اختيار الفعالية لإدارة أغانيها
+                        <MuiTypography
+                            variant="body2"
+                            sx={{ color: 'var(--color-primary-300)' }}
+                        >
+                            ربط الأغاني بقوائم التشغيل للفعاليات
                         </MuiTypography>
                     </MuiBox>
-                </MuiPaper>
-            )}
+                </MuiBox>
+            </MuiBox>
 
-            {/* Add/Edit Song Dialog */}
-            <SongDialog
-                open={isCreate || isEdit}
-                onClose={closeDialog}
-                song={isEdit ? editingSong : null}
-                onSubmit={handleSubmit}
-                loading={crudLoading}
-            />
-
-            {/* Delete Confirmation */}
-            <ConfirmDialog
-                open={isDelete}
-                onClose={closeDialog}
-                onConfirm={handleDeleteConfirm}
-                title="حذف الأغنية"
-                message={`هل أنت متأكد من حذف الأغنية "${editingSong?.title}"؟ لا يمكن التراجع عن هذا الإجراء.`}
-                confirmLabel="حذف"
-                cancelLabel="إلغاء"
-                loading={crudLoading}
-            />
-        </MuiBox>
-    )
-}
-
-// Song Dialog Component
-function SongDialog({ open, onClose, song, onSubmit, loading }) {
-    const [formData, setFormData] = useState({
-        title: song?.title || '',
-        artist: song?.artist || '',
-        url: song?.url || '',
-        duration: song?.duration || '',
-        scheduledTime: song?.scheduledTime ? new Date(song.scheduledTime).toISOString().slice(0, 16) : '',
-        notes: song?.notes || ''
-    })
-
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        onSubmit(formData)
-    }
-
-    const handleChange = (field) => (e) => {
-        setFormData(prev => ({ ...prev, [field]: e.target.value }))
-    }
-
-    return (
-        <MuiBox
-            sx={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                display: open ? 'flex' : 'none',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 9999
-            }}
-            onClick={onClose}
-        >
+            {/* Tabs */}
             <MuiPaper
                 elevation={0}
                 sx={{
-                    p: 4,
-                    background: 'var(--color-surface-dark)',
-                    border: '1px solid var(--color-border-glass)',
-                    borderRadius: '24px',
-                    width: '90%',
-                    maxWidth: 500,
-                    maxHeight: '90vh',
-                    overflowY: 'auto'
+                    mb: 4.5,
+                    background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(216, 185, 138, 0.15)',
+                    borderRadius: '20px',
+                    overflow: 'hidden',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
                 }}
-                onClick={(e) => e.stopPropagation()}
             >
-                <MuiTypography variant="h6" sx={{ 
-                    fontWeight: 700, 
-                    color: 'var(--color-text-primary-dark)', 
-                    mb: 4 
-                }}>
-                    {song ? 'تعديل الأغنية' : 'إضافة أغنية جديدة'}
-                </MuiTypography>
-
-                <form onSubmit={handleSubmit}>
-                    <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                        <MuiTextField
-                            label="عنوان الأغنية"
-                            value={formData.title}
-                            onChange={handleChange('title')}
-                            required
-                            fullWidth
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                }
-                            }}
-                        />
-
-                        <MuiTextField
-                            label="الفنان"
-                            value={formData.artist}
-                            onChange={handleChange('artist')}
-                            required
-                            fullWidth
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                }
-                            }}
-                        />
-
-                        <MuiTextField
-                            label="رابط الأغنية"
-                            value={formData.url}
-                            onChange={handleChange('url')}
-                            required
-                            fullWidth
-                            placeholder="https://example.com/song.mp3"
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                }
-                            }}
-                        />
-
-                        <MuiTextField
-                            label="المدة"
-                            value={formData.duration}
-                            onChange={handleChange('duration')}
-                            required
-                            fullWidth
-                            placeholder="04:30"
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                }
-                            }}
-                        />
-
-                        <MuiTextField
-                            label="وقت التشغيل"
-                            type="datetime-local"
-                            value={formData.scheduledTime}
-                            onChange={handleChange('scheduledTime')}
-                            fullWidth
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                }
-                            }}
-                        />
-
-                        <MuiTextField
-                            label="ملاحظات"
-                            value={formData.notes}
-                            onChange={handleChange('notes')}
-                            fullWidth
-                            multiline
-                            rows={2}
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                }
-                            }}
-                        />
-
-                        <MuiBox sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                            <MuiButton
-                                type="submit"
-                                variant="contained"
-                                fullWidth
-                                disabled={loading}
-                                sx={{
-                                    borderRadius: '12px',
-                                    py: 2,
-                                    background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
-                                    color: '#1A1A1A',
-                                    boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
-                                    '&:hover': {
-                                        background: 'linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800))',
-                                    }
-                                }}
-                            >
-                                {loading ? 'جاري الحفظ...' : 'حفظ'}
-                            </MuiButton>
-                            <MuiButton
-                                type="button"
-                                variant="outlined"
-                                fullWidth
-                                onClick={onClose}
-                                sx={{
-                                    borderRadius: '12px',
-                                    py: 2,
-                                    borderColor: 'var(--color-border-glass)',
-                                    color: 'var(--color-text-primary-dark)',
-                                    '&:hover': {
-                                        borderColor: 'var(--color-primary-500)',
-                                        backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                                    }
-                                }}
-                            >
-                                إلغاء
-                            </MuiButton>
-                        </MuiBox>
-                    </MuiBox>
-                </form>
+                <MuiTabs
+                    value={activeTab}
+                    onChange={(e, newValue) => setActiveTab(newValue)}
+                    tabs={[
+                        { label: 'إدارة الأغاني', icon: <Music size={18} /> },
+                        { label: 'ربط الأغاني', icon: <Link2 size={18} /> }
+                    ]}
+                    sx={{
+                        borderBottom: '1px solid rgba(216, 185, 138, 0.15)',
+                        '& .MuiTab-root': {
+                            color: 'var(--color-text-secondary)',
+                            '&.Mui-selected': {
+                                color: 'var(--color-primary-500)',
+                            }
+                        }
+                    }}
+                />
             </MuiPaper>
+
+            {/* Tab Content */}
+            {activeTab === 0 ? (
+                <>
+                    {/* Event Selection */}
+                    <MuiPaper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            mb: 4,
+                            background: 'var(--color-surface-dark)',
+                            border: '1px solid var(--color-border-glass)',
+                            borderRadius: '16px',
+                        }}
+                    >
+                        <MuiTypography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
+                            اختر الفعالية
+                        </MuiTypography>
+                        <MuiFormControl fullWidth>
+                            <MuiSelect
+                                value={selectedEvent}
+                                onChange={(e) => setSelectedEvent(e.target.value)}
+                                displayEmpty
+                            >
+                                <MuiMenuItem value="" disabled>
+                                    اختر الفعالية لإدارة أغانيها
+                                </MuiMenuItem>
+                                {events.map((event) => {
+                                    const eventId = event._id || event.id
+                                    const eventName = event.eventName || event.name || `فعالية ${eventId}`
+                                    return (
+                                        <MuiMenuItem key={eventId} value={eventId}>
+                                            {eventName}
+                                        </MuiMenuItem>
+                                    )
+                                })}
+                            </MuiSelect>
+                        </MuiFormControl>
+                    </MuiPaper>
+
+                    {selectedEvent ? (
+                        <>
+                            {playlistLoading ? (
+                                <LoadingScreen message="جاري تحميل قائمة الأغاني..." fullScreen={false} />
+                            ) : (
+                                <>
+                                    {/* Add Song Form */}
+                                    <MuiPaper
+                                        elevation={0}
+                                        sx={{
+                                            p: 3,
+                                            mb: 3,
+                                            borderRadius: '16px',
+                                            background: 'var(--color-surface-dark)',
+                                            border: '1px solid var(--color-border-glass)',
+                                        }}
+                                    >
+                                        <MuiTypography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
+                                            إضافة أغنية لقائمة التشغيل
+                                        </MuiTypography>
+                                        <MuiGrid container spacing={2}>
+                                            <MuiGrid item xs={12} md={4}>
+                                                <MuiSelect
+                                                    fullWidth
+                                                    value={formData.songId}
+                                                    onChange={(e) =>
+                                                        setFormData((prev) => ({ ...prev, songId: e.target.value }))
+                                                    }
+                                                    displayEmpty
+                                                >
+                                                    <MuiMenuItem value="">
+                                                        <em>اختر الأغنية</em>
+                                                    </MuiMenuItem>
+                                                    {hallSongs.map((song) => {
+                                                        const id = song._id || song.id
+                                                        return (
+                                                            <MuiMenuItem key={id} value={id}>
+                                                                {song.title || song.name || `أغنية ${id}`}
+                                                                {song.artist && ` - ${song.artist}`}
+                                                            </MuiMenuItem>
+                                                        )
+                                                    })}
+                                                </MuiSelect>
+                                            </MuiGrid>
+                                            <MuiGrid item xs={12} md={3}>
+                                                <MuiSelect
+                                                    fullWidth
+                                                    value={formData.momentType}
+                                                    onChange={(e) =>
+                                                        setFormData((prev) => ({ ...prev, momentType: e.target.value }))
+                                                    }
+                                                    displayEmpty
+                                                >
+                                                    <MuiMenuItem value="">
+                                                        <em>نوع اللحظة (اختياري)</em>
+                                                    </MuiMenuItem>
+                                                    <MuiMenuItem value="entrance">دخول</MuiMenuItem>
+                                                    <MuiMenuItem value="dance">رقصة</MuiMenuItem>
+                                                    <MuiMenuItem value="background">خلفية</MuiMenuItem>
+                                                    <MuiMenuItem value="other">أخرى</MuiMenuItem>
+                                                </MuiSelect>
+                                            </MuiGrid>
+                                            <MuiGrid item xs={12} md={4}>
+                                                <MuiTextField
+                                                    fullWidth
+                                                    label="ملاحظات (اختياري)"
+                                                    value={formData.notes}
+                                                    onChange={(e) =>
+                                                        setFormData((prev) => ({ ...prev, notes: e.target.value }))
+                                                    }
+                                                />
+                                            </MuiGrid>
+                                            <MuiGrid item xs={12} md={1} sx={{ display: 'flex', alignItems: 'stretch' }}>
+                                                <MuiButton
+                                                    fullWidth
+                                                    variant="contained"
+                                                    startIcon={<Plus size={18} />}
+                                                    onClick={handleAdd}
+                                                    disabled={addMutation.isPending}
+                                                >
+                                                    إضافة
+                                                </MuiButton>
+                                            </MuiGrid>
+                                        </MuiGrid>
+                                    </MuiPaper>
+
+                                    {/* Playlist Table */}
+                                    <MuiPaper
+                                        elevation={0}
+                                        sx={{
+                                            borderRadius: '16px',
+                                            border: '1px solid var(--color-border-glass)',
+                                            background: 'var(--color-surface-dark)',
+                                        }}
+                                    >
+                                        {playlist.length > 0 ? (
+                                            <DataTable
+                                                columns={columns}
+                                                data={playlist}
+                                                showActions
+                                                onDelete={openDeleteDialog}
+                                                emptyMessage="لا توجد أغاني في قائمة التشغيل"
+                                            />
+                                        ) : (
+                                            <EmptyState
+                                                title="لا توجد أغاني"
+                                                description="لم تتم إضافة أي أغاني لهذه الفعالية بعد."
+                                                icon={Music}
+                                                showPaper={false}
+                                            />
+                                        )}
+                                    </MuiPaper>
+
+                                    {/* Delete Confirmation */}
+                                    <ConfirmDialog
+                                        open={isDelete}
+                                        onClose={closeDialog}
+                                        onConfirm={handleDeleteConfirm}
+                                        title="حذف أغنية من قائمة التشغيل"
+                                        message={
+                                            songToDelete
+                                                ? `هل أنت متأكد من حذف الأغنية "${songToDelete.title || songToDelete.song?.title || ''}" من قائمة التشغيل؟`
+                                                : ''
+                                        }
+                                        confirmText="حذف"
+                                        cancelText="إلغاء"
+                                        loading={deleteMutation.isPending}
+                                        confirmColor="error"
+                                        icon={Trash2}
+                                    />
+                                </>
+                            )}
+                        </>
+                    ) : (
+                        <EmptyState
+                            title="اختر فعالية"
+                            description="يرجى اختيار الفعالية لإدارة أغانيها"
+                            icon={Music}
+                        />
+                    )}
+                </>
+            ) : (
+                <EventSongsConnectionTab />
+            )}
         </MuiBox>
     )
 }

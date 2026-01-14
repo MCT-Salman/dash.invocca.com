@@ -4,7 +4,7 @@ import api from './apiClient'
 // ==================== Halls Management ====================
 
 /**
- * GET - عرض جميع القاعات
+ * GET - عرض جميع قاعات/صالات
  * GET /admin/halls
  */
 export const getAllHalls = async () => {
@@ -17,7 +17,7 @@ export const getAllHalls = async () => {
 }
 
 /**
- * GET - عرض القاعات مع الترقيم
+ * GET - عرض قاعات/صالات مع الترقيم
  * GET /admin/halls/list
  */
 export const getHallsList = async (params = {}) => {
@@ -30,7 +30,7 @@ export const getHallsList = async (params = {}) => {
 }
 
 /**
- * POST - إضافة قاعة جديدة
+ * POST - إضافة قاعة/صالة جديدة
  * POST /admin/halls/
  */
 export const createHall = async (hallData) => {
@@ -43,7 +43,7 @@ export const createHall = async (hallData) => {
 }
 
 /**
- * PUT - تعديل قاعة
+ * PUT - تعديل قاعة/صالة
  * PUT /admin/halls/edit/:id
  */
 export const updateHall = async (id, hallData) => {
@@ -56,7 +56,7 @@ export const updateHall = async (id, hallData) => {
 }
 
 /**
- * DELETE - حذف قاعة
+ * DELETE - حذف قاعة/صالة
  * DELETE /admin/halls/:id
  */
 export const deleteHall = async (id) => {
@@ -69,7 +69,7 @@ export const deleteHall = async (id) => {
 }
 
 /**
- * POST - إضافة خدمة للقاعة
+ * POST - إضافة خدمة لقاعة/صالة
  * POST /admin/halls/:id/services
  */
 export const addHallService = async (hallId, serviceData) => {
@@ -320,6 +320,48 @@ export const toggleManagerStatus = async (id) => {
  * GET - عرض جميع القوالب
  * GET /admin/templates
  */
+/**
+ * GET - get templates assigned to hall
+ * GET /admin/halls/:hallId/templates
+ */
+export const getHallTemplates = async (hallId) => {
+  if (!hallId) return null
+  try {
+    const response = await api.get(`/admin/halls/${hallId}/templates`)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * POST - assign template to hall
+ * POST /admin/templates/:templateId/assign
+ */
+export const assignTemplateToHall = async (templateId, hallId) => {
+  if (!templateId || !hallId) return null
+  try {
+    const response = await api.post(`/admin/templates/${templateId}/assign`, { hallId })
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * DELETE - unassign template from hall
+ * DELETE /admin/templates/:templateId/halls/:hallId
+ */
+export const unassignTemplateFromHall = async (templateId, hallId) => {
+  if (!templateId || !hallId) return null
+  try {
+    const response = await api.delete(`/admin/templates/${templateId}/halls/${hallId}`)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
 export const getTemplates = async () => {
   try {
     const response = await api.get('/admin/templates')
@@ -595,6 +637,9 @@ export default {
   createTemplate,
   updateTemplate,
   deleteTemplate,
+  getHallTemplates,
+  assignTemplateToHall,
+  unassignTemplateFromHall,
 
   // Reports
   getReports,

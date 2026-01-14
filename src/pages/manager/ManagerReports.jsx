@@ -242,7 +242,7 @@ export default function ManagerReports() {
                                     letterSpacing: '0.3px'
                                 }}
                             >
-                                نظرة عامة على أداء الصالة والحجوزات
+                                نظرة عامة على أداء قاعة/صالة والحجوزات
                             </MuiTypography>
                         </MuiBox>
                     </MuiBox>

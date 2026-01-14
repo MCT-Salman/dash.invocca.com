@@ -511,7 +511,7 @@ export default function ComplaintsManagement() {
                     <MuiGrid item xs={12} md={6}>
                         <MuiTextField
                             fullWidth
-                            placeholder="البحث بنوع الشكوى، اسم المستخدم، أو القاعة..."
+                            placeholder="البحث بنوع الشكوى، اسم المستخدم، أو قاعة/صالة..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             InputProps={{

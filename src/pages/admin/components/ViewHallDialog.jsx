@@ -1,3 +1,4 @@
+// src\pages\admin\components\ViewHallDialog.jsx
 import MuiDialog from '@/components/ui/MuiDialog'
 import MuiDialogTitle from '@/components/ui/MuiDialogTitle'
 import MuiDialogContent from '@/components/ui/MuiDialogContent'
@@ -12,6 +13,8 @@ import MuiDivider from '@/components/ui/MuiDivider'
 import { X, MapPin, Users, Armchair as Chair, Table, User, Phone, DollarSign, CheckCircle, XCircle } from 'lucide-react'
 import { formatCurrency } from '@/utils/helpers'
 import { API_CONFIG } from '@/config/constants'
+import { useQuery } from '@tanstack/react-query'
+import { getHallTemplates } from '@/api/admin'
 
 const getImageUrl = (image) => {
     if (!image) return null
@@ -27,6 +30,19 @@ const getImageUrl = (image) => {
 }
 
 export default function ViewHallDialog({ open, onClose, hall }) {
+    const hallId = hall?._id || hall?.id
+    
+    // Fetch full template details if hall has templates
+    const { data: templatesData } = useQuery({
+        queryKey: ['admin', 'hall-templates', hallId],
+        queryFn: () => getHallTemplates(hallId),
+        enabled: open && !!hallId && !!hall?.templates?.length,
+        staleTime: 2 * 60 * 1000
+    })
+    
+    // Use fetched templates if available, otherwise use hall.templates
+    const templatesToDisplay = templatesData?.templates || hall?.templates || []
+    
     // Don't return null early, let the dialog handle the open/close state
     return (
         <MuiDialog
@@ -179,24 +195,139 @@ export default function ViewHallDialog({ open, onClose, hall }) {
                             </MuiBox>
                         </MuiGrid>
 
-                        {/* Services */}
-                        {hall.services && hall.services.length > 0 && (
+                        {/* Templates */}
+                        {templatesToDisplay && templatesToDisplay.length > 0 && (
                             <MuiGrid item xs={12}>
-                                <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>الخدمات</MuiTypography>
-                                <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                    {hall.services.map((s, index) => (
-                                        <MuiChip
-                                            key={index}
-                                            label={`${s.service?.name || 'خدمة'} - ${formatCurrency(s.service?.basePrice)}`}
-                                            variant="outlined"
-                                            sx={{
-                                                backgroundColor: 'rgba(255,255,255,0.03)',
-                                                borderColor: 'var(--color-border-glass)',
-                                                color: 'var(--color-text-primary-dark)',
-                                            }}
-                                        />
-                                    ))}
-                                </MuiBox>
+                                <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>القوالب</MuiTypography>
+                                <MuiGrid container spacing={2}>
+                                    {templatesToDisplay.map((templateAssignment, index) => {
+                                        // Handle both nested template object and direct template properties
+                                        // The template data can be in templateAssignment.template or directly in templateAssignment
+                                        const template = templateAssignment.template || templateAssignment || {}
+                                        
+                                        // Try multiple paths to get templateName (check nested object first, then direct)
+                                        const templateName = template.templateName 
+                                            || template.name 
+                                            || templateAssignment.templateName
+                                            || templateAssignment.name
+                                            || `قالب ${index + 1}`
+                                        
+                                        // Try multiple paths to get description
+                                        const templateDescription = template.description 
+                                            || templateAssignment.description 
+                                            || ''
+                                        
+                                        // Try multiple paths to get category
+                                        const templateCategory = template.category 
+                                            || templateAssignment.category 
+                                            || ''
+                                        
+                                        const templateImageUrl = template.imageUrl 
+                                            ? (template.imageUrl.startsWith('http') 
+                                                ? template.imageUrl 
+                                                : `${API_CONFIG.BASE_URL}${template.imageUrl}`)
+                                            : null
+                                        return (
+                                            <MuiGrid item xs={12} sm={6} md={4} key={templateAssignment._id || index}>
+                                                <MuiBox
+                                                    sx={{
+                                                        position: 'relative',
+                                                        borderRadius: '12px',
+                                                        overflow: 'hidden',
+                                                        border: '1px solid var(--color-border-glass)',
+                                                        backgroundColor: 'rgba(255,255,255,0.03)',
+                                                        cursor: templateImageUrl ? 'pointer' : 'default',
+                                                        transition: 'all 0.2s ease',
+                                                        height: '100%',
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        '&:hover': templateImageUrl ? {
+                                                            transform: 'scale(1.02)',
+                                                            borderColor: 'var(--color-primary-500)',
+                                                        } : {}
+                                                    }}
+                                                    onClick={() => {
+                                                        if (templateImageUrl) window.open(templateImageUrl, '_blank')
+                                                    }}
+                                                >
+                                                    {templateImageUrl ? (
+                                                        <img
+                                                            src={templateImageUrl}
+                                                            alt={templateName}
+                                                            style={{
+                                                                width: '100%',
+                                                                height: '160px',
+                                                                objectFit: 'cover',
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <MuiBox sx={{ width: '100%', height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(216, 185, 138, 0.1)' }}>
+                                                            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
+                                                                بدون صورة
+                                                            </MuiTypography>
+                                                        </MuiBox>
+                                                    )}
+                                                    <MuiBox sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                                        <MuiTypography 
+                                                            variant="body1" 
+                                                            sx={{ 
+                                                                fontWeight: 600, 
+                                                                color: 'var(--color-text-primary-dark)', 
+                                                                mb: 1,
+                                                                fontSize: '1rem'
+                                                            }}
+                                                        >
+                                                            {templateName}
+                                                        </MuiTypography>
+                                                        {templateDescription ? (
+                                                            <MuiTypography 
+                                                                variant="body2" 
+                                                                sx={{ 
+                                                                    color: 'var(--color-text-secondary)',
+                                                                    mb: templateCategory ? 1 : 0,
+                                                                    lineHeight: 1.5,
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    display: '-webkit-box',
+                                                                    WebkitLineClamp: 3,
+                                                                    WebkitBoxOrient: 'vertical',
+                                                                    flex: 1
+                                                                }}
+                                                            >
+                                                                {templateDescription}
+                                                            </MuiTypography>
+                                                        ) : (
+                                                            <MuiTypography 
+                                                                variant="caption" 
+                                                                sx={{ 
+                                                                    color: 'var(--color-text-secondary)',
+                                                                    fontStyle: 'italic',
+                                                                    mb: templateCategory ? 1 : 0
+                                                                }}
+                                                            >
+                                                                لا يوجد وصف
+                                                            </MuiTypography>
+                                                        )}
+                                                        {templateCategory && (
+                                                            <MuiChip
+                                                                label={templateCategory}
+                                                                size="small"
+                                                                sx={{
+                                                                    height: 24,
+                                                                    fontSize: '0.75rem',
+                                                                    backgroundColor: 'rgba(216, 185, 138, 0.1)',
+                                                                    color: 'var(--color-primary-500)',
+                                                                    alignSelf: 'flex-start',
+                                                                    mt: 'auto'
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </MuiBox>
+                                                </MuiBox>
+                                            </MuiGrid>
+                                        )
+                                    })}
+                                </MuiGrid>
                             </MuiGrid>
                         )}
 
@@ -250,7 +381,7 @@ export default function ViewHallDialog({ open, onClose, hall }) {
             ) : (
                 <MuiBox sx={{ p: 4, textAlign: 'center' }}>
                     <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)' }}>
-                        لم يتم اختيار قاعة
+                        لم يتم اختيار قاعة/صالة
                     </MuiTypography>
                     <MuiButton onClick={onClose} sx={{ mt: 2 }}>
                         إغلاق

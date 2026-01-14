@@ -1,3 +1,4 @@
+// src\pages\manager\components\ViewEventDialog.jsx
 import MuiDialog from '@/components/ui/MuiDialog'
 import MuiDialogContent from '@/components/ui/MuiDialogContent'
 import MuiDialogActions from '@/components/ui/MuiDialogActions'
@@ -9,6 +10,9 @@ import MuiGrid from '@/components/ui/MuiGrid'
 import MuiChip from '@/components/ui/MuiChip'
 import MuiDivider from '@/components/ui/MuiDivider'
 import MuiPaper from '@/components/ui/MuiPaper'
+import MuiTabs from '@mui/material/Tabs'
+import MuiTab from '@mui/material/Tab'
+import { useState } from 'react'
 import { 
     X, 
     Calendar, 
@@ -25,13 +29,15 @@ import {
     FileText,
     Tag,
     UserCheck,
-    Sparkles
+    Sparkles,
+    Music
 } from 'lucide-react'
 import { formatDate } from '@/utils/helpers'
 import { useQuery } from '@tanstack/react-query'
 import { listManagerTemplates, getEventScanners } from '@/api/manager'
 import { SERVICE_CATEGORY_LABELS, SERVICE_UNIT_LABELS } from '@/config/constants'
 import { QrCode, Hash } from 'lucide-react'
+import EventSongsTab from './EventSongsTab'
 
 export default function ViewEventDialog({ open, onClose, event }) {
     const eventId = event?._id || event?.id
@@ -74,6 +80,8 @@ export default function ViewEventDialog({ open, onClose, event }) {
     const fullTemplate = event?.template?._id 
         ? templates.find(t => (t._id || t.id) === event?.template?._id)
         : null
+
+    const [activeTab, setActiveTab] = useState('details')
 
     const statusConfig = {
         pending: { label: 'قيد الانتظار', color: '#D99B3D', bg: '#FFF8DA', icon: AlertCircle },
@@ -166,7 +174,21 @@ export default function ViewEventDialog({ open, onClose, event }) {
                 </MuiBox>
 
                 <MuiDialogContent sx={{ p: 3 }}>
-                    <MuiGrid container spacing={3}>
+                    {/* Tabs for details and songs management */}
+                    <MuiBox sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+                        <MuiTabs
+                            value={activeTab}
+                            onChange={(_, value) => setActiveTab(value)}
+                            textColor="inherit"
+                            indicatorColor="primary"
+                        >
+                            <MuiTab label="التفاصيل" value="details" />
+                            <MuiTab label="قائمة الأغاني" value="songs" />
+                        </MuiTabs>
+                    </MuiBox>
+
+                    {activeTab === 'details' && (
+                        <MuiGrid container spacing={3}>
                         {/* Basic Information */}
                         <MuiGrid item xs={12}>
                             <MuiTypography variant="h6" sx={{ fontWeight: 600, mb: 2, color: 'var(--color-primary-500)' }}>
@@ -311,7 +333,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
                                 </MuiGrid>
                                 <MuiGrid item xs={12}>
                                     <MuiTypography variant="h6" sx={{ fontWeight: 600, mb: 2, color: 'var(--color-primary-500)' }}>
-                                        معلومات القاعة
+                                        معلومات قاعة/صالة
                                     </MuiTypography>
                                     <MuiPaper sx={{ p: 3, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
                                         <MuiGrid container spacing={2}>
@@ -320,7 +342,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
                                                     <Building2 size={20} style={{ color: 'var(--color-primary-400)' }} />
                                                     <MuiBox>
                                                         <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.75rem' }}>
-                                                            اسم القاعة
+                                                            اسم قاعة/صالة
                                                         </MuiTypography>
                                                         <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                                                             {event.hall.name || '—'}
@@ -501,6 +523,8 @@ export default function ViewEventDialog({ open, onClose, event }) {
                                 </MuiGrid>
                             </>
                         )}
+
+                        {/* Playlist preview section removed in favor of dedicated tab */}
 
                         {/* Special Requests */}
                         {event.specialRequests && (
@@ -706,6 +730,11 @@ export default function ViewEventDialog({ open, onClose, event }) {
                             </MuiGrid>
                         </MuiGrid>
                     </MuiGrid>
+                    )}
+
+                    {activeTab === 'songs' && (
+                        <EventSongsTab eventId={eventId} open={open} />
+                    )}
                 </MuiDialogContent>
 
                 <MuiDialogActions sx={{ p: 3, backgroundColor: 'var(--color-surface-dark)', borderTop: '1px solid rgba(216, 185, 138, 0.15)' }}>

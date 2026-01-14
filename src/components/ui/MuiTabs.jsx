@@ -10,15 +10,19 @@ const MuiTabs = ({
   className = '',
   ...props
 }) => {
+  const handleChange = (event, newValue) => {
+    onChange?.(event, newValue);
+  };
+
   return (
     <Tabs
-      value={value}
-      onChange={onChange}
+      value={value !== undefined && value !== null ? value : 0}
+      onChange={handleChange}
       variant={variant}
       centered={centered}
-      className={`!border-b-2 !border-beige-light ${className}`}
+      className={className}
       TabIndicatorProps={{
-        className: '!bg-secondary-500 !h-1'
+        sx: { backgroundColor: 'var(--color-primary-500)', height: '3px' }
       }}
       {...props}
     >
@@ -28,7 +32,15 @@ const MuiTabs = ({
           label={tab.label}
           disabled={tab.disabled}
           icon={tab.icon}
-          className="!text-primary-500 !font-semibold hover:!text-secondary-500 hover:!bg-beige-light !transition-all !duration-300 !rounded-t-xl"
+          iconPosition={tab.iconPosition || 'start'}
+          sx={{
+            textTransform: 'none',
+            fontSize: '0.95rem',
+            fontWeight: 600,
+            minWidth: 'auto',
+            px: 2.5,
+            py: 1.5,
+          }}
         />
       ))}
     </Tabs>

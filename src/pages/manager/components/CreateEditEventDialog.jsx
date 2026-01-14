@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -19,7 +19,7 @@ import MuiTimePicker from '@/components/ui/MuiTimePicker'
 import { FormDialog } from '@/components/common'
 import { useNotification } from '@/hooks'
 import { getClients, getManagerHall, listManagerTemplates, getStaff, getEventScanners } from '@/api/manager'
-import { QUERY_KEYS } from '@/config/constants'
+import { QUERY_KEYS, API_CONFIG } from '@/config/constants'
 import { Plus, Trash2 } from 'lucide-react'
 
 // Validation Schema
@@ -42,7 +42,7 @@ const createEventSchema = (editingEvent = null) => {
         scanners: z.array(z.object({
             scannerId: z.string().min(1, 'الماسح مطلوب')
         })).optional().default([]),
-        clientSelection: z.enum(['existing', 'new']).default('existing'),
+        clientSelection: z.enum(['existing', 'new']).default('new'),
         clientId: z.string().optional(),
         clientName: z.string().optional(),
         clientusername: z.string().optional(),
@@ -124,7 +124,7 @@ const createEventSchema = (editingEvent = null) => {
 
 export default function CreateEditEventDialog({ open, onClose, onSubmit, editingEvent, loading }) {
     const { addNotification: showNotification } = useNotification()
-    const [clientSelection, setClientSelection] = useState('existing')
+    const [clientSelection, setClientSelection] = useState('new')
 
     // Fetch clients for dropdown
     const { data: clientsData } = useQuery({
@@ -174,23 +174,40 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
         ? staff.filter(s => s.role === 'scanner' || s.position === 'scanner')
         : []
 
-    // Get event scanners from API response
-    const eventScanners = Array.isArray(eventScannersData?.scanners)
-        ? eventScannersData.scanners
-        : Array.isArray(eventScannersData?.data)
-            ? eventScannersData.data
-            : Array.isArray(eventScannersData)
-                ? eventScannersData
-                : []
+    // Get event scanners from API response - memoized to prevent infinite loops
+    const eventScanners = useMemo(() => {
+        return Array.isArray(eventScannersData?.scanners)
+            ? eventScannersData.scanners
+            : Array.isArray(eventScannersData?.data)
+                ? eventScannersData.data
+                : Array.isArray(eventScannersData)
+                    ? eventScannersData
+                    : []
+    }, [eventScannersData])
     
     // Get templates from response - handle different response structures
-    const templates = Array.isArray(templatesData?.templates) 
-        ? templatesData.templates 
-        : Array.isArray(templatesData?.data) 
-            ? templatesData.data 
-            : Array.isArray(templatesData) 
-                ? templatesData 
-                : []
+    const templates = useMemo(() => {
+        const raw = Array.isArray(templatesData?.templates)
+            ? templatesData.templates
+            : Array.isArray(templatesData?.data)
+                ? templatesData.data
+                : Array.isArray(templatesData)
+                    ? templatesData
+                    : []
+
+        // Normalize both plain templates and hall-template assignments with nested template object
+        return raw.map((item) => {
+            const base = item.template || item
+            return {
+                ...item,
+                _id: base._id || item._id || item.id,
+                id: base._id || base.id || item._id || item.id,
+                templateName: base.templateName || base.name,
+                description: base.description || item.description,
+                imageUrl: base.imageUrl || item.imageUrl,
+            }
+        })
+    }, [templatesData])
     
     // Get services from hall response - services now include full service details in service object
     const hall = hallData?.hall || hallData || {}
@@ -214,7 +231,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
             })
             .filter(service => service._id) // Filter out invalid services
         : []
-
+    
     const {
         control,
         handleSubmit,
@@ -245,7 +262,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                 : (editingEvent?.scanners?.map(s => ({
                     scannerId: (s.scannerId?._id || s.scannerId || s.scanner?._id || s.scanner?.id || s._id || '').toString()
                 })).filter(s => s.scannerId) || []),
-            clientSelection: 'existing',
+            clientSelection: 'new',
             clientId: editingEvent?.clientId?._id || editingEvent?.clientId || editingEvent?.client?._id || '',
             clientName: '',
             clientusername: '',
@@ -265,66 +282,75 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
     })
 
     const watchedClientSelection = watch('clientSelection')
-
+    
+    // Sync clientSelection state with form value
     useEffect(() => {
-        setClientSelection(watchedClientSelection || 'existing')
+        if (watchedClientSelection) {
+            setClientSelection(watchedClientSelection)
+        }
     }, [watchedClientSelection])
 
+    // Memoize editing event ID for stable reference
+    const editingEventId = useMemo(() => editingEvent?._id || editingEvent?.id, [editingEvent?._id, editingEvent?.id])
+
     useEffect(() => {
-        if (open) {
-            if (editingEvent) {
-                reset({
-                    eventName: editingEvent.eventName || editingEvent.name || '',
-                    eventType: editingEvent.eventType || 'wedding',
-                    eventDate: editingEvent.eventDate || editingEvent.date || '',
-                    startTime: editingEvent.startTime || '',
-                    endTime: editingEvent.endTime || '',
-                    guestCount: editingEvent.guestCount || 0,
-                    requiredEmployees: editingEvent.requiredEmployees || 0,
-                    services: editingEvent.services?.map(s => ({
-                        service: s.service?._id || s.service || '',
-                        quantity: s.quantity || 1,
-                        price: s.price || 0
-                    })) || [],
-                    specialRequests: editingEvent.specialRequests || '',
-                    templateId: editingEvent.template?._id || editingEvent.templateId?._id || editingEvent.templateId || null,
-                    scanners: eventScanners.length > 0
-                        ? eventScanners.map(s => ({
-                            scannerId: (s.scanner?._id || s.scanner?.id || s.scannerId?._id || s.scannerId || s._id || '').toString()
-                        })).filter(s => s.scannerId)
-                        : (editingEvent.scanners?.map(s => ({
-                            scannerId: (s.scannerId?._id || s.scannerId || s.scanner?._id || s.scanner?.id || s._id || '').toString()
-                        })).filter(s => s.scannerId) || []),
-                    clientSelection: 'existing',
-                    clientId: editingEvent.clientId?._id || editingEvent.clientId || editingEvent.client?._id || '',
-                    clientName: '',
-                    clientusername: '',
-                    phone: '',
-                    password: ''
-                })
-            } else {
-                reset({
-                    eventName: '',
-                    eventType: 'wedding',
-                    eventDate: '',
-                    startTime: '',
-                    endTime: '',
-                    guestCount: 0,
-                    requiredEmployees: 0,
-                    services: [],
-                    specialRequests: '',
-                    templateId: null,
-                    scanners: [],
-                    clientSelection: 'existing',
-                    clientId: '',
-                    clientName: '',
-                    clientusername: '',
-                    phone: '',
-                    password: ''
-                })
-            }
+        if (!open) {
+            return
         }
-    }, [open, editingEvent, reset, eventScanners])
+
+        if (editingEvent) {
+            reset({
+                eventName: editingEvent.eventName || editingEvent.name || '',
+                eventType: editingEvent.eventType || 'wedding',
+                eventDate: editingEvent.eventDate || editingEvent.date || '',
+                startTime: editingEvent.startTime || '',
+                endTime: editingEvent.endTime || '',
+                guestCount: editingEvent.guestCount || 0,
+                requiredEmployees: editingEvent.requiredEmployees || 0,
+                services: editingEvent.services?.map(s => ({
+                    service: s.service?._id || s.service || '',
+                    quantity: s.quantity || 1,
+                    price: s.price || 0
+                })) || [],
+                specialRequests: editingEvent.specialRequests || '',
+                templateId: editingEvent.template?._id || editingEvent.templateId?._id || editingEvent.templateId || null,
+                scanners: eventScanners.length > 0
+                    ? eventScanners.map(s => ({
+                        scannerId: (s.scanner?._id || s.scanner?.id || s.scannerId?._id || s.scannerId || s._id || '').toString()
+                    })).filter(s => s.scannerId)
+                    : (editingEvent.scanners?.map(s => ({
+                        scannerId: (s.scannerId?._id || s.scannerId || s.scanner?._id || s.scanner?.id || s._id || '').toString()
+                    })).filter(s => s.scannerId) || []),
+                clientSelection: 'new',
+                clientId: editingEvent.clientId?._id || editingEvent.clientId || editingEvent.client?._id || '',
+                clientName: '',
+                clientusername: '',
+                phone: '',
+                password: ''
+            })
+        } else {
+            reset({
+                eventName: '',
+                eventType: 'wedding',
+                eventDate: '',
+                startTime: '',
+                endTime: '',
+                guestCount: 0,
+                requiredEmployees: 0,
+                services: [],
+                specialRequests: '',
+                templateId: null,
+                scanners: [],
+                clientSelection: 'new',
+                clientId: '',
+                clientName: '',
+                clientusername: '',
+                phone: '',
+                password: ''
+            })
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open, editingEventId, eventScanners, reset])
 
     const handleFormSubmit = (data) => {
         // Prepare the data according to API requirements
@@ -352,7 +378,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
         }
 
         // Add client data based on selection
-        const clientSelection = data.clientSelection || 'existing'
+        const clientSelection = data.clientSelection || 'new'
         
         if (clientSelection === 'existing') {
             // If editing, we might not need to send clientId again
@@ -476,6 +502,14 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                             const templateValue = field.value 
                                 ? (typeof field.value === 'string' ? field.value : (field.value._id || field.value.id || String(field.value)))
                                 : ''
+
+                            const selectedTemplate = templates.find(t => String(t._id || t.id) === templateValue)
+
+                            const getTemplateImageUrl = (img) => {
+                                if (!img) return ''
+                                if (typeof img === 'string' && img.startsWith('http')) return img
+                                return `${API_CONFIG.BASE_URL}${img.startsWith('/') ? '' : '/'}${img}`
+                            }
                             
                             return (
                                 <MuiBox>
@@ -485,10 +519,40 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                                         disabled={templatesLoading}
                                         error={!!error}
                                         fullWidth
+                                        displayEmpty
                                         onChange={(e) => {
                                             // Convert empty string to null for proper API handling
                                             const value = e.target.value === '' ? null : e.target.value
                                             field.onChange(value)
+                                        }}
+                                        renderValue={(value) => {
+                                            if (!value) {
+                                                return <em>بدون قالب</em>
+                                            }
+                                            const tpl = templates.find(t => String(t._id || t.id) === value)
+                                            if (!tpl) return value
+                                            const imgUrl = getTemplateImageUrl(tpl.imageUrl)
+                                            return (
+                                                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                    {imgUrl ? (
+                                                        <img
+                                                            src={imgUrl}
+                                                            alt={tpl.templateName || ''}
+                                                            style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 6 }}
+                                                        />
+                                                    ) : null}
+                                                    <MuiBox sx={{ overflow: 'hidden' }}>
+                                                        <MuiTypography variant="body2" sx={{ fontWeight: 600, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                                                            {tpl.templateName || tpl.name || 'قالب بدون اسم'}
+                                                        </MuiTypography>
+                                                        {tpl.description && (
+                                                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                                                                {tpl.description}
+                                                            </MuiTypography>
+                                                        )}
+                                                    </MuiBox>
+                                                </MuiBox>
+                                            )
                                         }}
                                     >
                                         <MuiMenuItem value="">
@@ -496,13 +560,112 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                                         </MuiMenuItem>
                                         {templates.map((template) => {
                                             const templateId = template._id || template.id
+                                            const imgUrl = getTemplateImageUrl(template.imageUrl)
                                             return (
                                                 <MuiMenuItem key={templateId} value={String(templateId)}>
-                                                    {template.templateName || template.name || 'قالب بدون اسم'}
+                                                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: '100%' }}>
+                                                        {imgUrl ? (
+                                                            <img
+                                                                src={imgUrl}
+                                                                alt={template.templateName || ''}
+                                                                style={{
+                                                                    width: 48,
+                                                                    height: 48,
+                                                                    objectFit: 'cover',
+                                                                    borderRadius: 6,
+                                                                    border: '1px solid var(--color-border-glass)',
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <MuiBox
+                                                                sx={{
+                                                                    width: 48,
+                                                                    height: 48,
+                                                                    borderRadius: 6,
+                                                                    border: '1px solid var(--color-border-glass)',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    backgroundColor: 'rgba(255,255,255,0.04)',
+                                                                }}
+                                                            >
+                                                                <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', fontSize: '10px' }}>
+                                                                    بدون صورة
+                                                                </MuiTypography>
+                                                            </MuiBox>
+                                                        )}
+                                                        <MuiBox sx={{ flex: 1, minWidth: 0 }}>
+                                                            <MuiTypography variant="body2" sx={{ fontWeight: 600, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                                                                {template.templateName || template.name || 'قالب بدون اسم'}
+                                                            </MuiTypography>
+                                                            {template.description && (
+                                                                <MuiTypography
+                                                                    variant="caption"
+                                                                    sx={{
+                                                                        color: 'var(--color-text-secondary)',
+                                                                        display: 'block',
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        whiteSpace: 'nowrap',
+                                                                    }}
+                                                                >
+                                                                    {template.description}
+                                                                </MuiTypography>
+                                                            )}
+                                                        </MuiBox>
+                                                    </MuiBox>
                                                 </MuiMenuItem>
                                             )
                                         })}
                                     </MuiSelect>
+                                    {selectedTemplate && (
+                                        <MuiBox
+                                            sx={{
+                                                mt: 1.5,
+                                                p: 1.5,
+                                                borderRadius: '10px',
+                                                border: '1px solid var(--color-border-glass)',
+                                                backgroundColor: 'rgba(255,255,255,0.02)',
+                                                display: 'flex',
+                                                gap: 1.5,
+                                                alignItems: 'center',
+                                            }}
+                                        >
+                                            {getTemplateImageUrl(selectedTemplate.imageUrl) ? (
+                                                <img
+                                                    src={getTemplateImageUrl(selectedTemplate.imageUrl)}
+                                                    alt={selectedTemplate.templateName || ''}
+                                                    style={{
+                                                        width: 80,
+                                                        height: 80,
+                                                        objectFit: 'cover',
+                                                        borderRadius: 8,
+                                                        border: '1px solid var(--color-border-glass)',
+                                                    }}
+                                                />
+                                            ) : null}
+                                            <MuiBox sx={{ flex: 1, minWidth: 0 }}>
+                                                <MuiTypography variant="body1" sx={{ fontWeight: 600, mb: 0.5, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                                                    {selectedTemplate.templateName || selectedTemplate.name || 'قالب بدون اسم'}
+                                                </MuiTypography>
+                                                {selectedTemplate.description && (
+                                                    <MuiTypography
+                                                        variant="body2"
+                                                        sx={{
+                                                            color: 'var(--color-text-secondary)',
+                                                            overflow: 'hidden',
+                                                            textOverflow: 'ellipsis',
+                                                            display: '-webkit-box',
+                                                            WebkitLineClamp: 2,
+                                                            WebkitBoxOrient: 'vertical',
+                                                        }}
+                                                    >
+                                                        {selectedTemplate.description}
+                                                    </MuiTypography>
+                                                )}
+                                            </MuiBox>
+                                        </MuiBox>
+                                    )}
                                     {error && (
                                         <MuiFormHelperText sx={{ color: 'var(--color-error-500)', mt: 0.5, mx: 1.75 }}>
                                             {error.message}

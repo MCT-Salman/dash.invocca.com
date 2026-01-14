@@ -66,6 +66,8 @@ export const ROUTES = {
   MANAGER: {
     DASHBOARD: '/manager/dashboard',
     HALL: '/manager/hall',
+    SERVICES: '/manager/services',
+    SONGS: '/manager/songs',
     EVENTS: '/manager/events',
     EVENTS_ADD: '/manager/events/add',
     EVENTS_EDIT: '/manager/events/:id/edit',
@@ -206,20 +208,26 @@ export const COMPLAINT_STATUS_LABELS = {
 // ═══════════════════════════════════════════════════════════
 
 export const SERVICE_CATEGORIES = {
+  SCANNER: 'scanner',
   CATERING: 'catering',
   DECORATION: 'decoration',
-  PHOTOGRAPHY: 'photography',
   ENTERTAINMENT: 'entertainment',
-  TRANSPORTATION: 'transportation',
+  PHOTOGRAPHY: 'photography',
+  MUSIC: 'music',
+  SECURITY: 'security',
+  CLEANING: 'cleaning',
   OTHER: 'other',
 }
 
 export const SERVICE_CATEGORY_LABELS = {
+  [SERVICE_CATEGORIES.SCANNER]: 'الماسح',
   [SERVICE_CATEGORIES.CATERING]: 'تقديم الطعام',
   [SERVICE_CATEGORIES.DECORATION]: 'الديكور',
-  [SERVICE_CATEGORIES.PHOTOGRAPHY]: 'التصوير',
   [SERVICE_CATEGORIES.ENTERTAINMENT]: 'الترفيه',
-  [SERVICE_CATEGORIES.TRANSPORTATION]: 'النقل',
+  [SERVICE_CATEGORIES.PHOTOGRAPHY]: 'التصوير',
+  [SERVICE_CATEGORIES.MUSIC]: 'الموسيقى',
+  [SERVICE_CATEGORIES.SECURITY]: 'الأمان',
+  [SERVICE_CATEGORIES.CLEANING]: 'التنظيف',
   [SERVICE_CATEGORIES.OTHER]: 'أخرى',
 }
 
@@ -340,6 +348,7 @@ export const QUERY_KEYS = {
   CLIENT_INVITATIONS: ['client', 'invitations'],
   CLIENT_SONGS: ['client', 'songs'],
   CLIENT_REPORTS: ['client', 'reports'],
+  CLIENT_EVENT_RATING: ['client', 'event-rating'],
 
   // Employee
   EMPLOYEE_DASHBOARD: ['employee', 'dashboard'],

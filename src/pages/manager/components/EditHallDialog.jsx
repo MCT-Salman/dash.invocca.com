@@ -11,7 +11,7 @@ import { useNotification } from '@/hooks'
 
 // Validation Schema
 const editHallSchema = z.object({
-    name: z.string().min(3, 'اسم القاعة يجب أن يكون 3 أحرف على الأقل').max(100, 'اسم القاعة طويل جداً'),
+    name: z.string().min(3, 'اسم قاعة/صالة يجب أن يكون 3 أحرف على الأقل').max(100, 'اسم قاعة/صالة طويل جداً'),
     location: z.string().min(3, 'الموقع مطلوب').max(200, 'الموقع طويل جداً'),
     capacity: z.coerce.number().min(1, 'السعة مطلوبة').max(10000, 'السعة كبيرة جداً'),
     tables: z.coerce.number().min(0, 'عدد الطاولات يجب أن يكون 0 أو أكثر').max(1000, 'عدد الطاولات كبير جداً'),
@@ -60,7 +60,7 @@ export default function EditHallDialog({ open, onClose, onSubmit, hall, loading 
         <FormDialog
             open={open}
             onClose={onClose}
-            title="تعديل معلومات القاعة"
+            title="تعديل معلومات قاعة/صالة"
             onSubmit={handleSubmit(handleFormSubmit, (errors) => {
                 const firstError = Object.values(errors)[0]
                 showNotification({
@@ -89,7 +89,7 @@ export default function EditHallDialog({ open, onClose, onSubmit, hall, loading 
                         render={({ field }) => (
                             <MuiTextField
                                 {...field}
-                                label="اسم القاعة"
+                                label="اسم قاعة/صالة"
                                 fullWidth
                                 required
                                 error={!!errors.name}
