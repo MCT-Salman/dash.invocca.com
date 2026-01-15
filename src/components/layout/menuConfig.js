@@ -5,6 +5,7 @@ import {
   ClipboardList,
   Users,
   BarChart3,
+  Star,
   QrCode,
   MessageCircle,
   UserPlus,
@@ -12,6 +13,9 @@ import {
   Calendar,
   Image,
   Music,
+  DollarSign,
+  FileText,
+  CreditCard,
 } from 'lucide-react'
 import { ROUTES } from '@/config/constants'
 
@@ -35,8 +39,14 @@ export const ROLE_MENUS = {
     { label: 'الخدمات', path: ROUTES.MANAGER.SERVICES, icon: ClipboardList },
     { label: 'الأغاني', path: ROUTES.MANAGER.SONGS, icon: Music },
     { label: 'التقارير', path: ROUTES.MANAGER.REPORTS, icon: BarChart3 },
+    { label: 'التقييمات', path: ROUTES.MANAGER.RATINGS, icon: Star },
     { label: 'قوالب الدعوات', path: ROUTES.MANAGER.TEMPLATES, icon: Image },
     { label: 'الشكاوى', path: ROUTES.MANAGER.COMPLAINTS, icon: MessageCircle },
+    // Financial Section
+    { label: 'المالية', path: '/manager/financial/dashboard', icon: DollarSign },
+    { label: 'الفواتير', path: '/manager/financial/invoices', icon: FileText },
+    { label: 'المعاملات', path: '/manager/financial/transactions', icon: CreditCard },
+    { label: 'التقارير المالية', path: '/manager/financial/reports', icon: BarChart3 },
     { label: 'الملف الشخصي', path: ROUTES.MANAGER.PROFILE, icon: User },
   ],
   client: [
@@ -44,6 +54,7 @@ export const ROLE_MENUS = {
     { label: 'دعواتي', path: '/client/invitations', icon: ClipboardList },
     { label: 'الأغاني', path: '/client/songs', icon: QrCode },
     { label: 'التقارير', path: '/client/reports', icon: BarChart3 },
+    { label: 'التقييمات', path: ROUTES.CLIENT.RATINGS, icon: Star },
     { label: 'الملف الشخصي', path: ROUTES.CLIENT.PROFILE, icon: User },
   ],
   employee: [

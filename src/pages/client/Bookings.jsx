@@ -10,8 +10,10 @@ import { QUERY_KEYS, EVENT_STATUS_LABELS, EVENT_STATUS_COLORS } from '@/config/c
 import { getBookings } from '@/api/client'
 import { formatDate } from '@/utils/helpers'
 import { Calendar, MapPin, Users, Clock } from 'lucide-react'
-
+import MuiButton from '@/components/ui/MuiButton'
+import { useNavigate } from 'react-router-dom'
 export default function Bookings() {
+  const navigate = useNavigate()
   const { data, isLoading } = useQuery({
     queryKey: QUERY_KEYS.CLIENT_BOOKINGS,
     queryFn: () => getBookings(),
@@ -92,6 +94,12 @@ export default function Bookings() {
                     </MuiBox>
                   </MuiGrid>
                 </MuiGrid>
+
+                <MuiBox sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                  <MuiButton variant="outlined" size="small" onClick={() => navigate('/client/ratings')}>
+                    عرض التقييم
+                  </MuiButton>
+                </MuiBox>
               </MuiPaper>
             </MuiGrid>
           ))}

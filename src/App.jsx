@@ -34,10 +34,15 @@ import EventsManagement from './pages/manager/EventsManagementNew'
 import ClientsManagement from './pages/manager/ClientsManagementNew'
 import StaffManagement from './pages/manager/StaffManagementNew'
 import ManagerReports from './pages/manager/ManagerReports'
+import ManagerRatings from './pages/manager/ManagerRatings'
 import ManagerTemplates from './pages/manager/ManagerTemplates'
 import ManagerComplaints from './pages/manager/ManagerComplaints'
 import ManagerProfile from './pages/manager/ManagerProfile'
 import ManagerSongsManagement from './pages/manager/SongsManagement'
+import ManagerFinancial from './pages/manager/ManagerFinancial'
+import ManagerFinancialDashboard from './pages/manager/ManagerFinancialDashboard'
+import ManagerTransactions from './pages/manager/ManagerTransactions'
+import ManagerFinancialReports from './pages/manager/ManagerFinancialReports'
 
 // Client Pages
 import ClientDashboard from './pages/client/ClientDashboard'
@@ -45,6 +50,7 @@ import ClientBookings from './pages/client/Bookings'
 import ClientInvitations from './pages/client/Invitations'
 import ClientSongs from './pages/client/Songs'
 import ClientReports from './pages/client/ClientReports'
+import ClientRatings from './pages/client/ClientRatings'
 import ClientProfile from './pages/client/ClientProfile'
 
 // Employee Pages
@@ -98,8 +104,13 @@ export default function App() {
                 <Route path={ROUTES.MANAGER.CLIENTS} element={<ClientsManagement />} />
                 <Route path={ROUTES.MANAGER.STAFF} element={<StaffManagement />} />
                 <Route path={ROUTES.MANAGER.REPORTS} element={<ManagerReports />} />
+                <Route path={ROUTES.MANAGER.RATINGS} element={<ManagerRatings />} />
                 <Route path={ROUTES.MANAGER.TEMPLATES} element={<ManagerTemplates />} />
                 <Route path={ROUTES.MANAGER.COMPLAINTS} element={<ManagerComplaints />} />
+                <Route path="/manager/financial/dashboard" element={<ManagerFinancialDashboard />} />
+                <Route path="/manager/financial/invoices" element={<ManagerFinancial />} />
+                <Route path="/manager/financial/transactions" element={<ManagerTransactions />} />
+                <Route path="/manager/financial/reports" element={<ManagerFinancialReports />} />
                 <Route path={ROUTES.MANAGER.PROFILE} element={<ManagerProfile />} />
             </Route>
 
@@ -111,6 +122,7 @@ export default function App() {
                 <Route path={ROUTES.CLIENT.INVITATIONS} element={<ClientInvitations />} />
                 <Route path={ROUTES.CLIENT.SONGS} element={<ClientSongs />} />
                 <Route path={ROUTES.CLIENT.REPORTS} element={<ClientReports />} />
+                <Route path={ROUTES.CLIENT.RATINGS} element={<ClientRatings />} />
                 <Route path={ROUTES.CLIENT.PROFILE} element={<ClientProfile />} />
             </Route>
 

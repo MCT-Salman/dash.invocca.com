@@ -167,10 +167,10 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
     })
 
     const clients = clientsData?.clients || clientsData?.data || []
-    
+
     // Get scanners from staff - filter by role 'scanner'
     const staff = staffData?.staff || staffData?.data || []
-    const scanners = Array.isArray(staff) 
+    const scanners = Array.isArray(staff)
         ? staff.filter(s => s.role === 'scanner' || s.position === 'scanner')
         : []
 
@@ -184,7 +184,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                     ? eventScannersData
                     : []
     }, [eventScannersData])
-    
+
     // Get templates from response - handle different response structures
     const templates = useMemo(() => {
         const raw = Array.isArray(templatesData?.templates)
@@ -208,10 +208,10 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
             }
         })
     }, [templatesData])
-    
+
     // Get services from hall response - services now include full service details in service object
     const hall = hallData?.hall || hallData || {}
-    const servicesList = Array.isArray(hall.services) 
+    const servicesList = Array.isArray(hall.services)
         ? hall.services
             .map(hallService => {
                 // Extract service details from hallService.service object
@@ -231,7 +231,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
             })
             .filter(service => service._id) // Filter out invalid services
         : []
-    
+
     const {
         control,
         handleSubmit,
@@ -282,7 +282,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
     })
 
     const watchedClientSelection = watch('clientSelection')
-    
+
     // Sync clientSelection state with form value
     useEffect(() => {
         if (watchedClientSelection) {
@@ -366,8 +366,8 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
             specialRequests: data.specialRequests || '',
             // Template ID - ensure it's a valid string ID or null
             // Handle empty string from select (when "بدون قالب" is selected)
-            templateId: (data.templateId && typeof data.templateId === 'string' && data.templateId.trim() && data.templateId !== '') 
-                ? data.templateId.trim() 
+            templateId: (data.templateId && typeof data.templateId === 'string' && data.templateId.trim() && data.templateId !== '')
+                ? data.templateId.trim()
                 : (data.templateId && typeof data.templateId === 'object' && data.templateId._id)
                     ? String(data.templateId._id).trim()
                     : null,
@@ -379,7 +379,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
         // Add client data based on selection
         const clientSelection = data.clientSelection || 'new'
-        
+
         if (clientSelection === 'existing') {
             // If editing, we might not need to send clientId again
             if (!editingEvent) {
@@ -400,7 +400,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
             const clientusername = (data.clientusername || clientName || '').trim()
             const phone = (data.phone || '').trim()
             const password = (data.password || '').trim()
-            
+
             if (!clientName || !phone || !password) {
                 showNotification({
                     title: 'خطأ',
@@ -409,10 +409,10 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                 })
                 return
             }
-            
-            // API expects 'name' not 'clientName' for new client
-            submitData.name = clientName
-            submitData.username = clientusername || clientName
+
+            // API expects 'clientName' and 'clientusername' for new client
+            submitData.clientName = clientName
+            submitData.clientusername = clientusername || clientName
             submitData.phone = phone
             submitData.password = password
         }
@@ -499,7 +499,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                         control={control}
                         render={({ field, fieldState: { error } }) => {
                             // Normalize the value to string for MuiSelect comparison
-                            const templateValue = field.value 
+                            const templateValue = field.value
                                 ? (typeof field.value === 'string' ? field.value : (field.value._id || field.value.id || String(field.value)))
                                 : ''
 
@@ -510,7 +510,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                                 if (typeof img === 'string' && img.startsWith('http')) return img
                                 return `${API_CONFIG.BASE_URL}${img.startsWith('/') ? '' : '/'}${img}`
                             }
-                            
+
                             return (
                                 <MuiBox>
                                     <MuiSelect

@@ -110,71 +110,71 @@ export default function ClientDashboard() {
   const complaintsSummary = summary.complaints || {}
   const nextEvent = responseData.nextEvent
   const recentActivity = responseData.recentActivity || {}
-  
+
   // Get events from different possible locations
   const bookings = responseData.allEvents || recentActivity.events || responseData.events || []
   const invitations = recentActivity.invitations || responseData.invitations || []
-  
+
   // Auto scroll for events - Must be called before any conditional returns
   useEffect(() => {
     if (isLoading || bookings.length <= 3 || !eventsScrollRef.current) return
-    
+
     const container = eventsScrollRef.current
     const itemHeight = 150 // Approximate height of each item including gap
     const maxScroll = (bookings.length - 3) * itemHeight
-    
+
     const interval = setInterval(() => {
       setCurrentEventIndex((prev) => {
         const nextIndex = prev + 1
         const scrollPosition = nextIndex * itemHeight
-        
+
         if (scrollPosition > maxScroll) {
           // Reset to top smoothly
           container.scrollTo({ top: 0, behavior: 'smooth' })
           return 0
         }
-        
+
         // Scroll to next position
         container.scrollTo({ top: scrollPosition, behavior: 'smooth' })
         return nextIndex
       })
     }, 3000) // Change every 3 seconds
-    
+
     return () => clearInterval(interval)
   }, [bookings.length, isLoading])
-  
+
   // Auto scroll for invitations - Must be called before any conditional returns
   useEffect(() => {
     if (isLoading || invitations.length <= 3 || !invitationsScrollRef.current) return
-    
+
     const container = invitationsScrollRef.current
     const itemHeight = 150 // Approximate height of each item including gap
     const maxScroll = (invitations.length - 3) * itemHeight
-    
+
     const interval = setInterval(() => {
       setCurrentInvitationIndex((prev) => {
         const nextIndex = prev + 1
         const scrollPosition = nextIndex * itemHeight
-        
+
         if (scrollPosition > maxScroll) {
           // Reset to top smoothly
           container.scrollTo({ top: 0, behavior: 'smooth' })
           return 0
         }
-        
+
         // Scroll to next position
         container.scrollTo({ top: scrollPosition, behavior: 'smooth' })
         return nextIndex
       })
     }, 3000) // Change every 3 seconds
-    
+
     return () => clearInterval(interval)
   }, [invitations.length, isLoading])
 
   if (isLoading) {
     return <LoadingScreen message="جاري تحميل لوحة التحكم..." fullScreen={false} />
   }
-  
+
   // Event type labels
   const eventTypeLabels = {
     wedding: 'زفاف',
@@ -193,7 +193,7 @@ export default function ClientDashboard() {
     completed: 'مكتمل',
     cancelled: 'ملغي'
   }
-  
+
   // Calculate stats from summary
   const stats = {
     totalBookings: eventsSummary.total || 0,
@@ -620,11 +620,11 @@ export default function ClientDashboard() {
             </MuiBox>
 
             {bookings.length > 0 ? (
-              <MuiBox 
+              <MuiBox
                 ref={eventsScrollRef}
-                sx={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
                   gap: 2,
                   overflowY: 'auto',
                   overflowX: 'hidden',
@@ -647,31 +647,27 @@ export default function ClientDashboard() {
                 }}
               >
                 {bookings.map((booking, idx) => (
-                    <MuiPaper
-                      key={booking._id || booking.id || idx}
-                      elevation={0}
-                      sx={{
-                        p: 2,
-                        background: 'rgba(255, 255, 255, 0.03)',
-                        border: '1px solid var(--color-border-glass)',
-                        borderRadius: '12px',
-                        transition: 'all 0.3s ease',
-                        cursor: 'pointer',
-                        flexShrink: 0,
-                        minHeight: '120px',
-                        '&:hover': {
-                          borderColor: 'var(--color-primary-500)',
-                          transform: 'translateY(-2px)',
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-                        }
-                      }}
-                      onClick={() => navigate(`/client/bookings/${booking._id || booking.id}`)}
-                    >
+                  <MuiPaper
+                    key={booking._id || booking.id || idx}
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid var(--color-border-glass)',
+                      borderRadius: '12px',
+                      transition: 'all 0.3s ease',
+                      flexShrink: 0,
+                      minHeight: '120px',
+                      '&:hover': {
+                        borderColor: 'var(--color-primary-500)',
+                      }
+                    }}
+                  >
                     <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                      <MuiTypography 
-                        variant="subtitle1" 
-                        sx={{ 
-                          color: 'var(--color-text-primary-dark)', 
+                      <MuiTypography
+                        variant="subtitle1"
+                        sx={{
+                          color: 'var(--color-text-primary-dark)',
                           fontWeight: 600,
                         }}
                       >
@@ -688,7 +684,7 @@ export default function ClientDashboard() {
                         }}
                       />
                     </MuiBox>
-                    
+
                     <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                       <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
                         <Calendar size={12} />
@@ -696,7 +692,7 @@ export default function ClientDashboard() {
                           {formatDate(booking.date || booking.eventDate, 'MM/DD/YYYY')}
                         </MuiTypography>
                       </MuiBox>
-                      
+
                       {booking.hall?.name && (
                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
                           <MapPin size={12} />
@@ -705,7 +701,7 @@ export default function ClientDashboard() {
                           </MuiTypography>
                         </MuiBox>
                       )}
-                      
+
                       {booking.guestCount && (
                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
                           <Users size={12} />
@@ -747,11 +743,11 @@ export default function ClientDashboard() {
             </MuiBox>
 
             {invitations.length > 0 ? (
-              <MuiBox 
+              <MuiBox
                 ref={invitationsScrollRef}
-                sx={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
                   gap: 2,
                   overflowY: 'auto',
                   overflowX: 'hidden',
@@ -774,23 +770,23 @@ export default function ClientDashboard() {
                 }}
               >
                 {invitations.map((invitation, idx) => (
-                    <MuiPaper
-                      key={invitation._id || invitation.id || idx}
-                      elevation={0}
-                      sx={{
-                        p: 2,
-                        background: 'rgba(255, 255, 255, 0.03)',
-                        border: '1px solid var(--color-border-glass)',
-                        borderRadius: '12px',
-                        flexShrink: 0,
-                        minHeight: '120px',
-                      }}
-                    >
+                  <MuiPaper
+                    key={invitation._id || invitation.id || idx}
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid var(--color-border-glass)',
+                      borderRadius: '12px',
+                      flexShrink: 0,
+                      minHeight: '120px',
+                    }}
+                  >
                     <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                      <MuiTypography 
-                        variant="subtitle1" 
-                        sx={{ 
-                          color: 'var(--color-text-primary-dark)', 
+                      <MuiTypography
+                        variant="subtitle1"
+                        sx={{
+                          color: 'var(--color-text-primary-dark)',
                           fontWeight: 600,
                         }}
                       >
@@ -807,7 +803,7 @@ export default function ClientDashboard() {
                         }}
                       />
                     </MuiBox>
-                    
+
                     <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                       {invitation.eventId && (
                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>

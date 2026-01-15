@@ -286,7 +286,7 @@ export const deleteManagerTemplate = async (templateId) => {
     if (!id) {
       throw new Error('Template ID is required')
     }
-    
+
     const response = await api.delete(`/manager/templates/delete/${id}`)
     return response.data
   } catch (error) {
@@ -300,9 +300,9 @@ export const deleteManagerTemplate = async (templateId) => {
  * GET - عرض الفواتير
  * GET /manager/financial/invoices
  */
-export const getManagerInvoices = async () => {
+export const getManagerInvoices = async (params = {}) => {
   try {
-    const response = await api.get('/manager/financial/invoices')
+    const response = await api.get('/manager/financial/invoices', { params })
     return response.data
   } catch (error) {
     throw error
@@ -677,6 +677,115 @@ export const getManagerReports = async (params = {}) => {
   }
 }
 
+// ==================== Ratings ====================
+
+/**
+ * GET - عرض جميع التقييمات للمدير
+ * GET /manager/ratings
+ */
+export const getManagerRatings = async () => {
+  try {
+    const response = await api.get('/manager/ratings')
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * GET - عرض تقييم حدث معين للمدير
+ * GET /manager/events/:eventId/rating
+ */
+export const getManagerEventRating = async (eventId) => {
+  if (!eventId) throw new Error('eventId is required to get rating')
+  try {
+    const response = await api.get(`/manager/events/${eventId}/rating`)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+// ==================== Financial Management ====================
+
+/**
+ * GET - لوحة التحكم المالية
+ * GET /manager/financial/dashboard
+ */
+export const getFinancialDashboard = async () => {
+  try {
+    const response = await api.get('/manager/financial/dashboard')
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * GET - عرض المعاملات المالية
+ * GET /manager/financial/transactions
+ */
+export const getFinancialTransactions = async (params = {}) => {
+  try {
+    const response = await api.get('/manager/financial/transactions', { params })
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * POST - إضافة معاملة مالية
+ * POST /manager/financial/transactions
+ */
+export const createFinancialTransaction = async (transactionData) => {
+  try {
+    const response = await api.post('/manager/financial/transactions', transactionData)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * PUT - تعديل معاملة مالية
+ * PUT /manager/financial/transactions/:id
+ */
+export const updateFinancialTransaction = async (id, transactionData) => {
+  try {
+    const response = await api.put(`/manager/financial/transactions/${id}`, transactionData)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * GET - التقارير المالية
+ * GET /manager/financial/reports
+ */
+export const getFinancialReports = async (params = {}) => {
+  try {
+    const response = await api.get('/manager/financial/reports', { params })
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * GET - ملخص مالي
+ * GET /manager/financial/summary
+ */
+export const getFinancialSummary = async (params = {}) => {
+  try {
+    const response = await api.get('/manager/financial/summary', { params })
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
 // Export all functions
 export default {
   // Hall
@@ -698,7 +807,7 @@ export default {
   createEvent,
   updateEvent,
   deleteEvent,
-  
+
   // Event Scanners
   addEventScanners,
   getEventScanners,
@@ -747,5 +856,17 @@ export default {
   getManagerDashboard,
 
   // Reports
-  getManagerReports
+  getManagerReports,
+
+  // Ratings
+  getManagerRatings,
+  getManagerEventRating,
+
+  // Financial Management
+  getFinancialDashboard,
+  getFinancialTransactions,
+  createFinancialTransaction,
+  updateFinancialTransaction,
+  getFinancialReports,
+  getFinancialSummary
 }

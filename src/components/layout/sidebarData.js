@@ -15,7 +15,8 @@ import {
   CreditCard,
   Bell,
   HelpCircle,
-  LogOut
+  LogOut,
+  DollarSign
 } from 'lucide-react';
 
 // تعريف الأدوار والصلاحيات
@@ -47,12 +48,12 @@ const COMMON_MENU_ITEMS = [
 const ADMIN_MENU_ITEMS = [
   // القسم الرئيسي
   { id: 'dashboard', label: 'الرئيسية', icon: Home, path: '/admin' },
-  
+
   // قسم التقارير
-  { 
-    id: 'reports', 
-    label: 'التقارير', 
-    icon: BarChart, 
+  {
+    id: 'reports',
+    label: 'التقارير',
+    icon: BarChart,
     path: '/admin/reports',
     subItems: [
       { id: 'financial-reports', label: 'التقارير المالية', path: '/admin/reports/financial' },
@@ -60,21 +61,21 @@ const ADMIN_MENU_ITEMS = [
       { id: 'users-reports', label: 'تقارير المستخدمين', path: '/admin/reports/users' }
     ]
   },
-  
+
   // قسم قاعة/صالة
-  { 
-    id: 'halls', 
-    label: 'قاعة/صالة', 
-    icon: Building, 
+  {
+    id: 'halls',
+    label: 'قاعة/صالة',
+    icon: Building,
     path: '/admin/halls',
     badge: 5 // عدد قاعات/صالات الجديدة
   },
-  
+
   // قسم الخدمات
-  { 
-    id: 'services', 
-    label: 'الخدمات', 
-    icon: Palette, 
+  {
+    id: 'services',
+    label: 'الخدمات',
+    icon: Palette,
     path: '/admin/services',
     subItems: [
       { id: 'decoration', label: 'خدمات التزيين', path: '/admin/services/decoration' },
@@ -82,21 +83,21 @@ const ADMIN_MENU_ITEMS = [
       { id: 'photography', label: 'خدمات التصوير', path: '/admin/services/photography' }
     ]
   },
-  
+
   // قسم القوالب
-  { 
-    id: 'templates', 
-    label: 'القوالب', 
-    icon: FileText, 
+  {
+    id: 'templates',
+    label: 'القوالب',
+    icon: FileText,
     path: '/admin/templates',
     badge: 3 // قوالب جديدة
   },
-  
+
   // قسم المستخدمون
-  { 
-    id: 'users', 
-    label: 'المستخدمون', 
-    icon: Users, 
+  {
+    id: 'users',
+    label: 'المستخدمون',
+    icon: Users,
     path: '/admin/users',
     subItems: [
       { id: 'all-users', label: 'جميع المستخدمين', path: '/admin/users/all' },
@@ -104,12 +105,12 @@ const ADMIN_MENU_ITEMS = [
       { id: 'blocked-users', label: 'مستخدمون محظورون', path: '/admin/users/blocked' }
     ]
   },
-  
+
   // قسم المدراء
-  { 
-    id: 'managers', 
-    label: 'المدراء', 
-    icon: Shield, 
+  {
+    id: 'managers',
+    label: 'المدراء',
+    icon: Shield,
     path: '/admin/managers',
     subItems: [
       { id: 'hall-managers', label: 'مدراء قاعة/صالة', path: '/admin/managers/halls' },
@@ -117,21 +118,21 @@ const ADMIN_MENU_ITEMS = [
       { id: 'event-managers', label: 'مدراء الفعاليات', path: '/admin/managers/events' }
     ]
   },
-  
+
   // قسم الشكاوى
-  { 
-    id: 'complaints', 
-    label: 'الشكاوى', 
-    icon: MessageSquare, 
+  {
+    id: 'complaints',
+    label: 'الشكاوى',
+    icon: MessageSquare,
     path: '/admin/complaints',
     badge: 8 // شكاوى جديدة
   },
-  
+
   // قسم الفعاليات
-  { 
-    id: 'events', 
-    label: 'الفعاليات', 
-    icon: Calendar, 
+  {
+    id: 'events',
+    label: 'الفعاليات',
+    icon: Calendar,
     path: '/admin/events',
     subItems: [
       { id: 'upcoming-events', label: 'الفعاليات القادمة', path: '/admin/events/upcoming' },
@@ -139,21 +140,21 @@ const ADMIN_MENU_ITEMS = [
       { id: 'cancelled-events', label: 'الفعاليات الملغاة', path: '/admin/events/cancelled' }
     ]
   },
-  
+
   // قسم الدعوات
-  { 
-    id: 'invitations', 
-    label: 'الدعوات', 
-    icon: Gift, 
+  {
+    id: 'invitations',
+    label: 'الدعوات',
+    icon: Gift,
     path: '/admin/invitations',
     badge: 12
   },
-  
+
   // قسم المدفوعات
-  { 
-    id: 'payments', 
-    label: 'المدفوعات', 
-    icon: CreditCard, 
+  {
+    id: 'payments',
+    label: 'المدفوعات',
+    icon: CreditCard,
     path: '/admin/payments',
     subItems: [
       { id: 'pending-payments', label: 'المدفوعات المعلقة', path: '/admin/payments/pending' },
@@ -161,21 +162,21 @@ const ADMIN_MENU_ITEMS = [
       { id: 'failed-payments', label: 'المدفوعات الفاشلة', path: '/admin/payments/failed' }
     ]
   },
-  
+
   // قسم الإشعارات
-  { 
-    id: 'notifications', 
-    label: 'الإشعارات', 
-    icon: Bell, 
+  {
+    id: 'notifications',
+    label: 'الإشعارات',
+    icon: Bell,
     path: '/admin/notifications',
     badge: 5
   },
-  
+
   // قسم المساعدة
-  { 
-    id: 'help', 
-    label: 'المساعدة والدعم', 
-    icon: HelpCircle, 
+  {
+    id: 'help',
+    label: 'المساعدة والدعم',
+    icon: HelpCircle,
     path: '/admin/help',
     subItems: [
       { id: 'faq', label: 'الأسئلة الشائعة', path: '/admin/help/faq' },
@@ -183,12 +184,12 @@ const ADMIN_MENU_ITEMS = [
       { id: 'contact-support', label: 'اتصل بالدعم', path: '/admin/help/contact' }
     ]
   },
-  
+
   // تسجيل الخروج (يضاف في الأخير)
-  { 
-    id: 'logout', 
-    label: 'تسجيل الخروج', 
-    icon: LogOut, 
+  {
+    id: 'logout',
+    label: 'تسجيل الخروج',
+    icon: LogOut,
     path: '/logout',
     isFooter: true,
     danger: true
@@ -203,6 +204,19 @@ const MANAGER_MENU_ITEMS = [
   { id: 'services', label: 'خدماتي', icon: Palette, path: '/manager/services' },
   { id: 'invitations', label: 'الدعوات', icon: Gift, path: '/manager/invitations' },
   { id: 'reports', label: 'التقارير', icon: BarChart, path: '/manager/reports' },
+  { id: 'ratings', label: 'التقييمات', icon: FileText, path: '/manager/ratings' },
+  {
+    id: 'financial',
+    label: 'المالية',
+    icon: DollarSign,
+    path: '/manager/financial/dashboard',
+    subItems: [
+      { id: 'financial-dashboard', label: 'لوحة التحكم', path: '/manager/financial/dashboard' },
+      { id: 'invoices', label: 'الفواتير', path: '/manager/financial/invoices' },
+      { id: 'transactions', label: 'المعاملات', path: '/manager/financial/transactions' },
+      { id: 'financial-reports', label: 'التقارير المالية', path: '/manager/financial/reports' }
+    ]
+  },
   ...COMMON_MENU_ITEMS,
   { id: 'logout', label: 'تسجيل الخروج', icon: LogOut, path: '/logout', isFooter: true, danger: true }
 ];
@@ -223,7 +237,9 @@ const USER_MENU_ITEMS = [
 export const ROLE_MENUS = {
   [ROLES.ADMIN]: [...ADMIN_MENU_ITEMS],
   [ROLES.MANAGER]: [...MANAGER_MENU_ITEMS],
-  [ROLES.USER]: [...USER_MENU_ITEMS]
+  [ROLES.USER]: [...USER_MENU_ITEMS],
+  client: [...USER_MENU_ITEMS],
+  employee: [...USER_MENU_ITEMS]
 };
 
 // وظيفة مساعدة لتصفية القائمة حسب الدور

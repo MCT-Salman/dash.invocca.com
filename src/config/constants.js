@@ -82,6 +82,7 @@ export const ROUTES = {
     COMPLAINTS: '/manager/complaints',
     COMPLAINTS_DETAILS: '/manager/complaints/:id',
     REPORTS: '/manager/reports',
+    RATINGS: '/manager/ratings',
     EMPLOYEES: '/manager/employees',
     PROFILE: '/manager/profile',
   },
@@ -95,6 +96,7 @@ export const ROUTES = {
     INVITATIONS_DETAILS: '/client/invitations/:id',
     SONGS: '/client/songs',
     REPORTS: '/client/reports',
+    RATINGS: '/client/ratings',
     PROFILE: '/client/profile',
   },
 

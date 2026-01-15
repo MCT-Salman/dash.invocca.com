@@ -18,9 +18,11 @@ import MuiFormControl from '@/components/ui/MuiFormControl'
 import {
     LoadingScreen,
     SEOHead,
+    EmptyState,
 } from '@/components/common'
 import { QUERY_KEYS } from '@/config/constants'
-import { getManagerReports } from '@/api/manager'
+import { getManagerReports, getManagerRatings } from '@/api/manager'
+import { formatDate } from '@/utils/helpers'
 import {
     BarChart3,
     Calendar,
@@ -28,6 +30,7 @@ import {
     TrendingUp,
     Download,
     DollarSign,
+    Star,
 } from 'lucide-react'
 
 // Stat Card Component
@@ -146,6 +149,12 @@ export default function ManagerReports() {
     const { data: reports, isLoading } = useQuery({
         queryKey: [QUERY_KEYS.MANAGER_REPORTS, period],
         queryFn: () => getManagerReports(period),
+    })
+
+    // Fetch ratings
+    const { data: ratings, isLoading: ratingsLoading } = useQuery({
+        queryKey: ['manager-ratings'],
+        queryFn: getManagerRatings,
     })
 
     if (isLoading) {
@@ -444,6 +453,77 @@ export default function ManagerReports() {
                     </MuiPaper>
                 </MuiGrid>
             </MuiGrid>
+
+            {/* Ratings Section */}
+            <MuiBox sx={{ mt: 6 }}>
+                <MuiTypography variant="h4" sx={{ mb: 4, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                    تقييمات العملاء
+                </MuiTypography>
+                {ratingsLoading ? (
+                    <LoadingScreen message="جاري تحميل التقييمات..." fullScreen={false} />
+                ) : ratings?.data?.length > 0 ? (
+                    <MuiGrid container spacing={3}>
+                        {ratings.data.map((item, index) => (
+                            <MuiGrid item xs={12} md={6} lg={4} key={item._id || index}>
+                                <MuiPaper
+                                    elevation={0}
+                                    sx={{
+                                        p: 3,
+                                        background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                                        backdropFilter: 'blur(20px)',
+                                        border: '1px solid rgba(216, 185, 138, 0.1)',
+                                        borderRadius: '16px',
+                                        transition: 'all 0.3s ease',
+                                        '&:hover': {
+                                            transform: 'translateY(-4px)',
+                                            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+                                            borderColor: 'rgba(216, 185, 138, 0.3)',
+                                        }
+                                    }}
+                                >
+                                    <MuiBox sx={{ mb: 2 }}>
+                                        <MuiTypography variant="h6" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                                            {item.name}
+                                        </MuiTypography>
+                                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mt: 0.5 }}>
+                                            {item.client?.name} - {formatDate(item.date)}
+                                        </MuiTypography>
+                                    </MuiBox>
+                                    <MuiBox sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                        <Star size={20} style={{ color: '#fbbf24', marginRight: '8px' }} />
+                                        <MuiTypography variant="h5" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                                            {item.rating?.overallRating}/5
+                                        </MuiTypography>
+                                    </MuiBox>
+                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 2 }}>
+                                        {item.rating?.comment}
+                                    </MuiTypography>
+                                    <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', textAlign: 'center' }}>
+                                        <MuiBox>
+                                            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-disabled)' }}>القاعة</MuiTypography>
+                                            <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary)' }}>{item.rating?.hallRating}/5</MuiTypography>
+                                        </MuiBox>
+                                        <MuiBox>
+                                            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-disabled)' }}>الموظفين</MuiTypography>
+                                            <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary)' }}>{item.rating?.staffRating}/5</MuiTypography>
+                                        </MuiBox>
+                                        <MuiBox>
+                                            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-disabled)' }}>الطعام</MuiTypography>
+                                            <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary)' }}>{item.rating?.foodRating}/5</MuiTypography>
+                                        </MuiBox>
+                                    </MuiBox>
+                                </MuiPaper>
+                            </MuiGrid>
+                        ))}
+                    </MuiGrid>
+                ) : (
+                    <EmptyState
+                        icon={Star}
+                        title="لا توجد تقييمات"
+                        subtitle="لم يتم تقييم أي مناسبة بعد"
+                    />
+                )}
+            </MuiBox>
         </MuiBox>
     )
 }

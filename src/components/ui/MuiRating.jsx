@@ -20,7 +20,21 @@ const MuiRating = ({
       size={size}
       disabled={disabled}
       readOnly={readOnly}
-      className={`!text-warning-500 ${className}`}
+      dir="ltr"
+      sx={{
+        direction: 'ltr',
+        '& .MuiRating-iconFilled': {
+          color: '#faaf00',
+        },
+        '& .MuiRating-iconHover': {
+          color: '#faaf00',
+        },
+        '& .MuiRating-iconEmpty': {
+          color: 'var(--color-text-secondary)',
+        },
+        ...props.sx
+      }}
+      className={className}
       {...props}
     />
   );
