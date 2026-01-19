@@ -333,7 +333,7 @@ export default function ClientDashboard() {
                   إجمالي المصروفات
                 </MuiTypography>
                 <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                  {formatNumber(stats.totalSpent)} {stats.currency || 'ر.س'}
+                  {formatNumber(stats.totalSpent)} {stats.currency || 'ل.س'}
                 </MuiTypography>
               </MuiBox>
               <MuiBox
@@ -378,7 +378,7 @@ export default function ClientDashboard() {
                   المدفوع
                 </MuiTypography>
                 <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                  {formatNumber(stats.totalPaid)} {stats.currency || 'ر.س'}
+                  {formatNumber(stats.totalPaid)} {stats.currency || 'ل.س'}
                 </MuiTypography>
               </MuiBox>
               <MuiBox
@@ -423,7 +423,7 @@ export default function ClientDashboard() {
                   المتبقي
                 </MuiTypography>
                 <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                  {formatNumber(stats.totalUnpaid)} {stats.currency || 'ر.س'}
+                  {formatNumber(stats.totalUnpaid)} {stats.currency || 'ل.س'}
                 </MuiTypography>
               </MuiBox>
               <MuiBox

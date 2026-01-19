@@ -1,7 +1,7 @@
 // src/pages/manager/ManagerTransactions.jsx
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { getFinancialTransactions, createFinancialTransaction, updateFinancialTransaction } from '@/api/manager'
+import { getFinancialTransactions, createFinancialTransaction, updateFinancialTransaction, getManagerEvents, getClients } from '@/api/manager'
 import MuiBox from '@/components/ui/MuiBox'
 import MuiTypography from '@/components/ui/MuiTypography'
 import MuiPaper from '@/components/ui/MuiPaper'
@@ -23,6 +23,35 @@ import { SEOHead, LoadingScreen } from '@/components/common'
 import { useCRUD } from '@/hooks'
 import { Plus, Edit2, DollarSign, TrendingUp, TrendingDown, Search, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/utils/helpers'
+
+const premiumMenuProps = {
+    PaperProps: {
+        sx: {
+            bgcolor: '#1E1E1E',
+            border: '1px solid rgba(216, 185, 138, 0.2)',
+            borderRadius: '12px',
+            mt: 1,
+            '& .MuiMenuItem-root': {
+                color: 'var(--color-text-primary)',
+                fontFamily: 'var(--font-family-base)',
+                py: 1.5,
+                px: 3,
+                '&:hover': {
+                    bgcolor: 'rgba(216, 185, 138, 0.1)',
+                    color: 'var(--color-primary-400)',
+                },
+                '&.Mui-selected': {
+                    bgcolor: 'rgba(216, 185, 138, 0.15)',
+                    color: 'var(--color-primary-500)',
+                    fontWeight: 600,
+                    '&:hover': {
+                        bgcolor: 'rgba(216, 185, 138, 0.2)',
+                    },
+                },
+            },
+        },
+    },
+}
 
 export default function ManagerTransactions() {
     const [page, setPage] = useState(1)
@@ -79,7 +108,7 @@ export default function ManagerTransactions() {
 
     const handleSubmitEdit = async (formData) => {
         if (editingTransaction) {
-            const result = await handleUpdate(editingTransaction._id, formData)
+            const result = await handleUpdate(editingTransaction._id || editingTransaction.id, formData)
             if (result.success) {
                 setEditingTransaction(null)
             }
@@ -90,7 +119,7 @@ export default function ManagerTransactions() {
         return <LoadingScreen message="جاري تحميل المعاملات..." fullScreen={false} />
     }
 
-    const transactions = data?.transactions || []
+    const transactions = data?.data || data?.transactions || []
     const pagination = data?.pagination || {}
 
     // Filter transactions by search term
@@ -181,6 +210,7 @@ export default function ManagerTransactions() {
                             onChange={(e) => setTypeFilter(e.target.value)}
                             displayEmpty
                             fullWidth
+                            MenuProps={premiumMenuProps}
                             sx={{
                                 borderRadius: '12px',
                                 backgroundColor: 'rgba(255, 255, 255, 0.03)',
@@ -372,17 +402,21 @@ function TransactionCard({ transaction, onEdit }) {
                     </MuiTypography>
                 </MuiBox>
 
-                {transaction.clientId && (
+                {(transaction.clientId || transaction.client) && (
                     <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', pb: 1 }}>
                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>العميل</MuiTypography>
-                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>{transaction.clientId.name}</MuiTypography>
+                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
+                            {transaction.client?.name || transaction.clientId?.name || 'عميل'}
+                        </MuiTypography>
                     </MuiBox>
                 )}
 
-                {transaction.eventId && (
+                {(transaction.eventId || transaction.event) && (
                     <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', pb: 1 }}>
                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>المناسبة</MuiTypography>
-                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>{transaction.eventId.name}</MuiTypography>
+                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
+                            {transaction.event?.name || transaction.eventId?.name || 'مناسبة'}
+                        </MuiTypography>
                     </MuiBox>
                 )}
 
@@ -423,9 +457,24 @@ function TransactionCard({ transaction, onEdit }) {
 
 // Transaction Dialog Component
 function TransactionDialog({ open, onClose, onSubmit, loading, title, transaction }) {
+    const { data: eventsData } = useQuery({
+        queryKey: ['manager-events-minimal'],
+        queryFn: () => getManagerEvents({ limit: 100 }),
+        enabled: open
+    })
+
+    const { data: clientsData } = useQuery({
+        queryKey: ['manager-clients-minimal'],
+        queryFn: () => getClients({ limit: 100 }),
+        enabled: open
+    })
+
+    const events = eventsData?.data || eventsData?.events || []
+    const clients = clientsData?.data || clientsData?.clients || []
+
     const [formData, setFormData] = useState({
-        eventId: transaction?.eventId?._id || '',
-        clientId: transaction?.clientId?._id || '',
+        eventId: (typeof transaction?.eventId === 'string' ? transaction.eventId : transaction?.eventId?._id) || '',
+        clientId: (typeof transaction?.clientId === 'string' ? transaction.clientId : transaction?.clientId?._id) || '',
         type: transaction?.type || 'payment',
         category: transaction?.category || 'event_payment',
         amount: transaction?.amount || '',
@@ -435,14 +484,34 @@ function TransactionDialog({ open, onClose, onSubmit, loading, title, transactio
         notes: transaction?.notes || '',
     })
 
+    useEffect(() => {
+        if (open) {
+            setFormData({
+                eventId: (typeof transaction?.eventId === 'string' ? transaction.eventId : transaction?.eventId?._id) || '',
+                clientId: (typeof transaction?.clientId === 'string' ? transaction.clientId : transaction?.clientId?._id) || '',
+                type: transaction?.type || 'payment',
+                category: transaction?.category || 'event_payment',
+                amount: transaction?.amount || '',
+                paymentMethod: transaction?.paymentMethod || '',
+                reference: transaction?.reference || '',
+                description: transaction?.description || '',
+                notes: transaction?.notes || '',
+            })
+        }
+    }, [open, transaction])
+
     const handleSubmit = (e) => {
         e.preventDefault()
         onSubmit(formData)
     }
 
     const handleChange = (field) => (e) => {
-        setFormData(prev => ({ ...prev, [field]: e.target.value }))
+        const val = e?.target ? e.target.value : (e || '');
+        setFormData(prev => ({ ...prev, [field]: val }))
     }
+
+
+    if (!open) return null
 
     return (
         <MuiBox
@@ -454,7 +523,7 @@ function TransactionDialog({ open, onClose, onSubmit, loading, title, transactio
                 height: '100%',
                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
                 backdropFilter: 'blur(8px)',
-                display: open ? 'flex' : 'none',
+                display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 zIndex: 1200
@@ -492,22 +561,48 @@ function TransactionDialog({ open, onClose, onSubmit, loading, title, transactio
                         <MuiGrid item xs={12} sm={6}>
                             <MuiTextField
                                 select
+                                label="المناسبة (اختياري)"
+                                value={formData.eventId}
+                                onChange={handleChange('eventId')}
+                                fullWidth
+                                SelectProps={{ MenuProps: premiumMenuProps }}
+                            >
+                                <MuiMenuItem value="">بدون مناسبة</MuiMenuItem>
+                                {events.map(event => (
+                                    <MuiMenuItem key={event._id || event.id} value={event._id || event.id || ''}>
+                                        {event.name}
+                                    </MuiMenuItem>
+                                ))}
+                            </MuiTextField>
+                        </MuiGrid>
+
+                        <MuiGrid item xs={12} sm={6}>
+                            <MuiTextField
+                                select
+                                label="العميل (اختياري)"
+                                value={formData.clientId}
+                                onChange={handleChange('clientId')}
+                                fullWidth
+                                SelectProps={{ MenuProps: premiumMenuProps }}
+                            >
+                                <MuiMenuItem value="">بدون عميل</MuiMenuItem>
+                                {clients.map(client => (
+                                    <MuiMenuItem key={client._id || client.id} value={client._id || client.id || ''}>
+                                        {client.name}
+                                    </MuiMenuItem>
+                                ))}
+                            </MuiTextField>
+                        </MuiGrid>
+
+                        <MuiGrid item xs={12} sm={6}>
+                            <MuiTextField
+                                select
                                 label="النوع"
                                 value={formData.type}
                                 onChange={handleChange('type')}
                                 required
                                 fullWidth
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: '12px',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        '&:hover': { borderColor: 'var(--color-primary-500)' },
-                                        '&.Mui-focused': { borderColor: 'var(--color-primary-500)' }
-                                    },
-                                    '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
-                                    '& .MuiSelect-select': { color: 'var(--color-text-primary)' }
-                                }}
+                                SelectProps={{ MenuProps: premiumMenuProps }}
                             >
                                 <MuiMenuItem value="payment">دفعة واردة</MuiMenuItem>
                                 <MuiMenuItem value="expense">مصروف</MuiMenuItem>
@@ -523,17 +618,7 @@ function TransactionDialog({ open, onClose, onSubmit, loading, title, transactio
                                 onChange={handleChange('category')}
                                 required
                                 fullWidth
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: '12px',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        '&:hover': { borderColor: 'var(--color-primary-500)' },
-                                        '&.Mui-focused': { borderColor: 'var(--color-primary-500)' }
-                                    },
-                                    '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
-                                    '& .MuiSelect-select': { color: 'var(--color-text-primary)' }
-                                }}
+                                SelectProps={{ MenuProps: premiumMenuProps }}
                             >
                                 <MuiMenuItem value="event_payment">دفعة مناسبة</MuiMenuItem>
                                 <MuiMenuItem value="staff_salary">راتب موظف</MuiMenuItem>
@@ -552,17 +637,6 @@ function TransactionDialog({ open, onClose, onSubmit, loading, title, transactio
                                 onChange={handleChange('amount')}
                                 required
                                 fullWidth
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: '12px',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        '&:hover': { borderColor: 'var(--color-primary-500)' },
-                                        '&.Mui-focused': { borderColor: 'var(--color-primary-500)' }
-                                    },
-                                    '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
-                                    '& .MuiInputBase-input': { color: 'var(--color-text-primary)', fontSize: '1.1rem', fontWeight: 600 }
-                                }}
                             />
                         </MuiGrid>
 
@@ -574,17 +648,7 @@ function TransactionDialog({ open, onClose, onSubmit, loading, title, transactio
                                 onChange={handleChange('paymentMethod')}
                                 required
                                 fullWidth
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: '12px',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        '&:hover': { borderColor: 'var(--color-primary-500)' },
-                                        '&.Mui-focused': { borderColor: 'var(--color-primary-500)' }
-                                    },
-                                    '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
-                                    '& .MuiSelect-select': { color: 'var(--color-text-primary)' }
-                                }}
+                                SelectProps={{ MenuProps: premiumMenuProps }}
                             >
                                 <MuiMenuItem value="cash">نقدي</MuiMenuItem>
                                 <MuiMenuItem value="bank_transfer">تحويل بنكي</MuiMenuItem>
@@ -599,17 +663,6 @@ function TransactionDialog({ open, onClose, onSubmit, loading, title, transactio
                                 value={formData.reference}
                                 onChange={handleChange('reference')}
                                 fullWidth
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: '12px',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        '&:hover': { borderColor: 'var(--color-primary-500)' },
-                                        '&.Mui-focused': { borderColor: 'var(--color-primary-500)' }
-                                    },
-                                    '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
-                                    '& .MuiInputBase-input': { color: 'var(--color-text-primary)' }
-                                }}
                             />
                         </MuiGrid>
 
@@ -619,17 +672,6 @@ function TransactionDialog({ open, onClose, onSubmit, loading, title, transactio
                                 value={formData.description}
                                 onChange={handleChange('description')}
                                 fullWidth
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: '12px',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        '&:hover': { borderColor: 'var(--color-primary-500)' },
-                                        '&.Mui-focused': { borderColor: 'var(--color-primary-500)' }
-                                    },
-                                    '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
-                                    '& .MuiInputBase-input': { color: 'var(--color-text-primary)' }
-                                }}
                             />
                         </MuiGrid>
 
@@ -641,17 +683,6 @@ function TransactionDialog({ open, onClose, onSubmit, loading, title, transactio
                                 fullWidth
                                 multiline
                                 rows={2}
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: '12px',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        '&:hover': { borderColor: 'var(--color-primary-500)' },
-                                        '&.Mui-focused': { borderColor: 'var(--color-primary-500)' }
-                                    },
-                                    '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
-                                    '& .MuiInputBase-input': { color: 'var(--color-text-primary)' }
-                                }}
                             />
                         </MuiGrid>
                     </MuiGrid>

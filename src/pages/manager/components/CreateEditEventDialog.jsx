@@ -18,7 +18,7 @@ import MuiDatePicker from '@/components/ui/MuiDatePicker'
 import MuiTimePicker from '@/components/ui/MuiTimePicker'
 import { FormDialog } from '@/components/common'
 import { useNotification } from '@/hooks'
-import { getClients, getManagerHall, listManagerTemplates, getStaff, getEventScanners } from '@/api/manager'
+import { getClients, getManagerHall, getHallServices, listManagerTemplates, getStaff, getEventScanners } from '@/api/manager'
 import { QUERY_KEYS, API_CONFIG } from '@/config/constants'
 import { Plus, Trash2 } from 'lucide-react'
 
@@ -133,10 +133,10 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
         enabled: open,
     })
 
-    // Fetch hall info to get services with full details
-    const { data: hallData, isLoading: servicesLoading } = useQuery({
-        queryKey: QUERY_KEYS.MANAGER_HALL,
-        queryFn: getManagerHall,
+    // Fetch hall services list with full details (names, prices, etc.)
+    const { data: servicesData, isLoading: servicesLoading } = useQuery({
+        queryKey: ['manager', 'hall-services'],
+        queryFn: getHallServices,
         enabled: open,
         staleTime: 5 * 60 * 1000
     })
@@ -209,28 +209,27 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
         })
     }, [templatesData])
 
-    // Get services from hall response - services now include full service details in service object
-    const hall = hallData?.hall || hallData || {}
-    const servicesList = Array.isArray(hall.services)
-        ? hall.services
-            .map(hallService => {
-                // Extract service details from hallService.service object
-                const serviceDetails = hallService.service || {}
-                return {
-                    _id: serviceDetails._id || hallService.service || hallService._id,
-                    id: serviceDetails._id || serviceDetails.id || hallService.service || hallService._id,
-                    name: serviceDetails.name || 'خدمة',
-                    category: serviceDetails.category || '',
-                    basePrice: serviceDetails.basePrice || 0,
-                    unit: serviceDetails.unit || 'per_event',
-                    // Include hall service specific data
-                    isIncluded: hallService.isIncluded,
-                    notes: hallService.notes || '',
-                    hallServiceId: hallService._id
-                }
-            })
-            .filter(service => service._id) // Filter out invalid services
-        : []
+    // Get services from response - handle different response structures
+    const servicesList = useMemo(() => {
+        const rawServices = Array.isArray(servicesData?.services)
+            ? servicesData.services
+            : Array.isArray(servicesData?.data)
+                ? servicesData.data
+                : Array.isArray(servicesData)
+                    ? servicesData
+                    : []
+
+        return rawServices.map(service => {
+            return {
+                _id: service._id || service.id,
+                id: service._id || service.id,
+                name: service.name || 'خدمة',
+                category: service.category || '',
+                basePrice: service.price || service.basePrice || 0,
+                unit: service.unit || 'per_event',
+            }
+        }).filter(service => service._id)
+    }, [servicesData])
 
     const {
         control,
@@ -262,7 +261,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                 : (editingEvent?.scanners?.map(s => ({
                     scannerId: (s.scannerId?._id || s.scannerId || s.scanner?._id || s.scanner?.id || s._id || '').toString()
                 })).filter(s => s.scannerId) || []),
-            clientSelection: 'new',
+            clientSelection: editingEvent ? 'existing' : 'new',
             clientId: editingEvent?.clientId?._id || editingEvent?.clientId || editingEvent?.client?._id || '',
             clientName: '',
             clientusername: '',
@@ -321,7 +320,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                     : (editingEvent.scanners?.map(s => ({
                         scannerId: (s.scannerId?._id || s.scannerId || s.scanner?._id || s.scanner?.id || s._id || '').toString()
                     })).filter(s => s.scannerId) || []),
-                clientSelection: 'new',
+                clientSelection: 'existing',
                 clientId: editingEvent.clientId?._id || editingEvent.clientId || editingEvent.client?._id || '',
                 clientName: '',
                 clientusername: '',
@@ -381,18 +380,15 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
         const clientSelection = data.clientSelection || 'new'
 
         if (clientSelection === 'existing') {
-            // If editing, we might not need to send clientId again
-            if (!editingEvent) {
-                if (!data.clientId || !data.clientId.trim()) {
-                    showNotification({
-                        title: 'خطأ',
-                        message: 'يرجى اختيار عميل موجود',
-                        type: 'error'
-                    })
-                    return
-                }
-                submitData.clientId = data.clientId.trim()
+            if (!data.clientId || !data.clientId.trim()) {
+                showNotification({
+                    title: 'خطأ',
+                    message: 'يرجى اختيار عميل موجود',
+                    type: 'error'
+                })
+                return
             }
+            submitData.clientId = data.clientId.trim()
         } else {
             // New client - API expects 'name' for the client
             // Ensure all required fields are present and not empty
@@ -781,135 +777,131 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                 </MuiGrid>
 
                 {/* Client Selection */}
-                {!editingEvent && (
-                    <>
-                        <MuiGrid item xs={12}>
-                            <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 1, color: 'var(--color-primary-500)' }}>
-                                العميل
-                            </MuiTypography>
-                        </MuiGrid>
+                <MuiGrid item xs={12}>
+                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 1, color: 'var(--color-primary-500)' }}>
+                        العميل
+                    </MuiTypography>
+                </MuiGrid>
 
-                        <MuiGrid item xs={12}>
-                            <Controller
-                                name="clientSelection"
-                                control={control}
-                                render={({ field }) => (
+                <MuiGrid item xs={12}>
+                    <Controller
+                        name="clientSelection"
+                        control={control}
+                        render={({ field }) => (
+                            <MuiSelect
+                                {...field}
+                                label="اختر نوع العميل"
+                                fullWidth
+                                onChange={(e) => {
+                                    field.onChange(e)
+                                    setClientSelection(e.target.value)
+                                }}
+                            >
+                                <MuiMenuItem value="existing">عميل موجود</MuiMenuItem>
+                                <MuiMenuItem value="new">عميل جديد</MuiMenuItem>
+                            </MuiSelect>
+                        )}
+                    />
+                </MuiGrid>
+
+                {clientSelection === 'existing' ? (
+                    <MuiGrid item xs={12}>
+                        <Controller
+                            name="clientId"
+                            control={control}
+                            render={({ field, fieldState: { error } }) => (
+                                <MuiBox>
                                     <MuiSelect
                                         {...field}
-                                        label="اختر نوع العميل"
+                                        label="العميل"
+                                        error={!!error}
                                         fullWidth
-                                        onChange={(e) => {
-                                            field.onChange(e)
-                                            setClientSelection(e.target.value)
-                                        }}
                                     >
-                                        <MuiMenuItem value="existing">عميل موجود</MuiMenuItem>
-                                        <MuiMenuItem value="new">عميل جديد</MuiMenuItem>
+                                        {Array.isArray(clients) && clients.map(client => (
+                                            <MuiMenuItem key={client._id || client.id} value={client._id || client.id}>
+                                                {client.name}
+                                            </MuiMenuItem>
+                                        ))}
                                     </MuiSelect>
+                                    {error && (
+                                        <MuiFormHelperText sx={{ color: 'var(--color-error-500)', mt: 0.5, mx: 1.75 }}>
+                                            {error.message}
+                                        </MuiFormHelperText>
+                                    )}
+                                </MuiBox>
+                            )}
+                        />
+                    </MuiGrid>
+                ) : (
+                    <>
+                        <MuiGrid item xs={12} sm={6}>
+                            <Controller
+                                name="clientName"
+                                control={control}
+                                render={({ field }) => (
+                                    <MuiTextField
+                                        {...field}
+                                        label="اسم العميل"
+                                        fullWidth
+                                        required
+                                        error={!!errors.clientName}
+                                        helperText={errors.clientName?.message}
+                                    />
                                 )}
                             />
                         </MuiGrid>
 
-                        {clientSelection === 'existing' ? (
-                            <MuiGrid item xs={12}>
-                                <Controller
-                                    name="clientId"
-                                    control={control}
-                                    render={({ field, fieldState: { error } }) => (
-                                        <MuiBox>
-                                            <MuiSelect
-                                                {...field}
-                                                label="العميل"
-                                                error={!!error}
-                                                fullWidth
-                                            >
-                                                {Array.isArray(clients) && clients.map(client => (
-                                                    <MuiMenuItem key={client._id || client.id} value={client._id || client.id}>
-                                                        {client.name}
-                                                    </MuiMenuItem>
-                                                ))}
-                                            </MuiSelect>
-                                            {error && (
-                                                <MuiFormHelperText sx={{ color: 'var(--color-error-500)', mt: 0.5, mx: 1.75 }}>
-                                                    {error.message}
-                                                </MuiFormHelperText>
-                                            )}
-                                        </MuiBox>
-                                    )}
-                                />
-                            </MuiGrid>
-                        ) : (
-                            <>
-                                <MuiGrid item xs={12} sm={6}>
-                                    <Controller
-                                        name="clientName"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <MuiTextField
-                                                {...field}
-                                                label="اسم العميل"
-                                                fullWidth
-                                                required
-                                                error={!!errors.clientName}
-                                                helperText={errors.clientName?.message}
-                                            />
-                                        )}
+                        <MuiGrid item xs={12} sm={6}>
+                            <Controller
+                                name="clientusername"
+                                control={control}
+                                render={({ field }) => (
+                                    <MuiTextField
+                                        {...field}
+                                        label="اسم المستخدم"
+                                        fullWidth
+                                        required
+                                        error={!!errors.clientusername}
+                                        helperText={errors.clientusername?.message}
                                     />
-                                </MuiGrid>
+                                )}
+                            />
+                        </MuiGrid>
 
-                                <MuiGrid item xs={12} sm={6}>
-                                    <Controller
-                                        name="clientusername"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <MuiTextField
-                                                {...field}
-                                                label="اسم المستخدم"
-                                                fullWidth
-                                                required
-                                                error={!!errors.clientusername}
-                                                helperText={errors.clientusername?.message}
-                                            />
-                                        )}
+                        <MuiGrid item xs={12} sm={6}>
+                            <Controller
+                                name="phone"
+                                control={control}
+                                render={({ field }) => (
+                                    <MuiTextField
+                                        {...field}
+                                        label="رقم الهاتف"
+                                        fullWidth
+                                        required
+                                        error={!!errors.phone}
+                                        helperText={errors.phone?.message}
                                     />
-                                </MuiGrid>
+                                )}
+                            />
+                        </MuiGrid>
 
-                                <MuiGrid item xs={12} sm={6}>
-                                    <Controller
-                                        name="phone"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <MuiTextField
-                                                {...field}
-                                                label="رقم الهاتف"
-                                                fullWidth
-                                                required
-                                                error={!!errors.phone}
-                                                helperText={errors.phone?.message}
-                                            />
-                                        )}
+                        <MuiGrid item xs={12} sm={6}>
+                            <Controller
+                                name="password"
+                                control={control}
+                                render={({ field }) => (
+                                    <MuiTextField
+                                        {...field}
+                                        label="كلمة المرور"
+                                        type="password"
+                                        fullWidth
+                                        required
+                                        error={!!errors.password}
+                                        helperText={errors.password?.message}
                                     />
-                                </MuiGrid>
-
-                                <MuiGrid item xs={12} sm={6}>
-                                    <Controller
-                                        name="password"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <MuiTextField
-                                                {...field}
-                                                label="كلمة المرور"
-                                                type="password"
-                                                fullWidth
-                                                required
-                                                error={!!errors.password}
-                                                helperText={errors.password?.message}
-                                            />
-                                        )}
-                                    />
-                                </MuiGrid>
-                            </>
-                        )}
+                                )}
+                            />
+                        </MuiGrid>
                     </>
                 )}
 

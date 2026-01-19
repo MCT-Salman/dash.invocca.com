@@ -18,7 +18,6 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import UsersManagement from './pages/admin/UsersManagement'
 import HallsManagement from './pages/admin/HallsManagement'
 import ServicesManagement from './pages/admin/ServicesManagement'
-import ComplaintsManagement from './pages/admin/ComplaintsManagement'
 import TemplatesManagement from './pages/admin/TemplatesManagement'
 import ReportsManagement from './pages/admin/ReportsManagement'
 import ManagersManagement from './pages/admin/ManagersManagement'
@@ -36,7 +35,6 @@ import StaffManagement from './pages/manager/StaffManagementNew'
 import ManagerReports from './pages/manager/ManagerReports'
 import ManagerRatings from './pages/manager/ManagerRatings'
 import ManagerTemplates from './pages/manager/ManagerTemplates'
-import ManagerComplaints from './pages/manager/ManagerComplaints'
 import ManagerProfile from './pages/manager/ManagerProfile'
 import ManagerSongsManagement from './pages/manager/SongsManagement'
 import ManagerFinancial from './pages/manager/ManagerFinancial'
@@ -87,7 +85,6 @@ export default function App() {
                 <Route path={ROUTES.ADMIN.SERVICES} element={<ServicesManagement />} />
                 <Route path={ROUTES.ADMIN.EVENTS} element={<EventsManagementAdmin />} />
                 <Route path={ROUTES.ADMIN.CLIENTS} element={<ClientsManagementAdmin />} />
-                <Route path={ROUTES.ADMIN.COMPLAINTS} element={<ComplaintsManagement />} />
                 <Route path={ROUTES.ADMIN.TEMPLATES} element={<TemplatesManagement />} />
                 <Route path={ROUTES.ADMIN.REPORTS} element={<ReportsManagement />} />
                 <Route path={ROUTES.ADMIN.PROFILE} element={<AdminProfile />} />
@@ -106,7 +103,6 @@ export default function App() {
                 <Route path={ROUTES.MANAGER.REPORTS} element={<ManagerReports />} />
                 <Route path={ROUTES.MANAGER.RATINGS} element={<ManagerRatings />} />
                 <Route path={ROUTES.MANAGER.TEMPLATES} element={<ManagerTemplates />} />
-                <Route path={ROUTES.MANAGER.COMPLAINTS} element={<ManagerComplaints />} />
                 <Route path="/manager/financial/dashboard" element={<ManagerFinancialDashboard />} />
                 <Route path="/manager/financial/invoices" element={<ManagerFinancial />} />
                 <Route path="/manager/financial/transactions" element={<ManagerTransactions />} />

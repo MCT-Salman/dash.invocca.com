@@ -604,7 +604,7 @@ export default function AdminDashboard() {
                                     الإيرادات الشهرية
                                 </MuiTypography>
                                 <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                                    {formatNumber(stats.monthRevenue || 0)} {stats.currency || 'ر.س'}
+                                    {formatNumber(stats.monthRevenue || 0)} {stats.currency || 'ل.س'}
                                 </MuiTypography>
                             </MuiBox>
                             <MuiBox
@@ -649,7 +649,7 @@ export default function AdminDashboard() {
                                     الإيرادات السنوية
                                 </MuiTypography>
                                 <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                                    {formatNumber(stats.yearRevenue || 0)} {stats.currency || 'ر.س'}
+                                    {formatNumber(stats.yearRevenue || 0)} {stats.currency || 'ل.س'}
                                 </MuiTypography>
                             </MuiBox>
                             <MuiBox
@@ -694,7 +694,7 @@ export default function AdminDashboard() {
                                     مدفوعات معلقة
                                 </MuiTypography>
                                 <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                                    {formatNumber(stats.pendingPayments || 0)} {stats.currency || 'ر.س'}
+                                    {formatNumber(stats.pendingPayments || 0)} {stats.currency || 'ل.س'}
                                 </MuiTypography>
                             </MuiBox>
                             <MuiBox
@@ -739,7 +739,7 @@ export default function AdminDashboard() {
                                     مدفوعات مكتملة
                                 </MuiTypography>
                                 <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                                    {formatNumber(stats.completedPayments || 0)} {stats.currency || 'ر.س'}
+                                    {formatNumber(stats.completedPayments || 0)} {stats.currency || 'ل.س'}
                                 </MuiTypography>
                             </MuiBox>
                             <MuiBox
@@ -851,7 +851,7 @@ export default function AdminDashboard() {
                                                     الإيرادات
                                                 </MuiTypography>
                                                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
-                                                    {formatNumber(hall.totalRevenue || 0)} {stats.currency || 'ر.س'}
+                                                    {formatNumber(hall.totalRevenue || 0)} {stats.currency || 'ل.س'}
                                                 </MuiTypography>
                                             </MuiBox>
                                         </MuiBox>

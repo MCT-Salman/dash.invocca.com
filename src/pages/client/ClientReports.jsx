@@ -652,61 +652,71 @@ export default function ClientReports() {
             borderRadius: '20px',
           }}
         >
-          <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 3 }}>
-            الخدمات ({event.services.length})
-          </MuiTypography>
-          <MuiGrid container spacing={2}>
-            {event.services.map((serviceItem, index) => {
-              const service = typeof serviceItem.service === 'object' ? serviceItem.service : {}
-              const serviceId = typeof serviceItem.service === 'string'
-                ? serviceItem.service
-                : (serviceItem.service?._id || serviceItem.service?.id)
-
-              // Get service name from service object or from hall.services map
-              const serviceName = service.name || (serviceId ? serviceNameMap[serviceId] : null) || 'خدمة'
-
-              return (
-                <MuiGrid item xs={12} sm={6} md={4} key={serviceItem._id || index}>
-                  <MuiPaper
-                    sx={{
-                      p: 2,
-                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(216, 185, 138, 0.15)',
-                      borderRadius: '12px',
-                    }}
-                  >
-                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-                      <Sparkles size={18} style={{ color: 'var(--color-primary-400)' }} />
-                      <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600, flex: 1 }}>
-                        {serviceName}
-                      </MuiTypography>
-                    </MuiBox>
-                    <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                      <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
-                        الكمية: {serviceItem.quantity || 1}
-                      </MuiTypography>
-                      <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
-                        السعر: {formatCurrency(serviceItem.price || service.basePrice || 0)}
-                      </MuiTypography>
-                      {service.category && (
-                        <MuiChip
-                          label={service.category}
-                          size="small"
-                          sx={{
-                            mt: 0.5,
-                            backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                            color: 'var(--color-primary-400)',
-                            fontSize: '0.7rem',
-                            height: 20
-                          }}
-                        />
-                      )}
-                    </MuiBox>
-                  </MuiPaper>
-                </MuiGrid>
-              )
-            })}
-          </MuiGrid>
+       <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 3 }}>
+  الخدمات ({event.services.length})
+</MuiTypography>
+<MuiGrid container spacing={2}>
+  {event.services.map((serviceItem, index) => {
+    const serviceId = serviceItem.service;
+    
+    // البحث عن الخدمة الكاملة في hall.services
+    const fullService = hall.services?.find(s => s._id === serviceId);
+    
+    const serviceName = serviceItem.name || fullService?.name || 'خدمة';
+    const serviceCategory = fullService?.category;
+    const serviceDescription = fullService?.description;
+    
+    return (
+      <MuiGrid item xs={12} sm={6} md={4} key={serviceItem._id || index}>
+        <MuiPaper
+          sx={{
+            p: 2,
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(216, 185, 138, 0.15)',
+            borderRadius: '12px',
+          }}
+        >
+          <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+            <Sparkles size={18} style={{ color: 'var(--color-primary-400)' }} />
+            <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600, flex: 1 }}>
+              {serviceName}
+            </MuiTypography>
+          </MuiBox>
+          
+          <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+            {serviceDescription && (
+              <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
+                {serviceDescription}
+              </MuiTypography>
+            )}
+            
+            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+              الكمية: {serviceItem.quantity || 1}
+            </MuiTypography>
+            
+            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+              السعر: {formatCurrency(serviceItem.price || 0)}
+            </MuiTypography>
+            
+            {serviceCategory && (
+              <MuiChip
+                label={serviceCategory}
+                size="small"
+                sx={{
+                  mt: 0.5,
+                  backgroundColor: 'rgba(216, 185, 138, 0.1)',
+                  color: 'var(--color-primary-400)',
+                  fontSize: '0.7rem',
+                  height: 20
+                }}
+              />
+            )}
+          </MuiBox>
+        </MuiPaper>
+      </MuiGrid>
+    );
+  })}
+</MuiGrid>
         </MuiPaper>
       )}
 

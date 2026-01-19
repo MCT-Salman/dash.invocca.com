@@ -6,7 +6,6 @@ import {
   Palette,
   Users,
   Shield,
-  MessageSquare,
   UserCircle,
   Settings,
   FileText,
@@ -117,15 +116,6 @@ const ADMIN_MENU_ITEMS = [
       { id: 'service-managers', label: 'مدراء الخدمات', path: '/admin/managers/services' },
       { id: 'event-managers', label: 'مدراء الفعاليات', path: '/admin/managers/events' }
     ]
-  },
-
-  // قسم الشكاوى
-  {
-    id: 'complaints',
-    label: 'الشكاوى',
-    icon: MessageSquare,
-    path: '/admin/complaints',
-    badge: 8 // شكاوى جديدة
   },
 
   // قسم الفعاليات

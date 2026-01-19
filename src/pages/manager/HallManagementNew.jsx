@@ -138,7 +138,7 @@ function InfoCard({ icon: Icon, label, value, color = 'var(--color-primary-500)'
                         variant="h4" 
                         sx={{ 
                             fontWeight: 700,
-                            fontSize: typeof value === 'string' && (value.includes('/') || value.includes('ر.س')) ? '1rem' : '1.75rem',
+                            fontSize: typeof value === 'string' && (value.includes('/') || value.includes('ل.س')) ? '1rem' : '1.75rem',
                             color: color,
                         }}
                     >
@@ -319,7 +319,7 @@ function ServiceCard({ service }) {
                             السعر الأساسي:
                         </MuiTypography>
                         <MuiChip
-                            label={`${servicePrice.toLocaleString()} ر.س`}
+                            label={`${servicePrice.toLocaleString()} ل.س`}
                             size="small"
                             sx={{
                                 backgroundColor: '#FFE36C',

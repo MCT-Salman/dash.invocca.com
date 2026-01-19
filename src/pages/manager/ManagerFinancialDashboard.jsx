@@ -9,10 +9,12 @@ import MuiButton from '@/components/ui/MuiButton'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiChip from '@/components/ui/MuiChip'
 import { SEOHead, LoadingScreen, EmptyState } from '@/components/common'
+import { useNavigate } from 'react-router-dom'
 import { DollarSign, TrendingUp, TrendingDown, Receipt, AlertCircle, ArrowUpRight, ArrowDownRight, Wallet, Activity } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/utils/helpers'
 
 export default function ManagerFinancialDashboard() {
+    const navigate = useNavigate()
     const { data, isLoading } = useQuery({
         queryKey: ['financial-dashboard'],
         queryFn: getFinancialDashboard,
@@ -182,6 +184,7 @@ export default function ManagerFinancialDashboard() {
                                     color="error"
                                     size="small"
                                     sx={{ mt: 1, borderRadius: '10px' }}
+                                    onClick={() => navigate('/manager/financial/invoices')}
                                 >
                                     عرض التفاصيل
                                 </MuiButton>
@@ -209,7 +212,13 @@ export default function ManagerFinancialDashboard() {
                         <Activity size={24} />
                         المعاملات الأخيرة
                     </MuiTypography>
-                    <MuiButton variant="text" sx={{ color: 'var(--color-primary-500)' }}>عرض الكل</MuiButton>
+                    <MuiButton
+                        variant="text"
+                        sx={{ color: 'var(--color-primary-500)' }}
+                        onClick={() => navigate('/manager/financial/transactions')}
+                    >
+                        عرض الكل
+                    </MuiButton>
                 </MuiBox>
 
                 {recentTransactions.length === 0 ? (

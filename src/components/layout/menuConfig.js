@@ -7,7 +7,6 @@ import {
   BarChart3,
   Star,
   QrCode,
-  MessageCircle,
   UserPlus,
   User,
   Calendar,
@@ -27,7 +26,6 @@ export const ROLE_MENUS = {
     { label: 'القوالب', path: '/admin/templates', icon: Image },
     { label: 'المستخدمون', path: '/admin/users', icon: Users },
     { label: 'المدراء', path: '/admin/managers', icon: UserPlus },
-    { label: 'الشكاوى', path: '/admin/complaints', icon: MessageCircle },
     { label: 'الملف الشخصي', path: ROUTES.ADMIN.PROFILE, icon: User },
   ],
   manager: [
@@ -41,7 +39,6 @@ export const ROLE_MENUS = {
     { label: 'التقارير', path: ROUTES.MANAGER.REPORTS, icon: BarChart3 },
     { label: 'التقييمات', path: ROUTES.MANAGER.RATINGS, icon: Star },
     { label: 'قوالب الدعوات', path: ROUTES.MANAGER.TEMPLATES, icon: Image },
-    { label: 'الشكاوى', path: ROUTES.MANAGER.COMPLAINTS, icon: MessageCircle },
     // Financial Section
     { label: 'المالية', path: '/manager/financial/dashboard', icon: DollarSign },
     { label: 'الفواتير', path: '/manager/financial/invoices', icon: FileText },

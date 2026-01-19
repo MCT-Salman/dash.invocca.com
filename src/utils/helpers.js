@@ -667,7 +667,7 @@ export const truncateText = (text, maxLength = 50) => {
  */
 export function translatePermission(permission) {
     if (!permission) return ''
-    
+
     const permissionMap = {
         // User Management
         'manage_users': 'إدارة المستخدمين',
@@ -676,7 +676,7 @@ export function translatePermission(permission) {
         'edit_users': 'تعديل المستخدمين',
         'delete_users': 'حذف المستخدمين',
         'manage_managers': 'إدارة المدراء',
-        
+
         // Hall Management
         'manage_halls': 'إدارة قاعة/صالة',
         'view_halls': 'عرض قاعة/صالة',
@@ -686,7 +686,7 @@ export function translatePermission(permission) {
         'view_hall_clients': 'عرض عملاء قاعة/صالة',
         'view_hall_complaints': 'عرض شكاوى قاعة/صالة',
         'manage_hall_templates': 'إدارة قوالب قاعة/صالة',
-        
+
         // Event Management
         'manage_events': 'إدارة الفعاليات',
         'view_events': 'عرض الفعاليات',
@@ -694,72 +694,72 @@ export function translatePermission(permission) {
         'edit_events': 'تعديل الفعاليات',
         'delete_events': 'حذف الفعاليات',
         'view_own_events': 'عرض فعالياتي',
-        
+
         // Reports
         'view_reports': 'عرض التقارير',
         'view_financial_reports': 'عرض التقارير المالية',
         'view_event_reports': 'عرض تقارير الفعاليات',
         'view_user_reports': 'عرض تقارير المستخدمين',
         'view_all_stats': 'عرض جميع الإحصائيات',
-        
+
         // Services
         'manage_services': 'إدارة الخدمات',
         'view_services': 'عرض الخدمات',
         'create_services': 'إنشاء خدمات',
         'edit_services': 'تعديل الخدمات',
         'delete_services': 'حذف الخدمات',
-        
+
         // Templates
         'manage_templates': 'إدارة القوالب',
         'view_templates': 'عرض القوالب',
         'create_templates': 'إنشاء قوالب',
         'edit_templates': 'تعديل القوالب',
         'delete_templates': 'حذف القوالب',
-        
+
         // Staff Management
         'manage_staff': 'إدارة الموظفين',
         'view_staff': 'عرض الموظفين',
         'create_staff': 'إنشاء موظفين',
         'edit_staff': 'تعديل الموظفين',
         'delete_staff': 'حذف الموظفين',
-        
+
         // Clients Management
         'manage_clients': 'إدارة العملاء',
         'view_clients': 'عرض العملاء',
         'create_clients': 'إنشاء عملاء',
         'edit_clients': 'تعديل العملاء',
         'delete_clients': 'حذف العملاء',
-        
+
         // Complaints
         'manage_complaints': 'إدارة الشكاوى',
         'view_complaints': 'عرض الشكاوى',
         'respond_complaints': 'الرد على الشكاوى',
-        
+
         // Financial
         'manage_financial': 'إدارة المالية',
         'view_financial': 'عرض المالية',
         'create_invoices': 'إنشاء فواتير',
         'edit_invoices': 'تعديل الفواتير',
         'delete_invoices': 'حذف الفواتير',
-        
+
         // Invitations
         'manage_invitations': 'إدارة الدعوات',
         'view_invitations': 'عرض الدعوات',
         'create_invitations': 'إنشاء دعوات',
         'edit_invitations': 'تعديل الدعوات',
         'delete_invitations': 'حذف الدعوات',
-        
+
         // Scanner
         'scan_qr': 'مسح QR',
         'scan_qr_codes': 'مسح رموز QR',
         'view_scanner': 'عرض الماسح',
         'view_event_invitations': 'عرض دعوات الفعاليات',
-        
+
         // Admin
         'admin_access': 'وصول إداري',
         'full_access': 'وصول كامل',
     }
-    
+
     // Resource translations
     const resourceMap = {
         'managers': 'المدراء',
@@ -777,15 +777,15 @@ export function translatePermission(permission) {
         'templates': 'القوالب',
         'template': 'القوالب',
     }
-    
+
     // Check if exact match exists
     if (permissionMap[permission]) {
         return permissionMap[permission]
     }
-    
+
     // Try to match by pattern
     const lowerPermission = permission.toLowerCase().trim()
-    
+
     // Helper function to translate resource
     const translateResource = (resource) => {
         const cleanResource = resource.trim().toLowerCase()
@@ -803,47 +803,47 @@ export function translatePermission(permission) {
             return resourceMap[withSpaces]
         }
         // Default: capitalize first letter of each word
-        return resource.split(/[\s_]+/).map(word => 
+        return resource.split(/[\s_]+/).map(word =>
             word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         ).join(' ')
     }
-    
+
     // Check for common patterns
     if (lowerPermission.startsWith('manage_') || lowerPermission.startsWith('manage ')) {
         const resource = lowerPermission.replace(/^manage[_ ]/, '').trim()
         const translatedResource = translateResource(resource)
         return `إدارة ${translatedResource}`
     }
-    
+
     if (lowerPermission.startsWith('view_') || lowerPermission.startsWith('view ')) {
         const resource = lowerPermission.replace(/^view[_ ]/, '').trim()
         const translatedResource = translateResource(resource)
         return `عرض ${translatedResource}`
     }
-    
+
     if (lowerPermission.startsWith('create_') || lowerPermission.startsWith('create ')) {
         const resource = lowerPermission.replace(/^create[_ ]/, '').trim()
         const translatedResource = translateResource(resource)
         return `إنشاء ${translatedResource}`
     }
-    
+
     if (lowerPermission.startsWith('edit_') || lowerPermission.startsWith('edit ')) {
         const resource = lowerPermission.replace(/^edit[_ ]/, '').trim()
         const translatedResource = translateResource(resource)
         return `تعديل ${translatedResource}`
     }
-    
+
     if (lowerPermission.startsWith('delete_') || lowerPermission.startsWith('delete ')) {
         const resource = lowerPermission.replace(/^delete[_ ]/, '').trim()
         const translatedResource = translateResource(resource)
         return `حذف ${translatedResource}`
     }
-    
+
     // Check if it's just a resource name
     if (resourceMap[lowerPermission] || resourceMap[lowerPermission.replace(/_/g, ' ')]) {
         return resourceMap[lowerPermission] || resourceMap[lowerPermission.replace(/_/g, ' ')]
     }
-    
+
     // Fallback: format as readable text
     return permission.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
 }

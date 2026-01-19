@@ -88,16 +88,7 @@ const MuiTextField = ({
 
     const currentValue = value !== undefined ? value : internalValue;
 
-    // Force text color when value changes (for loaded values)
-    useEffect(() => {
-        if (inputRef.current) {
-            const inputElement = inputRef.current.querySelector('input') || inputRef.current.querySelector('textarea');
-            if (inputElement) {
-                inputElement.style.color = '#EDEDED';
-                inputElement.style.WebkitTextFillColor = '#EDEDED';
-            }
-        }
-    }, [currentValue, value]);
+    // Style handled via sx
 
     // تحديد النوع الفعلي بناء على الإعدادات
     const getActualType = () => {
@@ -111,34 +102,30 @@ const MuiTextField = ({
     };
 
     const handleChange = (event) => {
-        let inputValue = event.target.value;
+        if (!event) return;
 
-        // معالجة خاصة للنوع الرقمي
-        if (type === 'number') {
-            if (allowDecimals) {
-                inputValue = inputValue.replace(/[^\d.]/g, '');
+        // For non-numeric types, we don't need to transform the value
+        // Passing the original event is much safer for controlled components and selects
+        if (type !== 'number') {
+            if (onChange) onChange(event);
+            if (value === undefined) setInternalValue(event.target?.value || '');
+            return;
+        }
 
-                // السماح بنقطة عشرية واحدة فقط
-                const decimalCount = (inputValue.match(/\./g) || []).length;
-                if (decimalCount > 1) {
-                    inputValue = inputValue.slice(0, -1);
-                }
-            } else {
-                inputValue = inputValue.replace(/\D/g, '');
-            }
+        let inputValue = event.target?.value || '';
 
-            // التحقق من القيمة الدنيا والقصوى
-            if (inputValue !== '' && inputValue !== '.') {
-                const numericValue = parseFloat(inputValue);
+        if (allowDecimals) {
+            inputValue = inputValue.replace(/[^\d.]/g, '');
+            const decimalCount = (inputValue.match(/\./g) || []).length;
+            if (decimalCount > 1) inputValue = inputValue.slice(0, -1);
+        } else {
+            inputValue = inputValue.replace(/\D/g, '');
+        }
 
-                if (min !== undefined && numericValue < min) {
-                    inputValue = min.toString();
-                }
-
-                if (max !== undefined && numericValue > max) {
-                    inputValue = max.toString();
-                }
-            }
+        if (inputValue !== '' && inputValue !== '.') {
+            const numericValue = parseFloat(inputValue);
+            if (min !== undefined && numericValue < min) inputValue = min.toString();
+            if (max !== undefined && numericValue > max) inputValue = max.toString();
         }
 
         if (value === undefined) {
@@ -146,14 +133,15 @@ const MuiTextField = ({
         }
 
         if (onChange) {
-            // Always pass event object for compatibility with standard React patterns
+            // Pass a simpler synthetic event for numeric transformations
             const syntheticEvent = {
                 ...event,
                 target: {
-                    ...event.target,
+                    ...(event.target || {}),
                     value: inputValue,
-                    name: name || event.target.name || '',
+                    name: name || event.target?.name || '',
                 },
+                persist: typeof event.persist === 'function' ? event.persist : () => { }
             };
             onChange(syntheticEvent);
         }
@@ -234,6 +222,7 @@ const MuiTextField = ({
         if (type === 'number') return 'decimal';
         if (type === 'tel') return 'tel';
         if (type === 'email') return 'email';
+        if (type === 'date' || type === 'time' || type === 'datetime-local') return undefined;
         return 'text';
     };
 
@@ -248,45 +237,8 @@ const MuiTextField = ({
                 required={required}
                 error={error}
                 readOnly={readOnly}
-                onInput={(e) => {
-                    // Force text color aggressively using HEX to avoid variable resolution issues
-                    const inputElement = e.target.querySelector('input') || e.target.querySelector('textarea') || e.target;
-                    if (inputElement) {
-                        inputElement.style.color = '#EDEDED';
-                        inputElement.style.WebkitTextFillColor = '#EDEDED';
-                        inputElement.style.fontFamily = 'var(--font-family-base)';
-                        // Force placeholder color
-                        inputElement.style.setProperty('--placeholder-color', 'rgba(255, 255, 255, 0.25)');
-                    }
-
-                    if (props.onInput) props.onInput(e);
-                }}
-                onChange={(e) => {
-                    // Force text color on change
-                    setTimeout(() => {
-                        const inputElement = e.target.querySelector('input') || e.target.querySelector('textarea') || e.target;
-                        if (inputElement) {
-                            inputElement.style.color = '#EDEDED';
-                            inputElement.style.WebkitTextFillColor = '#EDEDED';
-                            // Force placeholder color
-                            inputElement.style.setProperty('--placeholder-color', 'rgba(255, 255, 255, 0.2)');
-                        }
-                    }, 0);
-                    handleChange(e);
-                }}
-                onFocus={(e) => {
-                    // Force text color on focus
-                    setTimeout(() => {
-                        const inputElement = e.target.querySelector('input') || e.target.querySelector('textarea') || e.target;
-                        if (inputElement) {
-                            inputElement.style.color = '#EDEDED';
-                            inputElement.style.WebkitTextFillColor = '#EDEDED';
-                            // Force placeholder color
-                            inputElement.style.setProperty('--placeholder-color', 'rgba(255, 255, 255, 0.2)');
-                        }
-                    }, 0);
-                    handleFocus(e);
-                }}
+                onChange={handleChange}
+                onFocus={handleFocus}
                 onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
                 size={size}
@@ -324,17 +276,24 @@ const MuiTextField = ({
                             borderWidth: '1px !important',
                             borderRadius: '12px !important',
                         },
+                        // Ensure text color is forced even for Select
+                        '& .MuiSelect-select': {
+                            color: '#EDEDED !important',
+                            WebkitTextFillColor: '#EDEDED !important',
+                        }
                     },
                     '& .MuiInputBase-input': {
                         color: '#EDEDED !important', // Force white text (Hex)
+                        WebkitTextFillColor: '#EDEDED !important',
                         fontSize: size === 'small' ? '0.875rem' : '1rem',
                         padding: size === 'small' ? '10.5px 14px' : '14px 16px',
                         fontFamily: 'var(--font-family-base)',
+                        colorScheme: 'dark', // Tells browser to use dark native picker
                         '&:focus': {
                             color: '#EDEDED !important',
                             WebkitTextFillColor: '#EDEDED !important',
                         },
-                        // Date/Time picker icon styling
+                        // Date/Time picker icon styling - keeping filter as fallback
                         '&::-webkit-calendar-picker-indicator': {
                             filter: 'invert(1) brightness(2)',
                             cursor: 'pointer',
@@ -343,12 +302,7 @@ const MuiTextField = ({
                                 opacity: 1,
                             },
                         },
-                        '&::-webkit-inner-spin-button': {
-                            filter: 'invert(1) brightness(2)',
-                            cursor: 'pointer',
-                            opacity: 0.9,
-                        },
-                        '&::-webkit-outer-spin-button': {
+                        '&::-webkit-inner-spin-button, &::-webkit-outer-spin-button': {
                             filter: 'invert(1) brightness(2)',
                             cursor: 'pointer',
                             opacity: 0.9,
@@ -422,14 +376,17 @@ const MuiTextField = ({
                 inputProps={{
                     inputMode: getInputMode(),
                     pattern: pattern,
-                    min: type === 'number' ? min : undefined,
-                    max: type === 'number' ? max : undefined,
-                    step: type === 'number' ? step : undefined,
+                    min: (type === 'number' || type === 'date') ? min : undefined,
+                    max: (type === 'number' || type === 'date') ? max : undefined,
+                    step: (type === 'number' || type === 'date') ? step : undefined,
                     className: inputClassName,
-                    autoComplete: 'off', // Try to disable autocomplete to prevent browser styles interference
+                    autoComplete: 'off',
                     ...props.inputProps
                 }}
-                InputProps={getInputProps()}
+                InputProps={{
+                    ...getInputProps(),
+                    ...props.InputProps
+                }}
                 helperText={helperText}
                 FormHelperTextProps={{
                     sx: {
@@ -441,6 +398,8 @@ const MuiTextField = ({
                     className: helperTextClassName
                 }}
                 InputLabelProps={{
+                    shrink: true,
+                    ...props.InputLabelProps,
                     sx: {
                         color: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
                         fontFamily: 'var(--font-family-base)',
@@ -452,8 +411,6 @@ const MuiTextField = ({
                         left: 'auto',
                         transformOrigin: 'top right',
                         textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
-                        position: 'absolute',
-                        top: '-8px',
                         '&.Mui-focused': {
                             color: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
                             fontWeight: 600,
@@ -464,9 +421,9 @@ const MuiTextField = ({
                         '&.Mui-error': {
                             color: 'var(--color-error-500) !important',
                         },
+                        ...props.InputLabelProps?.sx
                     },
-                    className: labelClassName,
-                    shrink: true
+                    className: labelClassName || props.InputLabelProps?.className,
                 }}
                 id={id}
                 name={name}

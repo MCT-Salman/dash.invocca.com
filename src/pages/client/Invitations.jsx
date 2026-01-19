@@ -40,7 +40,7 @@ const createInvitationSchema = (eventGuestCount, totalInvitedPeople, isEdit, cur
       .refine((val) => {
         // Always validate if eventGuestCount is defined and > 0
         if (!eventGuestCount || eventGuestCount <= 0) return true // No limit if eventGuestCount is 0 or undefined
-        const newTotal = isEdit 
+        const newTotal = isEdit
           ? totalInvitedPeople - currentInvitationCount + val
           : totalInvitedPeople + val
         return newTotal <= eventGuestCount
@@ -59,12 +59,12 @@ const createInvitationSchema = (eventGuestCount, totalInvitedPeople, isEdit, cur
 
 export default function Invitations() {
   const { addNotification: showNotification } = useNotification()
-  
+
   // State for invitation card display
   const [showInvitationCard, setShowInvitationCard] = useState(false)
   const [selectedInvitation, setSelectedInvitation] = useState(null)
   const [selectedTemplateId, setSelectedTemplateId] = useState(null)
-  
+
   // Dialog state management
   const {
     selectedItem: editingInvitation,
@@ -112,16 +112,16 @@ export default function Invitations() {
   })
 
   const invitations = data?.invitations || data?.data || []
-  
+
   // Extract events (bookings) from dashboard data
   const dashboardResponse = dashboardDataForEvents?.data || dashboardDataForEvents || {}
   const bookings = dashboardResponse.allEvents || dashboardResponse.recentActivity?.events || dashboardResponse.events || []
 
   // Get the current event (assuming all invitations are for the same event, or get from first invitation)
-  const currentEventId = invitations.length > 0 
+  const currentEventId = invitations.length > 0
     ? (invitations[0]?.eventId?._id || invitations[0]?.eventId || null)
     : (bookings.length > 0 ? (bookings[0]?._id || bookings[0]?.id) : null)
-  
+
   // Get eventGuestCount directly from invitation's eventId if available, otherwise from bookings
   const eventGuestCount = invitations.length > 0 && invitations[0]?.eventId?.guestCount !== undefined
     ? invitations[0].eventId.guestCount
@@ -142,7 +142,7 @@ export default function Invitations() {
     let currentEventGuestCount = eventGuestCount
     let currentTotalInvited = totalInvitedPeople
     let eventIdForValidation = currentEventId
-    
+
     if (!isEdit && formData.eventId) {
       // For create, get guest count from selected event
       const selectedEvent = bookings.find(b => (b._id || b.id)?.toString() === formData.eventId?.toString())
@@ -171,14 +171,14 @@ export default function Invitations() {
         })
         .reduce((sum, inv) => sum + (inv.numOfPeople || 0), 0)
     }
-    
+
     // Validate total guests count BEFORE submitting
     if (currentEventGuestCount > 0) {
       const currentInvitationCount = editingInvitation?.numOfPeople || 0
-      const newTotal = isEdit 
+      const newTotal = isEdit
         ? currentTotalInvited - currentInvitationCount + formData.numOfPeople
         : currentTotalInvited + formData.numOfPeople
-      
+
       if (newTotal > currentEventGuestCount) {
         const remaining = currentEventGuestCount - (isEdit ? currentTotalInvited - currentInvitationCount : currentTotalInvited)
         showNotification({
@@ -195,12 +195,12 @@ export default function Invitations() {
       guestName: String(formData.guestName || '').trim(),
       numOfPeople: Number(formData.numOfPeople) || 1,
     }
-    
+
     // Add eventId for create operation only (required)
     if (!isEdit && formData.eventId) {
       submitData.eventId = formData.eventId
     }
-    
+
     // Validate required fields
     if (!submitData.guestName) {
       showNotification({
@@ -210,7 +210,7 @@ export default function Invitations() {
       })
       return
     }
-    
+
     if (submitData.numOfPeople < 1) {
       showNotification({
         title: 'خطأ',
@@ -219,7 +219,7 @@ export default function Invitations() {
       })
       return
     }
-    
+
     // Validate eventId for create operation
     if (!isEdit && !submitData.eventId) {
       showNotification({
@@ -229,7 +229,7 @@ export default function Invitations() {
       })
       return
     }
-    
+
     // Add guests array if provided and not empty (for both create and edit)
     if (formData.guests && Array.isArray(formData.guests) && formData.guests.length > 0) {
       const validGuests = formData.guests.filter(g => g.name && g.name.trim()).map(g => ({ name: g.name.trim() }))
@@ -237,27 +237,22 @@ export default function Invitations() {
         submitData.guests = validGuests
       }
     }
-    
+
     if (isEdit && editingInvitation) {
       const result = await handleUpdate(editingInvitation.id || editingInvitation._id, submitData)
       if (result?.success !== false || result?.message) {
         closeDialog()
+        return true
       }
+      return false
     } else {
       const result = await handleCreate(submitData)
       if (result?.success !== false) {
-        closeDialog()
-        // Show invitation card if invitation data is returned
-        // The API returns { message, invitation } structure
-        if (result?.invitation) {
-          setSelectedInvitation(result.invitation)
-          setShowInvitationCard(true)
-        } else if (result?.data?.invitation) {
-          setSelectedInvitation(result.data.invitation)
-          setShowInvitationCard(true)
-        }
+        // User requested to keep dialog open and clear fields for batch addition
+        // So we don't call closeDialog() or setShowInvitationCard(true) here
+        return true
       }
-      // Error is already handled by useCRUD hook and shown in toast
+      return false
     }
   }
 
@@ -348,12 +343,12 @@ export default function Invitations() {
 
                 <MuiBox sx={{ pt: 2, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                   <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
-                  <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
-                    <Users size={14} />
-                    <MuiTypography variant="caption">
+                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
+                      <Users size={14} />
+                      <MuiTypography variant="caption">
                         عدد المدعوين: {invitation.numOfPeople || invitation.guestCount || 0}
-                    </MuiTypography>
-                  </MuiBox>
+                      </MuiTypography>
+                    </MuiBox>
                     {invitation.guests && invitation.guests.length > 0 && (
                       <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, ml: 3 }}>
                         {invitation.guests.map((guest, idx) => (
@@ -371,7 +366,7 @@ export default function Invitations() {
                       </MuiBox>
                     )}
                     {invitation.eventDate && (
-                  <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
+                      <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
                         <Calendar size={14} />
                         <MuiTypography variant="caption">
                           تاريخ الفعالية: {formatDate(invitation.eventDate, 'MM/DD/YYYY')}
@@ -411,7 +406,7 @@ export default function Invitations() {
                       </MuiBox>
                     )}
                   </MuiBox>
-                  
+
                   <MuiBox sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
                     <MuiChip
                       label={invitation.status === 'sent' ? 'مرسلة' : invitation.status || '—'}
@@ -434,14 +429,14 @@ export default function Invitations() {
                       }}
                     />
                   </MuiBox>
-                  
+
                   {invitation.guests && invitation.guests.length > 0 && (
                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)', mb: 1 }}>
-                    <UserCheck size={14} />
-                    <MuiTypography variant="caption">
+                      <UserCheck size={14} />
+                      <MuiTypography variant="caption">
                         المؤكدون: {invitation.guests.filter(g => g.checkedIn).length} / {invitation.guests.length}
-                    </MuiTypography>
-                  </MuiBox>
+                      </MuiTypography>
+                    </MuiBox>
                   )}
                 </MuiBox>
 
@@ -550,20 +545,20 @@ export default function Invitations() {
 // Invitation Card Full Page View Component
 function InvitationCardView({ open, onClose, invitation, bookings, dashboardData, selectedTemplateId, onTemplateChange }) {
   const cardRef = useRef(null)
-  
+
   // Get event information from bookings or directly from invitation.eventId
   const eventId = invitation?.eventId?._id || invitation?.eventId || null
-  const event = (invitation?.eventId && typeof invitation.eventId === 'object' && invitation.eventId.name) 
-                ? invitation.eventId 
-                : (bookings?.find(b => (b._id || b.id) === eventId) || null)
-  
+  const event = (invitation?.eventId && typeof invitation.eventId === 'object' && invitation.eventId.name)
+    ? invitation.eventId
+    : (bookings?.find(b => (b._id || b.id) === eventId) || null)
+
   // Fetch templates for this event/user
   const { data: templatesData } = useQuery({
     queryKey: ['client', 'templates'],
     queryFn: () => getClientTemplates(),
     enabled: open, // Only fetch when dialog is open
   })
-  
+
   // Get template ID from invitation event
   const templateIdFromEvent = useMemo(() => {
     if (invitation?.eventId?.template) {
@@ -575,14 +570,14 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
     }
     return null
   }, [invitation])
-  
+
   // Fetch full template data if we only have an ID
   const { data: fullTemplateData, isLoading: isLoadingTemplate } = useQuery({
     queryKey: ['client', 'template', templateIdFromEvent],
     queryFn: () => getTemplateById(templateIdFromEvent),
     enabled: open && !!templateIdFromEvent, // Only fetch when dialog is open and we have a template ID
   })
-  
+
   // Debug: log template fetching
   console.log('🔍 Template Fetching Debug:', {
     'templateIdFromEvent': templateIdFromEvent,
@@ -590,23 +585,23 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
     'isLoadingTemplate': isLoadingTemplate,
     'open': open
   })
-  
+
   // Get available templates from dashboard or event
   const allEvents = useMemo(() => {
     const responseData = dashboardData?.data || dashboardData || {}
     return responseData.allEvents || responseData.recentActivity?.events || responseData.events || []
   }, [dashboardData])
-  
+
   // Get current event from available data
   const currentEvent = useMemo(() => {
     return allEvents.find(e => (e._id || e.id) === eventId) || event
   }, [allEvents, eventId, event])
-  
+
   // Extract templates from API and events - prioritize API templates
   const availableTemplates = useMemo(() => {
     const templates = []
     const responseData = dashboardData?.data || dashboardData || {}
-    
+
     // Priority 0: Get full template data if we fetched it by ID
     if (fullTemplateData) {
       console.log('🔍 Full Template Data from API:', JSON.stringify(fullTemplateData, null, 2))
@@ -617,7 +612,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
           const tId = t._id || t.id
           return tId && templateId && tId.toString() === templateId.toString()
         })
-        
+
         const fullTemplate = {
           _id: templateId,
           id: templateId,
@@ -625,9 +620,9 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
           imageUrl: template.imageUrl || template.image || '',
           ...template
         }
-        
+
         console.log('🔍 Full Template Object:', JSON.stringify(fullTemplate, null, 2))
-        
+
         if (existingIndex >= 0) {
           // Update existing template with full data
           templates[existingIndex] = fullTemplate
@@ -637,10 +632,10 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
         }
       }
     }
-    
+
     // Priority 1: Get templates from API (templatesData)
     const apiTemplates = templatesData?.templates || templatesData?.data?.templates || templatesData?.data || []
-    
+
     // Debug: log API response
     console.log('🔍 Templates API Response:', {
       'templatesData': templatesData,
@@ -652,25 +647,25 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
       'templatesData': templatesData,
       'apiTemplates': apiTemplates
     }, null, 2))
-    
+
     if (Array.isArray(apiTemplates) && apiTemplates.length > 0) {
       apiTemplates.forEach(template => {
         if (template && typeof template === 'object') {
           // Accept templates even if they don't have both image and name (for now)
           const hasImage = !!(template.imageUrl || template.image)
           const hasName = !!(template.templateName || template.name || template._id || template.id)
-          
+
           // Add template if it has at least an ID (required) and preferably an image
           if (hasName) {
             const templateId = template._id || template.id
-        if (templateId && !templates.find(t => (t._id || t.id) === templateId)) {
+            if (templateId && !templates.find(t => (t._id || t.id) === templateId)) {
               templates.push(template)
-        }
-      }
+            }
+          }
         }
       })
     }
-    
+
     // Priority 2: Extract templates from events (fallback)
     // Collect all events from different sources
     const allEventsList = [
@@ -683,11 +678,11 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
       ...(invitation?.eventId && typeof invitation.eventId === 'object' ? [invitation.eventId] : []),
       ...(responseData.nextEvent ? [responseData.nextEvent] : []),
     ]
-    
+
     // Helper function to find full template object by ID in all events
     const findFullTemplateById = (templateId) => {
       if (!templateId) return null
-      
+
       // Search through all events to find the full template object
       for (const evt of allEventsList) {
         const evtTemplate = evt.template || evt.templateId
@@ -701,25 +696,25 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
           }
         }
       }
-      
+
       // Also check dashboard response for templates
-    if (responseData.templates && Array.isArray(responseData.templates)) {
+      if (responseData.templates && Array.isArray(responseData.templates)) {
         for (const template of responseData.templates) {
           const templateIdCheck = template._id || template.id
           if (templateIdCheck && templateIdCheck.toString() === templateId.toString()) {
             return template
           }
         }
-    }
-    
+      }
+
       // Check nextEvent template
       if (responseData.nextEvent?.template && typeof responseData.nextEvent.template === 'object') {
         const nextEventTemplateId = responseData.nextEvent.template._id || responseData.nextEvent.template.id
         if (nextEventTemplateId && nextEventTemplateId.toString() === templateId.toString()) {
           return responseData.nextEvent.template
+        }
       }
-    }
-    
+
       // Check if template is nested in event data (e.g., event.template as object with full data)
       // Sometimes the template might be populated in some events but not others
       for (const evt of allEventsList) {
@@ -734,26 +729,26 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
           }
         }
       }
-      
+
       return null
     }
-    
+
     // Helper function to add template if not already exists
     const addTemplate = (template) => {
       if (!template) return
-      
+
       // If it's a full object
       if (typeof template === 'object') {
         // Check if template has required fields (at least an ID)
         const templateId = template._id || template.id
         if (!templateId) return // Must have an ID
-        
+
         // Check if already added
         const existingTemplate = templates.find(t => {
           const tId = t._id || t.id
           return tId && templateId && tId.toString() === templateId.toString()
         })
-        
+
         if (existingTemplate) {
           // If already exists but incomplete, try to enrich it
           if (!existingTemplate.imageUrl && !existingTemplate.templateName) {
@@ -771,10 +766,10 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
           }
           return // Already added
         }
-        
+
         // Check if this template has full data (imageUrl and templateName)
         const hasFullData = !!(template.imageUrl || template.image) && !!(template.templateName || template.name)
-        
+
         if (hasFullData) {
           // Add template with full data
           templates.push({
@@ -810,7 +805,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
       } else if (typeof template === 'string') {
         // If it's a string ID, search for full template object
         const fullTemplate = findFullTemplateById(template)
-        
+
         if (fullTemplate) {
           const templateId = fullTemplate._id || fullTemplate.id || template
           if (!templates.find(t => {
@@ -823,8 +818,8 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
               templateName: fullTemplate.templateName || fullTemplate.name || `Template ${templateId}`,
               imageUrl: fullTemplate.imageUrl || fullTemplate.image || '',
               ...fullTemplate
-      })
-    }
+            })
+          }
         } else {
           // If not found, add as a minimal template object
           // But try to enrich it later by searching again
@@ -842,7 +837,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
         }
       }
     }
-    
+
     // Priority 2: Extract templates from events (always check, not just if API failed)
     // First, prioritize the current event's template
     if (currentEvent) {
@@ -859,7 +854,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
       if (currentEvent.template) addTemplate(currentEvent.template)
       if (currentEvent.templateId) addTemplate(currentEvent.templateId)
     }
-    
+
     // Then check invitation's event template
     if (invitation?.eventId && typeof invitation.eventId === 'object') {
       console.log('🔍 Invitation Event Template:', {
@@ -875,7 +870,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
       if (invitation.eventId.template) addTemplate(invitation.eventId.template)
       if (invitation.eventId.templateId) addTemplate(invitation.eventId.templateId)
     }
-    
+
     // Then extract from all other events
     allEventsList.forEach(evt => {
       // Skip if this is the current event (already processed)
@@ -884,16 +879,16 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
       if (evtId && currentEventId && evtId.toString() === currentEventId.toString()) {
         return // Skip current event
       }
-      
+
       if (evt.template) addTemplate(evt.template)
       if (evt.templateId) addTemplate(evt.templateId)
     })
-    
+
     // Also check if templates are directly in dashboard response
     if (responseData.templates && Array.isArray(responseData.templates)) {
       responseData.templates.forEach(template => addTemplate(template))
-      }
-    
+    }
+
     // After extracting all templates, try to enrich incomplete ones
     // Note: This is async but we can't use await in useMemo, so we'll handle it differently
     // For now, we'll enrich synchronously from available data
@@ -902,7 +897,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
         const templateId = template._id || template.id
         // Try to find in local data first (synchronous)
         let fullTemplate = null
-        
+
         // Search through all events
         for (const evt of allEventsList) {
           const evtTemplate = evt.template || evt.templateId
@@ -916,7 +911,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
             }
           }
         }
-        
+
         // Check dashboard templates
         if (!fullTemplate && responseData.templates && Array.isArray(responseData.templates)) {
           for (const t of responseData.templates) {
@@ -927,7 +922,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
             }
           }
         }
-        
+
         if (fullTemplate) {
           templates[index] = {
             ...template,
@@ -938,7 +933,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
         }
       }
     })
-    
+
     // Debug: log for troubleshooting
     console.log('🔍 Template Extraction Debug:', {
       'Templates Data (API)': templatesData,
@@ -964,7 +959,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
         'templateId': evt.templateId
       }))
     }, null, 2))
-    
+
     return templates
   }, [templatesData, dashboardData, allEvents, currentEvent, invitation, event, fullTemplateData])
 
@@ -983,9 +978,9 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
       if (found) return found
     }
     // Priority 2: Check if current event has a template and find it in availableTemplates
-    const eventTemplateId = currentEvent?.template?._id || currentEvent?.template?.id || 
-                           currentEvent?.templateId?._id || currentEvent?.templateId?.id ||
-                           currentEvent?.templateId
+    const eventTemplateId = currentEvent?.template?._id || currentEvent?.template?.id ||
+      currentEvent?.templateId?._id || currentEvent?.templateId?.id ||
+      currentEvent?.templateId
     if (eventTemplateId) {
       const found = availableTemplates.find(t => {
         const tId = t._id || t.id
@@ -995,8 +990,8 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
     }
     // Priority 3: Check invitation event template
     const invitationTemplateId = invitation?.eventId?.template?._id || invitation?.eventId?.template?.id ||
-                                 invitation?.eventId?.templateId?._id || invitation?.eventId?.templateId?.id ||
-                                 invitation?.eventId?.templateId
+      invitation?.eventId?.templateId?._id || invitation?.eventId?.templateId?.id ||
+      invitation?.eventId?.templateId
     if (invitationTemplateId) {
       const found = availableTemplates.find(t => {
         const tId = t._id || t.id
@@ -1007,7 +1002,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
     // Priority 4: Use first available template from API (if any)
     return availableTemplates[0] || null
   }, [selectedTemplateId, availableTemplates, currentEvent, invitation, event])
-  
+
   // Get template image - check multiple possible locations with priority
   const templateImage = useMemo(() => {
     // Priority 1: Selected template from dropdown
@@ -1015,62 +1010,62 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
       const img = selectedTemplate.imageUrl || selectedTemplate.image
       if (img) return img
     }
-    
+
     // Priority 2: Template from current event
     if (currentEvent?.template && typeof currentEvent.template === 'object') {
       const img = currentEvent.template.imageUrl || currentEvent.template.image
       if (img) return img
     }
-    
+
     // Priority 3: Template from invitation event
     if (invitation?.eventId?.template && typeof invitation.eventId.template === 'object') {
       const img = invitation.eventId.template.imageUrl || invitation.eventId.template.image
       if (img) return img
     }
-    
+
     // Priority 4: Template from event prop
     if (event?.template && typeof event.template === 'object') {
       const img = event.template.imageUrl || event.template.image
       if (img) return img
     }
-    
+
     // Priority 5: Template from nextEvent
     const responseData = dashboardData?.data || dashboardData || {}
     if (responseData.nextEvent?.template && typeof responseData.nextEvent.template === 'object') {
       const img = responseData.nextEvent.template.imageUrl || responseData.nextEvent.template.image
       if (img) return img
     }
-    
+
     return null
   }, [selectedTemplate, currentEvent, invitation, event, dashboardData])
-  
+
   const templateImageUrl = useMemo(() => {
     if (!templateImage) return null
-    
+
     // If already a full URL, return as is
     if (templateImage.startsWith('http://') || templateImage.startsWith('https://')) {
-    return templateImage 
+      return templateImage
     }
-    
+
     // If starts with /, add base URL
     if (templateImage.startsWith('/')) {
       return `http://82.137.244.167:5001${templateImage}`
     }
-    
+
     // Otherwise, assume it's a relative path and add base URL with /
     return `http://82.137.244.167:5001/${templateImage}`
   }, [templateImage])
-  
+
   if (!open || !invitation) return null
-  
+
   // Export to PNG
   const handleExportPNG = async () => {
     if (!cardRef.current) return
-    
+
     try {
       // Wait longer to ensure fonts and images are fully loaded
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
+
       const canvas = await html2canvas(cardRef.current, {
         backgroundColor: null,
         scale: 3, // Increased scale for better quality
@@ -1087,23 +1082,23 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
             element.style.unicodeBidi = 'embed'
             element.style.visibility = 'visible'
             element.style.opacity = '1'
-            
+
             // Process all text elements
             const allElements = element.querySelectorAll('*')
             allElements.forEach((el) => {
               try {
                 const computedStyle = window.getComputedStyle(el)
                 const text = el.textContent || el.innerText || ''
-                
+
                 el.style.visibility = 'visible'
                 el.style.opacity = '1'
-                
+
                 // Handle Arabic text with proper font rendering
                 if (text.trim() && /[\u0600-\u06FF]/.test(text)) {
                   el.style.direction = 'rtl'
                   el.style.unicodeBidi = 'embed'
                   el.style.textAlign = computedStyle.textAlign || 'center'
-                  
+
                   // Preserve ALL font properties exactly as computed
                   el.style.fontFamily = computedStyle.fontFamily
                   el.style.fontSize = computedStyle.fontSize
@@ -1115,21 +1110,21 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                   el.style.lineHeight = computedStyle.lineHeight
                   el.style.textDecoration = computedStyle.textDecoration
                   el.style.textTransform = 'none' // Prevent any text transformation
-                  
+
                   // Ensure proper spacing
                   el.style.whiteSpace = computedStyle.whiteSpace || 'normal'
                   el.style.wordWrap = 'break-word'
                   el.style.overflowWrap = 'break-word'
-                  
+
                   // Remove any transforms that might affect text
                   el.style.transform = 'none'
                   el.style.webkitTransform = 'none'
-                  
+
                   // Ensure color is visible
                   if (!computedStyle.color || computedStyle.color === 'rgb(0, 0, 0)' || computedStyle.color === 'black') {
                     el.style.color = '#D8B98A'
                   }
-                  
+
                   // Force text rendering properties
                   el.style.webkitFontSmoothing = 'antialiased'
                   el.style.mozOsxFontSmoothing = 'grayscale'
@@ -1142,7 +1137,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
           }
         }
       })
-      
+
       const link = document.createElement('a')
       link.download = `invitation-${invitation.guestName || 'invitation'}.png`
       link.href = canvas.toDataURL('image/png', 1.0)
@@ -1151,15 +1146,15 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
       console.error('Error exporting PNG:', error)
     }
   }
-  
+
   // Export to PDF
   const handleExportPDF = async () => {
     if (!cardRef.current) return
-    
+
     try {
       // Wait longer to ensure fonts and images are fully loaded
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
+
       const canvas = await html2canvas(cardRef.current, {
         backgroundColor: null,
         scale: 2,
@@ -1181,25 +1176,25 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
             element.style.opacity = '1'
             element.style.position = 'relative'
             element.style.overflow = 'visible'
-            
+
             // Fix all text elements
             const allElements = element.querySelectorAll('*')
             allElements.forEach((el) => {
               try {
                 const originalStyle = window.getComputedStyle(el)
                 const text = el.textContent || el.innerText || ''
-                
+
                 // Ensure element is visible
                 el.style.visibility = 'visible'
                 el.style.opacity = '1'
-                
+
                 // Check if element contains Arabic text
                 if (text.trim() && /[\u0600-\u06FF]/.test(text)) {
                   // Use embed instead of bidi-override to prevent character overlap
                   el.style.direction = 'rtl'
                   el.style.unicodeBidi = 'embed'
                   el.style.textAlign = originalStyle.textAlign || 'center'
-                  
+
                   // Preserve font properties
                   el.style.fontFamily = originalStyle.fontFamily
                   el.style.fontSize = originalStyle.fontSize
@@ -1207,13 +1202,13 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                   el.style.letterSpacing = originalStyle.letterSpacing || 'normal'
                   el.style.wordSpacing = originalStyle.wordSpacing || 'normal'
                   el.style.lineHeight = originalStyle.lineHeight
-                  
+
                   // Ensure text color is visible
                   const color = originalStyle.color
                   if (!color || color === 'rgb(0, 0, 0)' || color === 'black' || color === 'rgba(0, 0, 0, 0)') {
                     el.style.color = '#D8B98A'
                   }
-                  
+
                   // Prevent transformations and ensure proper spacing
                   el.style.transform = 'none'
                   el.style.webkitTransform = 'none'
@@ -1228,9 +1223,9 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
           }
         }
       })
-      
+
       const imgData = canvas.toDataURL('image/png', 1.0)
-      
+
       // Create image to get dimensions
       const img = new Image()
       await new Promise((resolve, reject) => {
@@ -1238,16 +1233,16 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
         img.onerror = reject
         img.src = imgData
       })
-      
+
       const imgWidth = img.width * 0.264583 // Convert pixels to mm
       const imgHeight = img.height * 0.264583
-      
+
       const pdf = new jsPDF({
         orientation: imgHeight > imgWidth ? 'portrait' : 'landscape',
         unit: 'mm',
         format: [imgWidth, imgHeight]
       })
-      
+
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight)
       pdf.save(`invitation-${invitation.guestName || 'invitation'}.pdf`)
     } catch (error) {
@@ -1255,17 +1250,17 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
     }
   }
 
-  
+
   // Extract event data - prioritize invitation.eventId if it's a full object
   const eventData = invitation.eventId && typeof invitation.eventId === 'object' && (invitation.eventId.name || invitation.eventId._id)
     ? invitation.eventId
     : event
-  
+
   const eventName = eventData?.name || eventData?.eventName || 'فعالية'
   const eventDate = eventData?.date || eventData?.eventDate || invitation.eventDate || invitation.eventId?.date || invitation.eventId?.eventDate
   const startTime = eventData?.startTime || invitation.eventId?.startTime || ''
   const endTime = eventData?.endTime || invitation.eventId?.endTime || ''
-  
+
   // Helper function to convert 24-hour time to 12-hour format
   const convertTo12Hour = (time24) => {
     if (!time24) return ''
@@ -1273,28 +1268,28 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
       // Handle different time formats (HH:mm, HH:mm:ss, etc.)
       const [hours, minutes] = time24.split(':').map(Number)
       if (isNaN(hours) || isNaN(minutes)) return time24
-      
+
       const period = hours >= 12 ? 'PM' : 'AM'
       const hours12 = hours % 12 || 12
       const minutesStr = minutes.toString().padStart(2, '0')
-      
+
       return `${hours12}:${minutesStr} ${period}`
     } catch {
       return time24
     }
   }
-  
+
   // Format time - ensure both times are shown in 12-hour format
   const formattedStartTime = startTime ? convertTo12Hour(startTime) : ''
   const formattedEndTime = endTime ? convertTo12Hour(endTime) : ''
-  const eventTime = formattedStartTime && formattedEndTime 
-    ? `من ${formattedStartTime} إلى ${formattedEndTime}` 
+  const eventTime = formattedStartTime && formattedEndTime
+    ? `من ${formattedStartTime} إلى ${formattedEndTime}`
     : (formattedStartTime || formattedEndTime || '')
   const eventType = eventData?.type || eventData?.eventType || invitation.eventId?.type || ''
-  
+
   // Hall data - check if hall is populated or just an ID
   const hallData = eventData?.hallId || eventData?.hall || invitation.eventId?.hallId || invitation.eventId?.hall || event?.hallId || event?.hall
-  
+
   // Extract hall name - handle both object and string ID cases, check all possible sources
   let hallName = ''
   if (hallData) {
@@ -1304,20 +1299,20 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
   }
   // If hallName is still empty, try to get it from event data directly
   if (!hallName) {
-    hallName = eventData?.hallName || 
-               eventData?.hall?.name || 
-               invitation.eventId?.hallName || 
-               invitation.eventId?.hall?.name ||
-               event?.hallName ||
-               event?.hall?.name ||
-               currentEvent?.hallName ||
-               currentEvent?.hall?.name ||
-               ''
+    hallName = eventData?.hallName ||
+      eventData?.hall?.name ||
+      invitation.eventId?.hallName ||
+      invitation.eventId?.hall?.name ||
+      event?.hallName ||
+      event?.hall?.name ||
+      currentEvent?.hallName ||
+      currentEvent?.hall?.name ||
+      ''
   }
-  
+
   const hallLocation = typeof hallData === 'object' ? (hallData?.location || '') : (eventData?.hallLocation || event?.hallLocation || '')
   const hallCapacity = typeof hallData === 'object' ? (hallData?.capacity || '') : (eventData?.hallCapacity || event?.hallCapacity || '')
-  
+
   // Event type labels
   const eventTypeLabels = {
     wedding: 'زفاف',
@@ -1327,24 +1322,24 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
     corporate: 'فعالية شركات',
     other: 'أخرى'
   }
-  
+
   // Invitation details
   const invitationGuests = invitation?.guests || []
 
   // Format date - ensure it's always displayed (US-en format: MM/DD/YYYY)
-  const formattedDate = eventDate 
+  const formattedDate = eventDate
     ? new Date(eventDate).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric'
+    })
+    : (invitation.eventDate
+      ? new Date(invitation.eventDate).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'numeric',
         day: 'numeric'
       })
-    : (invitation.eventDate 
-        ? new Date(invitation.eventDate).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric'
-          })
-        : '')
+      : '')
 
   return (
     <MuiBox
@@ -1453,201 +1448,176 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
             borderRight: { lg: '2px solid var(--color-border-glass)' },
           }}
         >
-        <MuiBox
-          ref={cardRef}
-          data-card-ref="true"
-          sx={{
-            position: 'relative',
-            width: '100%',
-            maxWidth: { xs: '100%', sm: '320px', md: '360px' },
-            height: 'fit-content',
-            maxHeight: 'calc(100vh - 120px)',
-            background: templateImageUrl
-              ? `url("${templateImageUrl}") center/cover no-repeat`
-              : 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)',
-            borderRadius: '20px',
-            overflow: 'hidden',
-            border: '3px solid rgba(216, 185, 138, 0.5)',
-            boxShadow: '0 30px 100px rgba(0, 0, 0, 0.5), 0 0 60px rgba(216, 185, 138, 0.3), inset 0 0 40px rgba(0, 0, 0, 0.2)',
-            backgroundSize: templateImageUrl ? 'cover' : 'auto',
-            backgroundPosition: templateImageUrl ? 'center' : 'top',
-            backgroundRepeat: templateImageUrl ? 'no-repeat' : 'repeat',
-            backgroundAttachment: 'local',
-            mx: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            direction: 'rtl',
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              boxShadow: '0 35px 120px rgba(0, 0, 0, 0.6), 0 0 80px rgba(216, 185, 138, 0.4), inset 0 0 40px rgba(0, 0, 0, 0.2)',
-            },
-          }}
-        >
-        {/* Subtle overlay for better text readability - only if template image exists */}
-        {templateImageUrl && (
           <MuiBox
+            ref={cardRef}
+            data-card-ref="true"
             sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.4) 100%)',
-              zIndex: 1,
+              position: 'relative',
+              width: '100%',
+              maxWidth: { xs: '100%', sm: '320px', md: '360px' },
+              height: 'fit-content',
+              maxHeight: 'calc(100vh - 120px)',
+              background: templateImageUrl
+                ? `url("${templateImageUrl}") center/cover no-repeat`
+                : 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)',
+              borderRadius: '20px',
+              overflow: 'hidden',
+              border: '3px solid rgba(216, 185, 138, 0.5)',
+              boxShadow: '0 30px 100px rgba(0, 0, 0, 0.5), 0 0 60px rgba(216, 185, 138, 0.3), inset 0 0 40px rgba(0, 0, 0, 0.2)',
+              backgroundSize: templateImageUrl ? 'cover' : 'auto',
+              backgroundPosition: templateImageUrl ? 'center' : 'top',
+              backgroundRepeat: templateImageUrl ? 'no-repeat' : 'repeat',
+              backgroundAttachment: 'local',
+              mx: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              direction: 'rtl',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                boxShadow: '0 35px 120px rgba(0, 0, 0, 0.6), 0 0 80px rgba(216, 185, 138, 0.4), inset 0 0 40px rgba(0, 0, 0, 0.2)',
+              },
             }}
-          />
-        )}
-
-        {/* Decorative side patterns (golden ornamental patterns on edges) */}
-        <MuiBox
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '80px',
-            height: '100%',
-            background: 'linear-gradient(to right, rgba(216, 185, 138, 0.15) 0%, transparent 100%)',
-            zIndex: 2,
-            pointerEvents: 'none',
-          }}
-        />
-        <MuiBox
-          sx={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            width: '80px',
-            height: '100%',
-            background: 'linear-gradient(to left, rgba(216, 185, 138, 0.15) 0%, transparent 100%)',
-            zIndex: 2,
-            pointerEvents: 'none',
-          }}
-        />
-
-        {/* Content */}
-        <MuiBox
-          sx={{
-            position: 'relative',
-            zIndex: 3,
-            p: { xs: 1, sm: 1.25, md: 1.5 },
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            gap: { xs: 0.75, sm: 1 },
-            color: '#fff',
-            flex: 1,
-            direction: 'rtl',
-            fontFamily: "'Alexandria', 'Montserrat', sans-serif",
-          }}
-        >
-          {/* Top Section - Golden Frame for QR Code or Image */}
-          <MuiBox sx={{ display: 'flex', justifyContent: 'center', mb: { xs: 1, sm: 1.25 } }}>
-            {invitation.qrCodeImage ? (
+          >
+            {/* Subtle overlay for better text readability - only if template image exists */}
+            {templateImageUrl && (
               <MuiBox
                 sx={{
-                  width: { xs: '90px', sm: '100px', md: '110px' },
-                  height: { xs: '90px', sm: '100px', md: '110px' },
-                  border: '2px solid #D8B98A',
-                  borderRadius: '8px',
-                  p: 0.75,
-                  backgroundColor: 'transparent',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(216, 185, 138, 0.1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'relative',
-                }}
-              >
-                <img
-                  src={invitation.qrCodeImage}
-                  alt={`QR Code - ${invitation.qrCode}`}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                    borderRadius: '4px',
-                    backgroundColor: '#ffffff',
-                    imageRendering: 'crisp-edges',
-                  }}
-                />
-              </MuiBox>
-            ) : (
-              <MuiBox
-                sx={{
-                  width: { xs: '90px', sm: '100px', md: '110px' },
-                  height: { xs: '90px', sm: '100px', md: '110px' },
-                  border: '2px solid #D8B98A',
-                  borderRadius: '8px',
-                  backgroundColor: 'rgba(26, 26, 26, 0.8)',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(216, 185, 138, 0.1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.4) 100%)',
+                  zIndex: 1,
                 }}
               />
             )}
-          </MuiBox>
 
-          {/* Golden Horizontal Bar */}
-          <MuiBox
-            sx={{
-              width: '100%',
-              height: '2px',
-              background: 'linear-gradient(90deg, transparent 0%, #D8B98A 20%, #D8B98A 80%, transparent 100%)',
-              mb: { xs: 0.75, sm: 1 },
-              boxShadow: '0 2px 8px rgba(216, 185, 138, 0.4)',
-            }}
-          />
-
-          {/* Invitation Title Box */}
-          <MuiBox sx={{ display: 'flex', justifyContent: 'center', mb: { xs: 0.75, sm: 1 } }}>
+            {/* Decorative side patterns (golden ornamental patterns on edges) */}
             <MuiBox
               sx={{
-                border: '2px solid #D8B98A',
-                borderRadius: '8px',
-                p: { xs: 0.75, sm: 1 },
-                backgroundColor: 'rgba(26, 26, 26, 0.9)',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(216, 185, 138, 0.1)',
-                minWidth: '120px',
-                textAlign: 'center',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '80px',
+                height: '100%',
+                background: 'linear-gradient(to right, rgba(216, 185, 138, 0.15) 0%, transparent 100%)',
+                zIndex: 2,
+                pointerEvents: 'none',
+              }}
+            />
+            <MuiBox
+              sx={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                width: '80px',
+                height: '100%',
+                background: 'linear-gradient(to left, rgba(216, 185, 138, 0.15) 0%, transparent 100%)',
+                zIndex: 2,
+                pointerEvents: 'none',
+              }}
+            />
+
+            {/* Content */}
+            <MuiBox
+              sx={{
+                position: 'relative',
+                zIndex: 3,
+                p: { xs: 1, sm: 1.25, md: 1.5 },
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 1,
-                flexWrap: 'wrap',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                gap: { xs: 0.75, sm: 1 },
+                color: '#fff',
+                flex: 1,
+                direction: 'rtl',
+                fontFamily: "'Alexandria', 'Montserrat', sans-serif",
               }}
             >
-              <MuiTypography
-                variant="h4"
-                sx={{
-                  fontWeight: 700,
-                  color: '#fff',
-                  fontSize: { xs: '1rem', sm: '1.15rem', md: '1.3rem' },
-                  fontFamily: "'Alexandria', 'Montserrat', sans-serif",
-                  letterSpacing: 'normal',
-                  textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
-                  lineHeight: 1.2,
-                  direction: 'rtl',
-                  unicodeBidi: 'embed',
-                }}
-              >
-                دعوة
-              </MuiTypography>
-              {eventType && (
-                <>
+              {/* Top Section - Golden Frame for QR Code or Image */}
+              <MuiBox sx={{ display: 'flex', justifyContent: 'center', mb: { xs: 1, sm: 1.25 } }}>
+                {invitation.qrCodeImage ? (
                   <MuiBox
                     sx={{
-                      width: '1px',
-                      height: '18px',
-                      backgroundColor: 'rgba(216, 185, 138, 0.4)',
+                      width: { xs: '90px', sm: '100px', md: '110px' },
+                      height: { xs: '90px', sm: '100px', md: '110px' },
+                      border: '2px solid #D8B98A',
+                      borderRadius: '8px',
+                      p: 0.75,
+                      backgroundColor: 'transparent',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(216, 185, 138, 0.1)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'relative',
+                    }}
+                  >
+                    <img
+                      src={invitation.qrCodeImage}
+                      alt={`QR Code - ${invitation.qrCode}`}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        borderRadius: '4px',
+                        backgroundColor: '#ffffff',
+                        imageRendering: 'crisp-edges',
+                      }}
+                    />
+                  </MuiBox>
+                ) : (
+                  <MuiBox
+                    sx={{
+                      width: { xs: '90px', sm: '100px', md: '110px' },
+                      height: { xs: '90px', sm: '100px', md: '110px' },
+                      border: '2px solid #D8B98A',
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(26, 26, 26, 0.8)',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(216, 185, 138, 0.1)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
                   />
+                )}
+              </MuiBox>
+
+              {/* Golden Horizontal Bar */}
+              <MuiBox
+                sx={{
+                  width: '100%',
+                  height: '2px',
+                  background: 'linear-gradient(90deg, transparent 0%, #D8B98A 20%, #D8B98A 80%, transparent 100%)',
+                  mb: { xs: 0.75, sm: 1 },
+                  boxShadow: '0 2px 8px rgba(216, 185, 138, 0.4)',
+                }}
+              />
+
+              {/* Invitation Title Box */}
+              <MuiBox sx={{ display: 'flex', justifyContent: 'center', mb: { xs: 0.75, sm: 1 } }}>
+                <MuiBox
+                  sx={{
+                    border: '2px solid #D8B98A',
+                    borderRadius: '8px',
+                    p: { xs: 0.75, sm: 1 },
+                    backgroundColor: 'rgba(26, 26, 26, 0.9)',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(216, 185, 138, 0.1)',
+                    minWidth: '120px',
+                    textAlign: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 1,
+                    flexWrap: 'wrap',
+                  }}
+                >
                   <MuiTypography
-                    variant="body1"
+                    variant="h4"
                     sx={{
-                      fontWeight: 600,
-                      color: '#D8B98A',
-                      fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.95rem' },
+                      fontWeight: 700,
+                      color: '#fff',
+                      fontSize: { xs: '1rem', sm: '1.15rem', md: '1.3rem' },
                       fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                       letterSpacing: 'normal',
                       textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
@@ -1656,259 +1626,223 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                       unicodeBidi: 'embed',
                     }}
                   >
-                    {eventTypeLabels[eventType] || eventType}
+                    دعوة
                   </MuiTypography>
-                </>
-              )}
-            </MuiBox>
-          </MuiBox>
+                  {eventType && (
+                    <>
+                      <MuiBox
+                        sx={{
+                          width: '1px',
+                          height: '18px',
+                          backgroundColor: 'rgba(216, 185, 138, 0.4)',
+                        }}
+                      />
+                      <MuiTypography
+                        variant="body1"
+                        sx={{
+                          fontWeight: 600,
+                          color: '#D8B98A',
+                          fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.95rem' },
+                          fontFamily: "'Alexandria', 'Montserrat', sans-serif",
+                          letterSpacing: 'normal',
+                          textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
+                          lineHeight: 1.2,
+                          direction: 'rtl',
+                          unicodeBidi: 'embed',
+                        }}
+                      >
+                        {eventTypeLabels[eventType] || eventType}
+                      </MuiTypography>
+                    </>
+                  )}
+                </MuiBox>
+              </MuiBox>
 
-          {/* Guest Name Section */}
-          <MuiBox sx={{ textAlign: 'center', mb: { xs: 0.75, sm: 1 } }}>
-            <MuiTypography
-              variant="h4"
-              sx={{
-                fontWeight: 800,
-                color: '#fff',
-                fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
-                fontFamily: "'Alexandria', 'Montserrat', sans-serif",
-                mb: 0.5,
-                textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
-                letterSpacing: 'normal',
-                lineHeight: 1.3,
-                direction: 'rtl',
-                unicodeBidi: 'embed',
-                textRendering: 'optimizeLegibility',
-              }}
-            >
-              {invitation.guestName}
-            </MuiTypography>
-            {invitation.numOfPeople > 1 && (
-              <MuiTypography
-                variant="body2"
-                sx={{
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  fontSize: { xs: '0.75rem', sm: '0.85rem' },
-                  mt: 0.5,
-                  textShadow: '0 1px 4px rgba(0, 0, 0, 0.6)',
-                  fontFamily: "'Alexandria', 'Montserrat', sans-serif",
-                  direction: 'rtl',
-                  unicodeBidi: 'embed',
-                }}
-              >
-                عدد المدعوين: {invitation.numOfPeople}
-              </MuiTypography>
-            )}
-            
-            {/* Additional Guests List */}
-            {invitationGuests.length > 0 && (
-              <MuiBox sx={{ mt: 1, px: 2 }}>
+              {/* Guest Name Section */}
+              <MuiBox sx={{ textAlign: 'center', mb: { xs: 0.75, sm: 1 } }}>
                 <MuiTypography
-                  variant="caption"
+                  variant="h4"
                   sx={{
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    fontSize: { xs: '0.65rem', sm: '0.7rem' },
-                    textShadow: '0 1px 4px rgba(0, 0, 0, 0.6)',
-                    display: 'block',
-                    mb: 0.5,
+                    fontWeight: 800,
+                    color: '#fff',
+                    fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
                     fontFamily: "'Alexandria', 'Montserrat', sans-serif",
+                    mb: 0.5,
+                    textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
+                    letterSpacing: 'normal',
+                    lineHeight: 1.3,
                     direction: 'rtl',
                     unicodeBidi: 'embed',
+                    textRendering: 'optimizeLegibility',
                   }}
                 >
-                  الضيوف الإضافيين:
+                  {invitation.guestName}
                 </MuiTypography>
-                <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 0.5 }}>
-                  {invitationGuests.map((guest, index) => (
-                    <MuiBox
-                      key={guest._id || index}
+                {invitation.numOfPeople > 1 && (
+                  <MuiTypography
+                    variant="body2"
+                    sx={{
+                      color: 'rgba(255, 255, 255, 0.8)',
+                      fontSize: { xs: '0.75rem', sm: '0.85rem' },
+                      mt: 0.5,
+                      textShadow: '0 1px 4px rgba(0, 0, 0, 0.6)',
+                      fontFamily: "'Alexandria', 'Montserrat', sans-serif",
+                      direction: 'rtl',
+                      unicodeBidi: 'embed',
+                    }}
+                  >
+                    عدد المدعوين: {invitation.numOfPeople}
+                  </MuiTypography>
+                )}
+
+                {/* Additional Guests List */}
+                {invitationGuests.length > 0 && (
+                  <MuiBox sx={{ mt: 1, px: 2 }}>
+                    <MuiTypography
+                      variant="caption"
                       sx={{
-                        px: 1,
-                        py: 0.3,
-                        backgroundColor: 'rgba(216, 185, 138, 0.15)',
-                        borderRadius: '8px',
-                        border: '1px solid rgba(216, 185, 138, 0.3)',
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        fontSize: { xs: '0.65rem', sm: '0.7rem' },
+                        textShadow: '0 1px 4px rgba(0, 0, 0, 0.6)',
+                        display: 'block',
+                        mb: 0.5,
+                        fontFamily: "'Alexandria', 'Montserrat', sans-serif",
+                        direction: 'rtl',
+                        unicodeBidi: 'embed',
                       }}
                     >
+                      الضيوف الإضافيين:
+                    </MuiTypography>
+                    <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 0.5 }}>
+                      {invitationGuests.map((guest, index) => (
+                        <MuiBox
+                          key={guest._id || index}
+                          sx={{
+                            px: 1,
+                            py: 0.3,
+                            backgroundColor: 'rgba(216, 185, 138, 0.15)',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(216, 185, 138, 0.3)',
+                          }}
+                        >
+                          <MuiTypography
+                            variant="caption"
+                            sx={{
+                              color: '#D8B98A',
+                              fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                              textShadow: '0 1px 4px rgba(0, 0, 0, 0.6)',
+                              fontFamily: "'Alexandria', 'Montserrat', sans-serif",
+                              direction: 'rtl',
+                              unicodeBidi: 'embed',
+                            }}
+                          >
+                            {guest.name || `ضيف ${index + 2}`}
+                          </MuiTypography>
+                        </MuiBox>
+                      ))}
+                    </MuiBox>
+                  </MuiBox>
+                )}
+              </MuiBox>
+
+              {/* Event Details - Icons with Golden Lines */}
+              <MuiBox
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-around',
+                  alignItems: 'flex-start',
+                  mb: { xs: 0.75, sm: 1 },
+                  px: 0.5,
+                  flexWrap: 'wrap',
+                  gap: 0.75,
+                }}
+              >
+                {/* Time Icon - Show first */}
+                {(eventTime || startTime || endTime) && (
+                  <MuiBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: '70px' }}>
+                    <MuiBox
+                      sx={{
+                        width: { xs: '32px', sm: '36px' },
+                        height: { xs: '32px', sm: '36px' },
+                        borderRadius: '50%',
+                        backgroundColor: 'rgba(216, 185, 138, 0.2)',
+                        border: '2px solid #D8B98A',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mb: 0.75,
+                        boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
+                      }}
+                    >
+                      <Clock size={18} style={{ color: '#D8B98A' }} />
+                    </MuiBox>
+                    <MuiBox
+                      sx={{
+                        width: '40px',
+                        height: '2px',
+                        background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
+                        mb: 0.4,
+                      }}
+                    />
+                    {formattedStartTime && formattedEndTime ? (
+                      <MuiBox sx={{ textAlign: 'center' }}>
+                        <MuiTypography
+                          variant="body2"
+                          sx={{
+                            color: '#fff',
+                            fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                            textAlign: 'center',
+                            textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
+                            maxWidth: '80px',
+                            lineHeight: 1.3,
+                            fontFamily: "'Alexandria', 'Montserrat', sans-serif",
+                            direction: 'rtl',
+                            unicodeBidi: 'embed',
+                            mb: 0.3,
+                          }}
+                        >
+                          من {formattedStartTime}
+                        </MuiTypography>
+                        <MuiTypography
+                          variant="body2"
+                          sx={{
+                            color: '#fff',
+                            fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                            textAlign: 'center',
+                            textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
+                            maxWidth: '80px',
+                            lineHeight: 1.3,
+                            fontFamily: "'Alexandria', 'Montserrat', sans-serif",
+                            direction: 'rtl',
+                            unicodeBidi: 'embed',
+                          }}
+                        >
+                          إلى {formattedEndTime}
+                        </MuiTypography>
+                      </MuiBox>
+                    ) : (
                       <MuiTypography
-                        variant="caption"
+                        variant="body2"
                         sx={{
-                          color: '#D8B98A',
+                          color: '#fff',
                           fontSize: { xs: '0.6rem', sm: '0.65rem' },
-                          textShadow: '0 1px 4px rgba(0, 0, 0, 0.6)',
+                          textAlign: 'center',
+                          textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
+                          maxWidth: '80px',
+                          lineHeight: 1.2,
                           fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                           direction: 'rtl',
                           unicodeBidi: 'embed',
                         }}
                       >
-                        {guest.name || `ضيف ${index + 2}`}
+                        {formattedStartTime || formattedEndTime || '—'}
                       </MuiTypography>
-                    </MuiBox>
-                  ))}
-                </MuiBox>
-              </MuiBox>
-            )}
-          </MuiBox>
-
-          {/* Event Details - Icons with Golden Lines */}
-          <MuiBox 
-            sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-around',
-              alignItems: 'flex-start',
-              mb: { xs: 0.75, sm: 1 },
-              px: 0.5,
-              flexWrap: 'wrap',
-              gap: 0.75,
-            }}
-          >
-            {/* Time Icon - Show first */}
-            {(eventTime || startTime || endTime) && (
-              <MuiBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: '70px' }}>
-                <MuiBox
-                  sx={{
-                    width: { xs: '32px', sm: '36px' },
-                    height: { xs: '32px', sm: '36px' },
-                    borderRadius: '50%',
-                    backgroundColor: 'rgba(216, 185, 138, 0.2)',
-                    border: '2px solid #D8B98A',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mb: 0.75,
-                    boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
-                  }}
-                >
-                  <Clock size={18} style={{ color: '#D8B98A' }} />
-                </MuiBox>
-                <MuiBox
-                  sx={{
-                    width: '40px',
-                    height: '2px',
-                    background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
-                    mb: 0.4,
-                  }}
-                />
-                {formattedStartTime && formattedEndTime ? (
-                  <MuiBox sx={{ textAlign: 'center' }}>
-                    <MuiTypography
-                      variant="body2"
-                      sx={{
-                        color: '#fff',
-                        fontSize: { xs: '0.6rem', sm: '0.65rem' },
-                        textAlign: 'center',
-                        textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
-                        maxWidth: '80px',
-                        lineHeight: 1.3,
-                        fontFamily: "'Alexandria', 'Montserrat', sans-serif",
-                        direction: 'rtl',
-                        unicodeBidi: 'embed',
-                        mb: 0.3,
-                      }}
-                    >
-                      من {formattedStartTime}
-                    </MuiTypography>
-                    <MuiTypography
-                      variant="body2"
-                      sx={{
-                        color: '#fff',
-                        fontSize: { xs: '0.6rem', sm: '0.65rem' },
-                        textAlign: 'center',
-                        textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
-                        maxWidth: '80px',
-                        lineHeight: 1.3,
-                        fontFamily: "'Alexandria', 'Montserrat', sans-serif",
-                        direction: 'rtl',
-                        unicodeBidi: 'embed',
-                      }}
-                    >
-                      إلى {formattedEndTime}
-                    </MuiTypography>
+                    )}
                   </MuiBox>
-                ) : (
-                <MuiTypography
-                  variant="body2"
-                  sx={{
-                    color: '#fff',
-                    fontSize: { xs: '0.6rem', sm: '0.65rem' },
-                    textAlign: 'center',
-                    textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
-                    maxWidth: '80px',
-                    lineHeight: 1.2,
-                      fontFamily: "'Alexandria', 'Montserrat', sans-serif",
-                    direction: 'rtl',
-                    unicodeBidi: 'embed',
-                  }}
-                >
-                    {formattedStartTime || formattedEndTime || '—'}
-                </MuiTypography>
                 )}
-              </MuiBox>
-            )}
 
-            {/* Vertical Divider */}
-            {((eventTime || startTime || endTime) && formattedDate) && (
-              <MuiBox
-                sx={{
-                  width: '2px',
-                  height: { xs: '50px', sm: '55px' },
-                  background: 'linear-gradient(180deg, transparent 0%, #D8B98A 50%, transparent 100%)',
-                  mx: 0.3,
-                }}
-              />
-            )}
-
-            {/* Date Icon */}
-            {formattedDate && (
-              <MuiBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: '70px' }}>
-                <MuiBox
-                  sx={{
-                    width: { xs: '32px', sm: '36px' },
-                    height: { xs: '32px', sm: '36px' },
-                    borderRadius: '50%',
-                    backgroundColor: 'rgba(216, 185, 138, 0.2)',
-                    border: '2px solid #D8B98A',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mb: 0.75,
-                    boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
-                  }}
-                >
-                  <Calendar size={18} style={{ color: '#D8B98A' }} />
-                </MuiBox>
-                <MuiBox
-                  sx={{
-                    width: '40px',
-                    height: '2px',
-                    background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
-                    mb: 0.4,
-                  }}
-                />
-                <MuiTypography
-                  variant="body2"
-                  sx={{
-                    color: '#fff',
-                    fontSize: { xs: '0.6rem', sm: '0.65rem' },
-                    textAlign: 'center',
-                    textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
-                    maxWidth: '80px',
-                    lineHeight: 1.2,
-                    fontFamily: "'Alexandria', 'Montserrat', sans-serif",
-                    direction: 'rtl',
-                    unicodeBidi: 'embed',
-                  }}
-                >
-                  {formattedDate}
-                </MuiTypography>
-              </MuiBox>
-            )}
-
-            {/* Location Icon - Only show if hallName exists */}
-            {hallName && (
-              <>
                 {/* Vertical Divider */}
-                {((eventTime || startTime || endTime) || formattedDate) && (
+                {((eventTime || startTime || endTime) && formattedDate) && (
                   <MuiBox
                     sx={{
                       width: '2px',
@@ -1918,169 +1852,230 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                     }}
                   />
                 )}
-                <MuiBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: { xs: '80px', sm: '100px' }, maxWidth: { xs: '150px', sm: '180px' } }}>
-                  <MuiBox
-                    sx={{
-                      width: { xs: '32px', sm: '36px' },
-                      height: { xs: '32px', sm: '36px' },
-                      borderRadius: '50%',
-                      backgroundColor: 'rgba(216, 185, 138, 0.2)',
-                      border: '2px solid #D8B98A',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mb: 0.75,
-                      boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
-                    }}
-                  >
-                    <MapPin size={18} style={{ color: '#D8B98A' }} />
-                  </MuiBox>
-                  <MuiBox
-                    sx={{
-                      width: '40px',
-                      height: '2px',
-                      background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
-                      mb: 0.4,
-                    }}
-                  />
-                  <MuiTypography
-                    variant="body2"
-                    sx={{
-                      color: '#fff',
-                      fontSize: { xs: '0.6rem', sm: '0.65rem' },
-                      textAlign: 'center',
-                      textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
-                      width: '100%',
-                      wordWrap: 'break-word',
-                      overflowWrap: 'break-word',
-                      whiteSpace: 'normal',
-                      lineHeight: 1.3,
-                      fontFamily: "'Alexandria', 'Montserrat', sans-serif",
-                      direction: 'rtl',
-                      unicodeBidi: 'embed',
-                    }}
-                  >
-                    {hallName}
-                  </MuiTypography>
-                </MuiBox>
-              </>
-            )}
-          </MuiBox>
 
-          {/* Additional Event Details */}
-          {(eventName || hallLocation || hallCapacity) && (
-            <MuiBox 
-              sx={{ 
-                textAlign: 'center', 
-                mb: { xs: 0.75, sm: 1 },
-                px: 1.5,
-              }}
-            >
-              {/* Event Name */}
-              {eventName && eventName !== 'فعالية' && (
-                <MuiTypography
-                  variant="body2"
+                {/* Date Icon */}
+                {formattedDate && (
+                  <MuiBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: '70px' }}>
+                    <MuiBox
+                      sx={{
+                        width: { xs: '32px', sm: '36px' },
+                        height: { xs: '32px', sm: '36px' },
+                        borderRadius: '50%',
+                        backgroundColor: 'rgba(216, 185, 138, 0.2)',
+                        border: '2px solid #D8B98A',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mb: 0.75,
+                        boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
+                      }}
+                    >
+                      <Calendar size={18} style={{ color: '#D8B98A' }} />
+                    </MuiBox>
+                    <MuiBox
+                      sx={{
+                        width: '40px',
+                        height: '2px',
+                        background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
+                        mb: 0.4,
+                      }}
+                    />
+                    <MuiTypography
+                      variant="body2"
+                      sx={{
+                        color: '#fff',
+                        fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                        textAlign: 'center',
+                        textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
+                        maxWidth: '80px',
+                        lineHeight: 1.2,
+                        fontFamily: "'Alexandria', 'Montserrat', sans-serif",
+                        direction: 'rtl',
+                        unicodeBidi: 'embed',
+                      }}
+                    >
+                      {formattedDate}
+                    </MuiTypography>
+                  </MuiBox>
+                )}
+
+                {/* Location Icon - Only show if hallName exists */}
+                {hallName && (
+                  <>
+                    {/* Vertical Divider */}
+                    {((eventTime || startTime || endTime) || formattedDate) && (
+                      <MuiBox
+                        sx={{
+                          width: '2px',
+                          height: { xs: '50px', sm: '55px' },
+                          background: 'linear-gradient(180deg, transparent 0%, #D8B98A 50%, transparent 100%)',
+                          mx: 0.3,
+                        }}
+                      />
+                    )}
+                    <MuiBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: { xs: '80px', sm: '100px' }, maxWidth: { xs: '150px', sm: '180px' } }}>
+                      <MuiBox
+                        sx={{
+                          width: { xs: '32px', sm: '36px' },
+                          height: { xs: '32px', sm: '36px' },
+                          borderRadius: '50%',
+                          backgroundColor: 'rgba(216, 185, 138, 0.2)',
+                          border: '2px solid #D8B98A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          mb: 0.75,
+                          boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
+                        }}
+                      >
+                        <MapPin size={18} style={{ color: '#D8B98A' }} />
+                      </MuiBox>
+                      <MuiBox
+                        sx={{
+                          width: '40px',
+                          height: '2px',
+                          background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
+                          mb: 0.4,
+                        }}
+                      />
+                      <MuiTypography
+                        variant="body2"
+                        sx={{
+                          color: '#fff',
+                          fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                          textAlign: 'center',
+                          textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
+                          width: '100%',
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word',
+                          whiteSpace: 'normal',
+                          lineHeight: 1.3,
+                          fontFamily: "'Alexandria', 'Montserrat', sans-serif",
+                          direction: 'rtl',
+                          unicodeBidi: 'embed',
+                        }}
+                      >
+                        {hallName}
+                      </MuiTypography>
+                    </MuiBox>
+                  </>
+                )}
+              </MuiBox>
+
+              {/* Additional Event Details */}
+              {(eventName || hallLocation || hallCapacity) && (
+                <MuiBox
                   sx={{
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                    mb: 0.4,
-                    textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
-                    fontWeight: 600,
-                    fontFamily: "'Alexandria', 'Montserrat', sans-serif",
-                    direction: 'rtl',
-                    unicodeBidi: 'embed',
+                    textAlign: 'center',
+                    mb: { xs: 0.75, sm: 1 },
+                    px: 1.5,
                   }}
                 >
-                  {eventName}
-                </MuiTypography>
-              )}
-
-              {/* Hall Details */}
-              {(hallLocation || hallCapacity) && (
-                <MuiBox sx={{ mt: 0.75, display: 'flex', justifyContent: 'center', gap: 1, flexWrap: 'wrap' }}>
-                  {hallLocation && (
+                  {/* Event Name */}
+                  {eventName && eventName !== 'فعالية' && (
                     <MuiTypography
-                      variant="caption"
+                      variant="body2"
                       sx={{
-                        color: 'rgba(255, 255, 255, 0.8)',
-                        fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                        color: 'rgba(255, 255, 255, 0.9)',
+                        fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                        mb: 0.4,
                         textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
+                        fontWeight: 600,
                         fontFamily: "'Alexandria', 'Montserrat', sans-serif",
                         direction: 'rtl',
                         unicodeBidi: 'embed',
                       }}
                     >
-                      {hallLocation}
+                      {eventName}
                     </MuiTypography>
                   )}
-                  {hallCapacity && (
-                    <MuiTypography
-                      variant="caption"
-                      sx={{
-                        color: 'rgba(255, 255, 255, 0.8)',
-                        fontSize: { xs: '0.6rem', sm: '0.65rem' },
-                        textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
-                        fontFamily: "'Alexandria', 'Montserrat', sans-serif",
-                        direction: 'rtl',
-                        unicodeBidi: 'embed',
-                      }}
-                    >
-                      السعة: {hallCapacity} ضيف
-                    </MuiTypography>
+
+                  {/* Hall Details */}
+                  {(hallLocation || hallCapacity) && (
+                    <MuiBox sx={{ mt: 0.75, display: 'flex', justifyContent: 'center', gap: 1, flexWrap: 'wrap' }}>
+                      {hallLocation && (
+                        <MuiTypography
+                          variant="caption"
+                          sx={{
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                            textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
+                            fontFamily: "'Alexandria', 'Montserrat', sans-serif",
+                            direction: 'rtl',
+                            unicodeBidi: 'embed',
+                          }}
+                        >
+                          {hallLocation}
+                        </MuiTypography>
+                      )}
+                      {hallCapacity && (
+                        <MuiTypography
+                          variant="caption"
+                          sx={{
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                            textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
+                            fontFamily: "'Alexandria', 'Montserrat', sans-serif",
+                            direction: 'rtl',
+                            unicodeBidi: 'embed',
+                          }}
+                        >
+                          السعة: {hallCapacity} ضيف
+                        </MuiTypography>
+                      )}
+                    </MuiBox>
                   )}
                 </MuiBox>
               )}
-            </MuiBox>
-          )}
 
 
-          {/* Elegant Arabic Calligraphy Footer */}
-          <MuiBox sx={{ textAlign: 'center', mt: 'auto', pt: { xs: 0.75, sm: 1 }, pb: { xs: 1, sm: 1.25 } }}>
-            <MuiTypography
-              variant="h6"
-              sx={{
-                color: '#D8B98A',
-                fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
-                fontFamily: "'Alexandria', 'Montserrat', sans-serif",
-                fontWeight: 600,
-                letterSpacing: 'normal',
-                textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(216, 185, 138, 0.3)',
-                lineHeight: 1.4,
-                mb: 0.75,
-                direction: 'rtl',
-                unicodeBidi: 'embed',
-                textRendering: 'optimizeLegibility',
-              }}
-            >
-              وبحضوركم يتم لنا الفرح والسرور
-            </MuiTypography>
-            {/* Decorative lines below text */}
-            <MuiBox
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                gap: 1,
-                mt: 0.75,
-              }}
-            >
-              <MuiBox
-                sx={{
-                  width: { xs: '50px', sm: '60px' },
-                  height: '2px',
-                  background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
-                }}
-              />
-              <MuiBox
-                sx={{
-                  width: { xs: '50px', sm: '60px' },
-                  height: '2px',
-                  background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
-                }}
-              />
+              {/* Elegant Arabic Calligraphy Footer */}
+              <MuiBox sx={{ textAlign: 'center', mt: 'auto', pt: { xs: 0.75, sm: 1 }, pb: { xs: 1, sm: 1.25 } }}>
+                <MuiTypography
+                  variant="h6"
+                  sx={{
+                    color: '#D8B98A',
+                    fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
+                    fontFamily: "'Alexandria', 'Montserrat', sans-serif",
+                    fontWeight: 600,
+                    letterSpacing: 'normal',
+                    textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(216, 185, 138, 0.3)',
+                    lineHeight: 1.4,
+                    mb: 0.75,
+                    direction: 'rtl',
+                    unicodeBidi: 'embed',
+                    textRendering: 'optimizeLegibility',
+                  }}
+                >
+                  وبحضوركم يتم لنا الفرح والسرور
+                </MuiTypography>
+                {/* Decorative lines below text */}
+                <MuiBox
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: 1,
+                    mt: 0.75,
+                  }}
+                >
+                  <MuiBox
+                    sx={{
+                      width: { xs: '50px', sm: '60px' },
+                      height: '2px',
+                      background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
+                    }}
+                  />
+                  <MuiBox
+                    sx={{
+                      width: { xs: '50px', sm: '60px' },
+                      height: '2px',
+                      background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
+                    }}
+                  />
+                </MuiBox>
+              </MuiBox>
             </MuiBox>
           </MuiBox>
-        </MuiBox>
-        </MuiBox>
         </MuiBox>
 
         {/* Right Side - Template Selection */}
@@ -2112,10 +2107,10 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
               <ImageIcon size={22} style={{ color: 'var(--color-primary-500)' }} />
             </MuiBox>
             <MuiBox sx={{ flex: 1 }}>
-              <MuiTypography 
-                variant="h6" 
-                sx={{ 
-                  color: 'var(--color-text-primary)', 
+              <MuiTypography
+                variant="h6"
+                sx={{
+                  color: 'var(--color-text-primary)',
                   fontWeight: 600,
                   fontSize: '1.2rem',
                   mb: 0.5,
@@ -2132,30 +2127,30 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
           </MuiBox>
 
           {/* Templates Grid */}
-            <MuiBox
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(2, 1fr)', md: 'repeat(2, 1fr)' },
-                gap: 2,
-                overflowY: 'auto',
-                pr: 1,
-                pb: 2,
-                '&::-webkit-scrollbar': {
-                  width: '8px',
+          <MuiBox
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(2, 1fr)', md: 'repeat(2, 1fr)' },
+              gap: 2,
+              overflowY: 'auto',
+              pr: 1,
+              pb: 2,
+              '&::-webkit-scrollbar': {
+                width: '8px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '4px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: 'rgba(216, 185, 138, 0.4)',
+                borderRadius: '4px',
+                '&:hover': {
+                  background: 'rgba(216, 185, 138, 0.6)',
                 },
-                '&::-webkit-scrollbar-track': {
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  borderRadius: '4px',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  background: 'rgba(216, 185, 138, 0.4)',
-                  borderRadius: '4px',
-                  '&:hover': {
-                    background: 'rgba(216, 185, 138, 0.6)',
-                  },
-                },
-              }}
-            >
+              },
+            }}
+          >
             {/* No Template Option */}
             <MuiBox
               onClick={() => onTemplateChange(null)}
@@ -2166,13 +2161,13 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                 borderRadius: '16px',
                 overflow: 'hidden',
                 cursor: 'pointer',
-                border: selectedTemplateId === null 
-                  ? '3px solid var(--color-primary-500)' 
+                border: selectedTemplateId === null
+                  ? '3px solid var(--color-primary-500)'
                   : '2px solid rgba(216, 185, 138, 0.3)',
                 backgroundColor: 'var(--color-surface-dark)',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: selectedTemplateId === null 
-                  ? '0 12px 32px rgba(216, 185, 138, 0.5), 0 0 0 4px rgba(216, 185, 138, 0.1)' 
+                boxShadow: selectedTemplateId === null
+                  ? '0 12px 32px rgba(216, 185, 138, 0.5), 0 0 0 4px rgba(216, 185, 138, 0.1)'
                   : '0 4px 16px rgba(0, 0, 0, 0.3)',
                 '&:hover': {
                   transform: 'translateY(-6px) scale(1.02)',
@@ -2196,10 +2191,10 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                 }}
               >
                 <ImageIcon size={48} style={{ color: 'var(--color-primary-500)', opacity: 0.7 }} />
-                <MuiTypography 
-                  variant="body2" 
-                  sx={{ 
-                    color: 'var(--color-text-primary)', 
+                <MuiTypography
+                  variant="body2"
+                  sx={{
+                    color: 'var(--color-text-primary)',
                     fontWeight: 600,
                     fontSize: { xs: '0.75rem', sm: '0.85rem' },
                     textAlign: 'center',
@@ -2209,7 +2204,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                   بدون قالب
                 </MuiTypography>
               </MuiBox>
-              
+
               {/* Selected Indicator */}
               {selectedTemplateId === null && (
                 <MuiBox
@@ -2233,187 +2228,187 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
             </MuiBox>
 
             {/* Available Templates */}
-            {console.log('🔍 Rendering Templates:', JSON.stringify({ 
-              'availableTemplates.length': availableTemplates.length, 
-              'availableTemplates': availableTemplates 
+            {console.log('🔍 Rendering Templates:', JSON.stringify({
+              'availableTemplates.length': availableTemplates.length,
+              'availableTemplates': availableTemplates
             }, null, 2))}
             {availableTemplates.length > 0 ? availableTemplates.map((template) => {
-                const templateId = template._id || template.id
-                const isSelected = selectedTemplateId === templateId || 
-                                  (selectedTemplateId === null ? false : !selectedTemplateId && selectedTemplate?._id === templateId) ||
-                                  (selectedTemplateId === null ? false : !selectedTemplateId && selectedTemplate?.id === templateId)
-                const templateImg = template.imageUrl || template.image
-                const templateImgUrl = templateImg
-                  ? (templateImg.startsWith('http://') || templateImg.startsWith('https://') 
-                      ? templateImg 
-                      : (templateImg.startsWith('/') 
-                          ? `http://82.137.244.167:5001${templateImg}` 
-                          : `http://82.137.244.167:5001/${templateImg}`))
-                  : null
-                
-                console.log('🔍 Template Image Debug:', {
-                  'templateId': templateId,
-                  'template.imageUrl': template.imageUrl,
-                  'template.image': template.image,
-                  'templateImg': templateImg,
-                  'templateImgUrl': templateImgUrl,
-                  'fullTemplate': template
-                })
-                
-                return (
+              const templateId = template._id || template.id
+              const isSelected = selectedTemplateId === templateId ||
+                (selectedTemplateId === null ? false : !selectedTemplateId && selectedTemplate?._id === templateId) ||
+                (selectedTemplateId === null ? false : !selectedTemplateId && selectedTemplate?.id === templateId)
+              const templateImg = template.imageUrl || template.image
+              const templateImgUrl = templateImg
+                ? (templateImg.startsWith('http://') || templateImg.startsWith('https://')
+                  ? templateImg
+                  : (templateImg.startsWith('/')
+                    ? `http://82.137.244.167:5001${templateImg}`
+                    : `http://82.137.244.167:5001/${templateImg}`))
+                : null
+
+              console.log('🔍 Template Image Debug:', {
+                'templateId': templateId,
+                'template.imageUrl': template.imageUrl,
+                'template.image': template.image,
+                'templateImg': templateImg,
+                'templateImgUrl': templateImgUrl,
+                'fullTemplate': template
+              })
+
+              return (
+                <MuiBox
+                  key={templateId}
+                  onClick={() => onTemplateChange(templateId)}
+                  sx={{
+                    position: 'relative',
+                    width: '100%',
+                    aspectRatio: '3/4',
+                    borderRadius: '16px',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    border: isSelected
+                      ? '3px solid var(--color-primary-500)'
+                      : '2px solid rgba(216, 185, 138, 0.3)',
+                    backgroundColor: 'var(--color-surface-dark)',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: isSelected
+                      ? '0 12px 32px rgba(216, 185, 138, 0.5), 0 0 0 4px rgba(216, 185, 138, 0.1)'
+                      : '0 4px 16px rgba(0, 0, 0, 0.3)',
+                    '&:hover': {
+                      transform: 'translateY(-6px) scale(1.02)',
+                      borderColor: 'var(--color-primary-500)',
+                      boxShadow: '0 16px 40px rgba(216, 185, 138, 0.6), 0 0 0 4px rgba(216, 185, 138, 0.15)',
+                    },
+                  }}
+                >
+                  {/* Template Preview Image */}
+                  {templateImgUrl ? (
+                    <MuiBox
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        backgroundImage: `url(${templateImgUrl})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat',
+                        transition: 'transform 0.3s ease',
+                        '&:hover': {
+                          transform: 'scale(1.05)',
+                        },
+                      }}
+                    />
+                  ) : (
+                    <MuiBox
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.2), rgba(255, 227, 108, 0.1))',
+                        gap: 1,
+                      }}
+                    >
+                      <ImageIcon size={48} style={{ color: 'var(--color-primary-500)', opacity: 0.6 }} />
+                      <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.7rem' }}>
+                        بدون صورة
+                      </MuiTypography>
+                    </MuiBox>
+                  )}
+
+                  {/* Overlay with Template Name */}
                   <MuiBox
-                    key={templateId}
-                    onClick={() => onTemplateChange(templateId)}
                     sx={{
-                      position: 'relative',
-                      width: '100%',
-                      aspectRatio: '3/4',
-                      borderRadius: '16px',
-                      overflow: 'hidden',
-                      cursor: 'pointer',
-                      border: isSelected 
-                        ? '3px solid var(--color-primary-500)' 
-                        : '2px solid rgba(216, 185, 138, 0.3)',
-                      backgroundColor: 'var(--color-surface-dark)',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      boxShadow: isSelected 
-                        ? '0 12px 32px rgba(216, 185, 138, 0.5), 0 0 0 4px rgba(216, 185, 138, 0.1)' 
-                        : '0 4px 16px rgba(0, 0, 0, 0.3)',
-                      '&:hover': {
-                        transform: 'translateY(-6px) scale(1.02)',
-                        borderColor: 'var(--color-primary-500)',
-                        boxShadow: '0 16px 40px rgba(216, 185, 138, 0.6), 0 0 0 4px rgba(216, 185, 138, 0.15)',
-                      },
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      background: 'linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 50%, transparent 100%)',
+                      p: { xs: 1.5, sm: 2 },
+                      pt: 3,
                     }}
                   >
-                    {/* Template Preview Image */}
-                    {templateImgUrl ? (
-                      <MuiBox
-                        sx={{
-                          width: '100%',
-                          height: '100%',
-                          backgroundImage: `url(${templateImgUrl})`,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                          backgroundRepeat: 'no-repeat',
-                          transition: 'transform 0.3s ease',
-                          '&:hover': {
-                            transform: 'scale(1.05)',
-                          },
-                        }}
-                      />
-                    ) : (
-                      <MuiBox
-                        sx={{
-                          width: '100%',
-                          height: '100%',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.2), rgba(255, 227, 108, 0.1))',
-                          gap: 1,
-                        }}
-                      >
-                        <ImageIcon size={48} style={{ color: 'var(--color-primary-500)', opacity: 0.6 }} />
-                        <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.7rem' }}>
-                          بدون صورة
-                        </MuiTypography>
-                      </MuiBox>
-                    )}
-                    
-                    {/* Overlay with Template Name */}
+                    <MuiTypography
+                      variant="body2"
+                      sx={{
+                        color: '#fff',
+                        fontWeight: 600,
+                        textAlign: 'center',
+                        display: 'block',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        fontSize: { xs: '0.75rem', sm: '0.85rem' },
+                        textShadow: '0 2px 4px rgba(0, 0, 0, 0.8)',
+                      }}
+                    >
+                      {template.templateName || template.name || 'قالب بدون اسم'}
+                    </MuiTypography>
+                  </MuiBox>
+
+                  {/* Selected Indicator */}
+                  {isSelected && (
                     <MuiBox
                       sx={{
                         position: 'absolute',
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        background: 'linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 50%, transparent 100%)',
-                        p: { xs: 1.5, sm: 2 },
-                        pt: 3,
+                        top: { xs: 8, sm: 10 },
+                        right: { xs: 8, sm: 10 },
+                        width: { xs: 28, sm: 32 },
+                        height: { xs: 28, sm: 32 },
+                        borderRadius: '50%',
+                        backgroundColor: 'var(--color-primary-500)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 4px 12px rgba(216, 185, 138, 0.6), 0 0 0 3px rgba(216, 185, 138, 0.2)',
+                        animation: 'pulse 2s infinite',
+                        '@keyframes pulse': {
+                          '0%, 100%': {
+                            boxShadow: '0 4px 12px rgba(216, 185, 138, 0.6), 0 0 0 3px rgba(216, 185, 138, 0.2)',
+                          },
+                          '50%': {
+                            boxShadow: '0 4px 16px rgba(216, 185, 138, 0.8), 0 0 0 4px rgba(216, 185, 138, 0.3)',
+                          },
+                        },
                       }}
                     >
-                      <MuiTypography
-                        variant="body2"
-                        sx={{
-                          color: '#fff',
-                          fontWeight: 600,
-                          textAlign: 'center',
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          fontSize: { xs: '0.75rem', sm: '0.85rem' },
-                          textShadow: '0 2px 4px rgba(0, 0, 0, 0.8)',
-                        }}
-                      >
-                        {template.templateName || template.name || 'قالب بدون اسم'}
-                      </MuiTypography>
-                    </MuiBox>
-                    
-                    {/* Selected Indicator */}
-                    {isSelected && (
                       <MuiBox
+                        component="svg"
                         sx={{
-                          position: 'absolute',
-                          top: { xs: 8, sm: 10 },
-                          right: { xs: 8, sm: 10 },
-                          width: { xs: 28, sm: 32 },
-                          height: { xs: 28, sm: 32 },
-                          borderRadius: '50%',
-                          backgroundColor: 'var(--color-primary-500)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: '0 4px 12px rgba(216, 185, 138, 0.6), 0 0 0 3px rgba(216, 185, 138, 0.2)',
-                          animation: 'pulse 2s infinite',
-                          '@keyframes pulse': {
-                            '0%, 100%': {
-                              boxShadow: '0 4px 12px rgba(216, 185, 138, 0.6), 0 0 0 3px rgba(216, 185, 138, 0.2)',
-                            },
-                            '50%': {
-                              boxShadow: '0 4px 16px rgba(216, 185, 138, 0.8), 0 0 0 4px rgba(216, 185, 138, 0.3)',
-                            },
-                          },
+                          width: { xs: 16, sm: 18 },
+                          height: { xs: 16, sm: 18 },
+                          color: '#1A1A1A',
                         }}
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
                       >
-                        <MuiBox
-                          component="svg"
-                          sx={{
-                            width: { xs: 16, sm: 18 },
-                            height: { xs: 16, sm: 18 },
-                            color: '#1A1A1A',
-                          }}
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </MuiBox>
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
                       </MuiBox>
-                    )}
-                  </MuiBox>
-                )
-              }) : (
-            <MuiBox
-              sx={{
-                    gridColumn: '1 / -1',
-                textAlign: 'center',
-                    py: 4,
-                    color: 'var(--color-text-secondary)',
-              }}
-            >
-                  <ImageIcon size={48} style={{ opacity: 0.5, marginBottom: 16 }} />
-                  <MuiTypography variant="body2">
-                لا توجد قوالب متاحة
-              </MuiTypography>
-            </MuiBox>
-          )}
-            </MuiBox>
+                    </MuiBox>
+                  )}
+                </MuiBox>
+              )
+            }) : (
+              <MuiBox
+                sx={{
+                  gridColumn: '1 / -1',
+                  textAlign: 'center',
+                  py: 4,
+                  color: 'var(--color-text-secondary)',
+                }}
+              >
+                <ImageIcon size={48} style={{ opacity: 0.5, marginBottom: 16 }} />
+                <MuiTypography variant="body2">
+                  لا توجد قوالب متاحة
+                </MuiTypography>
+              </MuiBox>
+            )}
+          </MuiBox>
         </MuiBox>
       </MuiBox>
     </MuiBox>
@@ -2424,16 +2419,16 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit, loading, eventGuestCount, totalInvitedPeople, bookings = [], invitations = [] }) {
   const isEdit = !!editingInvitation
   const isCreate = !isEdit
-  
+
   // Watch selected eventId to update eventGuestCount dynamically
   const [selectedEventId, setSelectedEventId] = useState(null)
-  
+
   // Get selected event details
   const selectedEvent = useMemo(() => {
     if (!selectedEventId) return null
     return bookings.find(b => (b._id || b.id)?.toString() === selectedEventId?.toString())
   }, [selectedEventId, bookings])
-  
+
   // Calculate eventGuestCount and totalInvitedPeople based on selected event
   const currentEventGuestCount = useMemo(() => {
     if (isEdit && editingInvitation) {
@@ -2447,7 +2442,7 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
     }
     return eventGuestCount || 0
   }, [selectedEvent, eventGuestCount, isEdit, editingInvitation, bookings])
-  
+
   const currentTotalInvitedPeople = useMemo(() => {
     if (isEdit && editingInvitation) {
       // For edit, calculate based on invitation's event
@@ -2469,18 +2464,18 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
     }
     return totalInvitedPeople || 0
   }, [selectedEventId, invitations, totalInvitedPeople, isEdit, editingInvitation])
-  
+
   // Calculate remaining available guests
   const currentInvitationCount = editingInvitation?.numOfPeople || 0
-  const remainingGuests = currentEventGuestCount > 0 
+  const remainingGuests = currentEventGuestCount > 0
     ? currentEventGuestCount - (currentTotalInvitedPeople - (isEdit ? currentInvitationCount : 0))
     : null
-  
+
   // Create schema with validation - recreate on each render to get latest values
   const schema = useMemo(() => {
     return createInvitationSchema(currentEventGuestCount, currentTotalInvitedPeople, isEdit, currentInvitationCount, isCreate)
   }, [currentEventGuestCount, currentTotalInvitedPeople, isEdit, currentInvitationCount, isCreate])
-  
+
   const {
     control,
     handleSubmit,
@@ -2498,7 +2493,7 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
 
   const numOfPeopleValue = watch('numOfPeople')
   const selectedEventIdValue = watch('eventId')
-  
+
   // Update selectedEventId when form value changes
   useEffect(() => {
     if (selectedEventIdValue && selectedEventIdValue !== selectedEventId) {
@@ -2526,7 +2521,7 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
         setSelectedEventId(initialEventId)
       } else {
         setSelectedEventId(null)
-    }
+      }
     }
   }, [open, editingInvitation, reset, isEdit])
 
@@ -2535,7 +2530,17 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
       open={open}
       onClose={onClose}
       title={isEdit ? 'تعديل الدعوة' : 'إضافة دعوة جديدة'}
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(async (data) => {
+        const success = await onSubmit(data)
+        if (success && !isEdit) {
+          reset({
+            eventId: selectedEventIdValue || '',
+            guestName: '',
+            numOfPeople: 1,
+            guests: [],
+          })
+        }
+      })}
       loading={loading}
       submitText={isEdit ? 'تحديث' : 'إضافة'}
       cancelText="إلغاء"
@@ -2552,10 +2557,10 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
                 const selectId = `event-select-${field.name}`
                 return (
                   <MuiBox>
-                    <MuiTypography 
-                      variant="body2" 
+                    <MuiTypography
+                      variant="body2"
                       component="label"
-                      sx={{ 
+                      sx={{
                         mb: 1,
                         display: 'block',
                         color: error ? 'var(--color-error-500)' : 'var(--color-primary-500)',
@@ -2649,9 +2654,9 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
           />
           {currentEventGuestCount > 0 && remainingGuests !== null && (
             <MuiBox sx={{ mt: 1.5 }}>
-              <MuiTypography 
-                variant="caption" 
-                sx={{ 
+              <MuiTypography
+                variant="caption"
+                sx={{
                   color: remainingGuests < (numOfPeopleValue || 0) ? 'var(--color-error-500)' : 'var(--color-text-secondary)',
                   fontSize: '0.75rem',
                   display: 'block',
@@ -2661,9 +2666,9 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
                 عدد الضيوف في الفعالية: <strong>{currentEventGuestCount}</strong> | المتبقي: <strong>{remainingGuests}</strong> | المدعوون الحاليون: <strong>{currentTotalInvitedPeople - (isEdit ? currentInvitationCount : 0)}</strong>
               </MuiTypography>
               {remainingGuests < (numOfPeopleValue || 0) && (
-                <MuiTypography 
-                  variant="caption" 
-                  sx={{ 
+                <MuiTypography
+                  variant="caption"
+                  sx={{
                     color: 'var(--color-error-500)',
                     fontSize: '0.75rem',
                     fontWeight: 600,
@@ -2680,9 +2685,9 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
 
         {/* Guests List Section */}
         <MuiGrid item xs={12}>
-          <MuiBox sx={{ 
-            p: 2.5, 
-            backgroundColor: 'rgba(216, 185, 138, 0.05)', 
+          <MuiBox sx={{
+            p: 2.5,
+            backgroundColor: 'rgba(216, 185, 138, 0.05)',
             borderRadius: '12px',
             border: '1px solid rgba(216, 185, 138, 0.15)'
           }}>
@@ -2707,7 +2712,7 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
                 إضافة مدعو
               </MuiButton>
             </MuiBox>
-            
+
             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 2, fontSize: '0.85rem' }}>
               يمكنك إضافة أسماء المدعوين الإضافيين هنا. سيتم إرسالهم مع الدعوة.
             </MuiTypography>
@@ -2715,11 +2720,11 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
             {fields.length > 0 ? (
               <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {fields.map((field, index) => (
-                  <MuiBox 
-                    key={field.id} 
-                    sx={{ 
-                      display: 'flex', 
-                      alignItems: 'flex-start', 
+                  <MuiBox
+                    key={field.id}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
                       gap: 2,
                       p: 2,
                       backgroundColor: 'rgba(255, 255, 255, 0.03)',
@@ -2759,8 +2764,8 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
                 ))}
               </MuiBox>
             ) : (
-              <MuiBox sx={{ 
-                textAlign: 'center', 
+              <MuiBox sx={{
+                textAlign: 'center',
                 py: 3,
                 color: 'var(--color-text-secondary)'
               }}>

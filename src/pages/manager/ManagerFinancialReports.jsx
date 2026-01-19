@@ -1,7 +1,7 @@
 // src/pages/manager/ManagerFinancialReports.jsx
 import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { getFinancialReports } from '@/api/manager'
+import { getFinancialReports, getFinancialSummary } from '@/api/manager'
 import MuiBox from '@/components/ui/MuiBox'
 import MuiTypography from '@/components/ui/MuiTypography'
 import MuiPaper from '@/components/ui/MuiPaper'
@@ -19,14 +19,49 @@ import * as XLSX from 'xlsx'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
+const premiumMenuProps = {
+    PaperProps: {
+        sx: {
+            bgcolor: '#1E1E1E',
+            border: '1px solid rgba(216, 185, 138, 0.2)',
+            borderRadius: '12px',
+            mt: 1,
+            '& .MuiMenuItem-root': {
+                color: 'var(--color-text-primary)',
+                fontFamily: 'var(--font-family-base)',
+                py: 1.5,
+                px: 3,
+                '&:hover': {
+                    bgcolor: 'rgba(216, 185, 138, 0.1)',
+                    color: 'var(--color-primary-400)',
+                },
+                '&.Mui-selected': {
+                    bgcolor: 'rgba(216, 185, 138, 0.15)',
+                    color: 'var(--color-primary-500)',
+                    fontWeight: 600,
+                    '&:hover': {
+                        bgcolor: 'rgba(216, 185, 138, 0.2)',
+                    },
+                },
+            },
+        },
+    },
+}
+
 export default function ManagerFinancialReports() {
     const [reportType, setReportType] = useState('monthly_summary')
+
     const [dateRange, setDateRange] = useState({ start: '', end: '' })
     const [generatedReports, setGeneratedReports] = useState([])
 
     const { data, isLoading, refetch } = useQuery({
         queryKey: ['financial-reports', reportType, dateRange],
-        queryFn: () => getFinancialReports({ type: reportType, ...dateRange }),
+        queryFn: () => {
+            if (reportType === 'general_summary') {
+                return getFinancialSummary(dateRange)
+            }
+            return getFinancialReports({ type: reportType, ...dateRange })
+        },
         enabled: false, // Only fetch when button is clicked
     })
 
@@ -198,15 +233,9 @@ export default function ManagerFinancialReports() {
                                 <MuiSelect
                                     value={reportType}
                                     onChange={(e) => setReportType(e.target.value)}
-                                    sx={{
-                                        borderRadius: '12px',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        '&:hover': { borderColor: 'var(--color-primary-500)' },
-                                        '&.Mui-focused': { borderColor: 'var(--color-primary-500)' },
-                                        '& .MuiSelect-select': { color: 'var(--color-text-primary)', py: 1.5 }
-                                    }}
+                                    MenuProps={premiumMenuProps}
                                 >
+                                    <MuiMenuItem value="general_summary">ملخص عام</MuiMenuItem>
                                     <MuiMenuItem value="monthly_summary">ملخص شهري</MuiMenuItem>
                                     <MuiMenuItem value="expense_breakdown">تفصيل المصروفات</MuiMenuItem>
                                     <MuiMenuItem value="revenue_analysis">تحليل الإيرادات</MuiMenuItem>
@@ -224,17 +253,6 @@ export default function ManagerFinancialReports() {
                                         value={dateRange.start}
                                         onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
                                         fullWidth
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                borderRadius: '12px',
-                                                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                '&:hover': { borderColor: 'var(--color-primary-500)' },
-                                                '&.Mui-focused': { borderColor: 'var(--color-primary-500)' }
-                                            },
-                                            '& input': { color: 'var(--color-text-primary)' },
-                                            '& input::-webkit-calendar-picker-indicator': { filter: 'invert(1) opacity(0.5)' }
-                                        }}
                                     />
                                     <MuiTypography sx={{ alignSelf: 'center', color: 'var(--color-text-secondary)' }}>-</MuiTypography>
                                     <MuiTextField
@@ -242,17 +260,6 @@ export default function ManagerFinancialReports() {
                                         value={dateRange.end}
                                         onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
                                         fullWidth
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                borderRadius: '12px',
-                                                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                '&:hover': { borderColor: 'var(--color-primary-500)' },
-                                                '&.Mui-focused': { borderColor: 'var(--color-primary-500)' }
-                                            },
-                                            '& input': { color: 'var(--color-text-primary)' },
-                                            '& input::-webkit-calendar-picker-indicator': { filter: 'invert(1) opacity(0.5)' }
-                                        }}
                                     />
                                 </MuiBox>
                             </MuiBox>
@@ -334,6 +341,7 @@ function ReportCard({ report, onExportExcel, onExportPDF }) {
 
     const getLabel = (type) => {
         switch (type) {
+            case 'general_summary': return 'ملخص مالي عام';
             case 'monthly_summary': return 'ملخص مالي شهري';
             case 'expense_breakdown': return 'تفصيل المصروفات';
             case 'revenue_analysis': return 'تحليل الإيرادات';
