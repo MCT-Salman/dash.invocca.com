@@ -155,7 +155,7 @@ export default function TemplatesManagement() {
                     >
                         {row.imageUrl ? (
                             <img 
-                                src={row.imageUrl.startsWith('http') ? row.imageUrl : `http://82.137.244.167:5001${row.imageUrl}`} 
+                                src={row.imageUrl.startsWith('http') ? row.imageUrl : `${import.meta.env.VITE_API_BASE}${row.imageUrl}`} 
                                 alt={value} 
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                             />
@@ -168,66 +168,66 @@ export default function TemplatesManagement() {
                             {value}
                         </MuiTypography>
                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
-                            {row.hallId?.name || '—'}
+                            {row.description || '—'}
                         </MuiTypography>
                     </MuiBox>
                 </MuiBox>
             )
         },
-        {
-            id: 'hallId',
-            label: 'قاعة/صالة',
-            align: 'right',
-            format: (value) => (
-                <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Building2 size={16} style={{ color: 'var(--color-primary-400)' }} />
-                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                            {value?.name || 'قاعة/صالة غير محددة'}
-                        </MuiTypography>
-                    </MuiBox>
-                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <MapPin size={14} style={{ color: 'var(--color-primary-300)' }} />
-                        <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
-                            {value?.location || '—'}
-                        </MuiTypography>
-                    </MuiBox>
-                </MuiBox>
-            )
-        },
-        {
-            id: 'capacity',
-            label: 'السعة',
-            align: 'center',
-            format: (value, row) => (
-                <MuiBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
-                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Users size={16} style={{ color: 'var(--color-primary-400)' }} />
-                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                            {row.hallId?.capacity || value || '—'}
-                        </MuiTypography>
-                    </MuiBox>
-                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
-                        {row.hallId?.tables ? `${row.hallId.tables} طاولة` : ''}
-                        {row.hallId?.tables && row.hallId?.chairs ? ' • ' : ''}
-                        {row.hallId?.chairs ? `${row.hallId?.chairs} كرسي` : ''}
-                    </MuiTypography>
-                </MuiBox>
-            )
-        },
-        {
-            id: 'price',
-            label: 'السعر',
-            align: 'center',
-            format: (value, row) => (
-                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
-                    <DollarSign size={16} style={{ color: 'var(--color-primary-400)' }} />
-                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                        {row.hallId?.defaultPrices ? `${row.hallId.defaultPrices} ريال` : '—'}
-                    </MuiTypography>
-                </MuiBox>
-            )
-        },
+        // {
+        //     id: 'hallId',
+        //     label: 'قاعة/صالة',
+        //     align: 'right',
+        //     format: (value) => (
+        //         <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+        //             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        //                 <Building2 size={16} style={{ color: 'var(--color-primary-400)' }} />
+        //                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
+        //                     {value?.name || 'قاعة/صالة غير محددة'}
+        //                 </MuiTypography>
+        //             </MuiBox>
+        //             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        //                 <MapPin size={14} style={{ color: 'var(--color-primary-300)' }} />
+        //                 <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+        //                     {value?.location || '—'}
+        //                 </MuiTypography>
+        //             </MuiBox>
+        //         </MuiBox>
+        //     )
+        // },
+        // {
+        //     id: 'capacity',
+        //     label: 'السعة',
+        //     align: 'center',
+        //     format: (value, row) => (
+        //         <MuiBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
+        //             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        //                 <Users size={16} style={{ color: 'var(--color-primary-400)' }} />
+        //                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
+        //                     {row.hallId?.capacity || value || '—'}
+        //                 </MuiTypography>
+        //             </MuiBox>
+        //             <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+        //                 {row.hallId?.tables ? `${row.hallId.tables} طاولة` : ''}
+        //                 {row.hallId?.tables && row.hallId?.chairs ? ' • ' : ''}
+        //                 {row.hallId?.chairs ? `${row.hallId?.chairs} كرسي` : ''}
+        //             </MuiTypography>
+        //         </MuiBox>
+        //     )
+        // },
+        // {
+        //     id: 'price',
+        //     label: 'السعر',
+        //     align: 'center',
+        //     format: (value, row) => (
+        //         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
+        //             <DollarSign size={16} style={{ color: 'var(--color-primary-400)' }} />
+        //             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
+        //                 {row.hallId?.defaultPrices ? `${row.hallId.defaultPrices} ريال` : '—'}
+        //             </MuiTypography>
+        //         </MuiBox>
+        //     )
+        // },
         {
             id: 'createdAt',
             label: 'تاريخ الإنشاء',

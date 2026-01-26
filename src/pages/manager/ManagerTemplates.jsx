@@ -130,7 +130,7 @@ export default function ManagerTemplates() {
                     >
                         {row.imageUrl ? (
                             <img 
-                                src={row.imageUrl.startsWith('http') ? row.imageUrl : `http://82.137.244.167:5001/${row.imageUrl.startsWith('/') ? row.imageUrl.slice(1) : row.imageUrl}`} 
+                                src={row.imageUrl.startsWith('http') ? row.imageUrl : `${import.meta.env.VITE_API_BASE}/${row.imageUrl.startsWith('/') ? row.imageUrl.slice(1) : row.imageUrl}`} 
                                 alt={value} 
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                                 onError={() => {

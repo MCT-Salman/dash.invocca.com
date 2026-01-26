@@ -36,9 +36,9 @@ import ClientSongsConnectionTab from './components/ClientSongsConnectionTab'
 // Validation schema
 const songSchema = z.object({
   title: z.string().min(1, 'عنوان الأغنية مطلوب'),
-  artist: z.string().min(1, 'اسم الفنان مطلوب'),
-  url: z.string().url('رابط غير صحيح').min(1, 'رابط الأغنية مطلوب'),
-  duration: z.string().regex(/^\d{2}:\d{2}$/, 'المدة يجب أن تكون بصيغة MM:SS'),
+  // artist: z.string().min(1, 'اسم الفنان مطلوب'),
+  // url: z.string().url('رابط غير صحيح').min(1, 'رابط الأغنية مطلوب'),
+  // duration: z.string().regex(/^\d{2}:\d{2}$/, 'المدة يجب أن تكون بصيغة MM:SS'),
   category: z.string().optional(),
   scheduledTime: z.string().optional(),
   notes: z.string().optional(),
@@ -305,11 +305,11 @@ export default function ClientSongs() {
         )
       },
     },
-    {
-      id: 'duration',
-      label: 'المدة',
-      format: (value) => formatEmptyValue(value),
-    },
+    // {
+    //   id: 'duration',
+    //   label: 'المدة',
+    //   format: (value) => formatEmptyValue(value),
+    // },
     {
       id: 'url',
       label: 'الرابط',
@@ -352,18 +352,18 @@ export default function ClientSongs() {
         )
       },
     },
-    {
-      id: 'scheduledTime',
-      label: 'وقت التشغيل',
-      format: (value) => {
-        if (!value) return '—'
-        try {
-          return formatDate(value, 'MM/DD/YYYY HH:mm')
-        } catch {
-          return formatEmptyValue(value)
-        }
-      },
-    },
+    // {
+    //   id: 'scheduledTime',
+    //   label: 'وقت التشغيل',
+    //   format: (value) => {
+    //     if (!value) return '—'
+    //     try {
+    //       return formatDate(value, 'MM/DD/YYYY HH:mm')
+    //     } catch {
+    //       return formatEmptyValue(value)
+    //     }
+    //   },
+    // },
     {
       id: 'playStatus',
       label: 'حالة التشغيل',
@@ -905,7 +905,7 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
               <MuiTextField
                 {...field}
                 label="الفنان"
-                required
+                
                 fullWidth
                 error={!!errors.artist}
                 helperText={errors.artist?.message}
@@ -923,7 +923,7 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
                 {...field}
                 label="رابط الأغنية"
                 type="text"
-                required
+                
                 fullWidth
                 placeholder="https://example.com/song.mp3"
                 error={!!errors.url}
@@ -933,7 +933,7 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
           />
         </MuiGrid>
 
-        <MuiGrid item xs={12}>
+        {/* <MuiGrid item xs={12}>
           <Controller
             name="duration"
             control={control}
@@ -950,7 +950,7 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
               />
             )}
           />
-        </MuiGrid>
+        </MuiGrid> */}
 
         <MuiGrid item xs={12}>
           <Controller
@@ -973,7 +973,7 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
           />
         </MuiGrid>
 
-        <MuiGrid item xs={12}>
+        {/* <MuiGrid item xs={12}>
           <Controller
             name="scheduledTime"
             control={control}
@@ -988,7 +988,7 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
               />
             )}
           />
-        </MuiGrid>
+        </MuiGrid> */}
 
         <MuiGrid item xs={12}>
           <Controller
@@ -1078,7 +1078,7 @@ function ViewSongDialog({ open, onClose, song }) {
           </MuiBox>
         </MuiGrid>
 
-        <MuiGrid item xs={12} sm={6}>
+        {/* <MuiGrid item xs={12} sm={6}>
           <MuiBox>
             <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
               المدة
@@ -1090,7 +1090,7 @@ function ViewSongDialog({ open, onClose, song }) {
               </MuiTypography>
             </MuiBox>
           </MuiBox>
-        </MuiGrid>
+        </MuiGrid> */}
 
         <MuiGrid item xs={12} sm={6}>
           <MuiBox>
@@ -1113,7 +1113,7 @@ function ViewSongDialog({ open, onClose, song }) {
           </MuiBox>
         </MuiGrid>
 
-        <MuiGrid item xs={12} sm={6}>
+        {/* <MuiGrid item xs={12} sm={6}>
           <MuiBox>
             <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
               وقت التشغيل
@@ -1127,7 +1127,7 @@ function ViewSongDialog({ open, onClose, song }) {
               </MuiTypography>
             </MuiBox>
           </MuiBox>
-        </MuiGrid>
+        </MuiGrid> */}
 
         <MuiGrid item xs={12}>
           <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)' }} />

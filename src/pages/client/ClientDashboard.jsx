@@ -567,7 +567,7 @@ export default function ClientDashboard() {
                   onClick={() => {
                     const imageUrl = nextEvent.template.imageUrl?.startsWith('http')
                       ? nextEvent.template.imageUrl
-                      : `http://82.137.244.167:5001${nextEvent.template.imageUrl}`
+                      : `${import.meta.env.VITE_API_BASE}${nextEvent.template.imageUrl}`
                     window.open(imageUrl, '_blank')
                   }}
                   sx={{
@@ -588,7 +588,7 @@ export default function ClientDashboard() {
                   <img
                     src={nextEvent.template.imageUrl?.startsWith('http')
                       ? nextEvent.template.imageUrl
-                      : `http://82.137.244.167:5001${nextEvent.template.imageUrl}`}
+                      : `${import.meta.env.VITE_API_BASE}${nextEvent.template.imageUrl}`}
                     alt="قالب الفعالية"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />

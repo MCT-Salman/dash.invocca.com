@@ -584,7 +584,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
                                                     <img
                                                         src={(event?.template?.imageUrl || fullTemplate?.imageUrl || '').startsWith('http')
                                                             ? (event?.template?.imageUrl || fullTemplate?.imageUrl)
-                                                            : `http://82.137.244.167:5001${event?.template?.imageUrl || fullTemplate?.imageUrl}`}
+                                                            : `${import.meta.env.VITE_API_BASE}${event?.template?.imageUrl || fullTemplate?.imageUrl}`}
                                                         alt={fullTemplate?.templateName || event?.template?.templateName || event?.template?.name || 'قالب'}
                                                         style={{
                                                             width: '100%',

@@ -855,7 +855,7 @@ export default function HallManagement() {
                                         {hall.images.map((image, index) => {
                                             const imageUrl = image.url?.startsWith('http') 
                                                 ? image.url 
-                                                : `http://82.137.244.167:5001${image.url}`
+                                                : `${import.meta.env.VITE_API_BASE}${image.url}`
                                             return (
                                                 <MuiGrid item xs={12} sm={6} md={4} key={image._id || index}>
                                                     <MuiPaper

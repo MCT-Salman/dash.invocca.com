@@ -127,7 +127,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                     }}
                                 >
                                     <img
-                                        src={template.imageUrl.startsWith('http') ? template.imageUrl : `http://82.137.244.167:5001${template.imageUrl}`}
+                                        src={template.imageUrl.startsWith('http') ? template.imageUrl : `${import.meta.env.VITE_API_BASE}${template.imageUrl}`}
                                         alt={template.templateName}
                                         style={{ 
                                             maxWidth: '100%', 
@@ -484,7 +484,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                             onMouseDown={handleMouseDown}
                         >
                             <img
-                                src={template.imageUrl.startsWith('http') ? template.imageUrl : `http://82.137.244.167:5001${template.imageUrl}`}
+                                src={template.imageUrl.startsWith('http') ? template.imageUrl : `${import.meta.env.VITE_API_BASE}${template.imageUrl}`}
                                 alt={template.templateName}
                                 style={{ 
                                     maxWidth: '100%',

@@ -138,7 +138,7 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
                     </MuiTypography>
                 </MuiGrid>
 
-                <MuiGrid item xs={12} md={6}>
+                <MuiGrid item xs={12} md={12}>
                     <Controller
                         name="templateName"
                         control={control}
@@ -154,7 +154,7 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
                     />
                 </MuiGrid>
 
-                <MuiGrid item xs={12} md={6}>
+                {/* <MuiGrid item xs={12} md={6}>
                     <Controller
                         name="hallId"
                         control={control}
@@ -174,7 +174,7 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
                             </MuiSelect>
                         )}
                     />
-                </MuiGrid>
+                </MuiGrid> */}
 
                 <MuiGrid item xs={12}>
                     <Controller
@@ -241,7 +241,7 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
                         {editingTemplate?.imageUrl && !previewImage && (
                             <MuiBox sx={{ position: 'relative', display: 'inline-block' }}>
                                 <img
-                                    src={editingTemplate.imageUrl.startsWith('http') ? editingTemplate.imageUrl : `http://82.137.244.167:5001${editingTemplate.imageUrl}`}
+                                    src={editingTemplate.imageUrl.startsWith('http') ? editingTemplate.imageUrl : `${import.meta.env.VITE_API_BASE}${editingTemplate.imageUrl}`}
                                     alt="Current Template"
                                     style={{
                                         width: '120px',

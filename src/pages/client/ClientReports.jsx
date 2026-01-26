@@ -570,7 +570,7 @@ export default function ClientReports() {
                 </MuiTypography>
                 <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
                   {hall.images.map((image, index) => {
-                    const imageUrl = image.url?.startsWith('http') ? image.url : `http://82.137.244.167:5001${image.url}`
+                    const imageUrl = image.url?.startsWith('http') ? image.url : `${import.meta.env.VITE_API_BASE}${image.url}`
                     return (
                       <MuiBox
                         key={image._id || image.id || index}
@@ -609,7 +609,7 @@ export default function ClientReports() {
                   onClick={() => {
                     const imageUrl = hall.primaryImage.url?.startsWith('http')
                       ? hall.primaryImage.url
-                      : `http://82.137.244.167:5001${hall.primaryImage.url}`
+                      : `${import.meta.env.VITE_API_BASE}${hall.primaryImage.url}`
                     window.open(imageUrl, '_blank')
                   }}
                   sx={{
@@ -629,7 +629,7 @@ export default function ClientReports() {
                   <img
                     src={hall.primaryImage.url?.startsWith('http')
                       ? hall.primaryImage.url
-                      : `http://82.137.244.167:5001${hall.primaryImage.url}`}
+                      : `${import.meta.env.VITE_API_BASE}${hall.primaryImage.url}`}
                     alt={hall.primaryImage.caption || 'الصورة الرئيسية'}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />

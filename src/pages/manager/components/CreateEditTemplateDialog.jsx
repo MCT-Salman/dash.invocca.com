@@ -199,7 +199,7 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
                             ) : editingTemplate?.imageUrl ? (
                                 <MuiBox sx={{ position: 'relative', display: 'inline-block' }}>
                                     <img
-                                        src={editingTemplate.imageUrl.startsWith('http') ? editingTemplate.imageUrl : `http://82.137.244.167:5001/${editingTemplate.imageUrl.startsWith('/') ? editingTemplate.imageUrl.slice(1) : editingTemplate.imageUrl}`}
+                                        src={editingTemplate.imageUrl.startsWith('http') ? editingTemplate.imageUrl : `${import.meta.env.VITE_API_BASE}/${editingTemplate.imageUrl.startsWith('/') ? editingTemplate.imageUrl.slice(1) : editingTemplate.imageUrl}`}
                                         alt="Current Template"
                                         style={{
                                             maxWidth: '100%',

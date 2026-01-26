@@ -1049,11 +1049,11 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
     // If starts with /, add base URL
     if (templateImage.startsWith('/')) {
-      return `http://82.137.244.167:5001${templateImage}`
+      return `${import.meta.env.VITE_API_BASE}${templateImage}`
     }
 
     // Otherwise, assume it's a relative path and add base URL with /
-    return `http://82.137.244.167:5001/${templateImage}`
+    return `${import.meta.env.VITE_API_BASE}/${templateImage}`
   }, [templateImage])
 
   if (!open || !invitation) return null
@@ -2242,8 +2242,8 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                 ? (templateImg.startsWith('http://') || templateImg.startsWith('https://')
                   ? templateImg
                   : (templateImg.startsWith('/')
-                    ? `http://82.137.244.167:5001${templateImg}`
-                    : `http://82.137.244.167:5001/${templateImg}`))
+                    ? `${import.meta.env.VITE_API_BASE}${templateImg}`
+                    : `${import.meta.env.VITE_API_BASE}/${templateImg}`))
                 : null
 
               console.log('🔍 Template Image Debug:', {
