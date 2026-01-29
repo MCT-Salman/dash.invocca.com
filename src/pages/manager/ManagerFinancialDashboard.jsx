@@ -35,7 +35,7 @@ export default function ManagerFinancialDashboard() {
         <MuiBox sx={{
             p: { xs: 2, sm: 3 },
             minHeight: '100vh',
-            background: 'radial-gradient(circle at 50% 0%, rgba(216, 185, 138, 0.05) 0%, rgba(0, 0, 0, 0) 70%)'
+            background: 'var(--color-bg)'
         }}>
             <SEOHead title="لوحة التحكم المالية | INVOCCA" />
 
@@ -43,13 +43,9 @@ export default function ManagerFinancialDashboard() {
             <MuiBox sx={{ mb: 4, textAlign: 'center' }}>
                 <MuiTypography variant="h3" sx={{
                     fontWeight: 800,
-                    color: 'var(--color-primary-500)',
+                    color: 'var(--color-primary-600)',
                     mb: 1,
-                    textShadow: '0 0 30px rgba(216, 185, 138, 0.2)',
-                    background: 'linear-gradient(135deg, #D49B55 0%, #F5DEB3 50%, #D49B55 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text'
+                    textShadow: 'rgba(216, 185, 138, 0.2) 0px 0px 30px',
                 }}>
                     لوحة التحكم المالية
                 </MuiTypography>
@@ -117,15 +113,14 @@ export default function ManagerFinancialDashboard() {
                         elevation={0}
                         sx={{
                             p: 3,
-                            background: 'rgba(20, 20, 20, 0.6)',
-                            backdropFilter: 'blur(10px)',
-                            border: '1px solid rgba(216, 185, 138, 0.15)',
+                            background: 'var(--color-paper)',
+                            border: '1px solid var(--color-border)',
                             borderRadius: '24px',
                             height: '100%',
                             transition: 'all 0.3s ease',
                             '&:hover': {
-                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-                                borderColor: 'rgba(216, 185, 138, 0.3)'
+                                boxShadow: 'var(--shadow-lg)',
+                                borderColor: 'var(--color-primary-200)'
                             }
                         }}
                     >
@@ -136,8 +131,8 @@ export default function ManagerFinancialDashboard() {
                         <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                             <InfoRow label="إجمالي الفواتير" value={invoices.totalInvoices || 0} />
                             <InfoRow label="المبلغ الإجمالي" value={formatCurrency(invoices.totalAmount || 0)} />
-                            <InfoRow label="المدفوع" value={formatCurrency(invoices.totalPaid || 0)} color="#22c55e" />
-                            <InfoRow label="المتبقي" value={formatCurrency(invoices.totalOutstanding || 0)} color="#f59e0b" />
+                            <InfoRow label="المدفوع" value={formatCurrency(invoices.totalPaid || 0)} color="var(--color-success-600)" />
+                            <InfoRow label="المتبقي" value={formatCurrency(invoices.totalOutstanding || 0)} color="var(--color-warning-600)" />
                         </MuiBox>
                     </MuiPaper>
                 </MuiGrid>
@@ -148,15 +143,14 @@ export default function ManagerFinancialDashboard() {
                         elevation={0}
                         sx={{
                             p: 3,
-                            background: overdueInvoices.length > 0 ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(20, 20, 20, 0.6) 100%)' : 'rgba(20, 20, 20, 0.6)',
-                            backdropFilter: 'blur(10px)',
-                            border: `1px solid ${overdueInvoices.length > 0 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(216, 185, 138, 0.15)'}`,
+                            background: overdueInvoices.length > 0 ? 'var(--color-error-50)' : 'var(--color-paper)',
+                            border: `1px solid ${overdueInvoices.length > 0 ? 'var(--color-error-200)' : 'var(--color-border)'}`,
                             borderRadius: '24px',
                             height: '100%',
                             transition: 'all 0.3s ease',
                             '&:hover': {
-                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-                                borderColor: overdueInvoices.length > 0 ? 'rgba(239, 68, 68, 0.5)' : 'rgba(216, 185, 138, 0.3)'
+                                boxShadow: 'var(--shadow-lg)',
+                                borderColor: overdueInvoices.length > 0 ? 'var(--color-error-300)' : 'var(--color-primary-200)'
                             }
                         }}
                     >
@@ -199,9 +193,8 @@ export default function ManagerFinancialDashboard() {
                 elevation={0}
                 sx={{
                     p: 3,
-                    background: 'rgba(20, 20, 20, 0.6)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(216, 185, 138, 0.15)',
+                    background: 'var(--color-paper)',
+                    border: '1px solid var(--color-border)',
                     borderRadius: '24px',
                     mb: 4,
                     overflow: 'hidden'
@@ -236,12 +229,13 @@ export default function ManagerFinancialDashboard() {
                                     alignItems: 'center',
                                     p: 2,
                                     borderRadius: '16px',
-                                    background: 'rgba(255, 255, 255, 0.02)',
-                                    border: '1px solid transparent',
+                                    borderRadius: '16px',
+                                    background: 'var(--color-surface)',
+                                    border: '1px solid var(--color-border)',
                                     transition: 'all 0.2s ease',
                                     '&:hover': {
-                                        background: 'rgba(216, 185, 138, 0.05)',
-                                        borderColor: 'rgba(216, 185, 138, 0.1)',
+                                        background: 'var(--color-surface-hover)',
+                                        borderColor: 'var(--color-primary-200)',
                                         transform: 'translateX(-4px)'
                                     }
                                 }}
@@ -293,9 +287,8 @@ export default function ManagerFinancialDashboard() {
                     elevation={0}
                     sx={{
                         p: 3,
-                        background: 'rgba(20, 20, 20, 0.6)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(216, 185, 138, 0.15)',
+                        background: 'var(--color-paper)',
+                        border: '1px solid var(--color-border)',
                         borderRadius: '24px',
                         overflow: 'hidden'
                     }}
@@ -311,7 +304,7 @@ export default function ManagerFinancialDashboard() {
                                 alignItems: 'center',
                                 p: 1.5,
                                 borderRadius: '12px',
-                                background: 'rgba(255, 255, 255, 0.02)'
+                                background: 'var(--color-surface)'
                             }}>
                                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', minWidth: 100, fontWeight: 600 }}>
                                     {month.month}
@@ -359,9 +352,8 @@ function StatCard({ title, value, icon: Icon, color, bgColor, trend }) {
             elevation={0}
             sx={{
                 p: 3,
-                background: 'rgba(20, 20, 20, 0.6)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(216, 185, 138, 0.1)',
+                background: 'var(--color-paper)',
+                border: '1px solid var(--color-border)',
                 borderRadius: '24px',
                 height: '100%',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -374,14 +366,14 @@ function StatCard({ title, value, icon: Icon, color, bgColor, trend }) {
                     top: 0,
                     left: 0,
                     right: 0,
-                    height: '2px',
-                    background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
-                    opacity: 0.5
+                    height: '3px',
+                    background: color.startsWith('#') ? color : `var(--color-${color.replace('var(--color-', '').replace(')', '')})`,
+                    opacity: 0.8
                 },
                 '&:hover': {
                     transform: 'translateY(-8px)',
-                    boxShadow: `0 12px 30px -10px ${color}33`,
-                    borderColor: `${color}44`
+                    boxShadow: 'var(--shadow-lg)',
+                    borderColor: 'var(--color-primary-200)'
                 }
             }}
         >
@@ -446,7 +438,7 @@ function InfoRow({ label, value, color }) {
             p: 1.5,
             borderRadius: '12px',
             '&:hover': {
-                background: 'rgba(255, 255, 255, 0.02)'
+                background: 'var(--color-surface-hover)'
             }
         }}>
             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>

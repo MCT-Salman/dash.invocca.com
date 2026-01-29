@@ -34,12 +34,12 @@ const StyledButton = styled(Button)(({ theme, variant, color }) => {
           : color === 'error'
             ? 'var(--color-error-500)'
             : undefined,
-      color: color === 'secondary' ? '#fff' : '#000', // Primary text black on gold
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+      color: color === 'secondary' ? 'var(--color-text-on-dark)' : 'var(--color-text-on-primary)', // Primary text black on gold
+      boxShadow: 'var(--shadow-md)',
       border: 'none',
       '&:hover': {
         transform: 'translateY(-2px)',
-        boxShadow: '0 6px 20px rgba(0, 0, 0, 0.4)',
+        boxShadow: 'var(--shadow-lg)',
         background: color === 'primary'
           ? 'linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-600) 100%)'
           : color === 'secondary'
@@ -50,7 +50,7 @@ const StyledButton = styled(Button)(({ theme, variant, color }) => {
         transform: 'translateY(0)',
       },
       '&:disabled': {
-        background: 'var(--color-surface-dark)',
+        background: 'var(--color-surface)',
         color: 'var(--color-text-muted)',
         boxShadow: 'none',
       },
@@ -65,29 +65,25 @@ const StyledButton = styled(Button)(({ theme, variant, color }) => {
         ? 'var(--color-primary-500)'
         : color === 'secondary'
           ? 'var(--color-secondary-500)'
-          : 'var(--color-border-dark)',
+          : 'var(--color-border)',
       color: color === 'primary'
         ? 'var(--color-primary-500)'
         : color === 'secondary'
           ? 'var(--color-secondary-500)'
-          : 'var(--color-text-primary-dark)',
+          : 'var(--color-text-primary)',
       backgroundColor: 'transparent',
       '&:hover': {
-        backgroundColor: color === 'primary'
-          ? 'rgba(216, 185, 138, 0.1)'
-          : color === 'secondary'
-            ? 'rgba(109, 109, 109, 0.1)'
-            : 'rgba(255, 255, 255, 0.05)',
+        backgroundColor: 'var(--color-surface-hover)',
         borderColor: color === 'primary'
           ? 'var(--color-primary-400)'
           : color === 'secondary'
             ? 'var(--color-secondary-400)'
-            : 'var(--color-text-primary-dark)',
+            : 'var(--color-text-primary)',
         transform: 'translateY(-1px)',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+        boxShadow: 'var(--shadow-sm)',
       },
       '&:disabled': {
-        borderColor: 'var(--color-border-dark)',
+        borderColor: 'var(--color-border)',
         color: 'var(--color-text-muted)',
       },
     };
@@ -100,10 +96,10 @@ const StyledButton = styled(Button)(({ theme, variant, color }) => {
       ? 'var(--color-primary-500)'
       : color === 'secondary'
         ? 'var(--color-secondary-300)'
-        : 'var(--color-text-primary-dark)',
+        : 'var(--color-text-primary)',
     backgroundColor: 'transparent',
     '&:hover': {
-      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+      backgroundColor: 'var(--color-surface-hover)',
       transform: 'translateY(-1px)',
     },
     '&:disabled': {

@@ -11,16 +11,12 @@ import MuiPaper from '@/components/ui/MuiPaper'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiChip from '@/components/ui/MuiChip'
 import MuiInputAdornment from '@/components/ui/MuiInputAdornment'
-import MuiDialog from '@/components/ui/MuiDialog'
-import MuiDialogTitle from '@/components/ui/MuiDialogTitle'
-import MuiDialogContent from '@/components/ui/MuiDialogContent'
-import MuiDialogActions from '@/components/ui/MuiDialogActions'
 import MuiSelect from '@/components/ui/MuiSelect'
 import MuiMenuItem from '@/components/ui/MuiMenuItem'
 import MuiIconButton from '@/components/ui/MuiIconButton'
 
 // Layout & Common Components
-import { LoadingScreen, EmptyState, SEOHead, DataTable } from '@/components/common'
+import { LoadingScreen, EmptyState, SEOHead, DataTable, PageHeader } from '@/components/common'
 
 // Hooks & Utilities
 import { useDebounce, useCRUD } from '@/hooks'
@@ -32,15 +28,11 @@ import { formatDate } from '@/utils/helpers'
 import {
     Calendar,
     Search,
-    Plus,
     RefreshCw,
     CheckCircle,
     XCircle,
     Clock,
     Users,
-    Building2,
-    Filter,
-    Eye,
     Trash2,
     Edit2
 } from 'lucide-react'
@@ -48,11 +40,11 @@ import {
 // ====================== Status Badge ======================
 const EventStatusBadge = ({ status }) => {
     const statusConfig = {
-        [EVENT_STATUS.PENDING]: { label: 'قيد الانتظار', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)', icon: Clock },
-        [EVENT_STATUS.CONFIRMED]: { label: 'مؤكد', color: '#0284c7', bg: 'rgba(2, 132, 199, 0.1)', icon: CheckCircle },
-        [EVENT_STATUS.ACTIVE]: { label: 'نشط', color: '#16a34a', bg: 'rgba(22, 163, 74, 0.1)', icon: RefreshCw },
-        [EVENT_STATUS.COMPLETED]: { label: 'مكتمل', color: '#666', bg: 'rgba(102, 102, 102, 0.1)', icon: CheckCircle },
-        [EVENT_STATUS.CANCELLED]: { label: 'ملغي', color: '#dc2626', bg: 'rgba(220, 38, 38, 0.1)', icon: XCircle }
+        [EVENT_STATUS.PENDING]: { label: 'قيد الانتظار', color: 'warning', icon: Clock },
+        [EVENT_STATUS.CONFIRMED]: { label: 'مؤكد', color: 'info', icon: CheckCircle },
+        [EVENT_STATUS.ACTIVE]: { label: 'نشط', color: 'success', icon: RefreshCw },
+        [EVENT_STATUS.COMPLETED]: { label: 'مكتمل', color: 'secondary', icon: CheckCircle },
+        [EVENT_STATUS.CANCELLED]: { label: 'ملغي', color: 'error', icon: XCircle }
     }
 
     const config = statusConfig[status] || statusConfig[EVENT_STATUS.PENDING]
@@ -63,13 +55,8 @@ const EventStatusBadge = ({ status }) => {
             icon={<Icon size={14} />}
             label={config.label}
             size="small"
-            sx={{
-                background: config.bg,
-                color: config.color,
-                fontWeight: 600,
-                border: `1px solid ${config.color}33`,
-                '& .MuiChip-icon': { color: config.color }
-            }}
+            color={config.color}
+            variant="filled"
         />
     )
 }
@@ -135,20 +122,20 @@ export default function EventsManagement() {
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <MuiBox
                         sx={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: '10px',
-                            background: 'rgba(216, 185, 138, 0.1)',
+                            width: 36,
+                            height: 36,
+                            borderRadius: '8px',
+                            background: 'var(--color-surface)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            border: '1px solid rgba(216, 185, 138, 0.2)',
+                            border: '1px solid var(--color-border)',
                         }}
                     >
-                        <Calendar size={20} style={{ color: 'var(--color-primary-500)' }} />
+                        <Calendar size={18} style={{ color: 'var(--color-primary-500)' }} />
                     </MuiBox>
                     <MuiBox>
-                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                        <MuiTypography variant="body2" sx={{ fontWeight: 600 }}>
                             {value}
                         </MuiTypography>
                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
@@ -174,7 +161,7 @@ export default function EventsManagement() {
             align: 'right',
             format: (value) => (
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Users size={14} style={{ color: 'var(--color-primary-400)' }} />
+                    <Users size={14} style={{ color: 'var(--color-primary-500)' }} />
                     <MuiTypography variant="body2">{value || '---'}</MuiTypography>
                 </MuiBox>
             )
@@ -187,9 +174,7 @@ export default function EventsManagement() {
         }
     ]
 
-    const handleEdit = (event) => {
-        // Edit functionality to be implemented
-    }
+    const handleEdit = (event) => { }
 
     const handleDeleteClick = async (event) => {
         if (window.confirm(`هل أنت متأكد من حذف هذه الفعالية؟`)) {
@@ -199,67 +184,26 @@ export default function EventsManagement() {
         }
     }
 
-    const handleRefresh = () => {
-        refetch()
-    }
-
     if (isLoading) return <LoadingScreen message="جاري تحميل الفعاليات..." />
 
     return (
         <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
             <SEOHead title="إدارة الفعاليات | INVOCCA" />
 
-            {/* Header Section */}
-            <MuiBox
-                sx={{
-                    mb: 4,
-                    p: 4,
-                    borderRadius: '20px',
-                    background: 'var(--color-surface-dark)',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    border: '1px solid var(--color-border-glass)',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                    '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        right: 0,
-                        width: '300px',
-                        height: '300px',
-                        background: 'radial-gradient(circle, rgba(216, 185, 138, 0.05) 0%, transparent 70%)',
-                        borderRadius: '50%',
-                    }
-                }}
-            >
-                <MuiBox sx={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <MuiBox
-                            sx={{
-                                width: 56,
-                                height: 56,
-                                borderRadius: '14px',
-                                background: 'linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800))',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                border: '1px solid var(--color-primary-500)',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
-                            }}
-                        >
-                            <Calendar size={28} className="text-white" />
-                        </MuiBox>
-                        <MuiBox>
-                            <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 0.5 }}>
-                                إدارة الفعاليات ({filteredEvents.length})
-                            </MuiTypography>
-                            <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                                نظرة شاملة على جميع الفعاليات والحجوزات المقامة في جميع قاعات/صالات
-                            </MuiTypography>
-                        </MuiBox>
-                    </MuiBox>
-                </MuiBox>
-            </MuiBox>
+            <PageHeader
+                icon={Calendar}
+                title={`إدارة الفعاليات (${filteredEvents.length})`}
+                subtitle="نظرة شاملة على جميع الحجوزات والفعاليات المقامة"
+                actions={
+                    <MuiButton
+                        variant="outlined"
+                        start_icon={<RefreshCw size={18} />}
+                        onClick={() => refetch()}
+                    >
+                        تحديث
+                    </MuiButton>
+                }
+            />
 
             {/* Search & Filter */}
             <MuiPaper
@@ -267,75 +211,36 @@ export default function EventsManagement() {
                 sx={{
                     p: 2,
                     mb: 3,
-                    background: 'rgba(26, 26, 26, 0.6)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid var(--color-border-glass)',
+                    background: 'var(--color-paper)',
+                    border: '1px solid var(--color-border)',
                     borderRadius: '16px'
                 }}
             >
                 <MuiGrid container spacing={2} alignItems="center">
-                    <MuiGrid item xs={12} md={6}>
+                    <MuiGrid item xs={12} md={8}>
                         <MuiTextField
                             fullWidth
                             placeholder="البحث باسم الفعالية، العميل، أو قاعة/صالة..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            InputProps={{
-                                startAdornment: (
-                                    <MuiInputAdornment position="start">
-                                        <Search size={20} style={{ color: 'var(--color-primary-400)' }} />
-                                    </MuiInputAdornment>
-                                ),
-                            }}
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                }
-                            }}
+                            startIcon={<Search size={20} />}
                         />
                     </MuiGrid>
                     <MuiGrid item xs={12} md={4}>
-                        <MuiTextField
-                            select
+                        <MuiSelect
                             fullWidth
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
                             label="تصفية حسب الحالة"
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                }
-                            }}
-                        >
-                            <option value="all">الكل</option>
-                            <option value={EVENT_STATUS.PENDING}>قيد الانتظار</option>
-                            <option value={EVENT_STATUS.CONFIRMED}>مؤكد</option>
-                            <option value={EVENT_STATUS.ACTIVE}>نشط</option>
-                            <option value={EVENT_STATUS.COMPLETED}>مكتمل</option>
-                            <option value={EVENT_STATUS.CANCELLED}>ملغي</option>
-                        </MuiTextField>
-                    </MuiGrid>
-                    <MuiGrid item xs={12} md={2}>
-                        <MuiButton
-                            fullWidth
-                            variant="outlined"
-                            startIcon={<RefreshCw size={20} />}
-                            onClick={handleRefresh}
-                            sx={{
-                                height: '56px',
-                                borderRadius: '12px',
-                                borderColor: 'var(--color-border-glass)',
-                                color: 'var(--color-text-secondary)',
-                                '&:hover': {
-                                    borderColor: 'var(--color-primary-500)',
-                                    background: 'rgba(216, 185, 138, 0.05)'
-                                }
-                            }}
-                        >
-                            تحديث
-                        </MuiButton>
+                            options={[
+                                { label: 'الكل', value: 'all' },
+                                { label: 'قيد الانتظار', value: EVENT_STATUS.PENDING },
+                                { label: 'مؤكد', value: EVENT_STATUS.CONFIRMED },
+                                { label: 'نشط', value: EVENT_STATUS.ACTIVE },
+                                { label: 'مكتمل', value: EVENT_STATUS.COMPLETED },
+                                { label: 'ملغي', value: EVENT_STATUS.CANCELLED }
+                            ]}
+                        />
                     </MuiGrid>
                 </MuiGrid>
             </MuiPaper>
@@ -354,13 +259,6 @@ export default function EventsManagement() {
                     data={filteredEvents}
                     onEdit={handleEdit}
                     onDelete={handleDeleteClick}
-                    sx={{
-                        background: 'rgba(26, 26, 26, 0.4)',
-                        backdropFilter: 'blur(10px)',
-                        borderRadius: '20px',
-                        border: '1px solid var(--color-border-glass)',
-                        overflow: 'hidden',
-                    }}
                 />
             )}
         </MuiBox>

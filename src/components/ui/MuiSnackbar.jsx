@@ -1,5 +1,5 @@
 import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
+import MuiAlert from './MuiAlert';
 
 const MuiSnackbar = ({
   open = false,
@@ -12,13 +12,12 @@ const MuiSnackbar = ({
   ...props
 }) => {
   const content = severity ? (
-    <Alert
+    <MuiAlert
       onClose={onClose}
       severity={severity}
-      className="!rounded-2xl !shadow-2xl !border-2"
     >
       {message}
-    </Alert>
+    </MuiAlert>
   ) : null;
 
   return (

@@ -15,7 +15,19 @@ const MuiAlert = ({
       severity={severity}
       variant={variant}
       onClose={onClose}
-      className={`!rounded-2xl !shadow-md !border-2 !transition-all hover:!shadow-lg ${className}`}
+      sx={{
+        borderRadius: '16px',
+        border: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-paper)',
+        color: 'var(--color-text-primary)',
+        '& .MuiAlert-icon': {
+          color: severity === 'info' ? 'var(--color-info-500)' :
+            severity === 'success' ? 'var(--color-success-500)' :
+              severity === 'warning' ? 'var(--color-warning-500)' :
+                'var(--color-error-500)'
+        }
+      }}
+      className={className}
       {...props}
     >
       {title && <AlertTitle className="!font-semibold">{title}</AlertTitle>}

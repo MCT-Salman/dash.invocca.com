@@ -19,9 +19,9 @@ const MuiDialog = ({
             sx={{
                 '& .MuiPaper-root': {
                     borderRadius: '16px',
-                    background: 'var(--color-surface-dark)',
-                    border: '1px solid var(--color-border-glass)',
-                    boxShadow: '0 24px 48px rgba(0,0,0,0.5)',
+                    background: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    boxShadow: 'var(--shadow-2xl)',
                 },
                 ...sx
             }}

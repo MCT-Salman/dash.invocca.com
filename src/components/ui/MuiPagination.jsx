@@ -3,23 +3,23 @@ import { styled } from '@mui/material/styles';
 
 const StyledPagination = styled(Pagination)(({ theme }) => ({
     '& .MuiPaginationItem-root': {
-        color: 'var(--color-text-secondary, #b3b3b3)',
-        borderColor: 'var(--color-border-glass, rgba(255, 255, 255, 0.1))',
+        color: 'var(--color-text-secondary)',
+        borderColor: 'var(--color-border)',
         '&:hover': {
-            backgroundColor: 'rgba(216, 185, 138, 0.1)',
-            borderColor: 'var(--color-primary-500, #D8B98A)',
+            backgroundColor: 'var(--color-surface-hover)',
+            borderColor: 'var(--color-primary-500)',
         },
         '&.Mui-selected': {
-            backgroundColor: 'var(--color-primary-500, #D8B98A)',
-            color: 'var(--color-primary-950, #1A1A1A)',
+            backgroundColor: 'var(--color-primary-500)',
+            color: 'var(--color-text-on-primary)',
             fontWeight: 700,
             '&:hover': {
-                backgroundColor: 'var(--color-primary-600, #c4a578)',
+                backgroundColor: 'var(--color-primary-600)',
             },
         },
     },
     '& .MuiPaginationItem-ellipsis': {
-        color: 'var(--color-text-secondary, #b3b3b3)',
+        color: 'var(--color-text-secondary)',
     },
 }));
 

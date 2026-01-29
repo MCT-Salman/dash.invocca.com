@@ -62,7 +62,6 @@ const MuiTimePicker = ({
                 right: 0,
                 left: 'auto',
                 transformOrigin: 'top right',
-                textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
                 position: 'absolute',
                 top: '-8px',
                 '&.Mui-focused': {
@@ -70,7 +69,7 @@ const MuiTimePicker = ({
                   fontWeight: 600,
                 },
                 '&.Mui-disabled': {
-                  color: 'rgba(255, 255, 255, 0.5) !important',
+                  color: 'var(--color-text-muted) !important',
                 },
                 '&.Mui-error': {
                   color: 'var(--color-error-500) !important',
@@ -83,66 +82,46 @@ const MuiTimePicker = ({
                 backgroundColor: 'transparent',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                  backgroundColor: 'var(--color-surface-hover)',
                   '& .MuiOutlinedInput-notchedOutline': {
                     borderColor: error ? 'var(--color-error-600) !important' : 'var(--color-primary-500) !important',
                   },
                 },
                 '&.Mui-focused': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                  backgroundColor: 'var(--color-surface-hover)',
                   '& .MuiOutlinedInput-notchedOutline': {
                     borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
                     borderWidth: '1px !important',
                   },
-                  boxShadow: error
-                    ? '0 0 0 2px rgba(239, 68, 68, 0.1)'
-                    : '0 0 0 2px rgba(216, 185, 138, 0.1)',
                 },
                 '&.Mui-disabled': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.01)',
+                  backgroundColor: 'var(--color-surface)',
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'var(--color-border-dark) !important',
+                    borderColor: 'var(--color-border) !important',
                   },
                 },
                 '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: error ? 'var(--color-error-500) !important' : 'rgba(216, 185, 138, 0.3) !important',
+                  borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-border) !important',
                   borderWidth: '1px !important',
                   borderRadius: '12px !important',
                 },
               },
               '& .MuiInputBase-input': {
-                color: '#EDEDED !important',
+                color: 'var(--color-text-primary) !important',
                 fontSize: '1rem',
                 padding: '14px 16px',
                 fontFamily: 'var(--font-family-base)',
                 direction: 'rtl',
                 textAlign: 'right',
                 '&:focus': {
-                  color: '#EDEDED !important',
-                  WebkitTextFillColor: '#EDEDED !important',
+                  color: 'var(--color-text-primary) !important',
+                  WebkitTextFillColor: 'var(--color-text-primary) !important',
                 },
                 '&::placeholder': {
-                  color: 'rgba(255, 255, 255, 0.2) !important',
-                  WebkitTextFillColor: 'rgba(255, 255, 255, 0.2) !important',
-                  opacity: 1,
+                  color: 'var(--color-text-muted) !important',
+                  WebkitTextFillColor: 'var(--color-text-muted) !important',
+                  opacity: 0.6,
                   fontFamily: 'var(--font-family-base)',
-                },
-                '&::-webkit-input-placeholder': {
-                  color: 'rgba(255, 255, 255, 0.2) !important',
-                  WebkitTextFillColor: 'rgba(255, 255, 255, 0.2) !important',
-                  opacity: 1,
-                },
-                '&::-moz-placeholder': {
-                  color: 'rgba(255, 255, 255, 0.2) !important',
-                  opacity: 1,
-                },
-                '&:-ms-input-placeholder': {
-                  color: 'rgba(255, 255, 255, 0.2) !important',
-                  opacity: 1,
-                },
-                '&:-moz-placeholder': {
-                  color: 'rgba(255, 255, 255, 0.2) !important',
-                  opacity: 1,
                 },
                 '&.Mui-disabled': {
                   color: 'var(--color-text-muted) !important',
@@ -157,7 +136,7 @@ const MuiTimePicker = ({
               },
               '& .MuiInputAdornment-root': {
                 '& .MuiSvgIcon-root': {
-                  color: '#FFFFFF !important',
+                  color: 'var(--color-primary-500) !important',
                 },
               },
             }

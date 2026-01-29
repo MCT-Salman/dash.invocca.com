@@ -109,20 +109,6 @@ export default function DashboardLayout() {
                 </MuiBox>
             </MuiBox>
 
-            {/* Custom animations */}
-            <style jsx global>{`
-                @keyframes float {
-                    0%, 100% {
-                        transform: translateY(0) translateX(0) rotate(0deg);
-                    }
-                    50% {
-                        transform: translateY(-30px) translateX(20px) rotate(10deg);
-                    }
-                }
-                .animate-float {
-                    animation: float 12s ease-in-out infinite;
-                }
-            `}</style>
         </MuiBox>
     );
 }

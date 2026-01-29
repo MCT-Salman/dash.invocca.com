@@ -63,18 +63,18 @@ export default function BaseFormDialog({
                 sx: {
                     borderRadius: '16px',
                     overflow: 'auto',
-                    backgroundColor: 'var(--color-surface-dark)',
+                    backgroundColor: 'var(--color-paper)',
                     backgroundImage: 'none',
-                    border: '1px solid var(--color-border-glass)',
+                    border: '1px solid var(--color-border)',
                 }
             }}
         >
-            <MuiDialogTitle 
+            <MuiDialogTitle
                 component="div"
                 sx={{ mb: subtitle ? 1 : 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
                 <MuiBox>
-                    <MuiTypography variant="h6" component="div" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
+                    <MuiTypography variant="h6" component="div" sx={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>
                         {title}
                     </MuiTypography>
                     {subtitle && (
@@ -89,19 +89,19 @@ export default function BaseFormDialog({
                     sx={{
                         color: 'var(--color-text-secondary)',
                         '&:hover': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                            backgroundColor: 'var(--color-surface-hover)',
                         }
                     }}
                 >
                     <X size={20} />
                 </MuiIconButton>
             </MuiDialogTitle>
-            
+
             <form onSubmit={handleSubmit}>
                 <MuiDialogContent sx={{ pt: 0 }}>
                     {children}
                 </MuiDialogContent>
-                
+
                 <MuiDialogActions sx={{ p: 2, pt: 1 }}>
                     <MuiBox sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', width: '100%' }}>
                         {showCancel && (
@@ -110,11 +110,11 @@ export default function BaseFormDialog({
                                 variant="outlined"
                                 disabled={loading}
                                 sx={{
-                                    borderColor: 'var(--color-border-glass)',
+                                    borderColor: 'var(--color-border)',
                                     color: 'var(--color-text-secondary)',
                                     '&:hover': {
                                         borderColor: 'var(--color-primary-500)',
-                                        backgroundColor: 'rgba(216, 185, 138, 0.05)',
+                                        backgroundColor: 'var(--color-surface-hover)',
                                     }
                                 }}
                             >

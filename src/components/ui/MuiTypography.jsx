@@ -6,28 +6,30 @@ const StyledTypography = styled(Typography)(({ theme, color, variant }) => {
   const getColor = () => {
     if (color === 'primary') return 'var(--color-primary-500)';
     if (color === 'secondary') return 'var(--color-text-secondary)';
-    if (color === 'textPrimary') return 'var(--color-text-primary-dark)'; // Map to correct dark variable
+    if (color === 'textPrimary') return 'var(--color-text-primary)'; // Map to dynamic variable
     if (color === 'textSecondary') return 'var(--color-text-secondary)';
     if (color === 'error') return 'var(--color-error-500)';
     if (color === 'success') return 'var(--color-success-500)';
     if (color === 'warning') return 'var(--color-warning-500)';
     if (color === 'info') return 'var(--color-info-500)';
-    return color || 'var(--color-text-primary-dark)'; // Default to visible text
+    return color || 'var(--color-text-primary)'; // Default to visible text
   };
 
   return {
     color: getColor(),
     fontFamily: 'var(--font-family-base)',
     letterSpacing: variant?.includes('h') ? '-0.02em' : 'normal',
-    lineHeight: variant?.includes('body') ? 1.6 : 1.2,
-    '&.MuiTypography-h1': { fontWeight: 800 },
-    '&.MuiTypography-h2': { fontWeight: 700 },
-    '&.MuiTypography-h3': { fontWeight: 700 },
-    '&.MuiTypography-h4': { fontWeight: 700, color: 'var(--color-primary-500)' }, // Headers often look best in gold
-    '&.MuiTypography-h5': { fontWeight: 600 },
-    '&.MuiTypography-h6': { fontWeight: 600 },
-    '&.MuiTypography-subtitle1': { color: 'var(--color-text-secondary)' },
-    '&.MuiTypography-subtitle2': { fontWeight: 600 },
+    fontWeight: variant?.includes('h') ? 700 : 400,
+    '&.MuiTypography-h1': { fontWeight: 800, fontSize: '3rem' },
+    '&.MuiTypography-h2': { fontWeight: 700, fontSize: '2.5rem' },
+    '&.MuiTypography-h3': { fontWeight: 700, fontSize: '2rem' },
+    '&.MuiTypography-h4': { fontWeight: 710, fontSize: '1.75rem', color: 'var(--color-primary-500)' },
+    '&.MuiTypography-h5': { fontWeight: 600, fontSize: '1.5rem' },
+    '&.MuiTypography-h6': { fontWeight: 600, fontSize: '1.25rem' },
+    '&.MuiTypography-subtitle1': { color: 'var(--color-text-secondary)', fontSize: '1rem' },
+    '&.MuiTypography-subtitle2': { fontWeight: 600, fontSize: '0.875rem' },
+    '&.MuiTypography-body1': { fontSize: '1rem' },
+    '&.MuiTypography-body2': { fontSize: '0.875rem', color: 'var(--color-text-secondary)' },
   };
 });
 

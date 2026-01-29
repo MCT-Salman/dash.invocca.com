@@ -6,11 +6,11 @@ import { styled } from '@mui/material/styles';
 
 const StyledCard = styled(Card)(({ theme }) => ({
   borderRadius: '16px',
-  backgroundColor: 'var(--color-surface-dark)',
-  backgroundImage: 'linear-gradient(145deg, rgba(20, 20, 20, 0.6) 0%, rgba(10, 10, 10, 0.8) 100%)',
+  backgroundColor: 'var(--color-paper)',
+  backgroundImage: 'none',
   backdropFilter: 'blur(10px)',
-  border: '1px solid var(--color-border-glass)',
-  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)',
+  border: '1px solid var(--color-border)',
+  boxShadow: 'var(--shadow-md)',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   overflow: 'hidden',
   position: 'relative',
@@ -29,7 +29,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   },
   '&:hover': {
     transform: 'translateY(-4px)',
-    boxShadow: '0 12px 32px rgba(0, 0, 0, 0.6)',
+    boxShadow: 'var(--shadow-xl)',
     borderColor: 'var(--color-primary-500)',
     '&::before': {
       opacity: 1,
@@ -70,11 +70,11 @@ const MuiCard = ({
             '& .MuiCardHeader-title': {
               fontWeight: 700,
               fontSize: '1.25rem',
-              color: 'var(--color-text-primary-dark)',
+              color: 'var(--color-text-primary)',
               letterSpacing: '-0.01em',
             },
             '& .MuiCardHeader-subheader': {
-              color: 'var(--color-text-secondary-dark)',
+              color: 'var(--color-text-secondary)',
               fontSize: '0.875rem',
               mt: 0.5,
             }
@@ -83,7 +83,7 @@ const MuiCard = ({
       )}
       {content && (
         <CardContent sx={{
-          color: 'var(--color-text-primary-dark)',
+          color: 'var(--color-text-primary)',
           '&:last-child': {
             paddingBottom: 2,
           }
@@ -93,7 +93,7 @@ const MuiCard = ({
       )}
       {children && !content && (
         <CardContent sx={{
-          color: 'var(--color-text-primary-dark)',
+          color: 'var(--color-text-primary)',
           '&:last-child': {
             paddingBottom: 2,
           }

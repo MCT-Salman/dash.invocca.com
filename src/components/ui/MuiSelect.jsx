@@ -13,21 +13,20 @@ const StyledSelect = styled(Select, {
   color: 'var(--color-text-primary)',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    backgroundColor: 'var(--color-surface-hover)',
     '& .MuiOutlinedInput-notchedOutline': {
       borderColor: error ? 'var(--color-error-600) !important' : 'var(--color-primary-500) !important',
     },
   },
   '&.Mui-focused': {
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
-    boxShadow: '0 0 0 2px rgba(216, 185, 138, 0.1)',
+    backgroundColor: 'var(--color-surface-hover)',
     '& .MuiOutlinedInput-notchedOutline': {
       borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
       borderWidth: '1px !important',
     },
   },
   '& .MuiOutlinedInput-notchedOutline': {
-    borderColor: error ? 'var(--color-error-500) !important' : 'rgba(216, 185, 138, 0.3) !important',
+    borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-border) !important',
     borderWidth: '1px !important',
     borderRadius: '12px !important',
   },
@@ -42,10 +41,10 @@ const StyledSelect = styled(Select, {
     color: 'var(--color-text-secondary)',
   },
   '&.Mui-disabled': {
-    backgroundColor: 'rgba(255, 255, 255, 0.01)',
+    backgroundColor: 'var(--color-surface)',
     color: 'var(--color-text-muted)',
     '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'var(--color-border-dark)',
+      borderColor: 'var(--color-border) !important',
     },
     '& .MuiSvgIcon-root': {
       color: 'var(--color-text-muted)',
@@ -60,14 +59,14 @@ const StyledMenuItem = styled(MenuItem)(() => ({
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
   border: '1px solid transparent',
   '&:hover': {
-    backgroundColor: 'rgba(216, 185, 138, 0.1)',
+    backgroundColor: 'var(--color-surface-hover)',
     color: 'var(--color-primary-500)',
     borderColor: 'var(--color-primary-500)',
     transform: 'translateX(4px)',
   },
   '&.Mui-selected': {
     backgroundColor: 'var(--color-primary-500) !important',
-    color: '#000 !important',
+    color: 'var(--color-text-on-primary) !important',
     fontWeight: 600,
     '&:hover': {
       backgroundColor: 'var(--color-primary-600) !important',
@@ -78,7 +77,6 @@ const StyledMenuItem = styled(MenuItem)(() => ({
 const MuiSelect = ({
   label,
   value,
-  defaultValue,
   onChange,
   options = [],
   size = 'medium',
@@ -112,7 +110,6 @@ const MuiSelect = ({
             right: 0,
             left: 'auto',
             transformOrigin: 'top right',
-            textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
             position: 'absolute',
             top: '-8px',
             '&.Mui-focused': {
@@ -120,7 +117,7 @@ const MuiSelect = ({
               fontWeight: 600,
             },
             '&.Mui-disabled': {
-              color: 'rgba(255, 255, 255, 0.5) !important',
+              color: 'var(--color-text-muted) !important',
             },
             '&.Mui-error': {
               color: 'var(--color-error-500) !important',
@@ -135,17 +132,14 @@ const MuiSelect = ({
       <StyledSelect
         label={label}
         value={value}
-        defaultValue={defaultValue}
         onChange={onChange}
         variant={variant}
         disabled={disabled}
         name={name}
         error={error}
         sx={{
-          // Base styles from StyledSelect are already applied via styled component
-          // Add additional base styles here to ensure they're always applied
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: error ? 'var(--color-error-500) !important' : 'rgba(216, 185, 138, 0.3) !important',
+            borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-border) !important',
             borderWidth: '1px !important',
             borderRadius: '12px !important',
           },
@@ -156,19 +150,18 @@ const MuiSelect = ({
             borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
             borderWidth: '1px !important',
           },
-          // Merge with sx prop - external sx can override base styles
           ...(sx || {})
         }}
         MenuProps={{
           PaperProps: {
             sx: {
-              backgroundColor: 'var(--color-surface-dark)',
-              border: '1px solid var(--color-border-glass)',
+              backgroundColor: 'var(--color-paper)',
+              border: '1px solid var(--color-border)',
               borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+              boxShadow: 'var(--shadow-xl)',
               backdropFilter: 'blur(12px)',
               marginTop: '8px',
-              maxHeight: '240px', // 5 items * ~48px per item
+              maxHeight: '240px',
               overflow: 'auto',
               '& .MuiList-root': {
                 padding: '4px',

@@ -23,7 +23,7 @@ import MuiIconButton from '@/components/ui/MuiIconButton'
 import MuiStack from '@/components/ui/MuiStack'
 
 // Layout & Common Components
-import { LoadingScreen, EmptyState, SEOHead, DataTable, FormDialog, ConfirmDialog } from '@/components/common'
+import { LoadingScreen, EmptyState, SEOHead, DataTable, FormDialog, ConfirmDialog, PageHeader, StatCard, CardsView } from '@/components/common'
 import ViewServiceDialog from './components/ViewServiceDialog'
 
 // Hooks & Utilities
@@ -47,7 +47,12 @@ import {
     Trash2,
     X,
     Eye,
-    Download
+    Download,
+    Pencil,
+    Table,
+    LayoutGrid,
+    MessageSquare,
+    Check
 } from 'lucide-react'
 
 // ====================== Main Component ======================
@@ -61,6 +66,7 @@ export default function ServicesManagement() {
     const debouncedSearch = useDebounce(searchTerm, 500)
     const [categoryFilter, setCategoryFilter] = useState('all')
     const [statusFilter, setStatusFilter] = useState('all')
+    const [viewMode, setViewMode] = useState('table') // 'table' or 'card'
 
     // Dialog state management
     const {
@@ -230,6 +236,94 @@ export default function ServicesManagement() {
         }
     ]
 
+    const renderServiceCard = (service) => {
+        return (
+            <MuiCard
+                sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    borderRadius: '20px',
+                    overflow: 'hidden',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                        transform: 'translateY(-8px)',
+                        boxShadow: 'var(--shadow-xl)',
+                        borderColor: 'var(--color-primary-500)',
+                    }
+                }}
+            >
+                <MuiBox sx={{
+                    p: 3,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'var(--color-primary-50)',
+                    borderBottom: '1px solid var(--color-divider)'
+                }}>
+                    <MuiBox sx={{
+                        width: 64,
+                        height: 64,
+                        borderRadius: '16px',
+                        background: 'var(--color-paper)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: 'var(--shadow-sm)',
+                        color: 'var(--color-primary-500)'
+                    }}>
+                        <Package size={32} />
+                    </MuiBox>
+                </MuiBox>
+
+                <MuiCardContent sx={{ flexGrow: 1, p: 2.5 }}>
+                    <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                        <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                            {service.name}
+                        </MuiTypography>
+                        <MuiChip
+                            label={service.isActive ? 'نشط' : 'معطل'}
+                            size="small"
+                            color={service.isActive ? 'success' : 'default'}
+                            sx={{ fontWeight: 600 }}
+                        />
+                    </MuiBox>
+
+                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: '3em' }}>
+                        {service.description || 'لا يوجد وصف متاح'}
+                    </MuiTypography>
+
+                    <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 'auto' }}>
+                        <MuiChip
+                            icon={<Tag size={12} />}
+                            label={SERVICE_CATEGORY_LABELS[service.category] || service.category}
+                            size="small"
+                            variant="outlined"
+                        />
+                        <MuiChip
+                            icon={<DollarSign size={12} />}
+                            label={formatCurrency(service.basePrice)}
+                            size="small"
+                            sx={{ background: 'var(--color-success-50)', color: 'var(--color-success-700)', fontWeight: 700 }}
+                        />
+                    </MuiBox>
+                </MuiCardContent>
+
+                <MuiCardActions sx={{ px: 2, py: 1.5, borderTop: '1px solid var(--color-divider)', justifyContent: 'flex-end', gap: 1 }}>
+                    <MuiIconButton size="small" onClick={() => openViewDialog(service)} color="primary">
+                        <Eye size={18} />
+                    </MuiIconButton>
+                    <MuiIconButton size="small" onClick={() => handleEditClick(service)} color="info">
+                        <Pencil size={18} />
+                    </MuiIconButton>
+                    <MuiIconButton size="small" onClick={() => openDeleteDialog(service)} color="error">
+                        <Trash2 size={18} />
+                    </MuiIconButton>
+                </MuiCardActions>
+            </MuiCard>
+        )
+    }
+
 
     const handleToggleStatus = async (service) => {
         try {
@@ -350,290 +444,103 @@ export default function ServicesManagement() {
         <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
             <SEOHead pageKey="servicesManagement" title="إدارة الخدمات | INVOCCA" />
 
-            {/* Header Section */}
-            <MuiBox
-                sx={{
-                    mb: 4,
-                    p: 4,
-                    borderRadius: '20px',
-                    background: 'var(--color-surface-dark)',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    border: '1px solid var(--color-border-glass)',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                    '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        right: 0,
-                        width: '300px',
-                        height: '300px',
-                        background: 'radial-gradient(circle, rgba(216, 185, 138, 0.05) 0%, transparent 70%)',
-                        borderRadius: '50%',
-                    }
-                }}
-            >
-                <MuiBox sx={{ position: 'relative', zIndex: 1 }}>
-                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                        <MuiBox
-                            sx={{
-                                width: 56,
-                                height: 56,
-                                borderRadius: '14px',
-                                background: 'linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800))',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                border: '1px solid var(--color-primary-500)',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
-                            }}
+            <PageHeader
+                icon={Package}
+                title={`إدارة الخدمات (${filteredServices.length})`}
+                subtitle="إدارة جميع خدمات المناسبات المتاحة في النظام"
+                actions={
+                    <MuiBox sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                        <MuiBox sx={{ display: 'flex', background: 'var(--color-surface)', p: 0.5, borderRadius: '12px', border: '1px solid var(--color-border)' }}>
+                            <MuiIconButton
+                                size="small"
+                                onClick={() => setViewMode('table')}
+                                sx={{
+                                    borderRadius: '10px',
+                                    color: viewMode === 'table' ? 'var(--color-primary-500)' : 'var(--color-text-muted)',
+                                    background: viewMode === 'table' ? 'var(--color-paper)' : 'transparent',
+                                    boxShadow: viewMode === 'table' ? 'var(--shadow-sm)' : 'none',
+                                    '&:hover': { background: viewMode === 'table' ? 'var(--color-paper)' : 'rgba(0,0,0,0.05)' }
+                                }}
+                            >
+                                <Table size={20} />
+                            </MuiIconButton>
+                            <MuiIconButton
+                                size="small"
+                                onClick={() => setViewMode('card')}
+                                sx={{
+                                    borderRadius: '10px',
+                                    color: viewMode === 'card' ? 'var(--color-primary-500)' : 'var(--color-text-muted)',
+                                    background: viewMode === 'card' ? 'var(--color-paper)' : 'transparent',
+                                    boxShadow: viewMode === 'card' ? 'var(--shadow-sm)' : 'none',
+                                    '&:hover': { background: viewMode === 'card' ? 'var(--color-paper)' : 'rgba(0,0,0,0.05)' }
+                                }}
+                            >
+                                <LayoutGrid size={20} />
+                            </MuiIconButton>
+                        </MuiBox>
+                        <MuiButton
+                            variant="outlined"
+                            startIcon={<Download size={20} />}
+                            onClick={handleExport}
+                            disabled={services.length === 0}
                         >
-                            <Package size={28} className="text-white" />
-                        </MuiBox>
-                        <MuiBox>
-                            <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 0.5 }}>
-                                إدارة الخدمات ({filteredServices.length})
-                            </MuiTypography>
-                            <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                                إدارة جميع خدمات المناسبات في النظام
-                            </MuiTypography>
-                        </MuiBox>
+                            تصدير
+                        </MuiButton>
+                        <MuiButton
+                            variant="contained"
+                            startIcon={<Plus size={20} />}
+                            onClick={handleCreateClick}
+                        >
+                            إضافة خدمة
+                        </MuiButton>
                     </MuiBox>
-                </MuiBox>
-            </MuiBox>
+                }
+            />
 
             {/* Stats Cards */}
             <MuiGrid container spacing={3} sx={{ mb: 4 }}>
                 <MuiGrid item xs={12} sm={6} md={3}>
-                    <MuiPaper
-                        elevation={0}
-                        sx={{
-                            p: 3,
-                            height: '100%',
-                            background: 'var(--color-surface-dark)',
-                            border: '1px solid var(--color-border-glass)',
-                            borderRadius: '16px',
-                            position: 'relative',
-                            overflow: 'hidden',
-                            transition: 'all 0.3s ease',
-                            '&:hover': {
-                                transform: 'translateY(-4px)',
-                                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                                borderColor: 'var(--color-primary-500)',
-                            },
-                            '&::before': {
-                                content: '""',
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                height: '4px',
-                                background: 'linear-gradient(90deg, var(--color-primary-500), transparent)',
-                            }
-                        }}
-                    >
-                        <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <MuiBox>
-                                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                                    {services.length}
-                                </MuiTypography>
-                                <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                                    عدد الخدمات
-                                </MuiTypography>
-                            </MuiBox>
-                            <MuiBox
-                                sx={{
-                                    width: 56,
-                                    height: 56,
-                                    borderRadius: '12px',
-                                    background: 'rgba(216, 185, 138, 0.1)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    border: '1px solid rgba(216, 185, 138, 0.2)',
-                                }}
-                            >
-                                <Package size={28} style={{ color: '#D8B98A' }} />
-                            </MuiBox>
-                        </MuiBox>
-                    </MuiPaper>
+                    <StatCard
+                        title="عدد الخدمات"
+                        value={services.length}
+                        icon={<Package size={24} />}
+                        color="primary"
+                    />
                 </MuiGrid>
                 <MuiGrid item xs={12} sm={6} md={3}>
-                    <MuiPaper
-                        elevation={0}
-                        sx={{
-                            p: 3,
-                            height: '100%',
-                            background: 'var(--color-surface-dark)',
-                            border: '1px solid rgba(34, 197, 94, 0.2)',
-                            borderRadius: '16px',
-                            position: 'relative',
-                            overflow: 'hidden',
-                            transition: 'all 0.3s ease',
-                            '&:hover': {
-                                transform: 'translateY(-4px)',
-                                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                                borderColor: 'var(--color-success-500)',
-                            },
-                            '&::before': {
-                                content: '""',
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                height: '4px',
-                                background: 'linear-gradient(90deg, var(--color-success-500), transparent)',
-                            }
-                        }}
-                    >
-                        <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <MuiBox>
-                                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                                    {services.filter(s => s.isActive).length}
-                                </MuiTypography>
-                                <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                                    الخدمات النشطة
-                                </MuiTypography>
-                            </MuiBox>
-                            <MuiBox
-                                sx={{
-                                    width: 56,
-                                    height: 56,
-                                    borderRadius: '12px',
-                                    background: 'rgba(34, 197, 94, 0.1)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    border: '1px solid rgba(34, 197, 94, 0.2)',
-                                }}
-                            >
-                                <CheckCircle size={28} style={{ color: '#22c55e' }} />
-                            </MuiBox>
-                        </MuiBox>
-                    </MuiPaper>
+                    <StatCard
+                        title="الخدمات النشطة"
+                        value={services.filter(s => s.isActive).length}
+                        icon={<CheckCircle size={24} />}
+                        color="success"
+                    />
                 </MuiGrid>
                 <MuiGrid item xs={12} sm={6} md={3}>
-                    <MuiPaper
-                        elevation={0}
-                        sx={{
-                            p: 3,
-                            height: '100%',
-                            background: 'var(--color-surface-dark)',
-                            border: '1px solid rgba(220, 38, 38, 0.2)',
-                            borderRadius: '16px',
-                            position: 'relative',
-                            overflow: 'hidden',
-                            transition: 'all 0.3s ease',
-                            '&:hover': {
-                                transform: 'translateY(-4px)',
-                                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                                borderColor: 'var(--color-error-500)',
-                            },
-                            '&::before': {
-                                content: '""',
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                height: '4px',
-                                background: 'linear-gradient(90deg, var(--color-error-500), transparent)',
-                            }
-                        }}
-                    >
-                        <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <MuiBox>
-                                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                                    {services.filter(s => !s.isActive).length}
-                                </MuiTypography>
-                                <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                                    الخدمات غير نشطة
-                                </MuiTypography>
-                            </MuiBox>
-                            <MuiBox
-                                sx={{
-                                    width: 56,
-                                    height: 56,
-                                    borderRadius: '12px',
-                                    background: 'rgba(220, 38, 38, 0.1)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    border: '1px solid rgba(220, 38, 38, 0.2)',
-                                }}
-                            >
-                                <XCircle size={28} style={{ color: '#dc2626' }} />
-                            </MuiBox>
-                        </MuiBox>
-                    </MuiPaper>
+                    <StatCard
+                        title="الخدمات غير نشطة"
+                        value={services.filter(s => !s.isActive).length}
+                        icon={<XCircle size={24} />}
+                        color="error"
+                    />
                 </MuiGrid>
                 <MuiGrid item xs={12} sm={6} md={3}>
-                    <MuiPaper
-                        elevation={0}
-                        sx={{
-                            p: 3,
-                            height: '100%',
-                            background: 'var(--color-surface-dark)',
-                            border: '1px solid rgba(2, 132, 199, 0.2)',
-                            borderRadius: '16px',
-                            position: 'relative',
-                            overflow: 'hidden',
-                            transition: 'all 0.3s ease',
-                            '&:hover': {
-                                transform: 'translateY(-4px)',
-                                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                                borderColor: 'var(--color-info-500)',
-                            },
-                            '&::before': {
-                                content: '""',
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                height: '4px',
-                                background: 'linear-gradient(90deg, var(--color-info-500), transparent)',
-                            }
-                        }}
-                    >
-                        <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <MuiBox>
-                                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                                    {services.length > 0
-                                        ? Math.round(services.reduce((sum, service) => sum + (service.basePrice || 0), 0) / services.length)
-                                        : 0
-                                    }
-                                </MuiTypography>
-                                <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                                    متوسط السعر
-                                </MuiTypography>
-                            </MuiBox>
-                            <MuiBox
-                                sx={{
-                                    width: 56,
-                                    height: 56,
-                                    borderRadius: '12px',
-                                    background: 'rgba(2, 132, 199, 0.1)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    border: '1px solid rgba(2, 132, 199, 0.2)',
-                                }}
-                            >
-                                <DollarSign size={28} style={{ color: '#0284c7' }} />
-                            </MuiBox>
-                        </MuiBox>
-                    </MuiPaper>
+                    <StatCard
+                        title="متوسط السعر"
+                        value={services.length > 0 ? Math.round(services.reduce((sum, service) => sum + (service.basePrice || 0), 0) / services.length) : 0}
+                        icon={<DollarSign size={24} />}
+                        color="info"
+                    />
                 </MuiGrid>
             </MuiGrid>
 
-            {/* Search & Filter */}
             <MuiPaper
                 elevation={0}
                 sx={{
                     p: 3,
-                    mb: 3,
-                    background: 'var(--color-surface-dark)',
-                    border: '1px solid var(--color-border-glass)',
-                    borderRadius: '16px'
+                    mb: 4,
+                    background: 'var(--color-paper)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: '20px'
                 }}
             >
                 <MuiGrid container spacing={2} alignItems="center">
@@ -643,19 +550,7 @@ export default function ServicesManagement() {
                             placeholder="البحث عن خدمة..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            InputProps={{
-                                startAdornment: (
-                                    <MuiInputAdornment position="start">
-                                        <Search size={20} style={{ color: 'var(--color-text-secondary)' }} />
-                                    </MuiInputAdornment>
-                                ),
-                            }}
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '10px',
-                                    backgroundColor: 'rgba(0,0,0,0.3)',
-                                }
-                            }}
+                            startIcon={<Search size={20} />}
                         />
                     </MuiGrid>
                     <MuiGrid item xs={12} md={3}>
@@ -663,20 +558,13 @@ export default function ServicesManagement() {
                             fullWidth
                             value={categoryFilter}
                             onChange={(e) => setCategoryFilter(e.target.value)}
-                            sx={{
-                                borderRadius: '10px',
-                            }}
                         >
                             <MuiMenuItem value="all">جميع الفئات</MuiMenuItem>
-                            {Array.isArray(categories) && categories.map(cat => {
-                                const catValue = typeof cat === 'object' ? cat.value || cat.id || cat : cat
-                                const catLabel = typeof cat === 'object' ? cat.label || cat.name || cat : cat
-                                return (
-                                    <MuiMenuItem key={catValue} value={catValue}>
-                                        {SERVICE_CATEGORY_LABELS[catValue] || catLabel}
-                                    </MuiMenuItem>
-                                )
-                            })}
+                            {Array.isArray(categories) && categories.map(cat => (
+                                <MuiMenuItem key={cat.value || cat.id || cat} value={cat.value || cat.id || cat}>
+                                    {SERVICE_CATEGORY_LABELS[cat.value || cat.id || cat] || cat.label || cat.name || cat}
+                                </MuiMenuItem>
+                            ))}
                         </MuiSelect>
                     </MuiGrid>
                     <MuiGrid item xs={12} md={3}>
@@ -684,9 +572,6 @@ export default function ServicesManagement() {
                             fullWidth
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
-                            sx={{
-                                borderRadius: '10px',
-                            }}
                         >
                             <MuiMenuItem value="all">جميع الحالات</MuiMenuItem>
                             <MuiMenuItem value="active">نشطة</MuiMenuItem>
@@ -694,7 +579,8 @@ export default function ServicesManagement() {
                         </MuiSelect>
                     </MuiGrid>
                 </MuiGrid>
-                <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+
+                <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mt: 3, pt: 3, borderTop: '1px solid var(--color-divider)' }}>
                     <MuiBox sx={{ display: 'flex', gap: 2 }}>
                         {(categoryFilter !== 'all' || statusFilter !== 'all' || searchTerm) && (
                             <MuiButton
@@ -706,14 +592,6 @@ export default function ServicesManagement() {
                                     setSearchTerm('')
                                 }}
                                 startIcon={<X size={16} />}
-                                sx={{
-                                    borderColor: 'var(--color-text-secondary)',
-                                    color: 'var(--color-text-secondary)',
-                                    '&:hover': {
-                                        borderColor: '#666',
-                                        background: 'rgba(136, 136, 136, 0.1)',
-                                    }
-                                }}
                             >
                                 مسح الفلاتر
                             </MuiButton>
@@ -722,18 +600,15 @@ export default function ServicesManagement() {
                     <MuiBox sx={{ display: 'flex', gap: 2 }}>
                         <MuiButton
                             variant="outlined"
-                            color="info"
-                            startIcon={<Download size={20} />}
-                            onClick={handleExport}
-                            disabled={services.length === 0}
+                            startIcon={<RefreshCw size={20} />}
+                            onClick={handleRefresh}
                         >
-                            تصدير
+                            تحديث
                         </MuiButton>
                         <MuiButton
                             variant="contained"
                             startIcon={<Plus size={20} />}
                             onClick={handleCreateClick}
-                            color="primary"
                         >
                             إضافة خدمة
                         </MuiButton>
@@ -741,15 +616,8 @@ export default function ServicesManagement() {
                 </MuiBox>
             </MuiPaper>
 
-            {/* Services Table */}
-            {filteredServices.length === 0 ? (
-                <EmptyState
-                    title="لا يوجد خدمات"
-                    description="لم يتم العثور على أي خدمات تطابق بحثك"
-                    icon={ClipboardList}
-                    showPaper
-                />
-            ) : (
+            {/* Services Table/Cards */}
+            {viewMode === 'table' ? (
                 <DataTable
                     columns={columns}
                     data={filteredServices}
@@ -760,13 +628,13 @@ export default function ServicesManagement() {
                     loading={isLoading}
                     emptyMessage="لا توجد خدمات متاحة"
                     showActions={true}
-                    sx={{
-                        background: 'rgba(26, 26, 26, 0.4)',
-                        backdropFilter: 'blur(10px)',
-                        borderRadius: '20px',
-                        border: '1px solid var(--color-border-glass)',
-                        overflow: 'hidden',
-                    }}
+                />
+            ) : (
+                <CardsView
+                    data={filteredServices}
+                    renderCard={renderServiceCard}
+                    loading={isLoading}
+                    emptyMessage="لا توجد خدمات متاحة"
                 />
             )}
 
@@ -840,69 +708,69 @@ export default function ServicesManagement() {
                         </MuiGrid>
                     </MuiGrid>
 
+                    <MuiTextField
+                        fullWidth
+                        label="السعر الأساسي"
+                        type="number"
+                        required
+                        value={formData.basePrice}
+                        onChange={(e) => setFormData({ ...formData, basePrice: parseFloat(e.target.value) })}
+                        InputProps={{
+                            startAdornment: (
+                                <MuiInputAdornment position="start">
+                                    <DollarSign size={20} style={{ color: 'var(--color-primary-400)' }} />
+                                </MuiInputAdornment>
+                            ),
+                        }}
+                    />
+
+                    {/* Requirements Array */}
+                    <MuiBox>
+                        <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-primary-300)', mb: 1, fontWeight: 600 }}>
+                            المتطلبات (اختياري)
+                        </MuiTypography>
+                        <MuiBox sx={{ display: 'flex', gap: 1, mb: 2 }}>
                             <MuiTextField
                                 fullWidth
-                                label="السعر الأساسي"
-                                type="number"
-                                required
-                                value={formData.basePrice}
-                                onChange={(e) => setFormData({ ...formData, basePrice: parseFloat(e.target.value) })}
-                                InputProps={{
-                                    startAdornment: (
-                                        <MuiInputAdornment position="start">
-                                            <DollarSign size={20} style={{ color: 'var(--color-primary-400)' }} />
-                                        </MuiInputAdornment>
-                                    ),
-                                }}
+                                size="small"
+                                placeholder="أضف متطلب جديد..."
+                                value={newRequirement}
+                                onChange={(e) => setNewRequirement(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddRequirement())}
                             />
-
-                            {/* Requirements Array */}
-                            <MuiBox>
-                                <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-primary-300)', mb: 1, fontWeight: 600 }}>
-                                    المتطلبات (اختياري)
-                                </MuiTypography>
-                                <MuiBox sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                                    <MuiTextField
-                                        fullWidth
-                                        size="small"
-                                        placeholder="أضف متطلب جديد..."
-                                        value={newRequirement}
-                                        onChange={(e) => setNewRequirement(e.target.value)}
-                                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddRequirement())}
-                                    />
-                                    <MuiButton
-                                        variant="outlined"
-                                        onClick={handleAddRequirement}
-                                        disabled={!newRequirement.trim()}
-                                        sx={{ borderColor: 'var(--color-primary-500)', color: 'var(--color-primary-500)' }}
-                                    >
-                                        إضافة
-                                    </MuiButton>
-                                </MuiBox>
-                                <MuiStack spacing={1}>
-                                    {formData.requirements.map((req, index) => (
-                                        <MuiPaper
-                                            key={req.id || `req-${index}`}
-                                            sx={{
-                                                px: 2,
-                                                py: 1,
-                                                background: 'rgba(255,255,255,0.03)',
-                                                border: '1px solid var(--color-border-glass)',
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                borderRadius: '8px'
-                                            }}
-                                        >
-                                            <MuiTypography variant="body2">{req}</MuiTypography>
-                                            <MuiIconButton size="small" color="error" onClick={() => handleRemoveRequirement(index)}>
-                                                <X size={16} />
-                                            </MuiIconButton>
-                                        </MuiPaper>
-                                    ))}
-                                </MuiStack>
-                            </MuiBox>
+                            <MuiButton
+                                variant="outlined"
+                                onClick={handleAddRequirement}
+                                disabled={!newRequirement.trim()}
+                                sx={{ borderColor: 'var(--color-primary-500)', color: 'var(--color-primary-500)' }}
+                            >
+                                إضافة
+                            </MuiButton>
+                        </MuiBox>
+                        <MuiStack spacing={1}>
+                            {formData.requirements.map((req, index) => (
+                                <MuiPaper
+                                    key={req.id || `req-${index}`}
+                                    sx={{
+                                        px: 2,
+                                        py: 1,
+                                        background: 'rgba(255,255,255,0.03)',
+                                        border: '1px solid var(--color-border-glass)',
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        borderRadius: '8px'
+                                    }}
+                                >
+                                    <MuiTypography variant="body2">{req}</MuiTypography>
+                                    <MuiIconButton size="small" color="error" onClick={() => handleRemoveRequirement(index)}>
+                                        <X size={16} />
+                                    </MuiIconButton>
+                                </MuiPaper>
+                            ))}
                         </MuiStack>
+                    </MuiBox>
+                </MuiStack>
             </FormDialog>
 
             {/* View Dialog */}
@@ -923,7 +791,7 @@ export default function ServicesManagement() {
                 cancelLabel="إلغاء"
                 loading={crudLoading}
             />
-        </MuiBox>
+        </MuiBox >
     )
 }
 

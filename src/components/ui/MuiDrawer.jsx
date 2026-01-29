@@ -17,7 +17,12 @@ const MuiDrawer = ({
       variant={variant}
       className={className}
       PaperProps={{
-        className: '!bg-yellow-pale !text-primary-500 !border-l-2 !border-beige-light'
+        sx: {
+          backgroundColor: 'var(--color-paper)',
+          color: 'var(--color-text-primary)',
+          borderLeft: anchor === 'right' ? '1px solid var(--color-border)' : 'none',
+          borderRight: anchor === 'left' ? '1px solid var(--color-border)' : 'none',
+        }
       }}
       {...props}
     >

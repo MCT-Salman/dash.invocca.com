@@ -15,22 +15,25 @@ import { Calendar, Clock, Users, MapPin } from 'lucide-react'
  */
 function EventCard({ event, index }) {
   const statusColors = {
-    pending: { bg: '#FFF8DA', text: '#D99B3D', label: 'قيد الانتظار' },
-    confirmed: { bg: '#e0f2fe', text: '#0284c7', label: 'مؤكد' },
-    in_progress: { bg: '#f3e8ff', text: '#9333ea', label: 'جاري' },
-    completed: { bg: '#dcfce7', text: '#16a34a', label: 'مكتمل' },
-    cancelled: { bg: '#fee2e2', text: '#dc2626', label: 'ملغي' }
+    pending: { bg: 'var(--color-warning-50)', text: 'var(--color-warning-700)', label: 'قيد الانتظار' },
+    confirmed: { bg: 'var(--color-info-50)', text: 'var(--color-info-700)', label: 'مؤكد' },
+    in_progress: { bg: 'var(--color-secondary-100)', text: 'var(--color-secondary-700)', label: 'جاري' },
+    completed: { bg: 'var(--color-success-50)', text: 'var(--color-success-700)', label: 'مكتمل' },
+    cancelled: { bg: 'var(--color-error-50)', text: 'var(--color-error-700)', label: 'ملغي' }
   }
 
   const status = statusColors[event.status] || statusColors.pending
 
   return (
     <MuiBox
-      className="group hover:bg-secondary-50 transition-all duration-300 rounded-xl"
       sx={{
         p: 3,
-        borderBottom: index !== undefined ? '1px solid' : 'none',
-        borderColor: 'divider',
+        borderBottom: index !== undefined ? '1px solid var(--color-border)' : 'none',
+        transition: 'all 0.3s ease',
+        borderRadius: '16px',
+        '&:hover': {
+          backgroundColor: 'var(--color-surface-hover)',
+        },
         '&:last-child': {
           borderBottom: 'none'
         }
@@ -38,10 +41,10 @@ function EventCard({ event, index }) {
     >
       <MuiBox className="flex items-start justify-between gap-4 mb-3">
         <MuiBox className="flex-1">
-          <MuiTypography variant="h6" className="font-bold text-text-primary mb-1 group-hover:text-secondary-700 transition-colors">
+          <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary)', mb: 0.5 }}>
             {event.eventName || event.name}
           </MuiTypography>
-          <MuiTypography variant="body2" className="text-text-secondary">
+          <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
             {typeof event.eventType === 'object'
               ? (event.eventType.label || event.eventType.name || String(event.eventType))
               : (event.eventType || 'فعالية')}
@@ -65,8 +68,8 @@ function EventCard({ event, index }) {
       <MuiBox className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* Date */}
         <MuiBox className="flex items-center gap-2">
-          <Calendar size={16} className="text-secondary-500 flex-shrink-0" />
-          <MuiTypography variant="body2" className="text-text-secondary">
+          <Calendar size={16} style={{ color: 'var(--color-primary-500)' }} className="flex-shrink-0" />
+          <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
             {event.eventDate || event.date}
           </MuiTypography>
         </MuiBox>
@@ -74,8 +77,8 @@ function EventCard({ event, index }) {
         {/* Time */}
         {event.startTime && (
           <MuiBox className="flex items-center gap-2">
-            <Clock size={16} className="text-secondary-500 flex-shrink-0" />
-            <MuiTypography variant="body2" className="text-text-secondary">
+            <Clock size={16} style={{ color: 'var(--color-primary-500)' }} className="flex-shrink-0" />
+            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
               {event.startTime} - {event.endTime}
             </MuiTypography>
           </MuiBox>
@@ -84,8 +87,8 @@ function EventCard({ event, index }) {
         {/* Guests */}
         {event.guestCount && (
           <MuiBox className="flex items-center gap-2">
-            <Users size={16} className="text-secondary-500 flex-shrink-0" />
-            <MuiTypography variant="body2" className="text-text-secondary">
+            <Users size={16} style={{ color: 'var(--color-primary-500)' }} className="flex-shrink-0" />
+            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
               {event.guestCount} ضيف
             </MuiTypography>
           </MuiBox>
@@ -94,8 +97,8 @@ function EventCard({ event, index }) {
         {/* Client */}
         {event.client && (
           <MuiBox className="flex items-center gap-2">
-            <MapPin size={16} className="text-secondary-500 flex-shrink-0" />
-            <MuiTypography variant="body2" className="text-text-secondary">
+            <MapPin size={16} style={{ color: 'var(--color-primary-500)' }} className="flex-shrink-0" />
+            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
               {event.client.name || event.clientName}
             </MuiTypography>
           </MuiBox>
@@ -124,18 +127,35 @@ export default function UpcomingEvents({ events = [], title = "الفعاليا�
   }
 
   return (
-    <MuiPaper elevation={0} className="rounded-2xl border-2 border-border bg-white overflow-hidden">
+    <MuiPaper
+      elevation={0}
+      sx={{
+        borderRadius: '24px',
+        border: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-paper)',
+        overflow: 'hidden',
+        boxShadow: 'var(--shadow-sm)'
+      }}
+    >
       {/* Header */}
-      <MuiBox className="p-6 bg-gradient-to-r from-secondary-50 to-yellow-pale border-b-2 border-border">
+      <MuiBox sx={{ p: 3, backgroundColor: 'var(--color-surface)', borderBottom: '1px solid var(--color-border)' }}>
         <MuiBox className="flex items-center gap-3">
-          <MuiBox className="w-12 h-12 rounded-xl bg-secondary-500 flex items-center justify-center">
-            <Calendar size={24} className="text-white" strokeWidth={2.5} />
+          <MuiBox sx={{
+            width: 48,
+            height: 48,
+            borderRadius: '16px',
+            backgroundColor: 'var(--color-primary-500)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Calendar size={24} style={{ color: 'var(--color-text-on-primary)' }} strokeWidth={2.5} />
           </MuiBox>
           <MuiBox>
-            <MuiTypography variant="h5" className="font-bold text-text-primary">
+            <MuiTypography variant="h5" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
               {title}
             </MuiTypography>
-            <MuiTypography variant="body2" className="text-text-secondary">
+            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
               {events.length} فعالية مجدولة
             </MuiTypography>
           </MuiBox>

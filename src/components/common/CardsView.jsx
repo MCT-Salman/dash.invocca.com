@@ -37,9 +37,6 @@ export default function CardsView({
     onDelete,
     loading = false,
     emptyMessage = 'لا توجد بيانات',
-    pagination,
-    onPageChange,
-    onRowsPerPageChange,
     columns = { xs: 1, sm: 1, md: 2, lg: 3, xl: 4 },
     showActions = true,
     ...props
@@ -48,96 +45,127 @@ export default function CardsView({
         return (
             <EmptyState
                 title={emptyMessage}
-                description="لم يتم العثور على أي بيانات"
+                description="لم يتم العثور على أي بيانات تطابق المعايير المحددة"
                 showPaper
             />
         )
     }
 
     return (
-        <MuiBox>
-            <MuiGrid 
-                container 
-                spacing={{ xs: 0, sm: 0, md: 3 }}
+        <MuiBox sx={{ width: '100%' }}>
+            <MuiGrid
+                container
+                spacing={3}
                 sx={{
                     width: '100%',
-                    maxWidth: '100%',
                     margin: 0,
                     '& > .MuiGrid-item': {
-                        width: '100% !important',
-                        maxWidth: '100% !important',
-                        minWidth: 0,
-                        padding: { xs: '0 !important', sm: '0 !important', md: '12px !important' },
-                        marginBottom: { xs: '12px', sm: '16px', md: 0 },
+                        paddingLeft: { xs: 0, sm: 0, md: 3 },
+                        paddingTop: { xs: 0, sm: 0, md: 3 },
                     }
                 }}
             >
                 {data.map((item, index) => (
-                    <MuiGrid 
-                        item 
-                        {...columns} 
-                        key={item.id || index}
-                        sx={{
-                            width: '100% !important',
-                            maxWidth: '100% !important',
-                            minWidth: 0,
-                            flexBasis: { xs: '100% !important', sm: '100% !important' },
-                        }}
+                    <MuiGrid
+                        item
+                        {...columns}
+                        key={item.id || item._id || index}
                     >
                         {renderCard ? (
                             renderCard(item, index)
                         ) : (
-                            <MuiCard sx={{ width: '100%', maxWidth: '100%' }}>
-                                <MuiCardContent>
-                                    <MuiTypography variant="h6" sx={{ mb: 1 }}>
-                                        {item.name || item.title || `عنصر ${index + 1}`}
-                                    </MuiTypography>
+                            <MuiCard
+                                sx={{
+                                    height: '100%',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    background: 'var(--color-paper)',
+                                    borderRadius: '20px',
+                                    border: '1px solid var(--color-border)',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    '&:hover': {
+                                        transform: 'translateY(-8px)',
+                                        borderColor: 'var(--color-primary-500)',
+                                        boxShadow: 'var(--shadow-xl)',
+                                        '& .card-overlay': { opacity: 1 }
+                                    },
+                                    '&::before': {
+                                        content: '""',
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        height: '4px',
+                                        background: 'linear-gradient(90deg, var(--color-primary-500), transparent)',
+                                        opacity: 0.8
+                                    }
+                                }}
+                            >
+                                <MuiCardContent sx={{ p: 3, flexGrow: 1 }}>
+                                    <MuiBox sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                        <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                                            {item.name || item.title || `عنصر ${index + 1}`}
+                                        </MuiTypography>
+                                        {item.status && (
+                                            <MuiChip
+                                                label={item.status}
+                                                size="small"
+                                                color={item.status === 'نشط' || item.status === 'active' ? 'success' : 'default'}
+                                                sx={{ fontWeight: 600 }}
+                                            />
+                                        )}
+                                    </MuiBox>
+
                                     {item.description && (
-                                        <MuiTypography variant="body2" color="text.secondary">
+                                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', lineHeight: 1.6, mb: 2 }}>
                                             {item.description}
                                         </MuiTypography>
                                     )}
-                                    {item.status && (
-                                        <MuiChip
-                                            label={item.status}
-                                            color={item.status === 'نشط' ? 'success' : 'default'}
-                                            size="small"
-                                            sx={{ mt: 1 }}
-                                        />
-                                    )}
+
+                                    {/* Default slots for common metadata if present */}
+                                    <MuiGrid container spacing={1}>
+                                        {item.location && (
+                                            <MuiGrid item xs={12}>
+                                                <MuiTypography variant="caption" sx={{ color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                    • {item.location}
+                                                </MuiTypography>
+                                            </MuiGrid>
+                                        )}
+                                        {item.date && (
+                                            <MuiGrid item xs={12}>
+                                                <MuiTypography variant="caption" sx={{ color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                    • {item.date}
+                                                </MuiTypography>
+                                            </MuiGrid>
+                                        )}
+                                    </MuiGrid>
                                 </MuiCardContent>
+
                                 {showActions && (onView || onEdit || onDelete) && (
-                                    <MuiCardActions sx={{ gap: 1, flexWrap: 'wrap' }}>
+                                    <MuiCardActions sx={{
+                                        p: 2,
+                                        pt: 0,
+                                        gap: 1,
+                                        justifyContent: 'flex-end',
+                                        borderTop: '1px solid var(--color-divider)',
+                                        background: 'rgba(0,0,0,0.02)'
+                                    }}>
                                         {onView && (
-                                            <MuiButton
-                                                size="small"
-                                                variant="outlined"
-                                                start_icon={<Eye size={16} />}
-                                                onClick={() => onView(item)}
-                                            >
-                                                عرض
-                                            </MuiButton>
+                                            <MuiIconButton size="small" onClick={() => onView(item)} sx={{ color: 'var(--color-primary-500)' }}>
+                                                <Eye size={18} />
+                                            </MuiIconButton>
                                         )}
                                         {onEdit && (
-                                            <MuiButton
-                                                size="small"
-                                                variant="outlined"
-                                                start_icon={<Pencil size={16} />}
-                                                onClick={() => onEdit(item)}
-                                            >
-                                                تعديل
-                                            </MuiButton>
+                                            <MuiIconButton size="small" onClick={() => onEdit(item)} sx={{ color: 'var(--color-info-500)' }}>
+                                                <Pencil size={18} />
+                                            </MuiIconButton>
                                         )}
                                         {onDelete && (
-                                            <MuiButton
-                                                size="small"
-                                                variant="outlined"
-                                                color="error"
-                                                start_icon={<Trash2 size={16} />}
-                                                onClick={() => onDelete(item)}
-                                            >
-                                                حذف
-                                            </MuiButton>
+                                            <MuiIconButton size="small" onClick={() => onDelete(item)} sx={{ color: 'var(--color-error-500)' }}>
+                                                <Trash2 size={18} />
+                                            </MuiIconButton>
                                         )}
                                     </MuiCardActions>
                                 )}

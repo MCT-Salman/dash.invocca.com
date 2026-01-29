@@ -98,18 +98,24 @@ export default function QRCodeDisplay({
     }
 
     return (
-        <MuiPaper className="p-6 rounded-2xl shadow-lg border border-border bg-gradient-to-br from-white to-secondary-50">
-            <MuiBox className="flex flex-col items-center gap-4">
+        <MuiPaper sx={{
+            p: 3,
+            borderRadius: '24px',
+            border: '1px solid var(--color-border)',
+            backgroundColor: 'var(--color-paper)',
+            boxShadow: 'var(--shadow-lg)'
+        }}>
+            <MuiBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                 {/* Title */}
                 {title && (
-                    <MuiTypography variant="h6" className="font-bold text-text-primary text-center">
+                    <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary)', textAlign: 'center' }}>
                         {title}
                     </MuiTypography>
                 )}
 
                 {/* Subtitle */}
                 {subtitle && (
-                    <MuiTypography variant="body2" className="text-text-secondary text-center">
+                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', textAlign: 'center' }}>
                         {subtitle}
                     </MuiTypography>
                 )}
@@ -117,33 +123,45 @@ export default function QRCodeDisplay({
                 {/* QR Code */}
                 <MuiBox
                     ref={qrRef}
-                    className="p-4 bg-white rounded-xl shadow-md border-2 border-secondary-200"
+                    sx={{
+                        p: 2,
+                        backgroundColor: '#fff', // QR codes always need high contrast white bg
+                        borderRadius: '16px',
+                        boxShadow: 'var(--shadow-sm)',
+                        border: '2px solid var(--color-primary-500)'
+                    }}
                 >
                     <img
                         src={qrCodeUrl}
                         alt="QR Code"
                         width={size}
                         height={size}
-                        className="block"
+                        style={{ display: 'block' }}
                     />
                 </MuiBox>
 
                 {/* Value Display */}
                 <MuiTypography
                     variant="caption"
-                    className="text-text-secondary font-mono bg-surface px-3 py-1 rounded-lg"
+                    sx={{
+                        color: 'var(--color-text-secondary)',
+                        fontFamily: 'monospace',
+                        backgroundColor: 'var(--color-surface)',
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: '8px'
+                    }}
                 >
                     {value}
                 </MuiTypography>
 
                 {/* Actions */}
-                <MuiBox className="flex gap-3 mt-2">
+                <MuiBox sx={{ display: 'flex', gap: 2, mt: 2 }}>
                     {showDownload && (
                         <MuiButton
                             variant="outlined"
-                            startIcon={<Download size={18} />}
+                            start_icon={<Download size={18} />}
                             onClick={handleDownload}
-                            className="!border-secondary-500 !text-secondary-700 hover:!bg-secondary-50 transition-all duration-200"
                         >
                             تحميل
                         </MuiButton>
@@ -151,9 +169,8 @@ export default function QRCodeDisplay({
                     {showPrint && (
                         <MuiButton
                             variant="contained"
-                            startIcon={<Printer size={18} />}
+                            start_icon={<Printer size={18} />}
                             onClick={handlePrint}
-                            className="bg-gradient-to-br from-secondary-500 to-beige-dark hover:from-beige-dark hover:to-secondary-500 transition-all duration-300"
                         >
                             طباعة
                         </MuiButton>

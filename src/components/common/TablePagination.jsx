@@ -13,8 +13,8 @@ export default function TablePagination({
     return (
         <MuiBox
             sx={{
-                borderTop: '1px solid var(--color-border-glass)',
-                background: 'rgba(26, 26, 26, 0.2)',
+                borderTop: '1px solid var(--color-border)',
+                background: 'var(--color-surface)',
                 ...sx
             }}
         >

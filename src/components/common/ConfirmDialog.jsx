@@ -53,17 +53,17 @@ export default function ConfirmDialog({
             fullWidth
         >
             <MuiDialogTitle component="div" sx={{ mb: 2 }}>
-                <MuiTypography variant="h6" component="div" sx={{ color: 'var(--color-text-primary-dark)' }}>
+                <MuiTypography variant="h6" component="div" sx={{ color: 'var(--color-text-primary)' }}>
                     {title}
                 </MuiTypography>
             </MuiDialogTitle>
-            
+
             <MuiDialogContent>
-                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)' }}>
+                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)' }}>
                     {message}
                 </MuiTypography>
             </MuiDialogContent>
-            
+
             <MuiDialogActions>
                 <MuiBox sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', width: '100%' }}>
                     <MuiButton

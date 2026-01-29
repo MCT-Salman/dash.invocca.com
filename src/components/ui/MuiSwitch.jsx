@@ -25,7 +25,7 @@ const MuiSwitch = ({
       size={size}
       name={name}
       inputProps={inputProps}
-      className="!text-secondary-500"
+      sx={{ color: 'var(--color-primary-500)' }}
       {...props}
     />
   );
@@ -36,7 +36,12 @@ const MuiSwitch = ({
         control={switchComponent}
         label={label}
         labelPlacement={labelPlacement}
-        className={`!text-text-primary ${className}`}
+        sx={{
+          '& .MuiFormControlLabel-label': {
+            color: 'var(--color-text-primary)'
+          }
+        }}
+        className={className}
       />
     );
   }

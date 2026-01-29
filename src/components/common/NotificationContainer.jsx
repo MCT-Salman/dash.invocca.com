@@ -14,23 +14,23 @@ import MuiIconButton from '@/components/ui/MuiIconButton'
 function ToastItem({ notification, onClose }) {
     const colors = {
         success: {
-            bg: '#4CAF50',
-            text: '#FFFFFF',
+            bg: 'var(--color-success-500)',
+            text: 'var(--color-text-on-dark)',
             icon: '✓',
         },
         error: {
-            bg: '#F44336',
-            text: '#FFFFFF',
+            bg: 'var(--color-error-500)',
+            text: 'var(--color-text-on-dark)',
             icon: '✕',
         },
         warning: {
-            bg: '#FF9800',
-            text: '#FFFFFF',
+            bg: 'var(--color-warning-500)',
+            text: 'var(--color-text-on-dark)',
             icon: '⚠',
         },
         info: {
-            bg: '#2196F3',
-            text: '#FFFFFF',
+            bg: 'var(--color-info-500)',
+            text: 'var(--color-text-on-dark)',
             icon: 'ℹ',
         },
     }

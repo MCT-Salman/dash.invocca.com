@@ -39,25 +39,25 @@ const StyledTable = styled(Table)(() => ({
   '& .MuiTableCell-root': {
     fontFamily: 'var(--font-family-base)',
     color: 'var(--color-text-primary)',
-    borderColor: 'var(--color-border-glass)',
+    borderColor: 'var(--color-border)',
     padding: '16px 24px',
     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
   },
   '& .MuiTableCell-head': {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'var(--color-surface)',
     backdropFilter: 'blur(10px)',
     WebkitBackdropFilter: 'blur(10px)',
     color: 'var(--color-text-primary)',
     fontWeight: 700,
     fontSize: '0.9rem',
     letterSpacing: '0.01em',
-    borderBottom: '1px solid var(--color-border-glass)',
+    borderBottom: '2px solid var(--color-border)',
   },
   '& .MuiTableRow-root': {
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     backgroundColor: 'transparent',
     '&:hover': {
-      backgroundColor: 'rgba(255, 255, 255, 0.02)',
+      backgroundColor: 'var(--color-surface-hover)',
     },
     '&:last-child .MuiTableCell-root': {
       borderBottom: 'none',

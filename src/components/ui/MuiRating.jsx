@@ -24,10 +24,10 @@ const MuiRating = ({
       sx={{
         direction: 'ltr',
         '& .MuiRating-iconFilled': {
-          color: '#faaf00',
+          color: 'var(--color-primary-500)',
         },
         '& .MuiRating-iconHover': {
-          color: '#faaf00',
+          color: 'var(--color-primary-400)',
         },
         '& .MuiRating-iconEmpty': {
           color: 'var(--color-text-secondary)',

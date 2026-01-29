@@ -14,10 +14,20 @@ const MuiList = ({
       {items.map((item, index) => (
         <ListItem
           key={index}
-          className="hover:!bg-secondary-500 hover:!text-primary-500 !rounded-xl !transition-all !duration-300 cursor-pointer !my-1"
+          sx={{
+            borderRadius: '12px',
+            my: 0.5,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              backgroundColor: 'var(--color-surface-hover)',
+              color: 'var(--color-primary-500)',
+            }
+          }}
+          className={className}
         >
           {item.icon && (
-            <ListItemIcon className="!text-secondary-500">
+            <ListItemIcon sx={{ color: 'var(--color-text-secondary)', minWidth: 40 }}>
               {item.icon}
             </ListItemIcon>
           )}
@@ -25,10 +35,10 @@ const MuiList = ({
             primary={item.primary}
             secondary={item.secondary}
             primaryTypographyProps={{
-              className: '!text-primary-500 !font-semibold'
+              sx: { color: 'var(--color-text-primary)', fontWeight: 600 }
             }}
             secondaryTypographyProps={{
-              className: '!text-text-secondary'
+              sx: { color: 'var(--color-text-secondary)' }
             }}
           />
         </ListItem>

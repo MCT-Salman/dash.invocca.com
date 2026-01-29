@@ -14,16 +14,33 @@ const MuiAccordion = ({
         <Accordion
           key={index}
           defaultExpanded={item.defaultExpanded}
-          className="!bg-yellow-pale !border !border-beige-light !shadow-md !rounded-2xl !mb-3 last:!mb-0 hover:!shadow-lg !transition-all !duration-300"
-          {...props}
+          sx={{
+            backgroundColor: 'var(--color-paper)',
+            border: '1px solid var(--color-border)',
+            borderRadius: '16px !important',
+            mb: 2,
+            overflow: 'hidden',
+            '&:before': { display: 'none' }, // Remove default MUI divider
+            boxShadow: 'var(--shadow-sm)',
+            '&:hover': {
+              boxShadow: 'var(--shadow-md)',
+              borderColor: 'var(--color-primary-500)',
+            },
+            transition: 'all 0.3s ease',
+          }}
+          className={className}
         >
           <AccordionSummary
-            expandIcon={<ExpandMoreIcon className="!text-primary-600" />}
-            className="!text-primary-500 !font-semibold"
+            expandIcon={<ExpandMoreIcon sx={{ color: 'var(--color-primary-500)' }} />}
+            sx={{
+              color: 'var(--color-text-primary)',
+              fontWeight: 600,
+              '& .MuiAccordionSummary-content': { my: 1 }
+            }}
           >
             {item.summary}
           </AccordionSummary>
-          <AccordionDetails className="!text-text-secondary">
+          <AccordionDetails sx={{ color: 'var(--color-text-secondary)', pt: 0, pb: 2 }}>
             {item.details}
           </AccordionDetails>
         </Accordion>

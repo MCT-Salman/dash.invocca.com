@@ -6,10 +6,13 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
 import { AuthProvider } from '@/contexts/AuthContext'
-import { ThemeProvider } from '@/contexts/ThemeContext'
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext'
 import { NotificationProvider } from '@/contexts/NotificationContext'
 import { ErrorBoundary } from '@/components/common'
+import { createAppTheme } from '@/theme/theme'
+import { useMemo } from 'react'
 
 // Create QueryClient instance
 const queryClient = new QueryClient({
@@ -23,6 +26,21 @@ const queryClient = new QueryClient({
 })
 
 /**
+ * MUI Theme Wrapper
+ * Connects MUI theme to our custom ThemeContext
+ */
+function MuiThemeWrapper({ children }) {
+    const { theme } = useTheme()
+    const muiTheme = useMemo(() => createAppTheme(theme), [theme])
+
+    return (
+        <MuiThemeProvider theme={muiTheme}>
+            {children}
+        </MuiThemeProvider>
+    )
+}
+
+/**
  * App Provider
  * Wraps the app with all necessary providers
  */
@@ -32,11 +50,13 @@ export default function AppProvider({ children }) {
             <QueryClientProvider client={queryClient}>
                 <BrowserRouter>
                     <ThemeProvider>
-                        <AuthProvider>
-                            <NotificationProvider>
-                                {children}
-                            </NotificationProvider>
-                        </AuthProvider>
+                        <MuiThemeWrapper>
+                            <AuthProvider>
+                                <NotificationProvider>
+                                    {children}
+                                </NotificationProvider>
+                            </AuthProvider>
+                        </MuiThemeWrapper>
                     </ThemeProvider>
                 </BrowserRouter>
             </QueryClientProvider>

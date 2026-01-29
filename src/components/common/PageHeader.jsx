@@ -14,13 +14,13 @@ const HeaderContainer = styled(MuiBox)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   position: 'relative',
-  padding: theme.spacing(3),
-  backgroundColor: 'var(--color-yellow-pale, #FFF8DA)',
-  border: '2px solid var(--color-secondary-200, #f5e9d2)',
+  padding: '24px',
+  backgroundColor: 'var(--color-paper)',
+  border: '1px solid var(--color-border)',
   borderRadius: 16,
-  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-  gap: theme.spacing(3),
-  marginBottom: theme.spacing(4),
+  boxShadow: 'var(--shadow-sm)',
+  gap: '24px',
+  marginBottom: '32px',
   transition: 'all 0.3s ease-out',
   [theme.breakpoints.up('sm')]: {
     flexDirection: 'row',
@@ -28,7 +28,7 @@ const HeaderContainer = styled(MuiBox)(({ theme }) => ({
   },
   overflow: 'hidden',
   '&:hover': {
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+    boxShadow: 'var(--shadow-md)',
     transform: 'translateY(-2px)',
   },
   '&::before': {
@@ -38,16 +38,16 @@ const HeaderContainer = styled(MuiBox)(({ theme }) => ({
     top: 0,
     bottom: 0,
     width: 6,
-    backgroundColor: 'var(--color-secondary-500, #D8B98A)',
-    boxShadow: '-2px 0 8px rgba(216, 185, 138, 0.3)',
+    backgroundColor: 'var(--color-primary-500)',
+    boxShadow: 'var(--shadow-glow)',
   },
 }))
 
 const IconWrapper = styled(MuiBox)(({ theme }) => ({
-  padding: theme.spacing(2),
+  padding: '16px',
   borderRadius: 12,
-  backgroundColor: 'var(--color-secondary-500, #D8B98A)',
-  color: 'var(--color-primary-500, #1A1A1A)',
+  backgroundColor: 'var(--color-primary-500)',
+  color: 'var(--color-text-on-primary)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -56,41 +56,30 @@ const IconWrapper = styled(MuiBox)(({ theme }) => ({
   position: 'relative',
   overflow: 'hidden',
   '&:hover': {
-    backgroundColor: 'var(--color-secondary-600, #c4a578)',
+    backgroundColor: 'var(--color-primary-600)',
     transform: 'scale(1.05) rotate(5deg)',
     boxShadow: '0 6px 20px rgba(0, 0, 0, 0.15)',
-  },
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    inset: 0,
-    background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%)',
-    opacity: 0,
-    transition: 'opacity 0.3s ease',
-  },
-  '&:hover::before': {
-    opacity: 1,
   },
 }))
 
 const TitleSection = styled(MuiBox)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: theme.spacing(2),
+  gap: '16px',
   minWidth: 0,
   '& .MuiTypography-h4': {
-    color: 'var(--color-primary-500, #1A1A1A)',
-    fontWeight: 700,
+    color: 'var(--color-text-primary)',
+    fontWeight: 800,
   },
   '& .MuiTypography-body2': {
-    color: 'var(--color-secondary-900, #856c45)',
+    color: 'var(--color-text-secondary)',
   },
 }))
 
 const ActionsSection = styled(MuiBox)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  gap: theme.spacing(2),
+  gap: '16px',
   width: '100%',
   [theme.breakpoints.up('sm')]: {
     flexDirection: 'row',
@@ -104,37 +93,25 @@ const ActionsSection = styled(MuiBox)(({ theme }) => ({
 const ActionsGroup = styled(MuiBox)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: theme.spacing(2),
-  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-  border: '2px solid var(--color-secondary-200, #f5e9d2)',
+  gap: '16px',
+  backgroundColor: 'var(--color-surface)',
+  border: '1px solid var(--color-border)',
   borderRadius: 12,
-  padding: theme.spacing(1, 1.5),
+  padding: '8px 12px',
   backdropFilter: 'blur(8px)',
   transition: 'all 0.3s ease',
-  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+  boxShadow: 'var(--shadow-xs)',
   '&:hover': {
-    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
+    boxShadow: 'var(--shadow-sm)',
     transform: 'translateY(-1px)',
-  },
-  '& .MuiButton-root': {
-    backgroundColor: 'var(--color-secondary-500, #D8B98A)',
-    color: 'var(--color-primary-500, #1A1A1A)',
-    borderRadius: '10px',
-    fontWeight: 600,
-    transition: 'all 0.3s ease',
-    '&:hover': {
-      backgroundColor: 'var(--color-secondary-600, #c4a578)',
-      transform: 'scale(1.05)',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-    },
   },
 }))
 
 const Divider = styled('span')(({ theme }) => ({
   width: 1,
   height: 32,
-  backgroundColor: theme.palette.divider,
-  margin: `0 ${theme.spacing(1)}`,
+  backgroundColor: 'var(--color-border)',
+  margin: '0 8px',
   display: 'none',
   [theme.breakpoints.up('sm')]: {
     display: 'inline-block',

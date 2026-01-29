@@ -13,7 +13,14 @@ const MuiAppBar = ({
       position={position}
       color={color}
       elevation={elevation}
-      className={`!bg-secondary-500 !text-primary-500 !shadow-lg !border-b-2 !border-beige-dark ${className}`}
+      sx={{
+        backgroundColor: 'var(--color-surface-glass)',
+        color: 'var(--color-text-primary)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid var(--color-border)',
+        ...props.sx
+      }}
+      className={className}
       {...props}
     >
       {children}

@@ -13,10 +13,11 @@ const MuiDivider = ({
       orientation={orientation}
       flexItem={flexItem}
       textAlign={children ? textAlign : undefined}
-      className={`!border-beige-light ${className}`}
+      sx={{ borderColor: 'var(--color-border)', ...props.sx }}
+      className={className}
       {...props}
     >
-      {children && <span className="!text-primary-500 !text-sm !font-semibold">{children}</span>}
+      {children && <span style={{ color: 'var(--color-primary-500)', fontSize: '0.875rem', fontWeight: 600 }}>{children}</span>}
     </Divider>
   );
 };

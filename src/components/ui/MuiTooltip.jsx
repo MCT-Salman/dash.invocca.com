@@ -16,7 +16,14 @@ const MuiTooltip = ({
       className={className}
       componentsProps={{
         tooltip: {
-          className: '!bg-primary-500 !text-yellow-pale !rounded-xl !shadow-lg !border !border-secondary-500'
+          sx: {
+            backgroundColor: 'var(--color-primary-500)',
+            color: 'var(--color-text-on-primary)',
+            borderRadius: '12px',
+            border: '1px solid var(--color-border)',
+            boxShadow: 'var(--shadow-lg)',
+            fontWeight: 600
+          }
         }
       }}
       {...props}

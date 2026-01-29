@@ -30,22 +30,22 @@ const StyledChip = styled(Chip)(({ theme, color, variant }) => {
       backgroundColor: color === 'primary'
         ? 'var(--color-primary-500)'
         : color === 'secondary'
-        ? 'var(--color-secondary-500)'
-        : color === 'success'
-        ? 'var(--color-success-500)'
-        : color === 'error'
-        ? 'var(--color-error-500)'
-        : color === 'warning'
-        ? 'var(--color-warning-500)'
-        : color === 'info'
-        ? 'var(--color-info-500)'
-        : 'var(--color-gray-light)',
+          ? 'var(--color-secondary-500)'
+          : color === 'success'
+            ? 'var(--color-success-500)'
+            : color === 'error'
+              ? 'var(--color-error-500)'
+              : color === 'warning'
+                ? 'var(--color-warning-500)'
+                : color === 'info'
+                  ? 'var(--color-info-500)'
+                  : 'var(--color-gray-light)',
       color: color === 'primary' || color === 'secondary' || color === 'error' || color === 'info'
-        ? '#ffffff'
+        ? 'var(--color-text-on-dark)'
         : 'var(--color-text-primary)',
       '&:hover': {
         ...baseStyles['&:hover'],
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        boxShadow: 'var(--shadow-sm)',
       },
     };
   }
@@ -57,21 +57,21 @@ const StyledChip = styled(Chip)(({ theme, color, variant }) => {
     borderColor: color === 'primary'
       ? 'var(--color-primary-500)'
       : color === 'secondary'
-      ? 'var(--color-secondary-500)'
-      : 'var(--color-border)',
+        ? 'var(--color-secondary-500)'
+        : 'var(--color-border)',
     backgroundColor: 'transparent',
     color: color === 'primary'
       ? 'var(--color-primary-500)'
       : color === 'secondary'
-      ? 'var(--color-secondary-700)'
-      : 'var(--color-text-primary)',
+        ? 'var(--color-secondary-700)'
+        : 'var(--color-text-primary)',
     '&:hover': {
       ...baseStyles['&:hover'],
       backgroundColor: color === 'primary'
         ? 'var(--color-primary-50)'
         : color === 'secondary'
-        ? 'var(--color-secondary-50)'
-        : 'rgba(0, 0, 0, 0.04)',
+          ? 'var(--color-secondary-50)'
+          : 'var(--color-surface-hover)',
     },
   };
 });

@@ -49,10 +49,10 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        backgroundColor: 'var(--color-surface-dark)', // Base dark color
-        backgroundImage: 'linear-gradient(180deg, rgba(20, 20, 20, 0.95) 0%, rgba(10, 10, 10, 0.98) 100%)',
+        backgroundColor: 'var(--color-paper)',
+        backgroundImage: 'none',
         backdropFilter: 'blur(20px)',
-        borderLeft: '1px solid var(--color-border-glass)',
+        borderLeft: '1px solid var(--color-border)',
         position: 'relative',
         overflow: 'hidden'
       }}
@@ -65,7 +65,8 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
           right: -100,
           width: 300,
           height: 300,
-          background: 'radial-gradient(circle, rgba(216, 185, 138, 0.08) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, var(--color-primary-500) 0%, transparent 70%)',
+          opacity: 0.08,
           pointerEvents: 'none',
           zIndex: 0
         }}
@@ -86,14 +87,14 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
           alignItems: 'center',
           gap: collapsed ? 0 : 2,
           justifyContent: collapsed ? 'center' : 'flex-start',
-          borderBottom: '1px solid var(--color-border-glass)',
-          background: 'rgba(255, 255, 255, 0.02)',
+          borderBottom: '1px solid var(--color-border)',
+          background: 'var(--color-surface-hover)',
           position: 'relative',
           zIndex: 1,
           cursor: !isMobile ? 'pointer' : 'default',
           transition: 'all 0.3s ease',
           '&:hover': {
-            background: !isMobile ? 'rgba(255, 255, 255, 0.04)' : undefined,
+            background: !isMobile ? 'var(--color-surface-hover)' : undefined,
           }
         }}
       >
@@ -106,9 +107,9 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 15px rgba(216, 185, 138, 0.3)',
+            boxShadow: 'var(--shadow-glow)',
             transition: 'all 0.3s ease',
-            color: '#000'
+            color: 'var(--color-text-on-primary)'
           }}
         >
           <img
@@ -145,7 +146,7 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
           position: 'relative',
           zIndex: 1,
           '&::-webkit-scrollbar': { width: '4px' },
-          '&::-webkit-scrollbar-thumb': { background: 'rgba(255, 255, 255, 0.1)', borderRadius: '2px' }
+          '&::-webkit-scrollbar-thumb': { background: 'var(--color-border)', borderRadius: '2px' }
         }}
       >
         {menuItems.map((item) => {
@@ -169,18 +170,14 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
                 mb: 0.5,
                 border: '1px solid transparent',
                 backgroundColor: isActive
-                  ? 'rgba(216, 185, 138, 0.1)'
+                  ? 'var(--color-surface-hover)'
                   : 'transparent',
                 borderColor: isActive
-                  ? 'rgba(216, 185, 138, 0.2)'
+                  ? 'var(--color-primary-500)'
                   : 'transparent',
                 '&:hover': {
-                  backgroundColor: isActive
-                    ? 'rgba(216, 185, 138, 0.15)'
-                    : 'rgba(255, 255, 255, 0.03)',
-                  borderColor: isActive
-                    ? 'rgba(216, 185, 138, 0.3)'
-                    : 'rgba(255, 255, 255, 0.05)',
+                  backgroundColor: 'var(--color-surface-hover)',
+                  borderColor: 'var(--color-primary-500)',
                   transform: 'translateY(-1px)',
                 },
                 transition: 'all 0.2s ease',
@@ -210,7 +207,7 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
                     fontSize: '0.9rem',
                     fontWeight: isActive ? 600 : 400,
                     color: isActive
-                      ? 'var(--color-primary-100)'
+                      ? 'var(--color-text-primary)'
                       : 'var(--color-text-secondary)',
                     fontFamily: 'var(--font-family-base)',
                   }}
@@ -240,13 +237,13 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
         })}
       </MuiList>
 
-      <MuiDivider sx={{ borderColor: 'rgba(255,255,255,0.05)', mx: 2 }} />
+      <MuiDivider sx={{ borderColor: 'var(--color-border)', mx: 2, opacity: 0.5 }} />
 
       {/* Logout Section */}
       <MuiBox
         sx={{
           p: 1.5,
-          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+          borderTop: '1px solid var(--color-border)',
           position: 'relative',
           zIndex: 1
         }}
@@ -264,7 +261,7 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
                 backgroundColor: 'transparent',
                 color: 'var(--color-text-secondary)',
                 '&:hover': {
-                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  backgroundColor: 'var(--color-surface-hover)',
                   color: 'var(--color-error-500)',
                 }
               }}

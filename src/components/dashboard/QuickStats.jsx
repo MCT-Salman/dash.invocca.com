@@ -12,21 +12,32 @@ import { TrendingUp, TrendingDown } from 'lucide-react'
 /**
  * Quick Stat Card with progress bar
  */
-export function QuickStatCard({ 
-  title, 
-  value, 
-  total, 
-  icon: Icon, 
+export function QuickStatCard({
+  title,
+  value,
+  total,
+  icon: Icon,
   color = '#D8B98A',
   trend,
-  trendValue 
+  trendValue
 }) {
   const percentage = total ? Math.round((value / total) * 100) : 0
 
   return (
     <MuiPaper
       elevation={0}
-      className="p-6 rounded-2xl border-2 border-border hover:border-secondary-300 transition-all duration-300 hover:shadow-lg bg-white"
+      sx={{
+        p: 3,
+        borderRadius: '24px',
+        border: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-paper)',
+        transition: 'all 0.3s ease',
+        boxShadow: 'var(--shadow-sm)',
+        '&:hover': {
+          borderColor: 'var(--color-primary-500)',
+          boxShadow: 'var(--shadow-md)',
+        }
+      }}
     >
       <MuiBox className="flex items-start justify-between mb-4">
         <MuiBox className="flex-1">
@@ -62,9 +73,9 @@ export function QuickStatCard({
             sx={{
               height: 8,
               borderRadius: 4,
-              backgroundColor: '#f3f4f6',
+              backgroundColor: 'var(--color-surface)',
               '& .MuiLinearProgress-bar': {
-                backgroundColor: color,
+                backgroundColor: color === '#D8B98A' ? 'var(--color-primary-500)' : color,
                 borderRadius: 4,
               }
             }}
@@ -80,8 +91,8 @@ export function QuickStatCard({
           ) : (
             <TrendingDown size={16} className="text-error-600" />
           )}
-          <MuiTypography 
-            variant="caption" 
+          <MuiTypography
+            variant="caption"
             className={`font-semibold ${trend === 'up' ? 'text-success-600' : 'text-error-600'}`}
           >
             {trendValue}
@@ -98,9 +109,19 @@ export function QuickStatCard({
 /**
  * Mini Stat Card - بطاقة إحصائية صغيرة
  */
-export function MiniStatCard({ label, value, icon: Icon, color = '#D8B98A' }) {
+export function MiniStatCard({ label, value, icon: Icon, color = 'var(--color-primary-500)' }) {
   return (
-    <MuiBox className="flex items-center gap-3 p-4 rounded-xl bg-surface hover:bg-surface-hover transition-colors">
+    <MuiBox sx={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 2,
+      p: 2,
+      borderRadius: '16px',
+      backgroundColor: 'var(--color-paper)',
+      border: '1px solid var(--color-border)',
+      transition: 'all 0.2s ease',
+      '&:hover': { backgroundColor: 'var(--color-surface-hover)' }
+    }}>
       {Icon && (
         <MuiBox
           className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"

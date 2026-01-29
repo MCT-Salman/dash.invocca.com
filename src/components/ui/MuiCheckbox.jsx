@@ -60,13 +60,25 @@ const MuiCheckbox = ({
                         name={name}
                         value={value}
                         disableRipple={disableRipple}
-                        className="!text-secondary-500 hover:!text-secondary-600 !transition-colors"
+                        sx={{
+                            color: 'var(--color-primary-500)',
+                            '&.Mui-checked': {
+                                color: 'var(--color-primary-500)',
+                            },
+                        }}
+                        className="transition-colors"
                         {...props}
                     />
                 }
                 label={label}
                 labelPlacement={labelPlacement}
-                className={`!text-text-primary ${labelClassName}`}
+                sx={{
+                    '& .MuiFormControlLabel-label': {
+                        color: 'var(--color-text-primary)',
+                        fontWeight: 500,
+                    }
+                }}
+                className={labelClassName}
             />
         );
     }
@@ -87,7 +99,13 @@ const MuiCheckbox = ({
             name={name}
             value={value}
             disableRipple={disableRipple}
-            className="!text-secondary-500 hover:!text-secondary-600 !rounded-md !transition-colors"
+            sx={{
+                color: 'var(--color-primary-500)',
+                '&.Mui-checked': {
+                    color: 'var(--color-primary-500)',
+                },
+            }}
+            className="rounded-md transition-colors"
             {...props}
         />
     );

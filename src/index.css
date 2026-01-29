@@ -29,8 +29,9 @@ html {
 
 body {
   font-family: 'Alexandria', 'Montserrat', sans-serif !important;
-  background-color: var(--color-bg-dark) !important;
-  color: var(--color-text-primary-dark) !important;
+  background-color: var(--color-bg) !important;
+  color: var(--color-text-primary) !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 
@@ -39,97 +40,82 @@ body {
    ═══════════════════════════════════════════════════════════ */
 @theme {
   /* ─────────────────────────────────────────────────────────
-     PRIMARY COLORS - Gold/Premium Theme
+     PRIMARY COLORS - Nescafee / Coffee Theme
      ───────────────────────────────────────────────────────── */
-  --color-primary-50: #F9F5EC;
-  --color-primary-100: #F1E6D3;
-  --color-primary-200: #E6CEAA;
-  --color-primary-300: #DDB47F;
-  --color-primary-400: #D49B55;
-  --color-primary-500: #D8B98A;
-  /* Main Gold */
-  --color-primary-600: #B08D55;
-  --color-primary-700: #8A6B3D;
-  --color-primary-800: #664E2A;
-  --color-primary-900: #45341A;
-  --color-primary-950: #261C0D;
+  --color-primary-50: #F8F3F0;
+  --color-primary-100: #EFE6E0;
+  --color-primary-200: #DFCDC1;
+  --color-primary-300: #CBA893;
+  --color-primary-400: #B58463;
+  --color-primary-500: #9C6644;
+  /* Nescafee Main */
+  --color-primary-600: #7F5539;
+  --color-primary-700: #6B4423;
+  --color-primary-800: #582F0E;
+  --color-primary-900: #3D2B1F;
+  --color-primary-950: #26170F;
 
   /* ─────────────────────────────────────────────────────────
-     SECONDARY COLORS - Dark/Black Theme
+     SECONDARY COLORS - Roasted Bean / Dark Tones
      ───────────────────────────────────────────────────────── */
-  --color-secondary-50: #f6f6f6;
-  --color-secondary-100: #e7e7e7;
-  --color-secondary-200: #d1d1d1;
-  --color-secondary-300: #b0b0b0;
-  --color-secondary-400: #888888;
-  --color-secondary-500: #6d6d6d;
-  --color-secondary-600: #5d5d5d;
-  --color-secondary-700: #4f4f4f;
-  --color-secondary-800: #454545;
-  --color-secondary-900: #3d3d3d;
-  --color-secondary-950: #000000;
-  /* Deep Black */
+  --color-secondary-50: #fafaf9;
+  --color-secondary-100: #f5f5f4;
+  --color-secondary-200: #e7e5e4;
+  --color-secondary-300: #d6d3d1;
+  --color-secondary-400: #a8a29e;
+  --color-secondary-500: #78716c;
+  --color-secondary-600: #57534e;
+  --color-secondary-700: #44403c;
+  --color-secondary-800: #292524;
+  --color-secondary-900: #1c1917;
+  --color-secondary-950: #0c0a09;
 
   /* ─────────────────────────────────────────────────────────
      SEMANTIC COLORS
      ───────────────────────────────────────────────────────── */
-  /* Standard semantic colors adjusted for dark theme visibility */
-  --color-success-50: #ecfdf5;
-  --color-success-500: #10b981;
-  --color-success-700: #047857;
+  /* Standard semantic colors adjusted for coffee theme harmony */
+  --color-success-50: #f0fdf4;
+  --color-success-500: #15803d;
+  --color-success-700: #14532d;
 
   --color-error-50: #fef2f2;
-  --color-error-500: #ef4444;
-  --color-error-700: #b91c1c;
+  --color-error-500: #dc2626;
+  --color-error-700: #991b1b;
 
   --color-warning-50: #fffbeb;
-  --color-warning-500: #f59e0b;
-  --color-warning-700: #b45309;
+  --color-warning-500: #ca8a04;
+  --color-warning-700: #854d0e;
 
   --color-info-50: #eff6ff;
-  --color-info-500: #3b82f6;
-  --color-info-700: #1d4ed8;
+  --color-info-500: #2563eb;
+  --color-info-700: #1e3a8a;
 
   /* ─────────────────────────────────────────────────────────
-     BACKGROUND & SURFACE COLORS
+     BACKGROUND & SURFACE COLORS (Light Mode - Nescafee Cream)
      ───────────────────────────────────────────────────────── */
-  --color-bg: #F9F5EC;
-  --color-bg-dark: #050505;
-  /* Ultra Dark Background */
+  --color-bg: #FDFCFB;
   --color-paper: #ffffff;
-  --color-paper-dark: #0F0F0F;
-  /* Slightly Lighter for cards */
-  --color-surface: #f3f4f6;
-  --color-surface-hover: #e5e7eb;
-  --color-surface-dark: #1A1A1A;
-  --color-surface-glass: rgba(15, 15, 15, 0.7);
-  /* Glass effect base */
-
-  --color-overlay: rgba(0, 0, 0, 0.7);
+  --color-surface: #F8F3F0;
+  --color-surface-hover: #F1E6D3;
+  --color-surface-glass: rgba(255, 255, 255, 0.75);
+  --color-overlay: rgba(0, 0, 0, 0.4);
+  --color-icon-filter: none;
 
   /* ─────────────────────────────────────────────────────────
-     TEXT COLORS
+     TEXT COLORS (Espresso Tones)
      ───────────────────────────────────────────────────────── */
-  --color-text-primary: #EDEDED;
-  --color-text-primary-dark: #EDEDED;
-  /* Default to Dark */
-  --color-text-primary-light: #0f172a;
-  --color-text-secondary: #A1A1AA;
-  --color-text-secondary-dark: #A1A1AA;
-  /* Default to Dark */
-  --color-text-secondary-light: #334155;
-  --color-text-muted: #52525B;
-  --color-text-on-primary: #000000;
+  --color-text-primary: #2C1810;
+  --color-text-secondary: #582F0E;
+  --color-text-muted: #82736C;
+  --color-text-on-primary: #ffffff;
   --color-text-on-dark: #ffffff;
 
   /* ─────────────────────────────────────────────────────────
      BORDER & DIVIDER COLORS
      ───────────────────────────────────────────────────────── */
-  --color-border: #e2e8f0;
-  --color-border-dark: #27272A;
-  --color-border-glass: rgba(255, 255, 255, 0.08);
-  /* Subtle glass border */
-  --color-divider-dark: #27272A;
+  --color-border: #E8E0D9;
+  --color-border-glass: rgba(75, 44, 32, 0.08);
+  --color-divider: #F1E6D3;
 
   /* ─────────────────────────────────────────────────────────
      SPACING SYSTEM - نظام المسافات
@@ -312,6 +298,30 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
+    DARK MODE OVERRIDES
+   ═══════════════════════════════════════════════════════════ */
+.dark {
+  /* Background & Surface Colors */
+  --color-bg: #050505;
+  --color-paper: #0F0F0F;
+  --color-surface: #1A1A1A;
+  --color-surface-hover: #252525;
+  --color-surface-glass: rgba(15, 15, 15, 0.7);
+  --color-overlay: rgba(0, 0, 0, 0.7);
+  --color-icon-filter: invert(1) brightness(2);
+
+  /* Text Colors */
+  --color-text-primary: #EDEDED;
+  --color-text-secondary: #A1A1AA;
+  --color-text-muted: #52525B;
+
+  /* Border & Divider Colors */
+  --color-border: #27272A;
+  --color-border-glass: rgba(255, 255, 255, 0.08);
+  --color-divider: #27272A;
+}
+
+/* ═══════════════════════════════════════════════════════════
     ANIMATIONS & KEYFRAMES
    ═══════════════════════════════════════════════════════════ */
 @keyframes fadeIn {
@@ -380,23 +390,117 @@ body {
   }
 }
 
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-30px) translateX(20px) rotate(10deg);
+  }
+}
+
+@keyframes wave {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes particle {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-100px) translateX(20px);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-slow {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes glow {
+
+  0%,
+  100% {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+
+  50% {
+    text-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════
     UTILITY CLASSES
    ═══════════════════════════════════════════════════════════ */
-.animate-fadeIn {
-  animation: fadeIn var(--transition-base);
-}
-
-.animate-slideInUp {
-  animation: slideInUp var(--transition-normal);
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
 .animate-spin {
   animation: spin 1s linear infinite;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 1s ease-out;
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animate-wave {
+  animation: wave 3s ease-in-out infinite;
+}
+
+.animate-particle {
+  animation: particle linear infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
 }
 
 /* Smooth scrolling */
@@ -448,11 +552,11 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-bg-dark);
+  background: var(--color-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-secondary-800);
+  background: var(--color-border);
   border-radius: 4px;
 }
 

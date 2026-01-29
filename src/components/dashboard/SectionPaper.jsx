@@ -16,8 +16,8 @@ export default function SectionPaper({
             sx={{
                 p: 0,
                 height: '100%',
-                background: 'var(--color-surface-dark)',
-                border: '1px solid var(--color-border-glass)',
+                background: 'var(--color-paper)',
+                border: '1px solid var(--color-border)',
                 borderRadius: '20px',
                 overflow: 'hidden',
                 ...sx
@@ -31,8 +31,8 @@ export default function SectionPaper({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        background: 'rgba(255, 255, 255, 0.02)',
-                        borderBottom: '1px solid var(--color-border-glass)'
+                        background: 'var(--color-surface)',
+                        borderBottom: '1px solid var(--color-border)'
                     }}
                 >
                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -42,18 +42,18 @@ export default function SectionPaper({
                                     width: 40,
                                     height: 40,
                                     borderRadius: '10px',
-                                    background: 'rgba(216, 185, 138, 0.1)',
-                                    color: 'var(--color-primary-500)',
+                                    backgroundColor: 'var(--color-primary-500)',
+                                    color: 'var(--color-text-on-primary)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    border: '1px solid rgba(216, 185, 138, 0.2)'
+                                    border: '1px solid var(--color-border)'
                                 }}
                             >
                                 <Icon size={20} />
                             </MuiBox>
                         )}
-                        <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
+                        <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>
                             {title}
                         </MuiTypography>
                     </MuiBox>

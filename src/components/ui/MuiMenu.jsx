@@ -18,10 +18,10 @@ const MuiMenu = ({
       className={className}
       PaperProps={{
         sx: {
-          backgroundColor: 'var(--color-surface-dark)',
-          border: '1px solid var(--color-border-glass)',
+          backgroundColor: 'var(--color-paper)',
+          border: '1px solid var(--color-border)',
           borderRadius: '16px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+          boxShadow: 'var(--shadow-lg)',
           backdropFilter: 'blur(12px)',
           minWidth: 180,
           mt: 1,
@@ -43,7 +43,7 @@ const MuiMenu = ({
           }}
           disabled={item.disabled}
           sx={{
-            color: 'var(--color-text-primary-dark)',
+            color: 'var(--color-text-primary)',
             fontSize: '0.9rem',
             fontWeight: 500,
             borderRadius: '8px',
@@ -51,13 +51,13 @@ const MuiMenu = ({
             my: 0.5,
             transition: 'all 0.2s ease',
             '&:hover': {
-              backgroundColor: 'rgba(216, 185, 138, 0.1)',
+              backgroundColor: 'var(--color-surface-hover)',
               color: 'var(--color-primary-500)',
               transform: 'translateX(4px)',
             },
             '&.Mui-selected': {
               backgroundColor: 'var(--color-primary-500) !important',
-              color: '#000 !important', // Dark text on gold background
+              color: 'var(--color-text-on-primary) !important',
               fontWeight: 600,
               '&:hover': {
                 backgroundColor: 'var(--color-primary-600) !important',

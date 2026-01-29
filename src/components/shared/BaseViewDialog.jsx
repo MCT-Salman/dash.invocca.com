@@ -46,9 +46,9 @@ export default function BaseViewDialog({
                 sx: {
                     borderRadius: '20px',
                     overflow: 'auto',
-                    backgroundColor: 'var(--color-surface-dark)',
+                    backgroundColor: 'var(--color-paper)',
                     backgroundImage: 'none',
-                    border: '1px solid rgba(216, 185, 138, 0.15)',
+                    border: '1px solid var(--color-border)',
                     backdropFilter: 'blur(20px)',
                     zIndex: 1300,
                     maxHeight: '90vh'
@@ -81,8 +81,8 @@ export default function BaseViewDialog({
 
                 {/* Title */}
                 {title && !headerImage && (
-                    <MuiBox sx={{ p: 3, pb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-border-glass)' }}>
-                        <MuiTypography variant="h5" sx={{ fontWeight: 700, color: 'var(--color-text-primary-dark)' }}>
+                    <MuiBox sx={{ p: 3, pb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-border)' }}>
+                        <MuiTypography variant="h5" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
                             {title}
                         </MuiTypography>
                         <MuiIconButton
@@ -90,7 +90,7 @@ export default function BaseViewDialog({
                             sx={{
                                 color: 'var(--color-text-secondary)',
                                 '&:hover': {
-                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                    backgroundColor: 'var(--color-surface-hover)',
                                 }
                             }}
                         >

@@ -40,6 +40,14 @@ const MuiTabs = ({
             minWidth: 'auto',
             px: 2.5,
             py: 1.5,
+            color: 'var(--color-text-secondary)',
+            transition: 'all 0.2s ease',
+            '&.Mui-selected': {
+              color: 'var(--color-primary-500)',
+            },
+            '&:hover': {
+              backgroundColor: 'var(--color-surface-hover)',
+            }
           }}
         />
       ))}

@@ -19,9 +19,9 @@ export default function FilterBar({
             sx={{
                 p: 2,
                 mb: 3,
-                background: 'rgba(26, 26, 26, 0.6)',
+                background: 'var(--color-paper)',
                 backdropFilter: 'blur(10px)',
-                border: '1px solid var(--color-border-glass)',
+                border: '1px solid var(--color-border)',
                 borderRadius: '16px',
                 ...sx
             }}
@@ -43,7 +43,7 @@ export default function FilterBar({
                         sx={{
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: '12px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                backgroundColor: 'var(--color-surface)',
                             }
                         }}
                     />
@@ -65,11 +65,11 @@ export default function FilterBar({
                             sx={{
                                 height: '56px',
                                 borderRadius: '12px',
-                                borderColor: 'var(--color-border-glass)',
+                                borderColor: 'var(--color-border)',
                                 color: 'var(--color-text-secondary)',
                                 '&:hover': {
                                     borderColor: 'var(--color-primary-500)',
-                                    background: 'rgba(216, 185, 138, 0.05)'
+                                    background: 'var(--color-surface-hover)'
                                 }
                             }}
                         >

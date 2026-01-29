@@ -250,98 +250,69 @@ const MuiTextField = ({
                         backgroundColor: 'transparent',
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         '&:hover': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                            backgroundColor: 'var(--color-surface-hover)',
                             '& .MuiOutlinedInput-notchedOutline': {
                                 borderColor: error ? 'var(--color-error-600) !important' : 'var(--color-primary-500) !important',
                             },
                         },
                         '&.Mui-focused': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                            backgroundColor: 'var(--color-surface-hover)',
                             '& .MuiOutlinedInput-notchedOutline': {
                                 borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
                                 borderWidth: '1px !important',
                             },
-                            boxShadow: error
-                                ? '0 0 0 2px rgba(239, 68, 68, 0.1)'
-                                : '0 0 0 2px rgba(216, 185, 138, 0.1)',
                         },
                         '&.Mui-disabled': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.01)',
+                            backgroundColor: 'var(--color-surface)',
                             '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'var(--color-border-dark) !important',
+                                borderColor: 'var(--color-border) !important',
                             },
                         },
                         '& .MuiOutlinedInput-notchedOutline': {
-                            borderColor: error ? 'var(--color-error-500) !important' : 'rgba(216, 185, 138, 0.3) !important',
+                            borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-border) !important',
                             borderWidth: '1px !important',
                             borderRadius: '12px !important',
                         },
                         // Ensure text color is forced even for Select
                         '& .MuiSelect-select': {
-                            color: '#EDEDED !important',
-                            WebkitTextFillColor: '#EDEDED !important',
+                            color: 'var(--color-text-primary) !important',
+                            WebkitTextFillColor: 'var(--color-text-primary) !important',
                         }
                     },
                     '& .MuiInputBase-input': {
-                        color: '#EDEDED !important', // Force white text (Hex)
-                        WebkitTextFillColor: '#EDEDED !important',
+                        color: 'var(--color-text-primary) !important',
+                        WebkitTextFillColor: 'var(--color-text-primary) !important',
                         fontSize: size === 'small' ? '0.875rem' : '1rem',
                         padding: size === 'small' ? '10.5px 14px' : '14px 16px',
                         fontFamily: 'var(--font-family-base)',
-                        colorScheme: 'dark', // Tells browser to use dark native picker
                         '&:focus': {
-                            color: '#EDEDED !important',
-                            WebkitTextFillColor: '#EDEDED !important',
+                            color: 'var(--color-text-primary) !important',
+                            WebkitTextFillColor: 'var(--color-text-primary) !important',
                         },
-                        // Date/Time picker icon styling - keeping filter as fallback
+                        // Date/Time picker icon styling
                         '&::-webkit-calendar-picker-indicator': {
-                            filter: 'invert(1) brightness(2)',
-                            cursor: 'pointer',
-                            opacity: 0.9,
-                            '&:hover': {
-                                opacity: 1,
-                            },
-                        },
-                        '&::-webkit-inner-spin-button, &::-webkit-outer-spin-button': {
-                            filter: 'invert(1) brightness(2)',
+                            filter: 'var(--color-icon-filter)',
                             cursor: 'pointer',
                             opacity: 0.9,
                         },
                         '&::placeholder': {
-                            color: 'rgba(255, 255, 255, 0.2) !important',
-                            WebkitTextFillColor: 'rgba(255, 255, 255, 0.2) !important',
-                            opacity: 1,
+                            color: 'var(--color-text-muted) !important',
+                            WebkitTextFillColor: 'var(--color-text-muted) !important',
+                            opacity: 0.6,
                             fontFamily: 'var(--font-family-base)',
-                        },
-                        '&::-webkit-input-placeholder': {
-                            color: 'rgba(255, 255, 255, 0.2) !important',
-                            WebkitTextFillColor: 'rgba(255, 255, 255, 0.2) !important',
-                            opacity: 1,
-                        },
-                        '&::-moz-placeholder': {
-                            color: 'rgba(255, 255, 255, 0.2) !important',
-                            opacity: 1,
-                        },
-                        '&:-ms-input-placeholder': {
-                            color: 'rgba(255, 255, 255, 0.2) !important',
-                            opacity: 1,
-                        },
-                        '&:-moz-placeholder': {
-                            color: 'rgba(255, 255, 255, 0.2) !important',
-                            opacity: 1,
                         },
                         // TARGETING AUTOFILL SPECIFICALLY
                         '&:-webkit-autofill': {
-                            WebkitBoxShadow: '0 0 0 100px var(--color-surface-dark) inset !important',
-                            WebkitTextFillColor: '#EDEDED !important', // Explicit hex fallback
-                            caretColor: '#EDEDED',
-                            transition: 'background-color 5000s ease-in-out 0s', // Trick to delay background color change
+                            WebkitBoxShadow: '0 0 0 100px var(--color-surface) inset !important',
+                            WebkitTextFillColor: 'var(--color-text-primary) !important',
+                            caretColor: 'var(--color-text-primary)',
+                            transition: 'background-color 5000s ease-in-out 0s',
                         },
                         // Fallback for other browsers
                         '&:autofill': {
-                            WebkitBoxShadow: '0 0 0 100px var(--color-surface-dark) inset !important',
-                            WebkitTextFillColor: '#EDEDED !important',
-                            caretColor: '#EDEDED',
+                            WebkitBoxShadow: '0 0 0 100px var(--color-surface) inset !important',
+                            WebkitTextFillColor: 'var(--color-text-primary) !important',
+                            caretColor: 'var(--color-text-primary)',
                         },
                         '&.Mui-disabled': {
                             color: 'var(--color-text-muted) !important',
@@ -358,7 +329,7 @@ const MuiTextField = ({
                             fontWeight: 600,
                         },
                         '&.Mui-disabled': {
-                            color: 'rgba(255, 255, 255, 0.5)',
+                            color: 'var(--color-text-muted)',
                         },
                         '&.Mui-error': {
                             color: 'var(--color-error-500)',
@@ -410,13 +381,13 @@ const MuiTextField = ({
                         right: 0,
                         left: 'auto',
                         transformOrigin: 'top right',
-                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                        transformOrigin: 'top right',
                         '&.Mui-focused': {
                             color: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
                             fontWeight: 600,
                         },
                         '&.Mui-disabled': {
-                            color: 'rgba(255, 255, 255, 0.5) !important',
+                            color: 'var(--color-text-muted) !important',
                         },
                         '&.Mui-error': {
                             color: 'var(--color-error-500) !important',

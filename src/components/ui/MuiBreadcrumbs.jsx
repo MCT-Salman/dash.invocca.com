@@ -10,7 +10,11 @@ const MuiBreadcrumbs = ({
   return (
     <Breadcrumbs
       separator={separator}
-      className={`!text-text-secondary ${className}`}
+      sx={{
+        '& .MuiBreadcrumbs-separator': { color: 'var(--color-text-muted)' },
+        '& .MuiBreadcrumbs-ol': { alignItems: 'center' }
+      }}
+      className={className}
       {...props}
     >
       {items.map((item, index) => {
@@ -18,9 +22,13 @@ const MuiBreadcrumbs = ({
 
         if (isLast) {
           return (
-            <span key={index} className="!text-primary-500 !font-semibold">
+            <MuiTypography
+              key={index}
+              variant="body2"
+              sx={{ color: 'var(--color-primary-500)', fontWeight: 700 }}
+            >
               {item.label}
-            </span>
+            </MuiTypography>
           );
         }
 
@@ -29,7 +37,16 @@ const MuiBreadcrumbs = ({
             key={index}
             href={item.href}
             onClick={item.onClick}
-            className="!text-secondary-500 hover:!text-secondary-600 !no-underline hover:!underline transition-colors !font-medium"
+            sx={{
+              color: 'var(--color-text-secondary)',
+              fontWeight: 500,
+              textDecoration: 'none',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                color: 'var(--color-primary-500)',
+                textDecoration: 'underline',
+              }
+            }}
           >
             {item.label}
           </Link>

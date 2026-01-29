@@ -32,16 +32,16 @@ export default function EmptyState({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        background: 'rgba(216, 185, 138, 0.05)',
-                        color: 'var(--color-primary-400)',
+                        background: 'var(--color-surface)',
+                        color: 'var(--color-primary-500)',
                         mb: 2,
-                        border: '1px solid var(--color-border-glass)'
+                        border: '1px solid var(--color-border)'
                     }}
                 >
                     <Icon size={40} />
                 </MuiBox>
             )}
-            <MuiTypography variant="h5" sx={{ fontWeight: 700, color: '#fff' }}>
+            <MuiTypography variant="h5" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
                 {title}
             </MuiTypography>
             <MuiTypography variant="body1" sx={{ color: 'var(--color-text-secondary)', maxWidth: '400px' }}>
@@ -59,10 +59,10 @@ export default function EmptyState({
         return (
             <MuiPaper
                 sx={{
-                    background: 'rgba(26, 26, 26, 0.4)',
-                    backdropFilter: 'blur(10px)',
+                    background: 'var(--color-paper)',
+                    boxShadow: 'var(--shadow-sm)',
                     borderRadius: '20px',
-                    border: '1px solid var(--color-border-glass)',
+                    border: '1px solid var(--color-border)',
                     ...sx
                 }}
             >

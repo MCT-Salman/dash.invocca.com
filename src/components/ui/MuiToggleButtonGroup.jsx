@@ -26,7 +26,22 @@ const MuiToggleButtonGroup = ({
           key={opt.value}
           value={opt.value}
           disabled={opt.disabled}
-          className="!text-text-primary !border-border hover:!bg-surface-hover transition-colors"
+          sx={{
+            color: 'var(--color-text-primary)',
+            borderColor: 'var(--color-border)',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              backgroundColor: 'var(--color-surface-hover)',
+            },
+            '&.Mui-selected': {
+              backgroundColor: 'var(--color-primary-500) !important',
+              color: 'var(--color-text-on-primary) !important',
+              fontWeight: 600,
+              '&:hover': {
+                backgroundColor: 'var(--color-primary-600) !important',
+              }
+            }
+          }}
         >
           {opt.label}
         </ToggleButton>

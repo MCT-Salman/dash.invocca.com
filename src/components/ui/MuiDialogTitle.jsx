@@ -18,7 +18,7 @@ const MuiDialogTitle = ({
             {...props}
         >
             {typeof children === 'string' ? (
-                <MuiTypography variant="h5" sx={{ fontWeight: 700, color: 'var(--color-text-primary-dark)' }}>
+                <MuiTypography variant="h5" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
                     {children}
                 </MuiTypography>
             ) : (

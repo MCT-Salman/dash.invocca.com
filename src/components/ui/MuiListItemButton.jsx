@@ -7,7 +7,7 @@ const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
     margin: '4px 0',
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     '&:hover': {
-        backgroundColor: 'var(--color-primary-50)',
+        backgroundColor: 'var(--color-surface-hover)',
         transform: 'translateX(-2px)',
     },
     '& .MuiListItemIcon-root': {

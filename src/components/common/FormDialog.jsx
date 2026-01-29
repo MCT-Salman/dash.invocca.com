@@ -66,23 +66,23 @@ export default function FormDialog({
                 sx: {
                     borderRadius: '16px',
                     overflow: 'auto',
-                    backgroundColor: 'var(--color-surface-dark)',
+                    backgroundColor: 'var(--color-surface)',
                     backgroundImage: 'none',
-                    border: '1px solid var(--color-border-glass)',
+                    border: '1px solid var(--color-border)',
                 }
             }}
         >
             <form onSubmit={handleSubmit}>
                 <MuiDialogTitle component="div" sx={{ mb: 2 }}>
-                    <MuiTypography variant="h6" component="div" sx={{ color: 'var(--color-text-primary-dark)' }}>
+                    <MuiTypography variant="h6" component="div" sx={{ color: 'var(--color-text-primary)' }}>
                         {title}
                     </MuiTypography>
                 </MuiDialogTitle>
-                
+
                 <MuiDialogContent>
                     {children}
                 </MuiDialogContent>
-                
+
                 <MuiDialogActions>
                     <MuiBox sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', width: '100%' }}>
                         <MuiButton

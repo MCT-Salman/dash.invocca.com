@@ -21,7 +21,7 @@ const MuiRadioGroup = ({
   return (
     <FormControl className={className}>
       {label && (
-        <FormLabel className={`!text-text-primary !font-medium ${labelClassName}`}>
+        <FormLabel sx={{ color: 'var(--color-text-primary)', fontWeight: 500, mb: 1 }}>
           {label}
         </FormLabel>
       )}
@@ -37,10 +37,14 @@ const MuiRadioGroup = ({
           <FormControlLabel
             key={opt.value}
             value={opt.value}
-            control={<Radio color={color} size={size} className="!text-primary-600" />}
+            control={<Radio color={color} size={size} sx={{ color: 'var(--color-primary-500)' }} />}
             label={opt.label}
             disabled={opt.disabled}
-            className="!text-text-primary"
+            sx={{
+              '& .MuiFormControlLabel-label': {
+                color: 'var(--color-text-primary)',
+              }
+            }}
           />
         ))}
       </RadioGroup>

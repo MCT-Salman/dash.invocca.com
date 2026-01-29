@@ -32,10 +32,11 @@ import MuiSwitch from '@/components/ui/MuiSwitch'
 import MuiAutocomplete from '@/components/ui/MuiAutocomplete'
 import MuiAvatar from '@/components/ui/MuiAvatar'
 import MuiInputAdornment from '@/components/ui/MuiInputAdornment'
+import MuiIconButton from '@/components/ui/MuiIconButton'
 
 // Layout & Common Components
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { LoadingScreen, EmptyState, ConfirmDialog, SEOHead, CardsView, TablePagination, DataTable } from '@/components/common'
+import { LoadingScreen, EmptyState, ConfirmDialog, SEOHead, CardsView, TablePagination, DataTable, PageHeader, StatCard } from '@/components/common'
 import CreateEditHallDialog from './components/CreateEditHallDialog'
 import ViewHallDialog from './components/ViewHallDialog'
 
@@ -65,6 +66,7 @@ import {
   DollarSign,
   MapPin,
   Table,
+  LayoutGrid,
   Armchair as Chair,
   Check,
   X,
@@ -79,7 +81,8 @@ import {
   Settings,
   Shield,
   Calendar,
-  Clock
+  Clock,
+  MoreVertical
 } from 'lucide-react'
 
 // Helper function for truncating text
@@ -335,7 +338,7 @@ const HallsManagement = () => {
           return null
         }
         const fullImageUrl = getFullImageUrl(imageUrl)
-        
+
         return (
           <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             {imageUrl ? (
@@ -345,9 +348,9 @@ const HallsManagement = () => {
                 onClick={() => {
                   if (fullImageUrl) window.open(fullImageUrl, '_blank')
                 }}
-                sx={{ 
-                  width: 40, 
-                  height: 40, 
+                sx={{
+                  width: 40,
+                  height: 40,
                   border: '1px solid var(--color-border-glass)',
                   cursor: fullImageUrl ? 'pointer' : 'default',
                   transition: 'all 0.2s ease',
@@ -449,12 +452,8 @@ const HallsManagement = () => {
         <MuiChip
           label={value ? 'نشطة' : 'غير نشطة'}
           size="small"
-          sx={{
-            backgroundColor: value ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)',
-            color: value ? '#16a34a' : '#dc2626',
-            fontWeight: 600,
-            border: 'none',
-          }}
+          color={value ? 'success' : 'error'}
+          variant="filled"
           icon={value ? <CheckCircle size={14} /> : <XCircle size={14} />}
         />
       )
@@ -482,6 +481,44 @@ const HallsManagement = () => {
       showNotification({
         title: 'خطأ',
         message: 'فشل في تحديث حالة قاعة/صالة',
+        type: 'error'
+      })
+    }
+  }
+
+  const handleExport = () => {
+    try {
+      const dataToExport = filteredHalls.map(hall => ({
+        'اسم القاعة': hall.name,
+        'الموقع': hall.location,
+        'العنوان': hall.address,
+        'السعة': hall.capacity,
+        'عدد الطاولات': hall.tables,
+        'عدد الكراسي': hall.chairs,
+        'السعر الافتراضي': hall.defaultPrices,
+        'المدير': hall.managerName || hall.generalManager?.name || '-',
+        'رقم الهاتف': hall.managerPhone || hall.generalManager?.phone || '-',
+        'الحالة': hall.isActive ? 'نشطة' : 'غير نشطة',
+        'تاريخ الإنشاء': new Date(hall.createdAt).toLocaleDateString('ar-EG')
+      }))
+
+      const ws = XLSX.utils.json_to_sheet(dataToExport)
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, 'Halls')
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' })
+
+      saveAs(data, generateExportFileName('halls'))
+
+      showNotification({
+        title: 'تم التصدير',
+        message: 'تم تصدير بيانات القاعات بنجاح',
+        type: 'success'
+      })
+    } catch (err) {
+      showNotification({
+        title: 'خطأ',
+        message: 'حدث خطأ أثناء تصدير البيانات',
         type: 'error'
       })
     }
@@ -518,43 +555,99 @@ const HallsManagement = () => {
     closeDialog()
   }
 
-  const handleExport = () => {
-    try {
-      const exportData = halls.map(hall => ({
-        'اسم قاعة/صالة': hall.name,
-        'الموقع': hall.location,
-        'السعة': hall.capacity,
-        'السعر الافتراضي': hall.defaultPrices,
-        'اسم المدير': hall.managerName,
-        'هاتف المدير': hall.managerPhone,
-        'الحالة': hall.isActive ? 'نشطة' : 'غير نشطة',
-        'الوصف': hall.description || '',
-        'العنوان': hall.address || '',
-        'عدد الطاولات': hall.tables || 0,
-        'عدد الكراسي': hall.chairs || 0
-      }))
+  const renderHallCard = (hall) => {
+    const imageUrl = hall.primaryImage || hall.images?.[0]
+    return (
+      <MuiCard
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          borderRadius: '20px',
+          overflow: 'hidden',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-8px)',
+            boxShadow: 'var(--shadow-xl)',
+            borderColor: 'var(--color-primary-500)',
+          }
+        }}
+      >
+        <MuiBox sx={{ position: 'relative', height: 180 }}>
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={hall.name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            <MuiBox sx={{
+              width: '100%',
+              height: '100%',
+              background: 'var(--color-primary-100)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Building2 size={48} style={{ color: 'var(--color-primary-300)' }} />
+            </MuiBox>
+          )}
+          <MuiChip
+            label={hall.isActive ? 'نشطة' : 'غير نشطة'}
+            size="small"
+            color={hall.isActive ? 'success' : 'error'}
+            sx={{ position: 'absolute', top: 12, right: 12, fontWeight: 700 }}
+          />
+        </MuiBox>
 
-      const worksheet = XLSX.utils.json_to_sheet(exportData)
-      const workbook = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'قاعات/صالات')
+        <MuiCardContent sx={{ flexGrow: 1, p: 2.5 }}>
+          <MuiTypography variant="h6" sx={{ fontWeight: 700, mb: 1, color: 'var(--color-text-primary)' }}>
+            {hall.name}
+          </MuiTypography>
 
-      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
-      const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+          <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+            <MapPin size={14} style={{ color: 'var(--color-primary-500)' }} />
+            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+              {hall.location}
+            </MuiTypography>
+          </MuiBox>
 
-      saveAs(data, generateExportFileName('halls'))
+          <MuiGrid container spacing={1} sx={{ mt: 1 }}>
+            <MuiGrid item xs={6}>
+              <MuiBox sx={{ p: 1, borderRadius: '12px', background: 'var(--color-surface)', display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Users size={14} style={{ color: 'var(--color-info-500)' }} />
+                <MuiTypography variant="caption" sx={{ fontWeight: 600 }}>{hall.capacity}</MuiTypography>
+              </MuiBox>
+            </MuiGrid>
+            <MuiGrid item xs={6}>
+              <MuiBox sx={{ p: 1, borderRadius: '12px', background: 'var(--color-surface)', display: 'flex', alignItems: 'center', gap: 1 }}>
+                <DollarSign size={14} style={{ color: 'var(--color-success-500)' }} />
+                <MuiTypography variant="caption" sx={{ fontWeight: 600 }}>{formatCurrency(hall.defaultPrices)}</MuiTypography>
+              </MuiBox>
+            </MuiGrid>
+          </MuiGrid>
+        </MuiCardContent>
 
-      showNotification({
-        title: 'تم التصدير',
-        message: 'تم تصدير بيانات قاعات/صالات بنجاح',
-        type: 'success'
-      })
-    } catch (err) {
-      showNotification({
-        title: 'خطأ',
-        message: 'فشل في تصدير البيانات',
-        type: 'error'
-      })
-    }
+        <MuiCardActions sx={{ px: 2, py: 1.5, borderTop: '1px solid var(--color-divider)', justifyContent: 'space-between' }}>
+          <MuiBox sx={{ display: 'flex', gap: 1 }}>
+            <MuiIconButton size="small" onClick={() => openViewDialog(hall)} color="primary">
+              <Eye size={18} />
+            </MuiIconButton>
+            <MuiIconButton size="small" onClick={() => handleEditClick(hall)} color="info">
+              <Pencil size={18} />
+            </MuiIconButton>
+            <MuiIconButton size="small" onClick={() => openDeleteDialog(hall)} color="error">
+              <Trash2 size={18} />
+            </MuiIconButton>
+          </MuiBox>
+          <MuiSwitch
+            checked={hall.isActive}
+            onChange={() => handleToggleStatus(hall)}
+            size="small"
+          />
+        </MuiCardActions>
+      </MuiCard>
+    )
   }
 
   // Render Loading State
@@ -588,315 +681,112 @@ const HallsManagement = () => {
     <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
       <SEOHead pageKey="hallsManagement" title="إدارة قاعة/صالة | INVOCCA" />
 
-      {/* Header Section */}
-      <MuiBox
-        sx={{
-          mb: 4,
-          p: 4,
-          borderRadius: '20px',
-          background: 'var(--color-surface-dark)',
-          position: 'relative',
-          overflow: 'hidden',
-          border: '1px solid var(--color-border-glass)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            width: '300px',
-            height: '300px',
-            background: 'radial-gradient(circle, rgba(216, 185, 138, 0.05) 0%, transparent 70%)',
-            borderRadius: '50%',
-          }
-        }}
-      >
-        <MuiBox sx={{ position: 'relative', zIndex: 1 }}>
-          <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-            <MuiBox
-              sx={{
-                width: 56,
-                height: 56,
-                borderRadius: '14px',
-                background: 'linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800))',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: '1px solid var(--color-primary-500)',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
-              }}
+      <PageHeader
+        icon={Building2}
+        title={`إدارة قاعة/صالة (${filteredHalls.length})`}
+        subtitle="إدارة جميع قاعات/صالات المناسبات في النظام"
+        actions={
+          <MuiBox sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <MuiBox sx={{ display: 'flex', background: 'var(--color-surface)', p: 0.5, borderRadius: '12px', border: '1px solid var(--color-border)' }}>
+              <MuiIconButton
+                size="small"
+                onClick={() => setViewMode('table')}
+                sx={{
+                  borderRadius: '10px',
+                  color: viewMode === 'table' ? 'var(--color-primary-500)' : 'var(--color-text-muted)',
+                  background: viewMode === 'table' ? 'var(--color-paper)' : 'transparent',
+                  boxShadow: viewMode === 'table' ? 'var(--shadow-sm)' : 'none',
+                  '&:hover': { background: viewMode === 'table' ? 'var(--color-paper)' : 'rgba(0,0,0,0.05)' }
+                }}
+              >
+                <Table size={20} />
+              </MuiIconButton>
+              <MuiIconButton
+                size="small"
+                onClick={() => setViewMode('card')}
+                sx={{
+                  borderRadius: '10px',
+                  color: viewMode === 'card' ? 'var(--color-primary-500)' : 'var(--color-text-muted)',
+                  background: viewMode === 'card' ? 'var(--color-paper)' : 'transparent',
+                  boxShadow: viewMode === 'card' ? 'var(--shadow-sm)' : 'none',
+                  '&:hover': { background: viewMode === 'card' ? 'var(--color-paper)' : 'rgba(0,0,0,0.05)' }
+                }}
+              >
+                <LayoutGrid size={20} />
+              </MuiIconButton>
+            </MuiBox>
+            <MuiButton
+              variant="outlined"
+              start_icon={<Download size={18} />}
+              onClick={handleExport}
             >
-              <Building2 size={28} className="text-white" />
-            </MuiBox>
-            <MuiBox>
-              <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 0.5 }}>
-                إدارة قاعة/صالة ({filteredHalls.length})
-              </MuiTypography>
-              <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                إدارة جميع قاعات/صالات المناسبات في النظام
-              </MuiTypography>
-            </MuiBox>
+              تصدير
+            </MuiButton>
+            <MuiButton
+              variant="contained"
+              start_icon={<Plus size={18} />}
+              onClick={handleCreateClick}
+            >
+              إضافة
+            </MuiButton>
           </MuiBox>
-        </MuiBox>
-      </MuiBox>
+        }
+      />
 
       {/* Stats Cards */}
       <MuiGrid container spacing={3} sx={{ mb: 4 }}>
         <MuiGrid item xs={12} sm={6} md={3}>
-          <MuiPaper
-            elevation={0}
-            sx={{
-              p: 3,
-              height: '100%',
-              background: 'var(--color-surface-dark)',
-              border: '1px solid var(--color-border-glass)',
-              borderRadius: '16px',
-              position: 'relative',
-              overflow: 'hidden',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                borderColor: 'var(--color-primary-500)',
-              },
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '4px',
-                background: 'linear-gradient(90deg, var(--color-primary-500), transparent)',
-              }
-            }}
-          >
-            <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <MuiBox>
-                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                  {halls.length}
-                </MuiTypography>
-                <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                  عدد قاعات/صالات
-                </MuiTypography>
-              </MuiBox>
-              <MuiBox
-                sx={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '12px',
-                  background: 'rgba(216, 185, 138, 0.1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '1px solid rgba(216, 185, 138, 0.2)',
-                }}
-              >
-                <Building2 size={28} style={{ color: '#D8B98A' }} />
-              </MuiBox>
-            </MuiBox>
-          </MuiPaper>
+          <StatCard
+            title="عدد قاعات/صالات"
+            value={halls.length}
+            icon={<Building2 size={24} />}
+          />
         </MuiGrid>
         <MuiGrid item xs={12} sm={6} md={3}>
-          <MuiPaper
-            elevation={0}
-            sx={{
-              p: 3,
-              height: '100%',
-              background: 'var(--color-surface-dark)',
-              border: '1px solid rgba(22, 163, 74, 0.2)',
-              borderRadius: '16px',
-              position: 'relative',
-              overflow: 'hidden',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                borderColor: '#16a34a',
-              },
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '4px',
-                background: 'linear-gradient(90deg, #16a34a, transparent)',
-              }
-            }}
-          >
-            <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <MuiBox>
-                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                  {halls.filter(h => h.isActive).length}
-                </MuiTypography>
-                <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                  قاعات/صالات النشطة
-                </MuiTypography>
-              </MuiBox>
-              <MuiBox
-                sx={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '12px',
-                  background: 'rgba(22, 163, 74, 0.1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '1px solid rgba(22, 163, 74, 0.2)',
-                }}
-              >
-                <CheckCircle size={28} style={{ color: '#16a34a' }} />
-              </MuiBox>
-            </MuiBox>
-          </MuiPaper>
+          <StatCard
+            title="قاعات/صالات النشطة"
+            value={halls.filter(h => h.isActive).length}
+            icon={<CheckCircle size={24} />}
+            sx={{ borderTop: '4px solid var(--color-success-500)' }}
+          />
         </MuiGrid>
         <MuiGrid item xs={12} sm={6} md={3}>
-          <MuiPaper
-            elevation={0}
-            sx={{
-              p: 3,
-              height: '100%',
-              background: 'var(--color-surface-dark)',
-              border: '1px solid rgba(2, 132, 199, 0.2)',
-              borderRadius: '16px',
-              position: 'relative',
-              overflow: 'hidden',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                borderColor: '#0284c7',
-              },
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '4px',
-                background: 'linear-gradient(90deg, #0284c7, transparent)',
-              }
-            }}
-          >
-            <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <MuiBox>
-                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                  {halls.reduce((sum, hall) => sum + (hall.capacity || 0), 0)}
-                </MuiTypography>
-                <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                  إجمالي السعة
-                </MuiTypography>
-              </MuiBox>
-              <MuiBox
-                sx={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '12px',
-                  background: 'rgba(2, 132, 199, 0.1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '1px solid rgba(2, 132, 199, 0.2)',
-                }}
-              >
-                <Users size={28} style={{ color: '#0284c7' }} />
-              </MuiBox>
-            </MuiBox>
-          </MuiPaper>
+          <StatCard
+            title="إجمالي السعة"
+            value={halls.reduce((sum, hall) => sum + (hall.capacity || 0), 0)}
+            icon={<Users size={24} />}
+            sx={{ borderTop: '4px solid var(--color-info-500)' }}
+          />
         </MuiGrid>
         <MuiGrid item xs={12} sm={6} md={3}>
-          <MuiPaper
-            elevation={0}
-            sx={{
-              p: 3,
-              height: '100%',
-              background: 'var(--color-surface-dark)',
-              border: '1px solid rgba(217, 155, 61, 0.2)',
-              borderRadius: '16px',
-              position: 'relative',
-              overflow: 'hidden',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                borderColor: 'var(--color-warning-500)',
-              },
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '4px',
-                background: 'linear-gradient(90deg, var(--color-warning-500), transparent)',
-              }
-            }}
-          >
-            <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <MuiBox>
-                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                  {halls.length > 0
-                    ? Math.round(halls.reduce((sum, hall) => sum + (hall.defaultPrices || 0), 0) / halls.length)
-                    : 0
-                  }
-                </MuiTypography>
-                <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
-                  متوسط السعر
-                </MuiTypography>
-              </MuiBox>
-              <MuiBox
-                sx={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '12px',
-                  background: 'rgba(217, 155, 61, 0.1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '1px solid rgba(217, 155, 61, 0.2)',
-                }}
-              >
-                <DollarSign size={28} style={{ color: '#D99B3D' }} />
-              </MuiBox>
-            </MuiBox>
-          </MuiPaper>
+          <StatCard
+            title="متوسط السعر"
+            value={formatCurrency(halls.length > 0 ? halls.reduce((sum, h) => sum + (h.defaultPrices || 0), 0) / halls.length : 0)}
+            icon={<DollarSign size={24} />}
+            sx={{ borderTop: '4px solid var(--color-primary-500)' }}
+          />
         </MuiGrid>
       </MuiGrid>
 
-      {/* Search and Filter */}
+      {/* Search & Filter */}
       <MuiPaper
         elevation={0}
         sx={{
-          p: 3,
-          borderRadius: '16px',
-          border: '1px solid var(--color-border-glass)',
-          background: 'var(--color-surface-dark)',
-          mb: 4
+          p: 2,
+          mb: 3,
+          background: 'var(--color-paper)',
+          border: '1px solid var(--color-border)',
+          borderRadius: '16px'
         }}
       >
-        <MuiGrid container spacing={2}>
+        <MuiGrid container spacing={2} alignItems="center">
           <MuiGrid item xs={12} md={6}>
             <MuiTextField
               fullWidth
               placeholder="ابحث (اسم قاعة/صالة، المدير، رقم الهاتف)..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <MuiInputAdornment position="start">
-                    <Search size={20} className="text-text-secondary" />
-                  </MuiInputAdornment>
-                ),
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '10px',
-                  backgroundColor: 'rgba(0,0,0,0.2)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(0,0,0,0.3)',
-                  }
-                }
-              }}
+              startIcon={<Search size={20} />}
             />
           </MuiGrid>
           <MuiGrid item xs={12} md={3}>
@@ -904,96 +794,47 @@ const HallsManagement = () => {
               fullWidth
               value={locationFilter}
               onChange={(e) => setLocationFilter(e.target.value)}
-              sx={{
-                borderRadius: '10px',
-              }}
-            >
-              <MuiMenuItem value="all">جميع المواقع</MuiMenuItem>
-              {uniqueLocations.map((location) => {
-                const locationValue = typeof location === 'object' ? location.value || location.id || location : location
-                const locationLabel = typeof location === 'object' ? location.label || location.name || location : location
-                return (
-                  <MuiMenuItem key={locationValue} value={locationValue}>
-                    {locationLabel}
-                  </MuiMenuItem>
-                )
-              })}
-            </MuiSelect>
+              options={[
+                { label: 'جميع المواقع', value: 'all' },
+                ...uniqueLocations.map(loc => ({ label: loc, value: loc }))
+              ]}
+            />
           </MuiGrid>
           <MuiGrid item xs={12} md={3}>
             <MuiSelect
               fullWidth
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              sx={{
-                borderRadius: '10px',
-              }}
-            >
-              <MuiMenuItem value="all">جميع الحالات</MuiMenuItem>
-              <MuiMenuItem value="active">نشطة</MuiMenuItem>
-              <MuiMenuItem value="inactive">غير نشطة</MuiMenuItem>
-            </MuiSelect>
+              options={[
+                { label: 'جميع الحالات', value: 'all' },
+                { label: 'نشطة', value: 'active' },
+                { label: 'غير نشطة', value: 'inactive' }
+              ]}
+            />
           </MuiGrid>
         </MuiGrid>
-        <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-          <MuiBox sx={{ display: 'flex', gap: 2 }}>
-            {(locationFilter !== 'all' || statusFilter !== 'all' || searchTerm) && (
-              <MuiButton
-                variant="outlined"
-                size="small"
-                onClick={() => {
-                  setLocationFilter('all')
-                  setStatusFilter('all')
-                  setSearchTerm('')
-                }}
-                startIcon={<X size={16} />}
-                sx={{
-                  borderColor: 'var(--color-text-secondary)',
-                  color: 'var(--color-text-secondary)',
-                  '&:hover': {
-                    borderColor: '#666',
-                    background: 'rgba(136, 136, 136, 0.1)',
-                  }
-                }}
-              >
-                مسح الفلاتر
-              </MuiButton>
-            )}
-          </MuiBox>
-          <MuiBox sx={{ display: 'flex', gap: 2 }}>
-            <MuiButton
-              variant="outlined"
-              color="info"
-              startIcon={<Download size={20} />}
-              onClick={handleExport}
-              disabled={halls.length === 0}
-            >
-              تصدير
-            </MuiButton>
-            <MuiButton
-              variant="contained"
-              startIcon={<Plus size={20} />}
-              onClick={handleCreateClick}
-              color="primary"
-            >
-              إضافة قاعة/صالة
-            </MuiButton>
-          </MuiBox>
-        </MuiBox>
       </MuiPaper>
 
       {/* Content */}
-      <DataTable
-        columns={columns}
-        rows={filteredHalls}
-        onEdit={handleEditClick}
-        onDelete={openDeleteDialog}
-        onView={openViewDialog}
-        onToggleStatus={handleToggleStatus}
-        loading={loading}
-        emptyMessage="لا توجد قاعات/صالات متاحة"
-        showActions={true}
-      />
+      {viewMode === 'table' ? (
+        <DataTable
+          columns={columns}
+          data={filteredHalls}
+          onEdit={handleEditClick}
+          onDelete={openDeleteDialog}
+          onView={openViewDialog}
+          onToggleStatus={handleToggleStatus}
+          loading={loading}
+          emptyMessage="لا توجد قاعات/صالات متاحة"
+        />
+      ) : (
+        <CardsView
+          data={filteredHalls}
+          renderCard={renderHallCard}
+          loading={loading}
+          emptyMessage="لا توجد قاعات/صالات متاحة"
+        />
+      )}
 
       {/* Dialogs */}
       <CreateEditHallDialog

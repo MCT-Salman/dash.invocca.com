@@ -11,6 +11,7 @@ import { Menu, X, Bell, User, Sparkles, LogOut, Settings, Search } from 'lucide-
 import { useAuth } from '@/hooks'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/config/constants'
+import { ThemeToggle } from '@/components/common'
 
 const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false }) => {
     const { user, logout } = useAuth()
@@ -61,10 +62,10 @@ const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false 
                 zIndex: 1100,
                 backdropFilter: 'blur(12px)',
                 backgroundColor: scrolled
-                    ? 'rgba(10, 10, 10, 0.8)'
+                    ? 'var(--color-surface-glass)'
                     : 'transparent',
                 borderBottom: scrolled
-                    ? '1px solid var(--color-border-glass)'
+                    ? '1px solid var(--color-border)'
                     : '1px solid transparent',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
@@ -87,7 +88,7 @@ const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false 
                             display: { md: 'none' },
                             color: 'var(--color-primary-500)',
                             '&:hover': {
-                                backgroundColor: 'rgba(216, 185, 138, 0.1)',
+                                backgroundColor: 'var(--color-surface-hover)',
                                 transform: 'scale(1.05)'
                             }
                         }}
@@ -105,11 +106,14 @@ const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false 
 
                 {/* Right Section */}
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {/* Theme Toggle */}
+                    <ThemeToggle />
+
                     {/* User Menu */}
                     <MuiIconButton
                         onClick={handleMenuOpen}
                         sx={{
-                            border: '1px solid var(--color-border-glass)',
+                            border: '1px solid var(--color-border)',
                             p: 0.5,
                             '&:hover': {
                                 transform: 'scale(1.05)',
@@ -149,9 +153,9 @@ const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false 
                     sx: {
                         mt: 1.5,
                         minWidth: 200,
-                        backgroundColor: 'var(--color-surface-dark)',
+                        backgroundColor: 'var(--color-paper)',
                         backdropFilter: 'blur(20px)',
-                        border: '1px solid var(--color-border-glass)',
+                        border: '1px solid var(--color-border)',
                         borderRadius: '12px',
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
                         color: 'var(--color-text-primary)',
@@ -161,7 +165,7 @@ const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false 
                     }
                 }}
             >
-                <MuiBox sx={{ px: 2, py: 1.5, borderBottom: '1px solid var(--color-border-glass)' }}>
+                <MuiBox sx={{ px: 2, py: 1.5, borderBottom: '1px solid var(--color-border)' }}>
                     <MuiTypography variant="subtitle2" sx={{ fontWeight: 600, color: 'var(--color-primary-500)' }}>
                         {user?.name || 'المستخدم'}
                     </MuiTypography>
@@ -172,20 +176,20 @@ const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false 
                 <MuiMenuItem
                     onClick={() => {
                         // Navigate to profile based on user role
-                        const profilePath = user?.role === 'admin' 
-                            ? ROUTES.ADMIN.PROFILE 
-                            : user?.role === 'manager' 
-                            ? ROUTES.MANAGER.PROFILE 
-                            : user?.role === 'client' 
-                            ? ROUTES.CLIENT.PROFILE 
-                            : '/profile'
+                        const profilePath = user?.role === 'admin'
+                            ? ROUTES.ADMIN.PROFILE
+                            : user?.role === 'manager'
+                                ? ROUTES.MANAGER.PROFILE
+                                : user?.role === 'client'
+                                    ? ROUTES.CLIENT.PROFILE
+                                    : '/profile'
                         navigate(profilePath)
                         handleMenuClose()
                     }}
                     sx={{
                         py: 1.5,
                         '&:hover': {
-                            backgroundColor: 'rgba(216, 185, 138, 0.1)'
+                            backgroundColor: 'var(--color-surface-hover)'
                         }
                     }}
                 >
@@ -199,7 +203,7 @@ const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false 
                             py: 1.5,
                             color: 'var(--color-error-500) !important',
                             '&:hover': {
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)'
+                                backgroundColor: 'var(--color-surface-hover)'
                             }
                         }}
                     >

@@ -19,10 +19,10 @@ import { SEOHead } from '@/components/common';
  * @param {string} props.seoPageKey - مفتاح SEO للصفحة
  * @param {string} props.brandText - نص إضافي للعلامة التجارية
  */
-export default function AuthLayout({ 
-    children, 
-    title, 
-    subtitle, 
+export default function AuthLayout({
+    children,
+    title,
+    subtitle,
     seoPageKey,
     brandText = "الحل الأمثل لإدارة وتنظيم حفلاتك ومناسباتك بكل سهولة واحترافية"
 }) {
@@ -33,7 +33,7 @@ export default function AuthLayout({
             <MuiBox sx={{
                 minHeight: '100vh',
                 display: 'flex',
-                background: 'linear-gradient(135deg, var(--color-bg-dark) 0%, rgba(10, 10, 10, 0.98) 100%)',
+                background: 'var(--color-bg)',
                 position: 'relative',
                 overflow: 'hidden'
             }}>
@@ -69,7 +69,7 @@ export default function AuthLayout({
                         {/* Header مع تأثيرات */}
                         {(title || subtitle) && (
                             <MuiBox sx={{ mb: 5, textAlign: 'center', position: 'relative' }}>
-                                
+
                                 {title && (
                                     <MuiTypography
                                         variant="h3"
@@ -77,7 +77,7 @@ export default function AuthLayout({
                                             fontWeight: 800,
                                             mb: 2,
                                             position: 'relative',
-                                            background: 'linear-gradient(135deg, var(--color-text-primary-dark), var(--color-primary-500))',
+                                            background: 'linear-gradient(135deg, var(--color-text-primary), var(--color-primary-500))',
                                             WebkitBackgroundClip: 'text',
                                             WebkitTextFillColor: 'transparent',
                                             backgroundClip: 'text',
@@ -125,17 +125,17 @@ export default function AuthLayout({
                             sx={{
                                 p: { xs: 4, md: 5 },
                                 borderRadius: '24px',
-                                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.95) 0%, rgba(10, 10, 10, 0.98) 100%)',
+                                background: 'var(--color-paper)',
                                 backdropFilter: 'blur(30px)',
                                 WebkitBackdropFilter: 'blur(30px)',
-                                border: '1px solid rgba(216, 185, 138, 0.2)',
-                                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(216, 185, 138, 0.1)',
+                                border: '1px solid var(--color-border)',
+                                boxShadow: 'var(--shadow-xl)',
                                 position: 'relative',
                                 overflow: 'hidden',
                                 transition: 'all 0.4s ease',
                                 '&:hover': {
-                                    boxShadow: '0 24px 72px rgba(0, 0, 0, 0.6), 0 0 50px rgba(216, 185, 138, 0.15)',
-                                    borderColor: 'rgba(216, 185, 138, 0.3)',
+                                    boxShadow: 'var(--shadow-2xl)',
+                                    borderColor: 'var(--color-primary-500)',
                                 },
                                 '&::before': {
                                     content: '""',
@@ -144,7 +144,8 @@ export default function AuthLayout({
                                     right: '-20%',
                                     width: '500px',
                                     height: '500px',
-                                    background: 'radial-gradient(circle, rgba(216, 185, 138, 0.12) 0%, transparent 70%)',
+                                    background: 'radial-gradient(circle, var(--color-primary-500) 0%, transparent 70%)',
+                                    opacity: 0.12,
                                     borderRadius: '50%',
                                     animation: 'pulse 4s ease-in-out infinite',
                                 },
@@ -155,7 +156,8 @@ export default function AuthLayout({
                                     left: '-10%',
                                     width: '400px',
                                     height: '400px',
-                                    background: 'radial-gradient(circle, rgba(216, 185, 138, 0.08) 0%, transparent 70%)',
+                                    background: 'radial-gradient(circle, var(--color-primary-500) 0%, transparent 70%)',
+                                    opacity: 0.08,
                                     borderRadius: '50%',
                                     animation: 'pulse 5s ease-in-out infinite',
                                 }
@@ -197,10 +199,10 @@ export default function AuthLayout({
                     <div className="absolute inset-0">
                         {/* شبكة خلفية */}
                         <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.1)_50%,transparent_75%,transparent_100%)] bg-[length:20px_20px] opacity-20" />
-                        
+
                         {/* موجات متحركة */}
                         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white/20 to-transparent animate-wave" />
-                        
+
                         {/* جسيمات متحركة */}
                         {[...Array(20)].map((_, i) => (
                             <div
@@ -222,11 +224,11 @@ export default function AuthLayout({
                         <div className="relative !mb-10 !mx-auto w-56 h-56">
                             {/* هالة حول الشعار */}
                             <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-full blur-3xl animate-pulse-slow" />
-                            
+
                             {/* دائرة متحركة */}
                             {/* <div className="absolute inset-0 border-2 border-white/20 rounded-full animate-spin-slow" /> */}
                             {/* <div className="absolute inset-8 border border-white/10 rounded-full animate-spin-slow-reverse" /> */}
-                            
+
                             {/* الشعار الرئيسي */}
                             <MuiBox
                                 component="img"
@@ -309,7 +311,7 @@ export default function AuthLayout({
                             {brandText}
                         </MuiTypography>
 
-                       
+
                     </div>
 
                     {/* تصميم زاوية */}
@@ -318,139 +320,6 @@ export default function AuthLayout({
                 </MuiBox>
             </MuiBox>
 
-            {/* إضافة أنيميشن مخصصة */}
-            <style jsx global>{`
-                @keyframes fadeIn {
-                    from {
-                        opacity: 0;
-                        transform: translateY(20px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-
-                @keyframes slideInRight {
-                    from {
-                        opacity: 0;
-                        transform: translateX(50px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateX(0);
-                    }
-                }
-
-                @keyframes float {
-                    0%, 100% {
-                        transform: translateY(0) translateX(0);
-                    }
-                    50% {
-                        transform: translateY(-20px) translateX(10px);
-                    }
-                }
-
-                @keyframes wave {
-                    0%, 100% {
-                        transform: translateY(0);
-                    }
-                    50% {
-                        transform: translateY(-10px);
-                    }
-                }
-
-                @keyframes particle {
-                    0% {
-                        transform: translateY(0) translateX(0);
-                        opacity: 0;
-                    }
-                    10% {
-                        opacity: 1;
-                    }
-                    90% {
-                        opacity: 1;
-                    }
-                    100% {
-                        transform: translateY(-100px) translateX(20px);
-                        opacity: 0;
-                    }
-                }
-
-                @keyframes pulse-slow {
-                    0%, 100% {
-                        opacity: 0.3;
-                        transform: scale(1);
-                    }
-                    50% {
-                        opacity: 0.5;
-                        transform: scale(1.1);
-                    }
-                }
-
-                @keyframes spin-slow {
-                    from {
-                        transform: rotate(0deg);
-                    }
-                    to {
-                        transform: rotate(360deg);
-                    }
-                }
-
-                @keyframes spin-slow-reverse {
-                    from {
-                        transform: rotate(360deg);
-                    }
-                    to {
-                        transform: rotate(0deg);
-                    }
-                }
-
-                @keyframes glow {
-                    0%, 100% {
-                        text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-                    }
-                    50% {
-                        text-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
-                    }
-                }
-
-                .animate-fadeIn {
-                    animation: fadeIn 0.8s ease-out;
-                }
-
-                .animate-slideInRight {
-                    animation: slideInRight 1s ease-out;
-                }
-
-                .animate-float {
-                    animation: float 8s ease-in-out infinite;
-                }
-
-                .animate-wave {
-                    animation: wave 3s ease-in-out infinite;
-                }
-
-                .animate-particle {
-                    animation: particle linear infinite;
-                }
-
-                .animate-pulse-slow {
-                    animation: pulse-slow 4s ease-in-out infinite;
-                }
-
-                .animate-spin-slow {
-                    animation: spin-slow 20s linear infinite;
-                }
-
-                .animate-spin-slow-reverse {
-                    animation: spin-slow-reverse 25s linear infinite;
-                }
-
-                .animate-glow {
-                    animation: glow 2s ease-in-out infinite;
-                }
-            `}</style>
         </>
     );
 }
