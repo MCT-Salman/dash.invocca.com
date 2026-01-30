@@ -65,7 +65,7 @@ export default function ViewClientDialog({ open, onClose, client }) {
 
                 {/* Client Details */}
                 <MuiGrid item xs={12}>
-                    <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>معلومات العميل</MuiTypography>
+                    <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary)' }}>معلومات العميل</MuiTypography>
                     <MuiGrid container spacing={2}>
                         {[
                             { icon: Phone, label: 'الهاتف', value: formatEmptyValue(client.phone) },
@@ -75,7 +75,7 @@ export default function ViewClientDialog({ open, onClose, client }) {
                                 <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', textAlign: 'center', border: '1px solid rgba(216, 185, 138, 0.15)' }}>
                                     <item.icon size={24} style={{ margin: '0 auto 8px', color: 'var(--color-primary-500)' }} />
                                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>{item.label}</MuiTypography>
-                                    <MuiTypography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary-dark)' }}>{item.value}</MuiTypography>
+                                    <MuiTypography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>{item.value}</MuiTypography>
                                 </MuiBox>
                             </MuiGrid>
                         ))}

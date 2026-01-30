@@ -160,7 +160,7 @@ export default function AdminDashboard() {
             yearRevenue: summary.financial?.yearRevenue || 0,
             pendingPayments: summary.financial?.pendingPayments || 0,
             completedPayments: summary.financial?.completedPayments || 0,
-            currency: summary.financial?.currency || 'SAR',
+            currency: summary.financial?.currency || 'ل.س',
 
             // Top Performers
             topPerformers: dashboardData.topPerformers || {}

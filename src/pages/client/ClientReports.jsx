@@ -5,7 +5,7 @@
  */
 
 import React from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import MuiBox from '@/components/ui/MuiBox'
 import MuiTypography from '@/components/ui/MuiTypography'
 import MuiPaper from '@/components/ui/MuiPaper'
@@ -42,8 +42,6 @@ import MuiButton from '@/components/ui/MuiButton'
 
 
 export default function ClientReports() {
-  const queryClient = useQueryClient()
-
   const { data, isLoading } = useQuery({
     queryKey: QUERY_KEYS.CLIENT_REPORTS,
     queryFn: getClientReports,
@@ -53,7 +51,6 @@ export default function ClientReports() {
   const hasEvent = data?.hasEvent
   const event = data?.event
   const invitations = data?.invitations || []
-  const eventId = event?._id || event?.id
 
 
 
@@ -66,7 +63,7 @@ export default function ClientReports() {
     return (
       <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
         <SEOHead title="التقارير - INVOCCA" />
-        <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 4 }}>
+        <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary)', fontWeight: 700, mb: 4 }}>
           التقارير والإحصائيات
         </MuiTypography>
         <EmptyState
@@ -145,7 +142,7 @@ export default function ClientReports() {
 
       {/* Header */}
       <MuiBox sx={{ mb: 4 }}>
-        <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 1 }}>
+        <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary)', fontWeight: 700, mb: 1 }}>
           التقارير والإحصائيات
         </MuiTypography>
         <MuiTypography variant="body1" sx={{ color: 'var(--color-text-secondary)' }}>
@@ -159,14 +156,14 @@ export default function ClientReports() {
         sx={{
           p: 3,
           mb: 4,
-          background: 'var(--color-surface-dark)',
+          background: 'var(--color-paper)',
           border: '1px solid var(--color-border-glass)',
           borderRadius: '20px',
         }}
       >
         <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
           <MuiBox>
-            <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 1 }}>
+            <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary)', fontWeight: 700, mb: 1 }}>
               {formatEmptyValue(event.name || event.eventName)}
             </MuiTypography>
             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', mt: 1 }}>
@@ -174,18 +171,20 @@ export default function ClientReports() {
                 label={eventTypeLabels[event.type] || event.type || 'فعالية'}
                 size="small"
                 sx={{
-                  backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                  color: 'var(--color-primary-500)',
+                  backgroundColor: 'var(--color-primary-50)',
+                  color: 'var(--color-primary-700)',
                   fontWeight: 600,
+                  border: '1px solid var(--color-primary-200)',
                 }}
               />
               <MuiChip
                 label={statusLabels[event.status] || event.status}
                 size="small"
                 sx={{
-                  backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                  color: 'var(--color-primary-500)',
+                  backgroundColor: 'var(--color-primary-50)',
+                  color: 'var(--color-primary-700)',
                   fontWeight: 600,
+                  border: '1px solid var(--color-primary-200)',
                 }}
               />
             </MuiBox>
@@ -200,7 +199,7 @@ export default function ClientReports() {
                 <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
                   التاريخ
                 </MuiTypography>
-                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                   {formatDate(event.date || event.eventDate, 'MM/DD/YYYY')}
                 </MuiTypography>
               </MuiBox>
@@ -213,7 +212,7 @@ export default function ClientReports() {
                 <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
                   الوقت
                 </MuiTypography>
-                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                   {event.startTime && event.endTime ? `${event.startTime} - ${event.endTime}` : (event.startTime || '—')}
                 </MuiTypography>
               </MuiBox>
@@ -227,7 +226,7 @@ export default function ClientReports() {
                   <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
                     المدة
                   </MuiTypography>
-                  <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                  <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                     {formatNumber(event.duration)} ساعة
                   </MuiTypography>
                 </MuiBox>
@@ -241,7 +240,7 @@ export default function ClientReports() {
                 <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
                   عدد الضيوف
                 </MuiTypography>
-                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                   {formatEmptyValue(event.guestCount)}
                 </MuiTypography>
               </MuiBox>
@@ -255,7 +254,7 @@ export default function ClientReports() {
                   <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
                     الموظفين المطلوبين
                   </MuiTypography>
-                  <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                  <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                     {formatEmptyValue(event.requiredEmployees)}
                   </MuiTypography>
                 </MuiBox>
@@ -290,7 +289,7 @@ export default function ClientReports() {
             elevation={0}
             sx={{
               p: 3,
-              background: 'var(--color-surface-dark)',
+              background: 'var(--color-paper)',
               border: '1px solid var(--color-border-glass)',
               borderRadius: '16px',
               textAlign: 'center',
@@ -313,7 +312,7 @@ export default function ClientReports() {
             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1 }}>
               إجمالي المبلغ
             </MuiTypography>
-            <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
+            <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>
               {formatCurrency(totalPrice)}
             </MuiTypography>
           </MuiPaper>
@@ -324,7 +323,7 @@ export default function ClientReports() {
             elevation={0}
             sx={{
               p: 3,
-              background: 'var(--color-surface-dark)',
+              background: 'var(--color-paper)',
               border: '1px solid var(--color-border-glass)',
               borderRadius: '16px',
               textAlign: 'center',
@@ -347,7 +346,7 @@ export default function ClientReports() {
             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1 }}>
               المدفوع
             </MuiTypography>
-            <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
+            <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>
               {formatCurrency(paidAmount)}
             </MuiTypography>
           </MuiPaper>
@@ -358,7 +357,7 @@ export default function ClientReports() {
             elevation={0}
             sx={{
               p: 3,
-              background: 'var(--color-surface-dark)',
+              background: 'var(--color-paper)',
               border: '1px solid var(--color-border-glass)',
               borderRadius: '16px',
               textAlign: 'center',
@@ -381,7 +380,7 @@ export default function ClientReports() {
             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1 }}>
               المتبقي
             </MuiTypography>
-            <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
+            <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>
               {formatCurrency(remainingBalance)}
             </MuiTypography>
           </MuiPaper>
@@ -396,23 +395,24 @@ export default function ClientReports() {
               elevation={0}
               sx={{
                 p: 3,
-                background: 'var(--color-surface-dark)',
+                background: 'var(--color-paper)',
                 border: '1px solid var(--color-border-glass)',
                 borderRadius: '16px',
               }}
             >
               <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                 <DollarSign size={24} style={{ color: 'var(--color-primary-500)' }} />
-                <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                   حالة الدفع
                 </MuiTypography>
               </MuiBox>
               <MuiChip
                 label={paymentStatusLabels[event.paymentStatus] || event.paymentStatus}
                 sx={{
-                  backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                  color: 'var(--color-primary-500)',
+                  backgroundColor: 'var(--color-primary-50)',
+                  color: 'var(--color-primary-700)',
                   fontWeight: 600,
+                  border: '1px solid var(--color-primary-200)',
                 }}
               />
             </MuiPaper>
@@ -424,23 +424,24 @@ export default function ClientReports() {
               elevation={0}
               sx={{
                 p: 3,
-                background: 'var(--color-surface-dark)',
+                background: 'var(--color-paper)',
                 border: '1px solid var(--color-border-glass)',
                 borderRadius: '16px',
               }}
             >
               <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                 <UserCheck size={24} style={{ color: 'var(--color-primary-500)' }} />
-                <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                   حالة تعيين الموظفين
                 </MuiTypography>
               </MuiBox>
               <MuiChip
                 label={employeeStatusLabels[event.employeeAssignmentStatus] || event.employeeAssignmentStatus}
                 sx={{
-                  backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                  color: 'var(--color-primary-500)',
+                  backgroundColor: 'var(--color-primary-50)',
+                  color: 'var(--color-primary-700)',
                   fontWeight: 600,
+                  border: '1px solid var(--color-primary-200)',
                 }}
               />
             </MuiPaper>
@@ -455,12 +456,12 @@ export default function ClientReports() {
           sx={{
             p: 3,
             mb: 4,
-            background: 'var(--color-surface-dark)',
+            background: 'var(--color-paper)',
             border: '1px solid var(--color-border-glass)',
             borderRadius: '20px',
           }}
         >
-          <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 3 }}>
+          <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary)', fontWeight: 700, mb: 3 }}>
             معلومات قاعة/صالة
           </MuiTypography>
           <MuiGrid container spacing={2}>
@@ -468,7 +469,7 @@ export default function ClientReports() {
               <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
                 اسم قاعة/صالة
               </MuiTypography>
-              <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+              <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                 {formatEmptyValue(hall.name)}
               </MuiTypography>
             </MuiGrid>
@@ -477,7 +478,7 @@ export default function ClientReports() {
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
                   الموقع
                 </MuiTypography>
-                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                   {formatEmptyValue(hall.location)}
                 </MuiTypography>
               </MuiGrid>
@@ -487,7 +488,7 @@ export default function ClientReports() {
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
                   السعة
                 </MuiTypography>
-                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                   {formatEmptyValue(hall.capacity)} ضيف
                 </MuiTypography>
               </MuiGrid>
@@ -497,7 +498,7 @@ export default function ClientReports() {
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
                   عدد الطاولات
                 </MuiTypography>
-                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                   {formatEmptyValue(hall.tables)}
                 </MuiTypography>
               </MuiGrid>
@@ -507,7 +508,7 @@ export default function ClientReports() {
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
                   عدد الكراسي
                 </MuiTypography>
-                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                   {formatEmptyValue(hall.chairs)}
                 </MuiTypography>
               </MuiGrid>
@@ -517,7 +518,7 @@ export default function ClientReports() {
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
                   الحد الأقصى للموظفين
                 </MuiTypography>
-                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                   {formatEmptyValue(hall.maxEmployees)}
                 </MuiTypography>
               </MuiGrid>
@@ -527,7 +528,7 @@ export default function ClientReports() {
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
                   الأسعار الافتراضية
                 </MuiTypography>
-                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                   {formatCurrency(hall.defaultPrices)}
                 </MuiTypography>
               </MuiGrid>
@@ -537,7 +538,7 @@ export default function ClientReports() {
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
                   الوصف
                 </MuiTypography>
-                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', lineHeight: 1.8 }}>
+                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', lineHeight: 1.8 }}>
                   {hall.description}
                 </MuiTypography>
               </MuiGrid>
@@ -554,9 +555,10 @@ export default function ClientReports() {
                       label={amenity}
                       size="small"
                       sx={{
-                        backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                        color: 'var(--color-primary-500)',
+                        backgroundColor: 'var(--color-primary-50)',
+                        color: 'var(--color-primary-700)',
                         fontWeight: 500,
+                        border: '1px solid var(--color-primary-200)',
                       }}
                     />
                   ))}
@@ -647,12 +649,12 @@ export default function ClientReports() {
           sx={{
             p: 3,
             mb: 4,
-            background: 'var(--color-surface-dark)',
+            background: 'var(--color-paper)',
             border: '1px solid var(--color-border-glass)',
             borderRadius: '20px',
           }}
         >
-       <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 3 }}>
+       <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary)', fontWeight: 700, mb: 3 }}>
   الخدمات ({event.services.length})
 </MuiTypography>
 <MuiGrid container spacing={2}>
@@ -704,10 +706,11 @@ export default function ClientReports() {
                 size="small"
                 sx={{
                   mt: 0.5,
-                  backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                  color: 'var(--color-primary-400)',
+                  backgroundColor: 'var(--color-primary-50)',
+                  color: 'var(--color-primary-700)',
                   fontSize: '0.7rem',
-                  height: 20
+                  height: 20,
+                  border: '1px solid var(--color-primary-200)',
                 }}
               />
             )}
@@ -727,12 +730,12 @@ export default function ClientReports() {
           sx={{
             p: 3,
             mb: 4,
-            background: 'var(--color-surface-dark)',
+            background: 'var(--color-paper)',
             border: '1px solid var(--color-border-glass)',
             borderRadius: '20px',
           }}
         >
-          <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 3 }}>
+          <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary)', fontWeight: 700, mb: 3 }}>
             الدعوات ({invitations.length})
           </MuiTypography>
           <MuiGrid container spacing={2} sx={{ mb: 3 }}>
@@ -749,7 +752,7 @@ export default function ClientReports() {
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
                   إجمالي الدعوات
                 </MuiTypography>
-                <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
+                <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>
                   {invitations.length}
                 </MuiTypography>
               </MuiPaper>
@@ -767,7 +770,7 @@ export default function ClientReports() {
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
                   إجمالي المدعوين
                 </MuiTypography>
-                <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
+                <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>
                   {totalInvitedPeople}
                 </MuiTypography>
               </MuiPaper>
@@ -785,7 +788,7 @@ export default function ClientReports() {
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
                   المؤكدين
                 </MuiTypography>
-                <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
+                <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>
                   {totalCheckedIn}
                 </MuiTypography>
               </MuiPaper>
@@ -803,7 +806,7 @@ export default function ClientReports() {
                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
                   المتبقي
                 </MuiTypography>
-                <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
+                <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>
                   {totalInvitedPeople - totalCheckedIn}
                 </MuiTypography>
               </MuiPaper>
@@ -898,10 +901,11 @@ export default function ClientReports() {
                             sx={{
                               mr: 0.5,
                               mb: 0.5,
-                              backgroundColor: guest.checkedIn ? 'rgba(34, 197, 94, 0.1)' : 'rgba(216, 185, 138, 0.1)',
-                              color: guest.checkedIn ? '#22c55e' : 'var(--color-primary-400)',
+                              backgroundColor: guest.checkedIn ? 'var(--color-success-50)' : 'var(--color-primary-50)',
+                              color: guest.checkedIn ? 'var(--color-success-700)' : 'var(--color-primary-700)',
                               fontSize: '0.65rem',
-                              height: 18
+                              height: 18,
+                              border: `1px solid ${guest.checkedIn ? 'var(--color-success-200)' : 'var(--color-primary-200)'}`,
                             }}
                           />
                         ))}
@@ -912,10 +916,11 @@ export default function ClientReports() {
                         label={invitation.status === 'sent' ? 'مرسلة' : invitation.status}
                         size="small"
                         sx={{
-                          backgroundColor: invitation.status === 'sent' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(216, 185, 138, 0.1)',
-                          color: invitation.status === 'sent' ? '#22c55e' : 'var(--color-primary-400)',
+                          backgroundColor: invitation.status === 'sent' ? 'var(--color-success-50)' : 'var(--color-primary-50)',
+                          color: invitation.status === 'sent' ? 'var(--color-success-700)' : 'var(--color-primary-700)',
                           fontSize: '0.7rem',
-                          height: 20
+                          height: 20,
+                          border: `1px solid ${invitation.status === 'sent' ? 'var(--color-success-200)' : 'var(--color-primary-200)'}`,
                         }}
                       />
                       {invitation.used !== undefined && (
@@ -923,8 +928,9 @@ export default function ClientReports() {
                           label={invitation.used ? 'مستخدمة' : 'غير مستخدمة'}
                           size="small"
                           sx={{
-                            backgroundColor: invitation.used ? 'rgba(249, 115, 22, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-                            color: invitation.used ? '#f97316' : '#3b82f6',
+                            backgroundColor: invitation.used ? 'var(--color-warning-50)' : 'var(--color-info-50)',
+                            color: invitation.used ? 'var(--color-warning-700)' : 'var(--color-info-700)',
+                            border: `1px solid ${invitation.used ? 'var(--color-warning-200)' : 'var(--color-info-200)'}`,
                             fontSize: '0.7rem',
                             height: 20
                           }}

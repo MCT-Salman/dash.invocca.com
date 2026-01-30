@@ -260,7 +260,7 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
                                     >
                                         <UploadCloud size={40} style={{ color: 'var(--color-primary-400)' }} />
                                     </MuiBox>
-                                    <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600, mb: 1 }}>
+                                    <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600, mb: 1 }}>
                                         انقر لرفع صورة القالب
                                     </MuiTypography>
                                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>

@@ -128,7 +128,7 @@ export default function ClientsManagement() {
                         {value?.charAt(0).toUpperCase() || 'C'}
                     </MuiAvatar>
                     <MuiBox>
-                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                             {value || '—'}
                         </MuiTypography>
                         {row.username && (
@@ -145,7 +145,7 @@ export default function ClientsManagement() {
             label: 'اسم المستخدم',
             align: 'right',
             format: (value) => (
-                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)' }}>
+                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
                     {value || '—'}
                 </MuiTypography>
             )
@@ -240,7 +240,7 @@ export default function ClientsManagement() {
                         mb: 5,
                         p: { xs: 3, sm: 4.5, md: 5 },
                         borderRadius: '24px',
-                        background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.95) 0%, rgba(10, 10, 10, 0.98) 100%)',
+                        background: 'var(--color-paper)',
                         backdropFilter: 'blur(30px)',
                         WebkitBackdropFilter: 'blur(30px)',
                         position: 'relative',
@@ -292,11 +292,11 @@ export default function ClientsManagement() {
                                 <MuiTypography 
                                     variant="h4" 
                                     sx={{ 
-                                        color: 'var(--color-text-primary-dark)', 
+                                        color: 'var(--color-text-primary)', 
                                         fontWeight: 800, 
                                         mb: 1,
                                         fontSize: { xs: '1.5rem', sm: '2rem' },
-                                        background: 'linear-gradient(135deg, var(--color-text-primary-dark), var(--color-primary-500))',
+                                        background: 'linear-gradient(135deg, var(--color-text-primary), var(--color-primary-500))',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent',
                                         backgroundClip: 'text',
@@ -371,10 +371,10 @@ export default function ClientsManagement() {
                             elevation={0}
                             sx={{
                                 p: 3.5,
-                                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                                background: 'var(--color-paper)',
                                 backdropFilter: 'blur(20px)',
                                 WebkitBackdropFilter: 'blur(20px)',
-                                border: '1px solid rgba(216, 185, 138, 0.15)',
+                                border: '1px solid var(--color-border-glass)',
                                 borderRadius: '20px',
                                 position: 'relative',
                                 overflow: 'hidden',
@@ -441,7 +441,7 @@ export default function ClientsManagement() {
                             elevation={0}
                             sx={{
                                 p: 3.5,
-                                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                                background: 'var(--color-paper)',
                                 backdropFilter: 'blur(20px)',
                                 WebkitBackdropFilter: 'blur(20px)',
                                 border: '1px solid rgba(22, 163, 74, 0.15)',
@@ -511,7 +511,7 @@ export default function ClientsManagement() {
                             elevation={0}
                             sx={{
                                 p: 3.5,
-                                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                                background: 'var(--color-paper)',
                                 backdropFilter: 'blur(20px)',
                                 WebkitBackdropFilter: 'blur(20px)',
                                 border: '1px solid rgba(220, 38, 38, 0.15)',
@@ -584,10 +584,10 @@ export default function ClientsManagement() {
                     sx={{
                         p: 3,
                         mb: 4.5,
-                        background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                        background: 'var(--color-paper)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(216, 185, 138, 0.15)',
+                        border: '1px solid var(--color-border-glass)',
                         borderRadius: '20px',
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
                     }}
@@ -608,7 +608,7 @@ export default function ClientsManagement() {
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: '14px',
                                 background: 'rgba(255, 255, 255, 0.03)',
-                                border: '1px solid rgba(216, 185, 138, 0.15)',
+                                border: '1px solid var(--color-border-glass)',
                                 '&:hover': {
                                     borderColor: 'rgba(216, 185, 138, 0.3)',
                                 },
@@ -617,7 +617,7 @@ export default function ClientsManagement() {
                                 }
                             },
                             '& .MuiOutlinedInput-input': {
-                                color: 'var(--color-text-primary-dark)',
+                                color: 'var(--color-text-primary)',
                             }
                         }}
                     />
@@ -634,11 +634,11 @@ export default function ClientsManagement() {
                     loading={isLoading}
                     emptyMessage="لا يوجد عملاء"
                     sx={{
-                        background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                        background: 'var(--color-paper)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
                         borderRadius: '20px',
-                        border: '1px solid rgba(216, 185, 138, 0.15)',
+                        border: '1px solid var(--color-border-glass)',
                         overflow: 'hidden',
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
                     }}

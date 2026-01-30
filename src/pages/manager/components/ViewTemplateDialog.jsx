@@ -60,7 +60,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                     sx: {
                         borderRadius: '16px',
                         overflow: 'auto',
-                        backgroundColor: 'var(--color-surface-dark)',
+                        backgroundColor: 'var(--color-paper)',
                         backgroundImage: 'none',
                         border: '1px solid var(--color-border-glass)',
                         zIndex: 1300,
@@ -74,7 +74,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                         <MuiBox sx={{ p: 3, borderBottom: '1px solid var(--color-border-glass)' }}>
                             <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                 <MuiBox>
-                                    <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 0.5 }}>
+                                    <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary)', fontWeight: 700, mb: 0.5 }}>
                                         {template.templateName}
                                     </MuiTypography>
                                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -189,7 +189,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                             <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)', mb: 2 }} />
                                         </MuiGrid>
                                         <MuiGrid item xs={12}>
-                                            <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary)', mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                                                 <Building2 size={20} style={{ color: 'var(--color-primary-500)' }} />
                                                 معلومات قاعة/صالة
                                             </MuiTypography>
@@ -200,7 +200,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                                             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, fontSize: '0.75rem' }}>
                                                                 اسم قاعة/صالة
                                                             </MuiTypography>
-                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
                                                                 {template.hallId.name}
                                                             </MuiTypography>
                                                         </MuiPaper>
@@ -212,7 +212,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                                             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, fontSize: '0.75rem' }}>
                                                                 الموقع
                                                             </MuiTypography>
-                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
                                                                 {template.hallId.location}
                                                             </MuiTypography>
                                                         </MuiPaper>
@@ -224,7 +224,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                                             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, fontSize: '0.75rem' }}>
                                                                 السعة القصوى
                                                             </MuiTypography>
-                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
                                                                 {template.hallId.capacity} شخص
                                                             </MuiTypography>
                                                         </MuiPaper>
@@ -236,7 +236,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                                             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, fontSize: '0.75rem' }}>
                                                                 عدد الطاولات
                                                             </MuiTypography>
-                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
                                                                 {template.hallId.tables}
                                                             </MuiTypography>
                                                         </MuiPaper>
@@ -248,7 +248,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                                             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, fontSize: '0.75rem' }}>
                                                                 عدد الكراسي
                                                             </MuiTypography>
-                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                            <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
                                                                 {template.hallId.chairs}
                                                             </MuiTypography>
                                                         </MuiPaper>
@@ -261,7 +261,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
 
                                 {/* Template Details */}
                                 <MuiGrid item xs={12}>
-                                    <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', mb: 2, fontWeight: 600 }}>
+                                    <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary)', mb: 2, fontWeight: 600 }}>
                                         تفاصيل القالب
                                     </MuiTypography>
                                     <MuiGrid container spacing={2}>
@@ -318,7 +318,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                 {/* Description */}
                                 {template.description && (
                                     <MuiGrid item xs={12}>
-                                        <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', mb: 2, fontWeight: 600 }}>
+                                        <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary)', mb: 2, fontWeight: 600 }}>
                                             الوصف
                                         </MuiTypography>
                                         <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)' }}>
@@ -329,7 +329,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                             </MuiGrid>
                         </MuiDialogContent>
 
-                        <MuiDialogActions sx={{ p: 3, backgroundColor: 'var(--color-surface-dark)', borderTop: '1px solid var(--color-border-glass)' }}>
+                        <MuiDialogActions sx={{ p: 3, backgroundColor: 'var(--color-paper)', borderTop: '1px solid var(--color-border-glass)' }}>
                             <MuiButton onClick={onClose} variant="contained">
                                 إغلاق
                             </MuiButton>

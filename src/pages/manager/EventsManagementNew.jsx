@@ -82,8 +82,8 @@ function EventCard({ event, onEdit, onView }) {
             elevation={0}
             sx={{
                 borderRadius: '20px',
-                border: '1px solid rgba(216, 185, 138, 0.15)',
-                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                border: '1px solid var(--color-border-glass)',
+                background: 'var(--color-paper)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
                 overflow: 'hidden',
@@ -101,8 +101,8 @@ function EventCard({ event, onEdit, onView }) {
             <MuiBox 
                 sx={{ 
                     p: 3.5,
-                    background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.15), rgba(255, 227, 108, 0.08))',
-                    borderBottom: '1px solid rgba(216, 185, 138, 0.15)',
+                    background: 'linear-gradient(135deg, var(--color-border-glass), rgba(255, 227, 108, 0.08))',
+                    borderBottom: '1px solid var(--color-border-glass)',
                 }}
             >
                 <MuiBox sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
@@ -111,7 +111,7 @@ function EventCard({ event, onEdit, onView }) {
                             variant="h6" 
                             sx={{ 
                                 fontWeight: 700, 
-                                color: 'var(--color-text-primary-dark)', 
+                                color: 'var(--color-text-primary)', 
                                 mb: 1,
                                 fontSize: '1.1rem',
                                 transition: 'color 0.3s ease',
@@ -144,7 +144,7 @@ function EventCard({ event, onEdit, onView }) {
                             width: 36,
                             height: 36,
                             borderRadius: '10px',
-                            background: 'rgba(216, 185, 138, 0.15)',
+                            background: 'var(--color-border-glass)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -155,7 +155,7 @@ function EventCard({ event, onEdit, onView }) {
                     <MuiTypography 
                         variant="body2" 
                         sx={{ 
-                            color: 'var(--color-text-primary-dark)',
+                            color: 'var(--color-text-primary)',
                             fontWeight: 600,
                             fontSize: '0.9rem'
                         }}
@@ -171,7 +171,7 @@ function EventCard({ event, onEdit, onView }) {
                                 width: 36,
                                 height: 36,
                                 borderRadius: '10px',
-                                background: 'rgba(216, 185, 138, 0.15)',
+                                background: 'var(--color-border-glass)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -199,7 +199,7 @@ function EventCard({ event, onEdit, onView }) {
                                 width: 36,
                                 height: 36,
                                 borderRadius: '10px',
-                                background: 'rgba(216, 185, 138, 0.15)',
+                                background: 'var(--color-border-glass)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -227,7 +227,7 @@ function EventCard({ event, onEdit, onView }) {
                                 width: 36,
                                 height: 36,
                                 borderRadius: '10px',
-                                background: 'rgba(216, 185, 138, 0.15)',
+                                background: 'var(--color-border-glass)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -253,7 +253,7 @@ function EventCard({ event, onEdit, onView }) {
                 sx={{ 
                     p: 3,
                     background: 'rgba(255, 255, 255, 0.02)',
-                    borderTop: '1px solid rgba(216, 185, 138, 0.15)',
+                    borderTop: '1px solid var(--color-border-glass)',
                     display: 'flex',
                     gap: 1.5
                 }}
@@ -403,7 +403,7 @@ export default function EventsManagement() {
                         <Calendar size={20} style={{ color: 'var(--color-primary-500)' }} />
                     </MuiAvatar>
                     <MuiBox>
-                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                             {value || row.name}
                         </MuiTypography>
                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
@@ -567,7 +567,7 @@ export default function EventsManagement() {
                         mb: 5,
                         p: { xs: 3, sm: 4.5, md: 5 },
                         borderRadius: '24px',
-                        background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.95) 0%, rgba(10, 10, 10, 0.98) 100%)',
+                        background: 'var(--color-paper)',
                         backdropFilter: 'blur(30px)',
                         WebkitBackdropFilter: 'blur(30px)',
                         position: 'relative',
@@ -619,11 +619,11 @@ export default function EventsManagement() {
                                 <MuiTypography 
                                     variant="h4" 
                                     sx={{ 
-                                        color: 'var(--color-text-primary-dark)', 
+                                        color: 'var(--color-text-primary)', 
                                         fontWeight: 800, 
                                         mb: 1,
                                         fontSize: { xs: '1.5rem', sm: '2rem' },
-                                        background: 'linear-gradient(135deg, var(--color-text-primary-dark), var(--color-primary-500))',
+                                        background: 'linear-gradient(135deg, var(--color-text-primary), var(--color-primary-500))',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent',
                                         backgroundClip: 'text',
@@ -698,10 +698,10 @@ export default function EventsManagement() {
                             elevation={0}
                             sx={{
                                 p: 3.5,
-                                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                                background: 'var(--color-paper)',
                                 backdropFilter: 'blur(20px)',
                                 WebkitBackdropFilter: 'blur(20px)',
-                                border: '1px solid rgba(216, 185, 138, 0.15)',
+                                border: '1px solid var(--color-border-glass)',
                                 borderRadius: '20px',
                                 position: 'relative',
                                 overflow: 'hidden',
@@ -750,7 +750,7 @@ export default function EventsManagement() {
                             elevation={0}
                             sx={{
                                 p: 3.5,
-                                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                                background: 'var(--color-paper)',
                                 backdropFilter: 'blur(20px)',
                                 WebkitBackdropFilter: 'blur(20px)',
                                 border: '1px solid rgba(217, 155, 61, 0.15)',
@@ -802,7 +802,7 @@ export default function EventsManagement() {
                             elevation={0}
                             sx={{
                                 p: 3.5,
-                                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                                background: 'var(--color-paper)',
                                 backdropFilter: 'blur(20px)',
                                 WebkitBackdropFilter: 'blur(20px)',
                                 border: '1px solid rgba(59, 130, 246, 0.15)',
@@ -854,7 +854,7 @@ export default function EventsManagement() {
                             elevation={0}
                             sx={{
                                 p: 3.5,
-                                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                                background: 'var(--color-paper)',
                                 backdropFilter: 'blur(20px)',
                                 WebkitBackdropFilter: 'blur(20px)',
                                 border: '1px solid rgba(22, 163, 74, 0.15)',
@@ -909,10 +909,10 @@ export default function EventsManagement() {
                     sx={{
                         p: 3,
                         mb: 4.5,
-                        background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                        background: 'var(--color-paper)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(216, 185, 138, 0.15)',
+                        border: '1px solid var(--color-border-glass)',
                         borderRadius: '20px',
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
                     }}
@@ -927,7 +927,7 @@ export default function EventsManagement() {
                                 '& .MuiOutlinedInput-root': {
                                     borderRadius: '14px',
                                     background: 'rgba(255, 255, 255, 0.03)',
-                                    border: '1px solid rgba(216, 185, 138, 0.15)',
+                                    border: '1px solid var(--color-border-glass)',
                                     '&:hover': {
                                         borderColor: 'rgba(216, 185, 138, 0.3)',
                                     },
@@ -936,7 +936,7 @@ export default function EventsManagement() {
                                     }
                                 },
                                 '& .MuiOutlinedInput-input': {
-                                    color: 'var(--color-text-primary-dark)',
+                                    color: 'var(--color-text-primary)',
                                 }
                             }}
                             InputProps={{
@@ -961,11 +961,11 @@ export default function EventsManagement() {
                     loading={isLoading}
                     emptyMessage="لا توجد فعاليات"
                     sx={{
-                        background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                        background: 'var(--color-paper)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
                         borderRadius: '20px',
-                        border: '1px solid rgba(216, 185, 138, 0.15)',
+                        border: '1px solid var(--color-border-glass)',
                         overflow: 'hidden',
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
                     }}

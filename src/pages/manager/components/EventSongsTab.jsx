@@ -113,7 +113,7 @@ export default function EventSongsTab({ eventId, open }) {
           <MuiBox sx={{ flex: 1, minWidth: 0 }}>
             <MuiTypography
               variant="body2"
-              sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+              sx={{ fontWeight: 600, color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
             >
               {value || row.song?.title || 'أغنية'}
             </MuiTypography>
@@ -185,7 +185,7 @@ export default function EventSongsTab({ eventId, open }) {
           p: 3,
           mb: 3,
           borderRadius: '16px',
-          background: 'var(--color-surface-dark)',
+          background: 'var(--color-paper)',
           border: '1px solid var(--color-border-glass)',
         }}
       >
@@ -264,7 +264,7 @@ export default function EventSongsTab({ eventId, open }) {
         sx={{
           borderRadius: '16px',
           border: '1px solid var(--color-border-glass)',
-          background: 'var(--color-surface-dark)',
+          background: 'var(--color-paper)',
         }}
       >
         {playlist.length > 0 ? (

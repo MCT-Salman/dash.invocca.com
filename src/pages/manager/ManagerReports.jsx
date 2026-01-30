@@ -48,10 +48,10 @@ const StatCard = ({ title, value, subtitle, icon: Icon, color = 'primary' }) => 
             elevation={0}
             sx={{
                 p: 3.5,
-                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                background: 'var(--color-paper)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                border: '1px solid rgba(216, 185, 138, 0.15)',
+                border: '1px solid var(--color-border-glass)',
                 borderRadius: '20px',
                 position: 'relative',
                 overflow: 'hidden',
@@ -126,7 +126,7 @@ const StatCard = ({ title, value, subtitle, icon: Icon, color = 'primary' }) => 
 
                 <MuiTypography variant="h4" sx={{ 
                     fontWeight: 700, 
-                    color: 'var(--color-text-primary-dark)', 
+                    color: 'var(--color-text-primary)', 
                     mb: 1 
                 }}>
                     {value}
@@ -169,7 +169,7 @@ export default function ManagerReports() {
     }
 
     return (
-        <MuiBox sx={{ p: { xs: 2, sm: 3, md: 4 }, minHeight: '100vh', background: 'var(--color-bg-dark)' }}>
+        <MuiBox sx={{ p: { xs: 2, sm: 3, md: 4 }, minHeight: '100vh', background: 'var(--color-bg)' }}>
             <SEOHead pageKey="managerReports" title="التقارير والإحصائيات | INVOCCA" />
 
             {/* Header Section - Premium Welcome Card */}
@@ -178,12 +178,12 @@ export default function ManagerReports() {
                     mb: 5,
                     p: { xs: 3, sm: 4.5, md: 5 },
                     borderRadius: '24px',
-                    background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.95) 0%, rgba(10, 10, 10, 0.98) 100%)',
+                    background: 'var(--color-paper)',
                     backdropFilter: 'blur(30px)',
                     WebkitBackdropFilter: 'blur(30px)',
                     position: 'relative',
                     overflow: 'hidden',
-                    border: '1px solid rgba(216, 185, 138, 0.2)',
+                    border: '1px solid var(--color-border-glass)',
                     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(216, 185, 138, 0.1)',
                     '&::before': {
                         content: '""',
@@ -230,11 +230,11 @@ export default function ManagerReports() {
                             <MuiTypography 
                                 variant="h4" 
                                 sx={{ 
-                                    color: 'var(--color-text-primary-dark)', 
+                                    color: 'var(--color-text-primary)', 
                                     fontWeight: 800, 
                                     mb: 1,
                                     fontSize: { xs: '1.5rem', sm: '2rem' },
-                                    background: 'linear-gradient(135deg, var(--color-text-primary-dark), var(--color-primary-500))',
+                                    background: 'linear-gradient(135deg, var(--color-text-primary), var(--color-primary-500))',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     backgroundClip: 'text',
@@ -264,12 +264,12 @@ export default function ManagerReports() {
                 sx={{
                     p: 3,
                     mb: 4.5,
-                    background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                    background: 'var(--color-paper)',
                     backdropFilter: 'blur(20px)',
                     WebkitBackdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(216, 185, 138, 0.15)',
+                    border: '1px solid var(--color-border-glass)',
                     borderRadius: '20px',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                    boxShadow: 'var(--shadow-md)',
                 }}
             >
                 <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
@@ -279,13 +279,13 @@ export default function ManagerReports() {
                             onChange={(e) => setPeriod(e.target.value)}
                             sx={{
                                 borderRadius: '14px',
-                                background: 'rgba(255, 255, 255, 0.03)',
-                                border: '1px solid rgba(216, 185, 138, 0.15)',
-                                color: 'var(--color-text-primary-dark)',
+                                background: 'var(--color-surface)',
+                                border: '1px solid var(--color-border-glass)',
+                                color: 'var(--color-text-primary)',
                                 '& .MuiOutlinedInput-root': {
                                     borderRadius: '14px',
                                     '&:hover': {
-                                        borderColor: 'rgba(216, 185, 138, 0.3)',
+                                        borderColor: 'var(--color-primary-400)',
                                     },
                                     '&.Mui-focused': {
                                         borderColor: 'var(--color-primary-500)',
@@ -307,18 +307,18 @@ export default function ManagerReports() {
                         variant="outlined"
                         startIcon={<Download size={18} />}
                         sx={{
-                            borderColor: 'rgba(216, 185, 138, 0.3)',
-                            color: 'var(--color-primary-500)',
-                            fontWeight: 600,
-                            borderRadius: '14px',
-                            px: 3,
-                            py: 1.5,
-                            transition: 'all 0.3s ease',
-                            '&:hover': {
-                                borderColor: 'var(--color-primary-500)',
-                                backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                                transform: 'translateY(-2px)',
-                            }
+                        borderColor: 'var(--color-border-glass)',
+                        color: 'var(--color-primary-500)',
+                        fontWeight: 600,
+                        borderRadius: '14px',
+                        px: 3,
+                        py: 1.5,
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                            borderColor: 'var(--color-primary-500)',
+                            backgroundColor: 'var(--color-primary-50)',
+                            transform: 'translateY(-2px)',
+                        }
                         }}
                     >
                         تصدير
@@ -373,7 +373,7 @@ export default function ManagerReports() {
                         elevation={0}
                         sx={{
                             p: 4,
-                            background: 'var(--color-surface-dark)',
+                            background: 'var(--color-paper)',
                             border: '1px solid var(--color-border-glass)',
                             borderRadius: '24px',
                             height: 400,
@@ -415,7 +415,7 @@ export default function ManagerReports() {
                         elevation={0}
                         sx={{
                             p: 4,
-                            background: 'var(--color-surface-dark)',
+                            background: 'var(--color-paper)',
                             border: '1px solid var(--color-border-glass)',
                             borderRadius: '24px',
                             height: 400,
@@ -469,9 +469,9 @@ export default function ManagerReports() {
                                     elevation={0}
                                     sx={{
                                         p: 3,
-                                        background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                                        background: 'var(--color-paper)',
                                         backdropFilter: 'blur(20px)',
-                                        border: '1px solid rgba(216, 185, 138, 0.1)',
+                                        border: '1px solid var(--color-border-glass)',
                                         borderRadius: '16px',
                                         transition: 'all 0.3s ease',
                                         '&:hover': {

@@ -64,6 +64,9 @@ export default function Invitations() {
   const [showInvitationCard, setShowInvitationCard] = useState(false)
   const [selectedInvitation, setSelectedInvitation] = useState(null)
   const [selectedTemplateId, setSelectedTemplateId] = useState(null)
+  
+  // State for selected event (outside dialog) - for batch invitation creation
+  const [selectedEventIdForInvitations, setSelectedEventIdForInvitations] = useState(null)
 
   // Dialog state management
   const {
@@ -273,28 +276,54 @@ export default function Invitations() {
     <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
       <SEOHead title="دعواتي - INVOCCA" />
 
-      <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
         <MuiBox>
-          <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 1 }}>
+          <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary)', fontWeight: 700, mb: 1 }}>
             دعواتي
           </MuiTypography>
           <MuiTypography variant="body1" sx={{ color: 'var(--color-text-secondary)' }}>
             إدارة دعوات الضيوف لمناسباتك
           </MuiTypography>
         </MuiBox>
-        <MuiButton
-          variant="contained"
-          startIcon={<Plus size={20} />}
-          onClick={openCreateDialog}
-          sx={{
-            background: 'linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%)',
-            color: '#000',
-            fontWeight: 600,
-            px: 3
-          }}
-        >
-          إنشاء دعوة جديدة
-        </MuiButton>
+        <MuiBox sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* Event Selector - Outside Dialog */}
+          <MuiFormControl sx={{ minWidth: 200 }}>
+            <MuiInputLabel>اختر الفعالية</MuiInputLabel>
+            <MuiSelect
+              value={selectedEventIdForInvitations || ''}
+              onChange={(e) => setSelectedEventIdForInvitations(e.target.value || null)}
+              label="اختر الفعالية"
+              displayEmpty
+            >
+              <MuiMenuItem value="">
+                <em>جميع الفعاليات</em>
+              </MuiMenuItem>
+              {bookings.map((booking) => {
+                const eventId = booking._id || booking.id
+                const eventName = booking.name || 'فعالية بدون اسم'
+                const eventDate = booking.date ? formatDate(booking.date, 'MM/DD/YYYY') : ''
+                return (
+                  <MuiMenuItem key={eventId} value={eventId}>
+                    {eventName} {eventDate && `- ${eventDate}`}
+                  </MuiMenuItem>
+                )
+              })}
+            </MuiSelect>
+          </MuiFormControl>
+          <MuiButton
+            variant="contained"
+            startIcon={<Plus size={20} />}
+            onClick={openCreateDialog}
+            sx={{
+              background: 'linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%)',
+              color: '#fff',
+              fontWeight: 600,
+              px: 3
+            }}
+          >
+            إنشاء دعوة جديدة
+          </MuiButton>
+        </MuiBox>
       </MuiBox>
 
       {invitations.length > 0 ? (
@@ -412,20 +441,22 @@ export default function Invitations() {
                       label={invitation.status === 'sent' ? 'مرسلة' : invitation.status || '—'}
                       size="small"
                       sx={{
-                        backgroundColor: invitation.status === 'sent' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(216, 185, 138, 0.1)',
-                        color: invitation.status === 'sent' ? '#22c55e' : 'var(--color-primary-400)',
+                        backgroundColor: invitation.status === 'sent' ? 'var(--color-success-50)' : 'var(--color-primary-50)',
+                        color: invitation.status === 'sent' ? 'var(--color-success-700)' : 'var(--color-primary-700)',
                         fontSize: '0.7rem',
-                        height: 22
+                        height: 22,
+                        border: `1px solid ${invitation.status === 'sent' ? 'var(--color-success-200)' : 'var(--color-primary-200)'}`,
                       }}
                     />
                     <MuiChip
                       label={invitation.used ? 'مستخدمة' : 'غير مستخدمة'}
                       size="small"
                       sx={{
-                        backgroundColor: invitation.used ? 'rgba(249, 115, 22, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-                        color: invitation.used ? '#f97316' : '#3b82f6',
+                        backgroundColor: invitation.used ? 'var(--color-warning-50)' : 'var(--color-info-50)',
+                        color: invitation.used ? 'var(--color-warning-700)' : 'var(--color-info-700)',
                         fontSize: '0.7rem',
-                        height: 22
+                        height: 22,
+                        border: `1px solid ${invitation.used ? 'var(--color-warning-200)' : 'var(--color-info-200)'}`,
                       }}
                     />
                   </MuiBox>
@@ -451,7 +482,7 @@ export default function Invitations() {
                     sx={{
                       color: 'var(--color-primary-500)',
                       '&:hover': {
-                        backgroundColor: 'rgba(216, 185, 138, 0.1)',
+                        backgroundColor: 'var(--color-primary-50)',
                       }
                     }}
                     title="عرض الكرت"
@@ -464,7 +495,7 @@ export default function Invitations() {
                     sx={{
                       color: 'var(--color-primary-500)',
                       '&:hover': {
-                        backgroundColor: 'rgba(216, 185, 138, 0.1)',
+                        backgroundColor: 'var(--color-primary-50)',
                       }
                     }}
                     title="تعديل"
@@ -477,7 +508,7 @@ export default function Invitations() {
                     sx={{
                       color: 'var(--color-error-500)',
                       '&:hover': {
-                        backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                        backgroundColor: 'var(--color-error-50)',
                       }
                     }}
                     title="حذف"
@@ -508,6 +539,7 @@ export default function Invitations() {
         totalInvitedPeople={totalInvitedPeople}
         bookings={bookings}
         invitations={invitations}
+        preselectedEventId={selectedEventIdForInvitations}
       />
 
       {/* Delete Confirmation */}
@@ -1363,7 +1395,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: 'rgba(26, 26, 26, 0.98)',
+          backgroundColor: 'var(--color-paper)',
           backdropFilter: 'blur(20px)',
           borderBottom: '2px solid var(--color-border-glass)',
           boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
@@ -1444,7 +1476,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
             justifyContent: 'center',
             p: { xs: 2, sm: 3, md: 4 },
             overflow: 'auto',
-            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+            backgroundColor: 'var(--color-surface)',
             borderRight: { lg: '2px solid var(--color-border-glass)' },
           }}
         >
@@ -2086,7 +2118,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
             flexDirection: 'column',
             p: { xs: 2, sm: 3 },
             overflow: 'auto',
-            backgroundColor: 'rgba(26, 26, 26, 0.5)',
+            backgroundColor: 'var(--color-paper)',
             borderLeft: { lg: '2px solid var(--color-border-glass)' },
           }}
         >
@@ -2139,14 +2171,14 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                 width: '8px',
               },
               '&::-webkit-scrollbar-track': {
-                background: 'rgba(255, 255, 255, 0.05)',
+                  background: 'var(--color-surface)',
                 borderRadius: '4px',
               },
               '&::-webkit-scrollbar-thumb': {
-                background: 'rgba(216, 185, 138, 0.4)',
+                  background: 'var(--color-primary-400)',
                 borderRadius: '4px',
                 '&:hover': {
-                  background: 'rgba(216, 185, 138, 0.6)',
+                  background: 'var(--color-primary-500)',
                 },
               },
             }}
@@ -2184,7 +2216,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(10, 10, 10, 0.95) 100%)',
+                  background: 'var(--color-surface)',
                   gap: 1.5,
                   border: '2px dashed rgba(216, 185, 138, 0.3)',
                   borderRadius: '16px',
@@ -2416,7 +2448,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 }
 
 // Create/Edit Invitation Dialog Component
-function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit, loading, eventGuestCount, totalInvitedPeople, bookings = [], invitations = [] }) {
+function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit, loading, eventGuestCount, totalInvitedPeople, bookings = [], invitations = [], preselectedEventId = null }) {
   const isEdit = !!editingInvitation
   const isCreate = !isEdit
 
@@ -2510,7 +2542,10 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
   useEffect(() => {
     if (open) {
       const initialGuests = editingInvitation?.guests?.map(g => ({ name: g.name || '' })) || []
-      const initialEventId = isEdit ? (editingInvitation?.eventId?._id || editingInvitation?.eventId || '') : ''
+      // Use preselectedEventId for create mode, or editingInvitation's eventId for edit mode
+      const initialEventId = isEdit 
+        ? (editingInvitation?.eventId?._id || editingInvitation?.eventId || '') 
+        : (preselectedEventId || '')
       reset({
         eventId: initialEventId,
         guestName: editingInvitation?.guestName || '',
@@ -2523,7 +2558,7 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
         setSelectedEventId(null)
       }
     }
-  }, [open, editingInvitation, reset, isEdit])
+  }, [open, editingInvitation, reset, isEdit, preselectedEventId])
 
   return (
     <BaseFormDialog
@@ -2533,8 +2568,9 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
       onSubmit={handleSubmit(async (data) => {
         const success = await onSubmit(data)
         if (success && !isEdit) {
+          // Keep the same eventId for batch creation
           reset({
-            eventId: selectedEventIdValue || '',
+            eventId: preselectedEventId || selectedEventIdValue || '',
             guestName: '',
             numOfPeople: 1,
             guests: [],
@@ -2547,8 +2583,8 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
       maxWidth="sm"
     >
       <MuiGrid container spacing={3}>
-        {/* Event Selection - Only show for create */}
-        {isCreate && (
+        {/* Event Selection - Only show for create, and only if not preselected */}
+        {isCreate && !preselectedEventId && (
           <MuiGrid item xs={12}>
             <Controller
               name="eventId"
@@ -2616,6 +2652,44 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
                 )
               }}
             />
+          </MuiGrid>
+        )}
+        
+        {/* Show selected event info if preselected */}
+        {isCreate && preselectedEventId && (
+          <MuiGrid item xs={12}>
+            <MuiPaper
+              elevation={0}
+              sx={{
+                p: 2,
+                background: 'var(--color-primary-50)',
+                border: '1px solid var(--color-primary-200)',
+                borderRadius: '12px',
+              }}
+            >
+              <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Calendar size={20} style={{ color: 'var(--color-primary-500)' }} />
+                <MuiBox sx={{ flex: 1 }}>
+                  <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
+                    الفعالية المختارة:
+                  </MuiTypography>
+                  <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
+                    {bookings.find(b => (b._id || b.id)?.toString() === preselectedEventId?.toString())?.name || 'فعالية'}
+                  </MuiTypography>
+                </MuiBox>
+                <MuiButton
+                  size="small"
+                  variant="outlined"
+                  onClick={() => {
+                    setSelectedEventIdForInvitations(null)
+                    reset({ eventId: '', guestName: '', numOfPeople: 1, guests: [] })
+                  }}
+                  sx={{ borderColor: 'var(--color-primary-400)', color: 'var(--color-primary-500)' }}
+                >
+                  تغيير
+                </MuiButton>
+              </MuiBox>
+            </MuiPaper>
           </MuiGrid>
         )}
 

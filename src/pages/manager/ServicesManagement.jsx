@@ -205,7 +205,7 @@ export default function ServicesManagement() {
                         <Package size={20} style={{ color: '#D8B98A' }} />
                     </MuiBox>
                     <MuiBox>
-                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                             {value}
                         </MuiTypography>
                         {row.description && (
@@ -349,7 +349,7 @@ export default function ServicesManagement() {
                     mb: 4,
                     p: 4,
                     borderRadius: '20px',
-                    background: 'var(--color-surface-dark)',
+                    background: 'var(--color-paper)',
                     position: 'relative',
                     overflow: 'hidden',
                     border: '1px solid var(--color-border-glass)',
@@ -375,7 +375,7 @@ export default function ServicesManagement() {
                                 <Package size={28} className="text-white" />
                             </MuiBox>
                             <MuiBox>
-                                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 0.5 }}>
+                                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary)', fontWeight: 700, mb: 0.5 }}>
                                     إدارة الخدمات ({filteredServices.length})
                                 </MuiTypography>
                                 <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
@@ -409,7 +409,7 @@ export default function ServicesManagement() {
                 sx={{
                     p: 3,
                     mb: 3,
-                    background: 'var(--color-surface-dark)',
+                    background: 'var(--color-paper)',
                     border: '1px solid var(--color-border-glass)',
                     borderRadius: '16px',
                 }}

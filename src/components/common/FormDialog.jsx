@@ -1,3 +1,4 @@
+// src\components\common\FormDialog.jsx
 /**
  * FormDialog Component
  * نافذة منبثقة للنماذج مع دعم react-hook-form
@@ -79,7 +80,7 @@ export default function FormDialog({
                     </MuiTypography>
                 </MuiDialogTitle>
 
-                <MuiDialogContent>
+                <MuiDialogContent sx={{ pt: 3, '& .MuiInputLabel-root': { position: 'relative', transform: 'none', marginBottom: '8px' } }}>
                     {children}
                 </MuiDialogContent>
 

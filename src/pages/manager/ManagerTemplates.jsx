@@ -227,7 +227,7 @@ export default function ManagerTemplates() {
                     mb: 4,
                     p: 4,
                     borderRadius: '20px',
-                    background: 'var(--color-surface-dark)',
+                    background: 'var(--color-paper)',
                     position: 'relative',
                     overflow: 'hidden',
                     border: '1px solid var(--color-border-glass)',
@@ -262,7 +262,7 @@ export default function ManagerTemplates() {
                             <ImageIcon size={28} style={{ color: '#fff' }} />
                         </MuiBox>
                         <MuiBox>
-                            <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 0.5 }}>
+                            <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary)', fontWeight: 700, mb: 0.5 }}>
                                 إدارة القوالب ({filteredTemplates.length})
                             </MuiTypography>
                             <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)' }}>
@@ -350,7 +350,7 @@ export default function ManagerTemplates() {
                 sx={{
                     p: 2,
                     mb: 3,
-                    background: 'rgba(26, 26, 26, 0.6)',
+                    background: 'var(--color-paper)',
                     backdropFilter: 'blur(10px)',
                     border: '1px solid var(--color-border-glass)',
                     borderRadius: '16px'
@@ -372,8 +372,8 @@ export default function ManagerTemplates() {
                             }}
                             sx={{
                                 '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                borderRadius: '12px',
+                                backgroundColor: 'var(--color-surface)',
                                 }
                             }}
                         />

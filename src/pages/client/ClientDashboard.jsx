@@ -214,7 +214,7 @@ export default function ClientDashboard() {
     totalSpent: financialSummary.totalSpent || 0,
     totalPaid: financialSummary.totalPaid || 0,
     totalUnpaid: financialSummary.totalUnpaid || 0,
-    currency: financialSummary.currency || 'SAR',
+    currency: financialSummary.currency || 'ل.س',
     totalComplaints: complaintsSummary.total || 0,
     openComplaints: complaintsSummary.open || 0,
     resolvedComplaints: complaintsSummary.resolved || 0,

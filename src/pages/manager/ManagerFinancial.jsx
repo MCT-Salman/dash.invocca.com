@@ -27,8 +27,8 @@ import { formatDate } from '@/utils/helpers'
 const premiumMenuProps = {
     PaperProps: {
         sx: {
-            bgcolor: '#1E1E1E',
-            border: '1px solid rgba(216, 185, 138, 0.2)',
+            bgcolor: 'var(--color-paper)',
+            border: '1px solid var(--color-border-glass)',
             borderRadius: '12px',
             mt: 1,
             '& .MuiMenuItem-root': {
@@ -37,15 +37,15 @@ const premiumMenuProps = {
                 py: 1.5,
                 px: 3,
                 '&:hover': {
-                    bgcolor: 'rgba(216, 185, 138, 0.1)',
+                    bgcolor: 'var(--color-surface-hover)',
                     color: 'var(--color-primary-400)',
                 },
                 '&.Mui-selected': {
-                    bgcolor: 'rgba(216, 185, 138, 0.15)',
+                    bgcolor: 'var(--color-primary-50)',
                     color: 'var(--color-primary-500)',
                     fontWeight: 600,
                     '&:hover': {
-                        bgcolor: 'rgba(216, 185, 138, 0.2)',
+                        bgcolor: 'var(--color-primary-100)',
                     },
                 },
             },
@@ -178,9 +178,9 @@ export default function ManagerFinancial() {
                     p: 2,
                     mb: 4,
                     borderRadius: '16px',
-                    background: 'rgba(20, 20, 20, 0.6)',
+                    background: 'var(--color-paper)',
                     backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(216, 185, 138, 0.1)',
+                    border: '1px solid var(--color-border-glass)',
                     display: 'flex',
                     flexDirection: { xs: 'column', md: 'row' },
                     justifyContent: 'space-between',
@@ -219,16 +219,16 @@ export default function ManagerFinancial() {
                             flex: 1,
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: '12px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                border: '1px solid rgba(216, 185, 138, 0.1)',
+                                backgroundColor: 'var(--color-surface)',
+                                border: '1px solid var(--color-border-glass)',
                                 transition: 'all 0.3s ease',
                                 '&:hover': {
-                                    borderColor: 'rgba(216, 185, 138, 0.3)',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                    borderColor: 'var(--color-primary-400)',
+                                    backgroundColor: 'var(--color-surface-hover)',
                                 },
                                 '&.Mui-focused': {
                                     borderColor: 'var(--color-primary-500)',
-                                    boxShadow: '0 0 0 4px rgba(216, 185, 138, 0.1)'
+                                    boxShadow: '0 0 0 4px var(--color-primary-50)'
                                 }
                             }
                         }}
@@ -260,9 +260,9 @@ export default function ManagerFinancial() {
                         <MuiPaper sx={{
                             p: 8,
                             textAlign: 'center',
-                            background: 'rgba(20, 20, 20, 0.4)',
+                            background: 'var(--color-paper)',
                             borderRadius: '24px',
-                            border: '1px dashed rgba(216, 185, 138, 0.2)'
+                            border: '1px dashed var(--color-border-glass)'
                         }}>
                             <DollarSign size={64} style={{
                                 color: 'var(--color-primary-500)',
@@ -322,9 +322,9 @@ function InvoiceCard({ invoice, onEdit, onPay }) {
             sx={{
                 p: 3,
                 height: '100%',
-                background: 'rgba(20, 20, 20, 0.6)',
+                background: 'var(--color-paper)',
                 backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(216, 185, 138, 0.1)',
+                border: '1px solid var(--color-border-glass)',
                 borderRadius: '24px',
                 transition: 'all 0.3s ease',
                 display: 'flex',
@@ -333,8 +333,8 @@ function InvoiceCard({ invoice, onEdit, onPay }) {
                 overflow: 'hidden',
                 '&:hover': {
                     transform: 'translateY(-4px)',
-                    boxShadow: '0 12px 24px -10px rgba(0, 0, 0, 0.5)',
-                    borderColor: 'rgba(216, 185, 138, 0.3)'
+                    boxShadow: 'var(--shadow-lg)',
+                    borderColor: 'var(--color-primary-400)'
                 },
                 '&::after': {
                     content: '""',
@@ -408,7 +408,7 @@ function InvoiceCard({ invoice, onEdit, onPay }) {
                 elevation={0}
                 sx={{
                     p: 2,
-                    background: 'rgba(0, 0, 0, 0.2)',
+                    background: 'var(--color-surface)',
                     borderRadius: '12px',
                     mb: 2
                 }}
@@ -539,7 +539,7 @@ function InvoiceDialog({ open, onClose, invoice, onSubmit, loading }) {
                 left: 0,
                 width: '100%',
                 height: '100%',
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                backgroundColor: 'var(--color-overlay)',
                 backdropFilter: 'blur(8px)',
                 display: 'flex',
                 alignItems: 'center',
@@ -552,12 +552,12 @@ function InvoiceDialog({ open, onClose, invoice, onSubmit, loading }) {
                 elevation={24}
                 sx={{
                     p: 4,
-                    background: 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%)',
+                    background: 'var(--color-paper)',
                     border: '1px solid var(--color-primary-500)',
                     borderRadius: '24px',
                     width: '90%',
                     maxWidth: 450,
-                    boxShadow: '0 0 40px rgba(0,0,0,0.5)',
+                    boxShadow: 'var(--shadow-2xl)',
                     position: 'relative'
                 }}
                 onClick={(e) => e.stopPropagation()}
@@ -658,13 +658,13 @@ function InvoiceDialog({ open, onClose, invoice, onSubmit, loading }) {
                                 sx={{
                                     borderRadius: '12px',
                                     py: 1.5,
-                                    borderColor: 'rgba(255, 255, 255, 0.2)',
-                                    color: 'var(--color-text-secondary)',
-                                    '&:hover': {
-                                        borderColor: 'var(--color-text-primary)',
-                                        color: 'var(--color-text-primary)',
-                                        background: 'rgba(255, 255, 255, 0.05)'
-                                    }
+                                borderColor: 'var(--color-border-glass)',
+                                color: 'var(--color-text-secondary)',
+                                '&:hover': {
+                                    borderColor: 'var(--color-text-primary)',
+                                    color: 'var(--color-text-primary)',
+                                    background: 'var(--color-surface-hover)'
+                                }
                                 }}
                             >
                                 إلغاء
@@ -706,7 +706,7 @@ function PaymentDialog({ open, onClose, paymentData, onSubmit, loading }) {
                 left: 0,
                 width: '100%',
                 height: '100%',
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                backgroundColor: 'var(--color-overlay)',
                 backdropFilter: 'blur(8px)',
                 display: 'flex',
                 alignItems: 'center',
@@ -719,12 +719,12 @@ function PaymentDialog({ open, onClose, paymentData, onSubmit, loading }) {
                 elevation={24}
                 sx={{
                     p: 4,
-                    background: 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%)',
-                    border: '1px solid #22c55e',
+                    background: 'var(--color-paper)',
+                    border: '1px solid var(--color-success-500)',
                     borderRadius: '24px',
                     width: '90%',
                     maxWidth: 450,
-                    boxShadow: '0 0 40px rgba(0,0,0,0.5)'
+                    boxShadow: 'var(--shadow-2xl)'
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
@@ -860,13 +860,13 @@ function PaymentDialog({ open, onClose, paymentData, onSubmit, loading }) {
                                 sx={{
                                     borderRadius: '12px',
                                     py: 1.5,
-                                    borderColor: 'rgba(255, 255, 255, 0.2)',
-                                    color: 'var(--color-text-secondary)',
-                                    '&:hover': {
-                                        borderColor: 'var(--color-text-primary)',
-                                        color: 'var(--color-text-primary)',
-                                        background: 'rgba(255, 255, 255, 0.05)'
-                                    }
+                                borderColor: 'var(--color-border-glass)',
+                                color: 'var(--color-text-secondary)',
+                                '&:hover': {
+                                    borderColor: 'var(--color-text-primary)',
+                                    color: 'var(--color-text-primary)',
+                                    background: 'var(--color-surface-hover)'
+                                }
                                 }}
                             >
                                 إلغاء

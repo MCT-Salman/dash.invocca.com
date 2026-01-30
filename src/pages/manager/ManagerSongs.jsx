@@ -171,7 +171,7 @@ export default function ManagerSongs() {
                     <MuiBox sx={{ flex: 1, minWidth: 0 }}>
                         <MuiTypography
                             variant="body2"
-                            sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}
+                            sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}
                         >
                             {value || row.song?.title || 'أغنية'}
                         </MuiTypography>
@@ -251,7 +251,7 @@ export default function ManagerSongs() {
                     <MuiBox>
                         <MuiTypography
                             variant="h4"
-                            sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 0.5 }}
+                            sx={{ color: 'var(--color-text-primary)', fontWeight: 700, mb: 0.5 }}
                         >
                             إدارة أغاني الفعاليات
                         </MuiTypography>
@@ -270,13 +270,13 @@ export default function ManagerSongs() {
                 elevation={0}
                 sx={{
                     mb: 4.5,
-                    background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                    background: 'var(--color-paper)',
                     backdropFilter: 'blur(20px)',
                     WebkitBackdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(216, 185, 138, 0.15)',
+                    border: '1px solid var(--color-border-glass)',
                     borderRadius: '20px',
                     overflow: 'hidden',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                    boxShadow: 'var(--shadow-md)',
                 }}
             >
                 <MuiTabs
@@ -307,7 +307,7 @@ export default function ManagerSongs() {
                         sx={{
                             p: 3,
                             mb: 4,
-                            background: 'var(--color-surface-dark)',
+                            background: 'var(--color-paper)',
                             border: '1px solid var(--color-border-glass)',
                             borderRadius: '16px',
                         }}
@@ -350,7 +350,7 @@ export default function ManagerSongs() {
                                             p: 3,
                                             mb: 3,
                                             borderRadius: '16px',
-                                            background: 'var(--color-surface-dark)',
+                                            background: 'var(--color-paper)',
                                             border: '1px solid var(--color-border-glass)',
                                         }}
                                     >
@@ -429,7 +429,7 @@ export default function ManagerSongs() {
                                         sx={{
                                             borderRadius: '16px',
                                             border: '1px solid var(--color-border-glass)',
-                                            background: 'var(--color-surface-dark)',
+                                            background: 'var(--color-paper)',
                                         }}
                                     >
                                         {playlist.length > 0 ? (

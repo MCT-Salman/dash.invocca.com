@@ -236,7 +236,8 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
         handleSubmit,
         formState: { errors },
         reset,
-        watch
+        watch,
+        setValue
     } = useForm({
         resolver: zodResolver(createEventSchema(editingEvent)),
         defaultValues: {
@@ -952,34 +953,73 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                             <Controller
                                 name={`services.${index}.quantity`}
                                 control={control}
-                                render={({ field }) => (
-                                    <MuiTextField
-                                        {...field}
-                                        label="الكمية"
-                                        type="number"
-                                        fullWidth
-                                        required
-                                        error={!!errors.services?.[index]?.quantity}
-                                        helperText={errors.services?.[index]?.quantity?.message}
-                                    />
-                                )}
+                                render={({ field }) => {
+                                    const serviceId = watch(`services.${index}.service`)
+                                    const selectedService = servicesList.find(s => (s._id || s.id) === serviceId)
+                                    
+                                    return (
+                                        <MuiTextField
+                                            {...field}
+                                            label="الكمية"
+                                            type="number"
+                                            fullWidth
+                                            required
+                                            min={1}
+                                            error={!!errors.services?.[index]?.quantity}
+                                            helperText={errors.services?.[index]?.quantity?.message}
+                                        />
+                                    )
+                                }}
                             />
                         </MuiGrid>
                         <MuiGrid item xs={12} sm={3}>
                             <Controller
                                 name={`services.${index}.price`}
                                 control={control}
-                                render={({ field }) => (
-                                    <MuiTextField
-                                        {...field}
-                                        label="السعر"
-                                        type="number"
-                                        fullWidth
-                                        required
-                                        error={!!errors.services?.[index]?.price}
-                                        helperText={errors.services?.[index]?.price?.message}
-                                    />
-                                )}
+                                render={({ field }) => {
+                                    const serviceId = watch(`services.${index}.service`)
+                                    const quantity = watch(`services.${index}.quantity`) || 1
+                                    const selectedService = servicesList.find(s => (s._id || s.id) === serviceId)
+                                    const basePrice = selectedService?.basePrice || 0
+                                    const unit = selectedService?.unit || 'per_event'
+                                    
+                                    // Calculate total price based on unit
+                                    let calculatedPrice = basePrice
+                                    if (unit === 'per_person' && quantity > 0) {
+                                        calculatedPrice = basePrice * quantity
+                                    } else if (unit === 'per_event') {
+                                        calculatedPrice = basePrice
+                                    }
+                                    
+                                    // Update price field when quantity or service changes
+                                    useEffect(() => {
+                                        if (selectedService && quantity > 0) {
+                                            setValue(`services.${index}.price`, calculatedPrice)
+                                        }
+                                    }, [quantity, serviceId, calculatedPrice, selectedService, index, setValue])
+                                    
+                                    return (
+                                        <MuiTextField
+                                            {...field}
+                                            label="السعر (من الريسبونس)"
+                                            type="number"
+                                            fullWidth
+                                            required
+                                            value={calculatedPrice || field.value || 0}
+                                            InputProps={{
+                                                readOnly: true,
+                                            }}
+                                            sx={{
+                                                '& .MuiInputBase-input': {
+                                                    backgroundColor: 'var(--color-surface)',
+                                                    cursor: 'not-allowed',
+                                                }
+                                            }}
+                                            error={!!errors.services?.[index]?.price}
+                                            helperText={errors.services?.[index]?.price?.message || `السعر الأساسي: ${basePrice.toLocaleString()} ل.س ${unit === 'per_person' ? '× ' + quantity : ''}`}
+                                        />
+                                    )
+                                }}
                             />
                         </MuiGrid>
                         <MuiGrid item xs={12} sm={1}>

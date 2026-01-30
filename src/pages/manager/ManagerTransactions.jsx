@@ -37,7 +37,7 @@ const premiumMenuProps = {
                 py: 1.5,
                 px: 3,
                 '&:hover': {
-                    bgcolor: 'rgba(216, 185, 138, 0.1)',
+                    bgcolor: 'var(--color-border-glass)',
                     color: 'var(--color-primary-400)',
                 },
                 '&.Mui-selected': {
@@ -168,9 +168,9 @@ export default function ManagerTransactions() {
                     p: 2,
                     mb: 4,
                     borderRadius: '16px',
-                    background: 'rgba(20, 20, 20, 0.6)',
+                    background: 'var(--color-paper)',
                     backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(216, 185, 138, 0.1)',
+                    border: '1px solid var(--color-border-glass)',
                     display: 'flex',
                     flexDirection: { xs: 'column', md: 'row' },
                     justifyContent: 'space-between',
@@ -188,7 +188,7 @@ export default function ManagerTransactions() {
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: '12px',
                                 backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                border: '1px solid rgba(216, 185, 138, 0.1)',
+                                border: '1px solid var(--color-border-glass)',
                                 transition: 'all 0.3s ease',
                                 '&:hover': {
                                     borderColor: 'rgba(216, 185, 138, 0.3)',
@@ -196,7 +196,7 @@ export default function ManagerTransactions() {
                                 },
                                 '&.Mui-focused': {
                                     borderColor: 'var(--color-primary-500)',
-                                    boxShadow: '0 0 0 4px rgba(216, 185, 138, 0.1)'
+                                    boxShadow: '0 0 0 4px var(--color-border-glass)'
                                 }
                             }
                         }}
@@ -214,7 +214,7 @@ export default function ManagerTransactions() {
                             sx={{
                                 borderRadius: '12px',
                                 backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                border: '1px solid rgba(216, 185, 138, 0.1)',
+                                border: '1px solid var(--color-border-glass)',
                                 color: 'var(--color-text-primary)',
                                 '& .MuiSelect-select': { py: 1.5 },
                                 '&:hover': {
@@ -264,7 +264,7 @@ export default function ManagerTransactions() {
                         <MuiPaper sx={{
                             p: 8,
                             textAlign: 'center',
-                            background: 'rgba(20, 20, 20, 0.4)',
+                            background: 'var(--color-paper)',
                             borderRadius: '24px',
                             border: '1px dashed rgba(216, 185, 138, 0.2)'
                         }}>
@@ -322,9 +322,9 @@ function TransactionCard({ transaction, onEdit }) {
             sx={{
                 p: 3,
                 height: '100%',
-                background: 'rgba(20, 20, 20, 0.6)',
+                background: 'var(--color-paper)',
                 backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(216, 185, 138, 0.1)',
+                border: '1px solid var(--color-border-glass)',
                 borderRadius: '24px',
                 transition: 'all 0.3s ease',
                 display: 'flex',
@@ -444,7 +444,7 @@ function TransactionCard({ transaction, onEdit }) {
                     background: 'rgba(216, 185, 138, 0.05)',
                     '&:hover': {
                         borderColor: 'var(--color-primary-500)',
-                        background: 'rgba(216, 185, 138, 0.1)',
+                        background: 'var(--color-border-glass)',
                     },
                     opacity: isCompleted ? 0.5 : 1
                 }}
@@ -534,7 +534,7 @@ function TransactionDialog({ open, onClose, onSubmit, loading, title, transactio
                 elevation={24}
                 sx={{
                     p: 4,
-                    background: 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%)',
+                    background: 'var(--color-paper)',
                     border: '1px solid var(--color-primary-500)',
                     borderRadius: '24px',
                     width: '90%',
@@ -550,7 +550,7 @@ function TransactionDialog({ open, onClose, onSubmit, loading, title, transactio
                     color: 'var(--color-primary-500)',
                     mb: 4,
                     textAlign: 'center',
-                    borderBottom: '1px solid rgba(216, 185, 138, 0.1)',
+                    borderBottom: '1px solid var(--color-border-glass)',
                     pb: 2
                 }}>
                     {title}

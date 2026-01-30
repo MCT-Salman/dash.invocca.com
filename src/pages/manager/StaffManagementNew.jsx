@@ -228,15 +228,15 @@ function ScannerEventsTab() {
             elevation={0}
             sx={{
                 p: 4,
-                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                background: 'var(--color-paper)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                border: '1px solid rgba(216, 185, 138, 0.15)',
+                border: '1px solid var(--color-border-glass)',
                 borderRadius: '20px',
                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
             }}
         >
-            <MuiTypography variant="h5" sx={{ fontWeight: 700, mb: 3, color: 'var(--color-text-primary-dark)', display: 'flex', alignItems: 'center', gap: 2 }}>
+            <MuiTypography variant="h5" sx={{ fontWeight: 700, mb: 3, color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Link2 size={24} style={{ color: 'var(--color-primary-500)' }} />
                 ربط الماسحات مع الفعاليات
             </MuiTypography>
@@ -265,9 +265,9 @@ function ScannerEventsTab() {
                             sx={{
                                 borderRadius: '14px',
                                 background: 'rgba(255, 255, 255, 0.03)',
-                                color: 'var(--color-text-primary-dark)',
+                                color: 'var(--color-text-primary)',
                                 '& .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: 'rgba(216, 185, 138, 0.15)',
+                                    borderColor: 'var(--color-border-glass)',
                                 },
                                 '&:hover .MuiOutlinedInput-notchedOutline': {
                                     borderColor: 'rgba(216, 185, 138, 0.3)',
@@ -336,9 +336,9 @@ function ScannerEventsTab() {
                             sx={{
                                 borderRadius: '14px',
                                 background: 'rgba(255, 255, 255, 0.03)',
-                                color: 'var(--color-text-primary-dark)',
+                                color: 'var(--color-text-primary)',
                                 '& .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: 'rgba(216, 185, 138, 0.15)',
+                                    borderColor: 'var(--color-border-glass)',
                                 },
                                 '&:hover .MuiOutlinedInput-notchedOutline': {
                                     borderColor: 'rgba(216, 185, 138, 0.3)',
@@ -425,13 +425,13 @@ function ScannerEventsTab() {
                     </MuiTypography>
                     
                     {scannersLoading ? (
-                        <MuiPaper sx={{ p: 3, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
+                        <MuiPaper sx={{ p: 3, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--color-border-glass)', borderRadius: '12px' }}>
                             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
                                 جاري التحميل...
                             </MuiTypography>
                         </MuiPaper>
                     ) : eventScanners.length === 0 ? (
-                        <MuiPaper sx={{ p: 3, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
+                        <MuiPaper sx={{ p: 3, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--color-border-glass)', borderRadius: '12px' }}>
                             <QrCode size={32} style={{ color: 'var(--color-text-secondary)', margin: '0 auto 8px', opacity: 0.5 }} />
                             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
                                 لا توجد ماسحات مرتبطة بهذه الفعالية
@@ -447,7 +447,7 @@ function ScannerEventsTab() {
                                         <MuiPaper sx={{ 
                                             p: 2.5, 
                                             backgroundColor: 'rgba(255, 255, 255, 0.05)', 
-                                            border: '1px solid rgba(216, 185, 138, 0.15)', 
+                                            border: '1px solid var(--color-border-glass)', 
                                             borderRadius: '12px',
                                             position: 'relative',
                                             transition: 'all 0.3s ease',
@@ -460,7 +460,7 @@ function ScannerEventsTab() {
                                                 <MuiBox sx={{ flex: 1 }}>
                                                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                                                         <QrCode size={18} style={{ color: 'var(--color-primary-400)' }} />
-                                                        <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                                                        <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                                                             {scanner.name || scanner.username || 'ماسح بدون اسم'}
                                                         </MuiTypography>
                                                     </MuiBox>
@@ -534,7 +534,7 @@ function ScannerEventsTab() {
             )}
 
             {!selectedEventId && (
-                <MuiPaper sx={{ p: 4, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
+                <MuiPaper sx={{ p: 4, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--color-border-glass)', borderRadius: '12px' }}>
                     <Link2 size={48} style={{ color: 'var(--color-text-secondary)', margin: '0 auto 16px', opacity: 0.5 }} />
                     <MuiTypography variant="body1" sx={{ color: 'var(--color-text-secondary)', mb: 1 }}>
                         اختر فعالية لعرض الماسحات المرتبطة بها
@@ -660,7 +660,7 @@ export default function StaffManagement() {
                         {value?.charAt(0).toUpperCase() || 'S'}
                     </MuiAvatar>
                     <MuiBox>
-                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
+                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                             {value}
                         </MuiTypography>
                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
@@ -769,7 +769,7 @@ export default function StaffManagement() {
                         mb: 5,
                         p: { xs: 3, sm: 4.5, md: 5 },
                         borderRadius: '24px',
-                        background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.95) 0%, rgba(10, 10, 10, 0.98) 100%)',
+                        background: 'var(--color-paper)',
                         backdropFilter: 'blur(30px)',
                         WebkitBackdropFilter: 'blur(30px)',
                         position: 'relative',
@@ -821,11 +821,11 @@ export default function StaffManagement() {
                                 <MuiTypography 
                                     variant="h4" 
                                     sx={{ 
-                                        color: 'var(--color-text-primary-dark)', 
+                                        color: 'var(--color-text-primary)', 
                                         fontWeight: 800, 
                                         mb: 1,
                                         fontSize: { xs: '1.5rem', sm: '2rem' },
-                                        background: 'linear-gradient(135deg, var(--color-text-primary-dark), var(--color-primary-500))',
+                                        background: 'linear-gradient(135deg, var(--color-text-primary), var(--color-primary-500))',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent',
                                         backgroundClip: 'text',
@@ -900,10 +900,10 @@ export default function StaffManagement() {
                             elevation={0}
                             sx={{
                                 p: 3.5,
-                                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                                background: 'var(--color-paper)',
                                 backdropFilter: 'blur(20px)',
                                 WebkitBackdropFilter: 'blur(20px)',
-                                border: '1px solid rgba(216, 185, 138, 0.15)',
+                                border: '1px solid var(--color-border-glass)',
                                 borderRadius: '20px',
                                 position: 'relative',
                                 overflow: 'hidden',
@@ -970,7 +970,7 @@ export default function StaffManagement() {
                             elevation={0}
                             sx={{
                                 p: 3.5,
-                                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                                background: 'var(--color-paper)',
                                 backdropFilter: 'blur(20px)',
                                 WebkitBackdropFilter: 'blur(20px)',
                                 border: '1px solid rgba(22, 163, 74, 0.15)',
@@ -1040,7 +1040,7 @@ export default function StaffManagement() {
                             elevation={0}
                             sx={{
                                 p: 3.5,
-                                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                                background: 'var(--color-paper)',
                                 backdropFilter: 'blur(20px)',
                                 WebkitBackdropFilter: 'blur(20px)',
                                 border: '1px solid rgba(147, 51, 234, 0.15)',
@@ -1110,7 +1110,7 @@ export default function StaffManagement() {
                             elevation={0}
                             sx={{
                                 p: 3.5,
-                                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                                background: 'var(--color-paper)',
                                 backdropFilter: 'blur(20px)',
                                 WebkitBackdropFilter: 'blur(20px)',
                                 border: '1px solid rgba(59, 130, 246, 0.15)',
@@ -1182,10 +1182,10 @@ export default function StaffManagement() {
                     elevation={0}
                     sx={{
                         mb: 4.5,
-                        background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                        background: 'var(--color-paper)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(216, 185, 138, 0.15)',
+                        border: '1px solid var(--color-border-glass)',
                         borderRadius: '20px',
                         overflow: 'hidden',
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
@@ -1199,7 +1199,7 @@ export default function StaffManagement() {
                             { label: 'ربط الماسحات', icon: <Link2 size={18} /> }
                         ]}
                         sx={{
-                            borderBottom: '1px solid rgba(216, 185, 138, 0.15)',
+                            borderBottom: '1px solid var(--color-border-glass)',
                             '& .MuiTab-root': {
                                 color: 'var(--color-text-secondary)',
                                 '&.Mui-selected': {
@@ -1219,10 +1219,10 @@ export default function StaffManagement() {
                             sx={{
                                 p: 3,
                                 mb: 4.5,
-                                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                                background: 'var(--color-paper)',
                                 backdropFilter: 'blur(20px)',
                                 WebkitBackdropFilter: 'blur(20px)',
-                                border: '1px solid rgba(216, 185, 138, 0.15)',
+                                border: '1px solid var(--color-border-glass)',
                                 borderRadius: '20px',
                                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
                             }}
@@ -1243,7 +1243,7 @@ export default function StaffManagement() {
                                     '& .MuiOutlinedInput-root': {
                                         borderRadius: '14px',
                                         background: 'rgba(255, 255, 255, 0.03)',
-                                        border: '1px solid rgba(216, 185, 138, 0.15)',
+                                        border: '1px solid var(--color-border-glass)',
                                         '&:hover': {
                                             borderColor: 'rgba(216, 185, 138, 0.3)',
                                         },
@@ -1252,7 +1252,7 @@ export default function StaffManagement() {
                                         }
                                     },
                                     '& .MuiOutlinedInput-input': {
-                                        color: 'var(--color-text-primary-dark)',
+                                        color: 'var(--color-text-primary)',
                                     }
                                 }}
                             />
@@ -1269,11 +1269,11 @@ export default function StaffManagement() {
                         loading={isLoading}
                         emptyMessage="لا يوجد موظفين"
                         sx={{
-                            background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                            background: 'var(--color-paper)',
                             backdropFilter: 'blur(20px)',
                             WebkitBackdropFilter: 'blur(20px)',
                             borderRadius: '20px',
-                            border: '1px solid rgba(216, 185, 138, 0.15)',
+                            border: '1px solid var(--color-border-glass)',
                             overflow: 'hidden',
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
                         }}

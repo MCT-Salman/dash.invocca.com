@@ -135,7 +135,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
                 sx: {
                     borderRadius: '20px',
                     overflow: 'auto',
-                    backgroundColor: 'var(--color-surface-dark)',
+                    backgroundColor: 'var(--color-paper)',
                     backgroundImage: 'none',
                     border: '1px solid rgba(216, 185, 138, 0.15)',
                     backdropFilter: 'blur(20px)',
@@ -149,7 +149,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
                 <MuiBox sx={{ p: 3, borderBottom: '1px solid rgba(216, 185, 138, 0.15)' }}>
                     <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                         <MuiBox>
-                            <MuiTypography variant="h4" sx={{ fontWeight: 700, mb: 0.5, color: 'var(--color-text-primary-dark)' }}>
+                            <MuiTypography variant="h4" sx={{ fontWeight: 700, mb: 0.5, color: 'var(--color-text-primary)' }}>
                                 {event.eventName || event.name}
                             </MuiTypography>
                             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
@@ -757,7 +757,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
                     )}
                 </MuiDialogContent>
 
-                <MuiDialogActions sx={{ p: 3, backgroundColor: 'var(--color-surface-dark)', borderTop: '1px solid rgba(216, 185, 138, 0.15)' }}>
+                <MuiDialogActions sx={{ p: 3, backgroundColor: 'var(--color-paper)', borderTop: '1px solid rgba(216, 185, 138, 0.15)' }}>
                     <MuiButton
                         onClick={onClose}
                         variant="contained"

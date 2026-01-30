@@ -59,10 +59,10 @@ function InfoCard({ icon: Icon, label, value, color = 'var(--color-primary-500)'
             sx={{
                 p: 3.5,
                 height: '100%',
-                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                background: 'var(--color-paper)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                border: '1px solid rgba(216, 185, 138, 0.15)',
+                border: '1px solid var(--color-border-glass)',
                 borderRadius: '20px',
                 position: 'relative',
                 overflow: 'hidden',
@@ -191,7 +191,7 @@ function ServiceCard({ service }) {
             sx={{
                 p: 3.5,
                 height: '100%',
-                background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.7) 0%, rgba(10, 10, 10, 0.8) 100%)',
+                background: 'var(--color-paper)',
                 backdropFilter: 'blur(15px)',
                 WebkitBackdropFilter: 'blur(15px)',
                 border: '1px solid rgba(216, 185, 138, 0.12)',
@@ -251,7 +251,7 @@ function ServiceCard({ service }) {
                             variant="body1" 
                             sx={{ 
                                 fontWeight: 700, 
-                                color: 'var(--color-text-primary-dark)',
+                                color: 'var(--color-text-primary)',
                                 mb: 0.5,
                                 fontSize: '1.1rem',
                                 lineHeight: 1.4
@@ -495,7 +495,7 @@ export default function HallManagement() {
                         mb: 5,
                         p: { xs: 3, sm: 4.5, md: 5 },
                         borderRadius: '24px',
-                        background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.95) 0%, rgba(10, 10, 10, 0.98) 100%)',
+                        background: 'var(--color-paper)',
                         backdropFilter: 'blur(30px)',
                         WebkitBackdropFilter: 'blur(30px)',
                         position: 'relative',
@@ -547,11 +547,11 @@ export default function HallManagement() {
                                 <MuiTypography 
                                     variant="h4" 
                                     sx={{ 
-                                        color: 'var(--color-text-primary-dark)', 
+                                        color: 'var(--color-text-primary)', 
                                         fontWeight: 800, 
                                         mb: 1,
                                         fontSize: { xs: '1.5rem', sm: '2rem' },
-                                        background: 'linear-gradient(135deg, var(--color-text-primary-dark), var(--color-primary-500))',
+                                        background: 'linear-gradient(135deg, var(--color-text-primary), var(--color-primary-500))',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent',
                                         backgroundClip: 'text',
@@ -624,8 +624,8 @@ export default function HallManagement() {
                     elevation={0}
                     sx={{
                         borderRadius: '24px',
-                        border: '1px solid rgba(216, 185, 138, 0.15)',
-                        background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                        border: '1px solid var(--color-border-glass)',
+                        background: 'var(--color-paper)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
                         overflow: 'hidden',
@@ -780,18 +780,18 @@ export default function HallManagement() {
                         {/* Description */}
                         {hall.description && (
                             <>
-                                <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)', mb: 3 }} />
+                                <MuiDivider sx={{ borderColor: 'var(--color-border-glass)', mb: 3 }} />
                                 <MuiBox
                                     sx={{
                                         p: 3,
                                         borderRadius: '16px',
                                         background: 'rgba(216, 185, 138, 0.05)',
-                                        border: '1px solid rgba(216, 185, 138, 0.15)',
+                                        border: '1px solid var(--color-border-glass)',
                                     }}
                                 >
                                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                                         <Info size={20} style={{ color: 'var(--color-primary-500)' }} />
-                                        <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary-dark)' }}>
+                                        <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
                                             الوصف
                                         </MuiTypography>
                                     </MuiBox>
@@ -806,18 +806,18 @@ export default function HallManagement() {
                         {/* Amenities */}
                         {hall.amenities && Array.isArray(hall.amenities) && hall.amenities.length > 0 && (
                             <>
-                                <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)', mb: 3, mt: 3 }} />
+                                <MuiDivider sx={{ borderColor: 'var(--color-border-glass)', mb: 3, mt: 3 }} />
                                 <MuiBox
                                     sx={{
                                         p: 3,
                                         borderRadius: '16px',
                                         background: 'rgba(216, 185, 138, 0.05)',
-                                        border: '1px solid rgba(216, 185, 138, 0.15)',
+                                        border: '1px solid var(--color-border-glass)',
                                     }}
                                 >
                                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                                         <Award size={20} style={{ color: 'var(--color-primary-500)' }} />
-                                        <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary-dark)' }}>
+                                        <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
                                             المرافق ({hall.amenities.length})
                                         </MuiTypography>
                                     </MuiBox>
@@ -843,11 +843,11 @@ export default function HallManagement() {
                         {/* Images */}
                         {hall.images && Array.isArray(hall.images) && hall.images.length > 0 && (
                             <>
-                                <MuiDivider sx={{ borderColor: 'rgba(216, 185, 138, 0.15)', mb: 3, mt: 3 }} />
+                                <MuiDivider sx={{ borderColor: 'var(--color-border-glass)', mb: 3, mt: 3 }} />
                                 <MuiBox>
                                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                                         <ImageIcon size={20} style={{ color: 'var(--color-primary-500)' }} />
-                                        <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary-dark)' }}>
+                                        <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
                                             الصور ({hall.images.length})
                                         </MuiTypography>
                                     </MuiBox>
@@ -863,7 +863,7 @@ export default function HallManagement() {
                                                             p: 2,
                                                             borderRadius: '12px',
                                                             background: 'rgba(255,255,255,0.03)',
-                                                            border: '1px solid rgba(216, 185, 138, 0.15)',
+                                                            border: '1px solid var(--color-border-glass)',
                                                             position: 'relative',
                                                             overflow: 'hidden',
                                                         }}
@@ -921,8 +921,8 @@ export default function HallManagement() {
                     elevation={0}
                     sx={{
                         borderRadius: '24px',
-                        border: '1px solid rgba(216, 185, 138, 0.15)',
-                        background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                        border: '1px solid var(--color-border-glass)',
+                        background: 'var(--color-paper)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
                         overflow: 'hidden',
@@ -933,7 +933,7 @@ export default function HallManagement() {
                         sx={{ 
                             p: { xs: 3, sm: 4, md: 5 },
                             background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.1), rgba(255, 227, 108, 0.05))',
-                            borderBottom: '1px solid rgba(216, 185, 138, 0.15)',
+                            borderBottom: '1px solid var(--color-border-glass)',
                         }}
                     >
                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
@@ -957,7 +957,7 @@ export default function HallManagement() {
                                     variant="h5" 
                                     sx={{ 
                                         fontWeight: 800, 
-                                        color: 'var(--color-text-primary-dark)',
+                                        color: 'var(--color-text-primary)',
                                         mb: 0.5,
                                         fontSize: { xs: '1.25rem', sm: '1.5rem' }
                                     }}
@@ -1003,8 +1003,8 @@ export default function HallManagement() {
                         elevation={0}
                         sx={{
                             borderRadius: '24px',
-                            border: '1px solid rgba(216, 185, 138, 0.15)',
-                            background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                            border: '1px solid var(--color-border-glass)',
+                            background: 'var(--color-paper)',
                             backdropFilter: 'blur(20px)',
                             WebkitBackdropFilter: 'blur(20px)',
                             overflow: 'hidden',
@@ -1016,7 +1016,7 @@ export default function HallManagement() {
                             sx={{ 
                                 p: { xs: 3, sm: 4, md: 5 },
                                 background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.1), rgba(255, 227, 108, 0.05))',
-                                borderBottom: '1px solid rgba(216, 185, 138, 0.15)',
+                                borderBottom: '1px solid var(--color-border-glass)',
                             }}
                         >
                             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
@@ -1040,7 +1040,7 @@ export default function HallManagement() {
                                         variant="h5" 
                                         sx={{ 
                                             fontWeight: 800, 
-                                            color: 'var(--color-text-primary-dark)',
+                                            color: 'var(--color-text-primary)',
                                             mb: 0.5,
                                             fontSize: { xs: '1.25rem', sm: '1.5rem' }
                                         }}
@@ -1070,7 +1070,7 @@ export default function HallManagement() {
                                             <MuiGrid item xs={12} md={6}>
                                                 <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
                                                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>الاسم</MuiTypography>
-                                                    <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                    <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
                                                         {hall.generalManager.name}
                                                     </MuiTypography>
                                                 </MuiBox>
@@ -1080,7 +1080,7 @@ export default function HallManagement() {
                                             <MuiGrid item xs={12} md={6}>
                                                 <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
                                                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>اسم المستخدم</MuiTypography>
-                                                    <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                    <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
                                                         {hall.generalManager.username}
                                                     </MuiTypography>
                                                 </MuiBox>
@@ -1090,7 +1090,7 @@ export default function HallManagement() {
                                             <MuiGrid item xs={12} md={6}>
                                                 <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
                                                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>رقم الهاتف</MuiTypography>
-                                                    <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary-dark)' }}>
+                                                    <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
                                                         {hall.generalManager.phone}
                                                     </MuiTypography>
                                                 </MuiBox>
@@ -1109,8 +1109,8 @@ export default function HallManagement() {
                         elevation={0}
                         sx={{
                             borderRadius: '24px',
-                            border: '1px solid rgba(216, 185, 138, 0.15)',
-                            background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                            border: '1px solid var(--color-border-glass)',
+                            background: 'var(--color-paper)',
                             backdropFilter: 'blur(20px)',
                             WebkitBackdropFilter: 'blur(20px)',
                             overflow: 'hidden',
@@ -1122,7 +1122,7 @@ export default function HallManagement() {
                             sx={{ 
                                 p: { xs: 3, sm: 4, md: 5 },
                                 background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.1), rgba(255, 227, 108, 0.05))',
-                                borderBottom: '1px solid rgba(216, 185, 138, 0.15)',
+                                borderBottom: '1px solid var(--color-border-glass)',
                             }}
                         >
                             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
@@ -1146,7 +1146,7 @@ export default function HallManagement() {
                                         variant="h5" 
                                         sx={{ 
                                             fontWeight: 800, 
-                                            color: 'var(--color-text-primary-dark)',
+                                            color: 'var(--color-text-primary)',
                                             mb: 0.5,
                                             fontSize: { xs: '1.25rem', sm: '1.5rem' }
                                         }}
@@ -1219,7 +1219,7 @@ export default function HallManagement() {
                                                         variant="body1" 
                                                         sx={{ 
                                                             fontWeight: 600, 
-                                                            color: 'var(--color-text-primary-dark)', 
+                                                            color: 'var(--color-text-primary)', 
                                                             mb: 0.5,
                                                             fontSize: '1rem'
                                                         }}
@@ -1274,8 +1274,8 @@ export default function HallManagement() {
                         elevation={0}
                         sx={{
                             borderRadius: '24px',
-                            border: '1px solid rgba(216, 185, 138, 0.15)',
-                            background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                            border: '1px solid var(--color-border-glass)',
+                            background: 'var(--color-paper)',
                             backdropFilter: 'blur(20px)',
                             WebkitBackdropFilter: 'blur(20px)',
                             overflow: 'hidden',
@@ -1287,7 +1287,7 @@ export default function HallManagement() {
                             sx={{ 
                                 p: { xs: 3, sm: 4, md: 5 },
                                 background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.1), rgba(255, 227, 108, 0.05))',
-                                borderBottom: '1px solid rgba(216, 185, 138, 0.15)',
+                                borderBottom: '1px solid var(--color-border-glass)',
                             }}
                         >
                             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
@@ -1311,7 +1311,7 @@ export default function HallManagement() {
                                         variant="h5" 
                                         sx={{ 
                                             fontWeight: 800, 
-                                            color: 'var(--color-text-primary-dark)',
+                                            color: 'var(--color-text-primary)',
                                             mb: 0.5,
                                             fontSize: { xs: '1.25rem', sm: '1.5rem' }
                                         }}
@@ -1351,7 +1351,7 @@ export default function HallManagement() {
                                                 variant="body1" 
                                                 sx={{ 
                                                     fontWeight: 600, 
-                                                    color: 'var(--color-text-primary-dark)', 
+                                                    color: 'var(--color-text-primary)', 
                                                     mb: 0.5
                                                 }}
                                             >

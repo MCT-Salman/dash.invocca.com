@@ -181,8 +181,29 @@ export const createAppTheme = (mode = 'light') => createTheme({
       styleOverrides: {
         root: {
           color: 'var(--color-text-secondary)',
+          position: 'relative',
+          transform: 'none',
+          marginBottom: '8px',
+          fontSize: '0.875rem',
+          fontWeight: 600,
           '&.Mui-focused': {
             color: 'var(--color-primary-500)',
+          },
+          '&.MuiInputLabel-shrink': {
+            transform: 'none',
+            position: 'relative',
+          },
+        }
+      }
+    },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: {
+          paddingTop: '24px !important',
+          '& .MuiInputLabel-root': {
+            position: 'relative',
+            transform: 'none',
+            marginBottom: '8px',
           },
         }
       }

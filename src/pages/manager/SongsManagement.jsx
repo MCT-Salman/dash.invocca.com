@@ -199,7 +199,7 @@ export default function ManagerSongsManagement() {
         <MuiBox sx={{ display: 'flex', flexDirection: 'column' }}>
           <MuiTypography
             variant="body2"
-            sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}
+            sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}
           >
             {value}
           </MuiTypography>
@@ -376,7 +376,7 @@ export default function ManagerSongsManagement() {
           <MuiBox>
             <MuiTypography
               variant="h4"
-              sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 0.5 }}
+              sx={{ color: 'var(--color-text-primary)', fontWeight: 700, mb: 0.5 }}
             >
               إدارة أغاني القاعة/الصالة
             </MuiTypography>
@@ -395,13 +395,13 @@ export default function ManagerSongsManagement() {
         elevation={0}
         sx={{
           mb: 4.5,
-          background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+          background: 'var(--color-paper)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(216, 185, 138, 0.15)',
+          border: '1px solid var(--color-border-glass)',
           borderRadius: '20px',
           overflow: 'hidden',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+          boxShadow: 'var(--shadow-md)',
         }}
       >
         <MuiTabs
@@ -412,7 +412,7 @@ export default function ManagerSongsManagement() {
             { label: 'ربط الأغاني', icon: <Link2 size={18} /> }
           ]}
           sx={{
-            borderBottom: '1px solid rgba(216, 185, 138, 0.15)',
+            borderBottom: '1px solid var(--color-border-glass)',
             '& .MuiTab-root': {
               color: 'var(--color-text-secondary)',
               '&.Mui-selected': {
@@ -432,7 +432,7 @@ export default function ManagerSongsManagement() {
         sx={{
           p: 3,
           mb: 3,
-          background: 'var(--color-surface-dark)',
+          background: 'var(--color-paper)',
           border: '1px solid var(--color-border-glass)',
           borderRadius: '16px',
         }}
@@ -491,7 +491,7 @@ export default function ManagerSongsManagement() {
       <MuiPaper
         elevation={0}
         sx={{
-          background: 'var(--color-surface-dark)',
+          background: 'var(--color-paper)',
           border: '1px solid var(--color-border-glass)',
           borderRadius: '16px',
           overflow: 'hidden',

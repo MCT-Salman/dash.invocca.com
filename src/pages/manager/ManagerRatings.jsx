@@ -21,7 +21,7 @@ export default function ManagerRatings() {
   const ratings = data?.data || []
 
   return (
-    <MuiBox sx={{ p: { xs: 2, sm: 3, md: 4 }, minHeight: '100vh', background: 'var(--color-bg-dark)' }}>
+    <MuiBox sx={{ p: { xs: 2, sm: 3, md: 4 }, minHeight: '100vh', background: 'var(--color-bg)' }}>
       <SEOHead pageKey="managerRatings" title="تقييمات العملاء | INVOCCA" />
 
       <MuiTypography variant="h4" sx={{ mb: 4, fontWeight: 700, color: 'var(--color-text-primary)' }}>

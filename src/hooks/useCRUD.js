@@ -55,21 +55,31 @@ function extractErrorFromResponse(data, defaultMessage) {
         else if (data?.success === false && data?.message) {
             errorMsg = String(data.message)
         }
-        // 4. Errors array
+        // 4. Errors array - show all error messages
         else if (data?.errors && Array.isArray(data.errors) && data.errors.length > 0) {
-            const firstError = data.errors[0]
-            if (firstError?.msg && typeof firstError.msg === 'string') {
-                errorMsg = firstError.msg
-            } else if (firstError?.message && typeof firstError.message === 'string') {
-                errorMsg = firstError.message
-            } else if (firstError?.error && typeof firstError.error === 'string') {
-                errorMsg = firstError.error
-            } else if (firstError?.msg) {
-                errorMsg = String(firstError.msg)
-            } else if (firstError?.message) {
-                errorMsg = String(firstError.message)
-            } else if (firstError?.error) {
-                errorMsg = String(firstError.error)
+            // Collect all error messages
+            const errorMessages = data.errors
+                .map(error => {
+                    if (error?.msg && typeof error.msg === 'string') return error.msg
+                    if (error?.message && typeof error.message === 'string') return error.message
+                    if (error?.error && typeof error.error === 'string') return error.error
+                    if (error?.msg) return String(error.msg)
+                    if (error?.message) return String(error.message)
+                    if (error?.error) return String(error.error)
+                    return null
+                })
+                .filter(Boolean)
+            
+            // Join all messages with newlines or show first if only one
+            if (errorMessages.length > 0) {
+                errorMsg = errorMessages.length === 1 
+                    ? errorMessages[0] 
+                    : errorMessages.join('\n')
+            } else {
+                const firstError = data.errors[0]
+                if (firstError?.msg) errorMsg = String(firstError.msg)
+                else if (firstError?.message) errorMsg = String(firstError.message)
+                else if (firstError?.error) errorMsg = String(firstError.error)
             }
         }
     } catch {
@@ -134,21 +144,31 @@ function extractErrorMessage(err, defaultMessage) {
         else if (err?.response?.data?.message) {
             errorMsg = String(err.response.data.message)
         }
-        // 3. Errors array - first error message - e.g., {"errors": [{"msg": "..."}]}
+        // 3. Errors array - show all error messages - e.g., {"errors": [{"msg": "..."}]}
         else if (err?.response?.data?.errors && Array.isArray(err.response.data.errors) && err.response.data.errors.length > 0) {
-            const firstError = err.response.data.errors[0]
-            if (firstError?.msg && typeof firstError.msg === 'string') {
-                errorMsg = firstError.msg
-            } else if (firstError?.message && typeof firstError.message === 'string') {
-                errorMsg = firstError.message
-            } else if (firstError?.error && typeof firstError.error === 'string') {
-                errorMsg = firstError.error
-            } else if (firstError?.msg) {
-                errorMsg = String(firstError.msg)
-            } else if (firstError?.message) {
-                errorMsg = String(firstError.message)
-            } else if (firstError?.error) {
-                errorMsg = String(firstError.error)
+            // Collect all error messages
+            const errorMessages = err.response.data.errors
+                .map(error => {
+                    if (error?.msg && typeof error.msg === 'string') return error.msg
+                    if (error?.message && typeof error.message === 'string') return error.message
+                    if (error?.error && typeof error.error === 'string') return error.error
+                    if (error?.msg) return String(error.msg)
+                    if (error?.message) return String(error.message)
+                    if (error?.error) return String(error.error)
+                    return null
+                })
+                .filter(Boolean)
+            
+            // Join all messages with newlines or show first if only one
+            if (errorMessages.length > 0) {
+                errorMsg = errorMessages.length === 1 
+                    ? errorMessages[0] 
+                    : errorMessages.join('\n')
+            } else {
+                const firstError = err.response.data.errors[0]
+                if (firstError?.msg) errorMsg = String(firstError.msg)
+                else if (firstError?.message) errorMsg = String(firstError.message)
+                else if (firstError?.error) errorMsg = String(firstError.error)
             }
         }
         // 4. Error object message

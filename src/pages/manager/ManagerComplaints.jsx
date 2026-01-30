@@ -14,7 +14,7 @@ export default function ManagerComplaints() {
             <MuiBox sx={{ mb: 4, textAlign: 'center' }}>
                 <MuiTypography variant="h3" sx={{ 
                     fontWeight: 800, 
-                    color: 'var(--color-text-primary-dark)', 
+                    color: 'var(--color-text-primary)', 
                     mb: 1,
                     background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
                     WebkitBackgroundClip: 'text',
@@ -33,7 +33,7 @@ export default function ManagerComplaints() {
                 elevation={0}
                 sx={{
                     p: 6,
-                    background: 'var(--color-surface-dark)',
+                    background: 'var(--color-paper)',
                     border: '1px solid var(--color-border-glass)',
                     borderRadius: '24px',
                     textAlign: 'center',

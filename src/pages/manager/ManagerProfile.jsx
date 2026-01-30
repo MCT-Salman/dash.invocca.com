@@ -117,7 +117,7 @@ export default function ManagerProfile() {
       <MuiBox sx={{ mb: 4, textAlign: 'center' }}>
         <MuiTypography variant="h3" sx={{ 
           fontWeight: 800, 
-          color: 'var(--color-text-primary-dark)', 
+          color: 'var(--color-text-primary)', 
           mb: 1,
           background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
           WebkitBackgroundClip: 'text',
@@ -136,7 +136,7 @@ export default function ManagerProfile() {
         elevation={0}
         sx={{
           p: 4,
-          background: 'var(--color-surface-dark)',
+          background: 'var(--color-paper)',
           border: '1px solid var(--color-border-glass)',
           borderRadius: '24px',
           mb: 6,
@@ -183,7 +183,7 @@ export default function ManagerProfile() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '2px solid var(--color-surface-dark)',
+                    border: '2px solid var(--color-paper)',
                   }}
                 >
                   <Briefcase size={16} style={{ color: '#fff' }} />
@@ -191,7 +191,7 @@ export default function ManagerProfile() {
               </MuiBox>
               <MuiBox>
                 <MuiTypography variant="h4" sx={{ 
-                  color: 'var(--color-text-primary-dark)', 
+                  color: 'var(--color-text-primary)', 
                   fontWeight: 700,
                   mb: 0.5
                 }}>
@@ -249,7 +249,7 @@ export default function ManagerProfile() {
                   <MuiCardContent sx={{ py: 2 }}>
                     <MuiTypography variant="body1" sx={{ 
                       fontWeight: 600, 
-                      color: 'var(--color-text-primary-dark)' 
+                      color: 'var(--color-text-primary)' 
                     }}>
                       {user?.name}
                     </MuiTypography>
@@ -279,7 +279,7 @@ export default function ManagerProfile() {
                   <MuiCardContent sx={{ py: 2 }}>
                     <MuiTypography variant="body1" sx={{ 
                       fontWeight: 600, 
-                      color: 'var(--color-text-primary-dark)' 
+                      color: 'var(--color-text-primary)' 
                     }}>
                       {user?.phone}
                     </MuiTypography>
@@ -309,7 +309,7 @@ export default function ManagerProfile() {
                   <MuiCardContent sx={{ py: 2 }}>
                     <MuiTypography variant="body1" sx={{ 
                       fontWeight: 600, 
-                      color: 'var(--color-text-primary-dark)' 
+                      color: 'var(--color-text-primary)' 
                     }}>
                       {user?.role === 'manager' ? 'مدير قاعة/صالة' : user?.role}
                     </MuiTypography>
@@ -328,7 +328,7 @@ export default function ManagerProfile() {
           p: 4,
           borderRadius: '24px',
           border: '1px solid var(--color-border-glass)',
-          background: 'var(--color-surface-dark)',
+          background: 'var(--color-paper)',
           position: 'relative',
           overflow: 'hidden',
           marginTop: '2rem',
@@ -347,7 +347,7 @@ export default function ManagerProfile() {
         <MuiBox sx={{ position: 'relative', zIndex: 1 }}>
           <MuiTypography variant="h6" sx={{ 
             fontWeight: 'bold', 
-            color: 'var(--color-text-primary-dark)', 
+            color: 'var(--color-text-primary)', 
             mb: 3, 
             display: 'flex', 
             alignItems: 'center', 
@@ -439,8 +439,8 @@ export default function ManagerProfile() {
         fullWidth
       >
         <MuiDialogTitle sx={{ 
-          background: 'var(--color-surface-dark)',
-          color: 'var(--color-text-primary-dark)',
+          background: 'var(--color-paper)',
+          color: 'var(--color-text-primary)',
           borderBottom: '1px solid var(--color-border-glass)'
         }}>
           <MuiTypography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -450,8 +450,8 @@ export default function ManagerProfile() {
         </MuiDialogTitle>
         
         <MuiDialogContent sx={{ 
-          background: 'var(--color-surface-dark)',
-          color: 'var(--color-text-primary-dark)',
+          background: 'var(--color-paper)',
+          color: 'var(--color-text-primary)',
           p: 5,
           mt: 3
         }}>
@@ -494,7 +494,7 @@ export default function ManagerProfile() {
         </MuiDialogContent>
         
         <MuiDialogActions sx={{ 
-          background: 'var(--color-surface-dark)',
+          background: 'var(--color-paper)',
           borderTop: '1px solid var(--color-border-glass)',
           p: 3
         }}>

@@ -145,15 +145,15 @@ export default function EventSongsConnectionTab() {
       elevation={0}
       sx={{
         p: 4,
-        background: 'linear-gradient(145deg, rgba(15, 15, 15, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+        background: 'var(--color-paper)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(216, 185, 138, 0.15)',
+        border: '1px solid var(--color-border-glass)',
         borderRadius: '20px',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+        boxShadow: 'var(--shadow-md)',
       }}
     >
-      <MuiTypography variant="h5" sx={{ fontWeight: 700, mb: 3, color: 'var(--color-text-primary-dark)', display: 'flex', alignItems: 'center', gap: 2 }}>
+      <MuiTypography variant="h5" sx={{ fontWeight: 700, mb: 3, color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: 2 }}>
         <Link2 size={24} style={{ color: 'var(--color-primary-500)' }} />
         ربط الأغاني مع الفعاليات
       </MuiTypography>
@@ -180,9 +180,9 @@ export default function EventSongsConnectionTab() {
               sx={{
                 borderRadius: '14px',
                 background: 'rgba(255, 255, 255, 0.03)',
-                color: 'var(--color-text-primary-dark)',
+                color: 'var(--color-text-primary)',
                 '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(216, 185, 138, 0.15)',
+                  borderColor: 'var(--color-border-glass)',
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
                   borderColor: 'rgba(216, 185, 138, 0.3)',
@@ -226,9 +226,9 @@ export default function EventSongsConnectionTab() {
               sx={{
                 borderRadius: '14px',
                 background: 'rgba(255, 255, 255, 0.03)',
-                color: 'var(--color-text-primary-dark)',
+                color: 'var(--color-text-primary)',
                 '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(216, 185, 138, 0.15)',
+                  borderColor: 'var(--color-border-glass)',
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
                   borderColor: 'rgba(216, 185, 138, 0.3)',
@@ -263,9 +263,9 @@ export default function EventSongsConnectionTab() {
               sx={{
                 borderRadius: '14px',
                 background: 'rgba(255, 255, 255, 0.03)',
-                color: 'var(--color-text-primary-dark)',
+                color: 'var(--color-text-primary)',
                 '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(216, 185, 138, 0.15)',
+                  borderColor: 'var(--color-border-glass)',
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
                   borderColor: 'rgba(216, 185, 138, 0.3)',
@@ -321,13 +321,13 @@ export default function EventSongsConnectionTab() {
           </MuiTypography>
           
           {playlistLoading ? (
-            <MuiPaper sx={{ p: 3, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
+            <MuiPaper sx={{ p: 3, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--color-border-glass)', borderRadius: '12px' }}>
               <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
                 جاري التحميل...
               </MuiTypography>
             </MuiPaper>
           ) : eventPlaylist.length === 0 ? (
-            <MuiPaper sx={{ p: 3, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(216, 185, 138, 0.15)', borderRadius: '12px' }}>
+            <MuiPaper sx={{ p: 3, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--color-border-glass)', borderRadius: '12px' }}>
               <Music size={32} style={{ color: 'var(--color-text-secondary)', margin: '0 auto 8px', opacity: 0.5 }} />
               <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
                 لا توجد أغاني مرتبطة بهذه الفعالية
@@ -344,7 +344,7 @@ export default function EventSongsConnectionTab() {
                     <MuiPaper sx={{ 
                       p: 2.5, 
                       backgroundColor: 'rgba(255, 255, 255, 0.05)', 
-                      border: '1px solid rgba(216, 185, 138, 0.15)', 
+                      border: '1px solid var(--color-border-glass)', 
                       borderRadius: '12px',
                       display: 'flex',
                       flexDirection: 'column',
@@ -367,7 +367,7 @@ export default function EventSongsConnectionTab() {
                               size="small"
                               sx={{
                                 mt: 1,
-                                backgroundColor: 'rgba(216, 185, 138, 0.15)',
+                                backgroundColor: 'var(--color-border-glass)',
                                 color: 'var(--color-primary-400)',
                                 fontWeight: 600,
                                 height: '24px',
@@ -383,7 +383,7 @@ export default function EventSongsConnectionTab() {
                         </MuiBox>
                       </MuiBox>
                       
-                      <MuiBox sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1, borderTop: '1px solid rgba(216, 185, 138, 0.15)' }}>
+                      <MuiBox sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1, borderTop: '1px solid var(--color-border-glass)' }}>
                         <MuiIconButton
                           size="small"
                           onClick={() => handleRemoveSong(playlistId, songTitle)}

@@ -32,7 +32,7 @@ const premiumMenuProps = {
                 py: 1.5,
                 px: 3,
                 '&:hover': {
-                    bgcolor: 'rgba(216, 185, 138, 0.1)',
+                    bgcolor: 'var(--color-border-glass)',
                     color: 'var(--color-primary-400)',
                 },
                 '&.Mui-selected': {
@@ -202,7 +202,7 @@ export default function ManagerFinancialReports() {
                         elevation={0}
                         sx={{
                             p: 3,
-                            background: 'rgba(20, 20, 20, 0.6)',
+                            background: 'var(--color-paper)',
                             backdropFilter: 'blur(10px)',
                             border: '1px solid rgba(216, 185, 138, 0.2)',
                             borderRadius: '24px',
@@ -214,7 +214,7 @@ export default function ManagerFinancialReports() {
                             <MuiBox sx={{
                                 width: 48, height: 48,
                                 borderRadius: '14px',
-                                background: 'rgba(216, 185, 138, 0.1)',
+                                background: 'var(--color-border-glass)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 color: 'var(--color-primary-500)'
                             }}>
@@ -302,7 +302,7 @@ export default function ManagerFinancialReports() {
                             sx={{
                                 p: 6,
                                 textAlign: 'center',
-                                background: 'rgba(20, 20, 20, 0.4)',
+                                background: 'var(--color-paper)',
                                 border: '1px dashed rgba(255, 255, 255, 0.1)',
                                 borderRadius: '24px'
                             }}
@@ -355,9 +355,9 @@ function ReportCard({ report, onExportExcel, onExportPDF }) {
             elevation={0}
             sx={{
                 p: 2.5,
-                background: 'rgba(20, 20, 20, 0.6)',
+                background: 'var(--color-paper)',
                 backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(216, 185, 138, 0.1)',
+                border: '1px solid var(--color-border-glass)',
                 borderRadius: '20px',
                 display: 'flex',
                 alignItems: 'center',
@@ -374,7 +374,7 @@ function ReportCard({ report, onExportExcel, onExportPDF }) {
                 <MuiBox sx={{
                     width: 56, height: 56,
                     borderRadius: '16px',
-                    background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.1) 0%, rgba(216, 185, 138, 0.05) 100%)',
+                    background: 'linear-gradient(135deg, var(--color-border-glass) 0%, rgba(216, 185, 138, 0.05) 100%)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     color: 'var(--color-primary-500)',
                     border: '1px solid rgba(216, 185, 138, 0.2)'
