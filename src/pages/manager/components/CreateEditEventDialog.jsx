@@ -127,11 +127,16 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
     const [clientSelection, setClientSelection] = useState('new')
 
     // Fetch clients for dropdown
-    const { data: clientsData } = useQuery({
+    const { data: clientsData, isLoading: clientsLoading, error: clientsError } = useQuery({
         queryKey: [QUERY_KEYS.MANAGER_CLIENTS],
         queryFn: getClients,
         enabled: open,
     })
+
+    // Debug: Log client data
+    console.log('CreateEditEventDialog - clientsData:', clientsData)
+    console.log('CreateEditEventDialog - clientsLoading:', clientsLoading)
+    console.log('CreateEditEventDialog - clientsError:', clientsError)
 
     // Fetch hall services list with full details (names, prices, etc.)
     const { data: servicesData, isLoading: servicesLoading } = useQuery({
@@ -167,6 +172,10 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
     })
 
     const clients = clientsData?.clients || clientsData?.data || []
+    
+    // Debug: Log processed clients
+    console.log('CreateEditEventDialog - processed clients:', clients)
+    console.log('CreateEditEventDialog - clients length:', clients.length)
 
     // Get scanners from staff - filter by role 'scanner'
     const staff = staffData?.staff || staffData?.data || []

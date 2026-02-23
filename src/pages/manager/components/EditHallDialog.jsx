@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiTextField from '@/components/ui/MuiTextField'
-import MuiBox from '@/components/ui/MuiBox'
 import MuiTypography from '@/components/ui/MuiTypography'
 import { FormDialog } from '@/components/common'
 import { useNotification } from '@/hooks'
@@ -16,6 +15,7 @@ const editHallSchema = z.object({
     capacity: z.coerce.number().min(1, 'السعة مطلوبة').max(10000, 'السعة كبيرة جداً'),
     tables: z.coerce.number().min(0, 'عدد الطاولات يجب أن يكون 0 أو أكثر').max(1000, 'عدد الطاولات كبير جداً'),
     chairs: z.coerce.number().min(0, 'عدد الكراسي يجب أن يكون 0 أو أكثر').max(10000, 'عدد الكراسي كبير جداً'),
+    defaultPrices: z.coerce.number().min(0, 'السعر يجب أن يكون 0 أو أكثر').max(100000, 'السعر كبير جداً'),
     description: z.string().optional(),
 })
 
@@ -35,6 +35,7 @@ export default function EditHallDialog({ open, onClose, onSubmit, hall, loading 
             capacity: hall?.capacity || 0,
             tables: hall?.tables || 0,
             chairs: hall?.chairs || 0,
+            defaultPrices: hall?.defaultPrices || 0,
             description: hall?.description || ''
         }
     })
@@ -47,13 +48,29 @@ export default function EditHallDialog({ open, onClose, onSubmit, hall, loading 
                 capacity: hall.capacity || 0,
                 tables: hall.tables || 0,
                 chairs: hall.chairs || 0,
+                defaultPrices: hall.defaultPrices || 0,
                 description: hall.description || ''
             })
         }
     }, [open, hall, reset])
 
     const handleFormSubmit = (data) => {
-        onSubmit(data)
+        // Only include the specific fields we want to update, excluding images (handled separately)
+        const submitData = {
+            name: data.name,
+            location: data.location,
+            capacity: data.capacity,
+            tables: data.tables,
+            chairs: data.chairs,
+            defaultPrices: data.defaultPrices,
+            description: data.description,
+            // Note: Images are handled separately via uploadHallImage and setPrimaryHallImage
+        }
+        
+        // Debug: Log what we're submitting
+        console.log('EditHallDialog submitting:', submitData)
+        
+        onSubmit(submitData)
     }
 
     return (
@@ -170,6 +187,23 @@ export default function EditHallDialog({ open, onClose, onSubmit, hall, loading 
                                 fullWidth
                                 error={!!errors.chairs}
                                 helperText={errors.chairs?.message}
+                            />
+                        )}
+                    />
+                </MuiGrid>
+
+                <MuiGrid item xs={12} sm={4}>
+                    <Controller
+                        name="defaultPrices"
+                        control={control}
+                        render={({ field }) => (
+                            <MuiTextField
+                                {...field}
+                                label="السعر الافتراضي (ل.س)"
+                                type="number"
+                                fullWidth
+                                error={!!errors.defaultPrices}
+                                helperText={errors.defaultPrices?.message}
                             />
                         )}
                     />

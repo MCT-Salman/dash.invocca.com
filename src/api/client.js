@@ -89,9 +89,16 @@ export const getEventSongs = async eventId => {
  */
 export const addSong = async (eventId, songData) => {
   try {
+    console.log('Client API - addSong called with:')
+    console.log('eventId:', eventId)
+    console.log('songData:', songData)
+    console.log('Full payload to send:', songData)
+
     const response = await api.post(`/client/events/${eventId}/songs`, songData)
+    console.log('Client API - addSong response:', response.data)
     return response.data
   } catch (error) {
+    console.error('Client API - addSong error:', error)
     throw error
   }
 }

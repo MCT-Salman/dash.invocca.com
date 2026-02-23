@@ -37,6 +37,96 @@ export const updateHallInfo = async (id, hallData) => {
 }
 
 /**
+ * POST - إضافة صورة للقاعة
+ * POST /manager/hall/images
+ * Alternative: PUT /manager/hall (with images in FormData)
+ */
+export const uploadHallImage = async (formData) => {
+  try {
+    console.log('Calling uploadHallImage API:', '/manager/hall/images')
+    console.log('FormData contents:')
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value instanceof File ? `File: ${value.name} (${value.size} bytes, ${value.type})` : value)
+    }
+
+    // Try the original endpoint first
+    let response;
+    try {
+      response = await api.post('/manager/hall/images', formData, {
+        // Remove manual Content-Type to let browser set it automatically
+        headers: {},
+        // Prevent axios from transforming FormData
+        transformRequest: [(data) => data]
+      })
+    } catch (postError) {
+      console.log('POST /manager/hall/images failed, trying PUT /manager/hall')
+      console.log('POST error details:', postError.response?.data || postError.message)
+
+      // If POST fails, try PUT /manager/hall as fallback
+      response = await api.put('/manager/hall', formData, {
+        // Remove manual Content-Type to let browser set it automatically
+        headers: {},
+        // Prevent axios from transforming FormData
+        transformRequest: [(data) => data]
+      })
+    }
+    console.log('uploadHallImage response:', response.data)
+    return response.data
+  } catch (error) {
+    console.error('uploadHallImage API error:', error)
+    console.error('Error details:', error.response?.data || error.message)
+    throw error
+  }
+}
+
+/**
+ * PUT - تعديل صورة القاعة
+ * PUT /manager/hall/images/:id
+ */
+export const updateHallImage = async (imageId, formData) => {
+  try {
+    const response = await api.put(`/manager/hall/images/${imageId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * DELETE - حذف صورة القاعة
+ * DELETE /manager/hall/images/:id
+ */
+export const deleteHallImage = async (imageId) => {
+  try {
+    const response = await api.delete(`/manager/hall/images/${imageId}`)
+    return response.data
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+/**
+ * PUT - تعديل الصورة الرئيسية للقاعة
+ * PUT /manager/hall/images/:id/primary
+ */
+export const setPrimaryHallImage = async (imageId) => {
+  try {
+    console.log('Calling setPrimaryHallImage API:', `/manager/hall/images/${imageId}/primary`)
+    const response = await api.put(`/manager/hall/images/${imageId}/primary`)
+    console.log('setPrimaryHallImage response:', response.data)
+    return response.data
+  } catch (error) {
+    console.error('setPrimaryHallImage API error:', error)
+    throw error
+  }
+}
+
+/**
  * POST - إضافة خدمة للقاعة
  * POST /manager/hall/services
  */
@@ -533,9 +623,12 @@ export const deleteEventPlaylistSong = async (eventId, playlistId) => {
  */
 export const getClients = async (params = {}) => {
   try {
+    console.log('Calling getClients API:', '/manager/clients', 'params:', params)
     const response = await api.get('/manager/clients', { params })
+    console.log('getClients response:', response.data)
     return response.data
   } catch (error) {
+    console.error('getClients API error:', error)
     throw error
   }
 }
@@ -800,6 +893,10 @@ export default {
   updateHallSong,
   deleteHallSong,
   toggleHallSongActive,
+  uploadHallImage,
+  updateHallImage,
+  deleteHallImage,
+  setPrimaryHallImage,
 
   // Events
   getManagerEvents,

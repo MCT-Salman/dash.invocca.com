@@ -64,7 +64,7 @@ export default function Invitations() {
   const [showInvitationCard, setShowInvitationCard] = useState(false)
   const [selectedInvitation, setSelectedInvitation] = useState(null)
   const [selectedTemplateId, setSelectedTemplateId] = useState(null)
-  
+
   // State for selected event (outside dialog) - for batch invitation creation
   const [selectedEventIdForInvitations, setSelectedEventIdForInvitations] = useState(null)
 
@@ -1614,6 +1614,22 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                   />
                 )}
               </MuiBox>
+              <MuiTypography variant="body1"
+                sx={{
+                  fontWeight: 700,
+                  color: '#fff',
+                  fontSize: { xs: '1rem', sm: '1.15rem', md: '1.3rem' },
+                  fontFamily: "'Alexandria', 'Montserrat', sans-serif",
+                  letterSpacing: 'normal',
+                  textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
+                  textAlign: 'center',
+                  lineHeight: 1.2,
+                  direction: 'rtl',
+                  unicodeBidi: 'embed',
+                }}
+              >
+                {invitation.qrCode}
+              </MuiTypography>
 
               {/* Golden Horizontal Bar */}
               <MuiBox
@@ -2171,11 +2187,11 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
                 width: '8px',
               },
               '&::-webkit-scrollbar-track': {
-                  background: 'var(--color-surface)',
+                background: 'var(--color-surface)',
                 borderRadius: '4px',
               },
               '&::-webkit-scrollbar-thumb': {
-                  background: 'var(--color-primary-400)',
+                background: 'var(--color-primary-400)',
                 borderRadius: '4px',
                 '&:hover': {
                   background: 'var(--color-primary-500)',
@@ -2543,8 +2559,8 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
     if (open) {
       const initialGuests = editingInvitation?.guests?.map(g => ({ name: g.name || '' })) || []
       // Use preselectedEventId for create mode, or editingInvitation's eventId for edit mode
-      const initialEventId = isEdit 
-        ? (editingInvitation?.eventId?._id || editingInvitation?.eventId || '') 
+      const initialEventId = isEdit
+        ? (editingInvitation?.eventId?._id || editingInvitation?.eventId || '')
         : (preselectedEventId || '')
       reset({
         eventId: initialEventId,
@@ -2654,7 +2670,7 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
             />
           </MuiGrid>
         )}
-        
+
         {/* Show selected event info if preselected */}
         {isCreate && preselectedEventId && (
           <MuiGrid item xs={12}>

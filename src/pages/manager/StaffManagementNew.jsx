@@ -57,10 +57,10 @@ function StaffRoleBadge({ role }) {
         manager: { label: 'مدير', color: '#9333ea', bg: '#f3e8ff', icon: Shield },
         employee: { label: 'موظف', color: '#0284c7', bg: '#e0f2fe', icon: Briefcase },
         supervisor: { label: 'مشرف', color: '#D99B3D', bg: '#FFF8DA', icon: Award },
-        scanner: { label: 'مسح', color: '#16a34a', bg: '#dcfce7', icon: Briefcase },
+        scanner: { label: 'ماسح', color: '#16a34a', bg: '#dcfce7', icon: QrCode },
     }
 
-    const config = roleConfig[role] || roleConfig.employee
+    const config = roleConfig[role] || roleConfig.scanner
     const Icon = config.icon
 
     return (
@@ -636,7 +636,7 @@ export default function StaffManagement() {
         total: staff.length,
         active: staff.filter(s => s.isActive !== false).length,
         managers: staff.filter(s => s.role === 'manager').length,
-        employees: staff.filter(s => s.role === 'employee').length,
+        scanners: staff.filter(s => s.role === 'scanner').length,
     }
 
     // Table Columns
@@ -760,7 +760,7 @@ export default function StaffManagement() {
 
     return (
         <>
-            <SEOHead title="إدارة الموظفين" />
+            <SEOHead title="إدارة المديرين والماسحات" />
 
             <MuiBox sx={{ p: { xs: 2, sm: 3, md: 4 }, minHeight: '100vh', background: 'var(--color-bg-dark)' }}>
                 {/* Header Section - Premium Welcome Card */}
@@ -831,7 +831,7 @@ export default function StaffManagement() {
                                         backgroundClip: 'text',
                                     }}
                                 >
-                                    إدارة الموظفين
+                                    إدارة المديرين والماسحات
                                 </MuiTypography>
                                 <MuiTypography 
                                     variant="body1" 
@@ -842,7 +842,7 @@ export default function StaffManagement() {
                                         letterSpacing: '0.3px'
                                     }}
                                 >
-                                    عرض وإدارة جميع الموظفين والمشرفين
+                                    عرض وإدارة جميع المديرين والماسحات
                                 </MuiTypography>
                             </MuiBox>
                         </MuiBox>
@@ -887,7 +887,7 @@ export default function StaffManagement() {
                                     }
                                 }}
                             >
-                                إضافة موظف جديد
+                                إضافة مدير أو ماسح
                             </MuiButton>
                         </MuiBox>
                     </MuiBox>
@@ -1159,7 +1159,7 @@ export default function StaffManagement() {
                                             display: 'block'
                                         }}
                                     >
-                                        موظفين
+                                        ماسحات
                                     </MuiTypography>
                                     <MuiTypography 
                                         variant="h4" 
@@ -1169,7 +1169,7 @@ export default function StaffManagement() {
                                             fontSize: '2rem'
                                         }}
                                     >
-                                        {stats.employees}
+                                        {stats.scanners}
                                     </MuiTypography>
                                 </MuiBox>
                             </MuiBox>
@@ -1195,7 +1195,7 @@ export default function StaffManagement() {
                         value={activeTab}
                         onChange={(e, newValue) => setActiveTab(newValue)}
                         tabs={[
-                            { label: 'قائمة الموظفين', icon: <Users size={18} /> },
+                            { label: 'المديرين والماسحات', icon: <Users size={18} /> },
                             { label: 'ربط الماسحات', icon: <Link2 size={18} /> }
                         ]}
                         sx={{

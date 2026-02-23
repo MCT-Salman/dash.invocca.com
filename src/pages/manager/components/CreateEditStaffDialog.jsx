@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiTypography from '@/components/ui/MuiTypography'
 import MuiTextField from '@/components/ui/MuiTextField'
+import MuiSelect from '@/components/ui/MuiSelect'
 import { BaseFormDialog } from '@/components/shared'
 import { useNotification } from '@/hooks'
 import { createStaffSchema } from '@/utils/validations'
@@ -19,7 +20,7 @@ export default function CreateEditStaffDialog({ open, onClose, onSubmit, editing
         formState: { errors },
         reset
     } = useForm({
-        resolver: zodResolver(createStaffSchema(isEdit, ['scanner'])),
+        resolver: zodResolver(createStaffSchema(isEdit, ['scanner', 'manager'])),
         defaultValues: {
             name: editingStaff?.name || '',
             phone: editingStaff?.phone || '',
@@ -52,12 +53,12 @@ export default function CreateEditStaffDialog({ open, onClose, onSubmit, editing
     }, [open, editingStaff, reset])
 
     const handleFormSubmit = (data) => {
-        // Prepare data for API - role is always 'scanner'
+        // Prepare data for API - role can be 'scanner' or 'manager'
         const submitData = {
             name: data.name,
             phone: data.phone,
             username: data.username,
-            role: 'scanner', // Always scanner - no user selection
+            role: data.role, // Allow both scanner and manager roles
             password: data.password
         }
         
@@ -78,7 +79,7 @@ export default function CreateEditStaffDialog({ open, onClose, onSubmit, editing
         <BaseFormDialog
             open={open}
             onClose={onClose}
-            title={isEdit ? 'تعديل الموظف' : 'إضافة موظف جديد'}
+            title={isEdit ? 'تعديل المدير أو الماسح' : 'إضافة مدير أو ماسح جديد'}
             onSubmit={handleSubmit(handleFormSubmit, (errors) => {
                 const firstError = Object.values(errors)[0]
                 showNotification({
@@ -149,6 +150,27 @@ export default function CreateEditStaffDialog({ open, onClose, onSubmit, editing
                                 placeholder={isEdit ? 'اتركه فارغاً إذا لم ترد تغييره' : ''}
                                 error={!!error}
                                 helperText={error?.message || (isEdit ? 'اتركه فارغاً إذا لم ترد تغييره' : '')}
+                            />
+                        )}
+                    />
+                </MuiGrid>
+
+                <MuiGrid item xs={12}>
+                    <Controller
+                        name="role"
+                        control={control}
+                        render={({ field, fieldState: { error } }) => (
+                            <MuiSelect
+                                {...field}
+                                label="المنصب"
+                                required
+                                fullWidth
+                                error={!!error}
+                                helperText={error?.message}
+                                options={[
+                                    { label: 'ماسح', value: 'scanner' },
+                                    { label: 'مدير', value: 'manager' }
+                                ]}
                             />
                         )}
                     />

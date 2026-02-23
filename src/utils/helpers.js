@@ -445,16 +445,23 @@ export function getImageUrl(path) {
     // Use API_CONFIG.BASE_URL directly if possible, otherwise rely on import
     const baseUrl = import.meta.env.VITE_API_BASE || 'http://82.137.244.167:5001'
 
-    return `${baseUrl}/uploads/${cleanPath}`
+    // Check if path already includes 'uploads/' to avoid duplication
+    if (cleanPath.startsWith('uploads/')) {
+        const fullUrl = `${baseUrl}/${cleanPath}`
+        return fullUrl
+    }
+
+    const fullUrl = `${baseUrl}/uploads/halls/${cleanPath}`
+    return fullUrl
 }
 
 /**
  * Format empty/null/undefined values to display text
  * @param {any} value - Value to format
- * @param {string} fallback - Fallback text (default: '—')
+ * @param {string} fallback - Fallback text (default: '-')
  * @returns {string} Formatted value or fallback
  */
-export function formatEmptyValue(value, fallback = '—') {
+export function formatEmptyValue(value, fallback = '-') {
     if (value === null || value === undefined || value === '' || value === 'N/A' || value === 'غير محدد' || value === 'غير متوفر' || value === 'لا يوجد') {
         return fallback
     }

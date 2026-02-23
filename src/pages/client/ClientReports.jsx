@@ -15,7 +15,7 @@ import MuiDivider from '@/components/ui/MuiDivider'
 import { LoadingScreen, SEOHead, EmptyState, FormDialog } from '@/components/common'
 import { QUERY_KEYS } from '@/config/constants'
 import { getClientReports } from '@/api/client'
-import { formatDate, formatCurrency, formatEmptyValue, formatNumber } from '@/utils/helpers'
+import { formatDate, formatCurrency, formatEmptyValue, formatNumber, getImageUrl } from '@/utils/helpers'
 import {
   BarChart3,
   Calendar,
@@ -572,7 +572,7 @@ export default function ClientReports() {
                 </MuiTypography>
                 <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
                   {hall.images.map((image, index) => {
-                    const imageUrl = image.url?.startsWith('http') ? image.url : `${import.meta.env.VITE_API_BASE}${image.url}`
+                    const imageUrl = getImageUrl(image.url)
                     return (
                       <MuiBox
                         key={image._id || image.id || index}
@@ -609,9 +609,7 @@ export default function ClientReports() {
                 </MuiTypography>
                 <MuiBox
                   onClick={() => {
-                    const imageUrl = hall.primaryImage.url?.startsWith('http')
-                      ? hall.primaryImage.url
-                      : `${import.meta.env.VITE_API_BASE}${hall.primaryImage.url}`
+                    const imageUrl = getImageUrl(hall.primaryImage.url)
                     window.open(imageUrl, '_blank')
                   }}
                   sx={{
@@ -619,9 +617,24 @@ export default function ClientReports() {
                     height: 200,
                     borderRadius: '12px',
                     overflow: 'hidden',
-                    border: '1px solid var(--color-border-glass)',
+                    border: '3px solid var(--color-primary-500)',
                     cursor: 'pointer',
                     transition: 'transform 0.2s, box-shadow 0.2s',
+                    position: 'relative',
+                    '&::before': {
+                      content: '"رئيسية"',
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      backgroundColor: 'var(--color-primary-500)',
+                      color: 'white',
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: '4px',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
+                      zIndex: 1
+                    },
                     '&:hover': {
                       transform: 'scale(1.05)',
                       boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
@@ -629,9 +642,7 @@ export default function ClientReports() {
                   }}
                 >
                   <img
-                    src={hall.primaryImage.url?.startsWith('http')
-                      ? hall.primaryImage.url
-                      : `${import.meta.env.VITE_API_BASE}${hall.primaryImage.url}`}
+                    src={getImageUrl(hall.primaryImage.url)}
                     alt={hall.primaryImage.caption || 'الصورة الرئيسية'}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />

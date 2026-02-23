@@ -99,7 +99,18 @@ export const getClientEventSongs = (eventId) => {
  * إضافة أغنية جديدة لحدث (للعميل)
  */
 export const addClientSong = (eventId, payload) => {
-    return api.post(`/client/events/${eventId}/songs`, payload).then(r => r.data)
+    console.log('Songs API - addClientSong called with:')
+    console.log('eventId:', eventId)
+    console.log('payload:', payload)
+    console.log('Full payload to send:', payload)
+
+    return api.post(`/client/events/${eventId}/songs`, payload).then(r => {
+        console.log('Songs API - addClientSong response:', r.data)
+        return r.data
+    }).catch(error => {
+        console.error('Songs API - addClientSong error:', error)
+        throw error
+    })
 }
 
 /**

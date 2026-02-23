@@ -36,7 +36,7 @@ import ClientSongsConnectionTab from './components/ClientSongsConnectionTab'
 // Validation schema
 const songSchema = z.object({
   title: z.string().min(1, 'عنوان الأغنية مطلوب'),
-  // artist: z.string().min(1, 'اسم الفنان مطلوب'),
+  artist: z.string().min(1, 'اسم الفنان مطلوب'),
   // url: z.string().url('رابط غير صحيح').min(1, 'رابط الأغنية مطلوب'),
   // duration: z.string().regex(/^\d{2}:\d{2}$/, 'المدة يجب أن تكون بصيغة MM:SS'),
   category: z.string().optional(),
@@ -408,6 +408,10 @@ export default function ClientSongs() {
       category: data.category || 'other',
       notes: data.notes || '',
     }
+
+    console.log('ClientSongs - Form data received:', data)
+    console.log('ClientSongs - Submit data to send:', submitData)
+    console.log('ClientSongs - nextOrder:', nextOrder)
 
     if (isEdit && editingSong) {
       const result = await handleUpdate(editingSong.id || editingSong._id, submitData)
@@ -897,7 +901,7 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
           />
         </MuiGrid>
 
-        <MuiGrid item xs={12}>
+        <MuiGrid item xs={12} sm={6}>
           <Controller
             name="artist"
             control={control}
@@ -905,7 +909,7 @@ function CreateEditSongDialog({ open, onClose, editingSong, onSubmit, loading })
               <MuiTextField
                 {...field}
                 label="الفنان"
-                
+                required
                 fullWidth
                 error={!!errors.artist}
                 helperText={errors.artist?.message}

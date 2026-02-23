@@ -222,6 +222,19 @@ export const updateUser = async (id, userData) => {
 }
 
 /**
+ * PUT - تعديل مستخدم (بناءً على المواصفات المطلوبة)
+ * PUT /admin/user/edit/:id
+ */
+export const editUser = async (id, userData) => {
+  try {
+    const response = await api.put(`/admin/user/edit/${id}`, userData)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
  * PUT - تفعيل/تعطيل المستخدم
  * PUT /admin/users/:id/activate
  */
@@ -622,6 +635,7 @@ export default {
   getUserById,
   createUser,
   updateUser,
+  editUser,
   toggleUserStatus,
   deleteUser,
 

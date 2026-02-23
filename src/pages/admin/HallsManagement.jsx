@@ -187,6 +187,7 @@ const HallsManagement = () => {
   const [locationFilter, setLocationFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [viewMode, setViewMode] = useState('table') // 'table' or 'card'
+  const [submitError, setSubmitError] = useState(null)
 
   // Refs
   const fileInputRef = useRef(null)
@@ -231,6 +232,17 @@ const HallsManagement = () => {
     errorMessage: 'حدث خطأ أثناء العملية',
     onSuccess: () => {
       fetchHalls()
+      setSubmitError(null)
+      closeDialog()
+    },
+    onError: (error) => {
+      // احفظ الـ error لعرضه في الـ Dialog
+      const errorMsg = error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        error?.message ||
+        'حدث خطأ أثناء العملية'
+      setSubmitError(errorMsg)
+      // لا تغلق الـ Dialog - سيبقى مفتوحاً
     },
   })
 
@@ -537,15 +549,17 @@ const HallsManagement = () => {
   }
 
   const handleCreateSubmit = async (formData) => {
+    setSubmitError(null)
     await handleCreate(formData)
-    closeDialog()
+    // closeDialog()
   }
 
   const handleUpdateSubmit = async (formData) => {
     const id = selectedHall?.id || selectedHall?._id
     if (!id) return
+    setSubmitError(null)
     await handleUpdate(id, formData)
-    closeDialog()
+    // closeDialog()
   }
 
   const handleDeleteConfirm = async () => {
@@ -844,6 +858,8 @@ const HallsManagement = () => {
         onSubmit={isCreate ? handleCreateSubmit : handleUpdateSubmit}
         editingHall={isEdit ? selectedHall : null}
         loading={crudLoading}
+        error={submitError}
+        onClearError={() => setSubmitError(null)}
       />
 
       <ViewHallDialog

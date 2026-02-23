@@ -206,6 +206,7 @@ export function useCRUD({
     successMessage = 'تمت العملية بنجاح',
     errorMessage = 'حدث خطأ أثناء العملية',
     onSuccess,
+    onError,
 }) {
     const queryClient = useQueryClient()
     const { success, error: showError } = useNotification()
@@ -217,6 +218,7 @@ export function useCRUD({
             if (hasErrorInResponse(data)) {
                 const errorMsg = extractErrorFromResponse(data, errorMessage)
                 showError(errorMsg)
+                if (onError) onError({ response: { data } })
                 return
             }
             // Otherwise, treat as success
@@ -232,6 +234,7 @@ export function useCRUD({
         onError: (err) => {
             const errorMsg = extractErrorMessage(err, errorMessage)
             showError(errorMsg)
+            if (onError) onError(err)
         },
     })
 
@@ -242,6 +245,7 @@ export function useCRUD({
             if (hasErrorInResponse(data)) {
                 const errorMsg = extractErrorFromResponse(data, errorMessage)
                 showError(errorMsg)
+                if (onError) onError({ response: { data } })
                 return
             }
             // Otherwise, treat as success
@@ -257,6 +261,7 @@ export function useCRUD({
         onError: (err) => {
             const errorMsg = extractErrorMessage(err, errorMessage)
             showError(errorMsg)
+            if (onError) onError(err)
         },
     })
 
@@ -267,6 +272,7 @@ export function useCRUD({
             if (hasErrorInResponse(data)) {
                 const errorMsg = extractErrorFromResponse(data, errorMessage)
                 showError(errorMsg)
+                if (onError) onError({ response: { data } })
                 return
             }
             // Otherwise, treat as success
@@ -282,6 +288,7 @@ export function useCRUD({
         onError: (err) => {
             const errorMsg = extractErrorMessage(err, errorMessage)
             showError(errorMsg)
+            if (onError) onError(err)
         },
     })
 
@@ -332,5 +339,6 @@ export function useCRUD({
         handleUpdate,
         handleDelete,
         isLoading: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending,
+         error: createMutation.error || updateMutation.error || deleteMutation.error,
     }
 }

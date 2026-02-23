@@ -18,6 +18,7 @@ import MuiSelect from '@/components/ui/MuiSelect'
 import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog, PageHeader, StatCard } from '@/components/common'
 import ViewUserDialog from './components/ViewUserDialog'
 import CreateAdminDialog from './components/CreateAdminDialog'
+import EditUserDialog from './components/EditUserDialog'
 
 // Hooks & Utilities
 import { useDebounce, useDialogState, useCRUD, useNotification } from '@/hooks'
@@ -80,10 +81,12 @@ export default function UsersManagement() {
     selectedItem: selectedUser,
     openCreateDialog,
     openViewDialog,
+    openEditDialog,
     openDeleteDialog,
     closeDialog,
     isCreate,
     isView,
+    isEdit,
     isDelete,
   } = useDialogState()
 
@@ -232,6 +235,11 @@ export default function UsersManagement() {
     closeDialog()
   }
 
+  const handleEditSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_USERS })
+    success('تم تحديث بيانات المستخدم بنجاح')
+  }
+
   if (isLoading) return <LoadingScreen message="جاري تحميل المستخدمين..." />
 
   return (
@@ -348,6 +356,7 @@ export default function UsersManagement() {
           columns={columns}
           data={filteredUsers}
           onView={openViewDialog}
+          onEdit={openEditDialog}
           onDelete={openDeleteDialog}
           onToggleStatus={handleToggleStatus}
         />
@@ -366,6 +375,14 @@ export default function UsersManagement() {
         onClose={closeDialog}
         onSubmit={(form) => addAdminMutation.mutateAsync(form)}
         loading={addAdminMutation.isPending}
+      />
+
+      {/* Edit User Dialog */}
+      <EditUserDialog
+        open={isEdit}
+        onClose={closeDialog}
+        user={selectedUser}
+        onSuccess={handleEditSuccess}
       />
 
       {/* Delete Confirmation Dialog */}

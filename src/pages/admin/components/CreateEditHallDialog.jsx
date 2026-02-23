@@ -57,7 +57,15 @@ const createHallSchema = (editingHall = null) => z.object({
     templates: z.array(z.string()).optional().default([])
 })
 
-export default function CreateEditHallDialog({ open, onClose, onSubmit, editingHall, loading }) {
+export default function CreateEditHallDialog({
+    open,
+    onClose,
+    onSubmit,
+    editingHall,
+    loading,
+    error,
+    onClearError
+}) {
     const { addNotification: showNotification } = useNotification()
 
     const getHallImagePath = (img) => {
@@ -168,6 +176,11 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
         }
     }, [open, editingHall, reset])
 
+    const handleClose = () => {
+        if (onClearError) onClearError()
+        onClose()
+    }
+
     const handleFormSubmit = (data) => {
         // Validation for primary image
         if (!editingHall && !primaryImage) {
@@ -248,7 +261,7 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
     return (
         <FormDialog
             open={open}
-            onClose={onClose}
+            onClose={handleClose}
             title={editingHall ? 'تعديل قاعة/صالة' : 'إضافة قاعة/صالة جديدة'}
             onSubmit={handleSubmit(handleFormSubmit, (errors) => {
                 const firstError = Object.values(errors)[0]
@@ -263,6 +276,14 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
             cancelText="إلغاء"
             maxWidth="lg"
         >
+            {/*  عرض خطأ الـ API في أعلى الـ Dialog */}
+            {/* {error && (
+                <MuiBox sx={{ mb: 3, p: 2, backgroundColor: 'rgba(211, 47, 47, 0.1)', border: '1px solid #d32f2f', borderRadius: '8px' }}>
+                    <MuiTypography variant="body2" sx={{ color: '#d32f2f', fontWeight: 500 }}>
+                        {error.errors?.[0]?.message || error.message || 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.'}
+                    </MuiTypography>
+                </MuiBox>
+            )} */}
             <MuiGrid container spacing={3}>
                 {/* Basic Info */}
                 <MuiGrid item xs={12}>
@@ -507,18 +528,18 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                         const selectedTemplateId = watchedTemplates[index] || ''
                         const selectedTemplate = templatesList.find(t => (t._id || t.id) === selectedTemplateId)
                         const selectedTemplateImageUrl = selectedTemplate ? getTemplateImageUrl(selectedTemplate.imageUrl) : null
-                        
+
                         return (
                             <MuiBox key={field.id} sx={{ mb: 2 }}>
                                 <MuiBox sx={{ display: 'flex', gap: 2, mb: 1.5, alignItems: 'flex-start' }}>
-                            <Controller
+                                    <Controller
                                         name={`templates.${index}`}
-                                control={control}
-                                render={({ field: selectField }) => (
-                                    <MuiSelect
-                                        {...selectField}
-                                        sx={{ flexGrow: 1 }}
-                                        size="small"
+                                        control={control}
+                                        render={({ field: selectField }) => (
+                                            <MuiSelect
+                                                {...selectField}
+                                                sx={{ flexGrow: 1 }}
+                                                size="small"
                                                 displayEmpty
                                                 error={!!errors.templates?.[index]}
                                                 renderValue={(value) => {
@@ -528,14 +549,14 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                                                     return (
                                                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                             {template.imageUrl && (
-                                                                <img 
-                                                                    src={getTemplateImageUrl(template.imageUrl)} 
+                                                                <img
+                                                                    src={getTemplateImageUrl(template.imageUrl)}
                                                                     alt={template.templateName || ''}
-                                                                    style={{ 
-                                                                        width: 24, 
-                                                                        height: 24, 
-                                                                        objectFit: 'cover', 
-                                                                        borderRadius: '4px' 
+                                                                    style={{
+                                                                        width: 24,
+                                                                        height: 24,
+                                                                        objectFit: 'cover',
+                                                                        borderRadius: '4px'
                                                                     }}
                                                                 />
                                                             )}
@@ -553,23 +574,23 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                                                         <MuiMenuItem key={template._id || template.id} value={template._id || template.id}>
                                                             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: '100%', py: 0.5 }}>
                                                                 {templateImageUrl ? (
-                                                                    <img 
-                                                                        src={templateImageUrl} 
+                                                                    <img
+                                                                        src={templateImageUrl}
                                                                         alt={template.templateName || ''}
-                                                                        style={{ 
-                                                                            width: 50, 
-                                                                            height: 50, 
-                                                                            objectFit: 'cover', 
+                                                                        style={{
+                                                                            width: 50,
+                                                                            height: 50,
+                                                                            objectFit: 'cover',
                                                                             borderRadius: '6px',
                                                                             border: '1px solid var(--color-border-glass)',
                                                                             flexShrink: 0
                                                                         }}
                                                                     />
                                                                 ) : (
-                                                                    <MuiBox 
-                                                                        sx={{ 
-                                                                            width: 50, 
-                                                                            height: 50, 
+                                                                    <MuiBox
+                                                                        sx={{
+                                                                            width: 50,
+                                                                            height: 50,
                                                                             borderRadius: '6px',
                                                                             backgroundColor: 'rgba(255, 255, 255, 0.05)',
                                                                             border: '1px solid var(--color-border-glass)',
@@ -589,9 +610,9 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                                                                         {template.templateName || template.name || template._id || template.id}
                                                                     </MuiTypography>
                                                                     {template.description && (
-                                                                        <MuiTypography 
-                                                                            variant="caption" 
-                                                                            sx={{ 
+                                                                        <MuiTypography
+                                                                            variant="caption"
+                                                                            sx={{
                                                                                 color: 'var(--color-text-secondary)',
                                                                                 overflow: 'hidden',
                                                                                 textOverflow: 'ellipsis',
@@ -606,29 +627,29 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                                                                     )}
                                                                 </MuiBox>
                                                             </MuiBox>
-                                            </MuiMenuItem>
+                                                        </MuiMenuItem>
                                                     )
                                                 })}
-                                    </MuiSelect>
-                                )}
-                            />
-                            <MuiIconButton
+                                            </MuiSelect>
+                                        )}
+                                    />
+                                    <MuiIconButton
                                         onClick={() => removeTemplate(index)}
-                                color="error"
-                                size="small"
-                                sx={{ mt: 0.5 }}
-                            >
-                                <Trash2 size={20} />
-                            </MuiIconButton>
-                        </MuiBox>
-                                
+                                        color="error"
+                                        size="small"
+                                        sx={{ mt: 0.5 }}
+                                    >
+                                        <Trash2 size={20} />
+                                    </MuiIconButton>
+                                </MuiBox>
+
                                 {/* Preview of selected template */}
                                 {selectedTemplate && (
-                                    <MuiBox 
-                                        sx={{ 
-                                            mt: 1, 
-                                            p: 2, 
-                                            borderRadius: '12px', 
+                                    <MuiBox
+                                        sx={{
+                                            mt: 1,
+                                            p: 2,
+                                            borderRadius: '12px',
                                             border: '1px solid var(--color-border-glass)',
                                             backgroundColor: 'rgba(255, 255, 255, 0.03)',
                                             transition: 'all 0.2s ease',
@@ -640,23 +661,23 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                                     >
                                         <MuiBox sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
                                             {selectedTemplateImageUrl ? (
-                                                <img 
-                                                    src={selectedTemplateImageUrl} 
+                                                <img
+                                                    src={selectedTemplateImageUrl}
                                                     alt={selectedTemplate.templateName || ''}
-                                                    style={{ 
-                                                        width: 120, 
-                                                        height: 120, 
-                                                        objectFit: 'cover', 
+                                                    style={{
+                                                        width: 120,
+                                                        height: 120,
+                                                        objectFit: 'cover',
                                                         borderRadius: '8px',
                                                         border: '1px solid var(--color-border-glass)',
                                                         flexShrink: 0
                                                     }}
                                                 />
                                             ) : (
-                                                <MuiBox 
-                                                    sx={{ 
-                                                        width: 120, 
-                                                        height: 120, 
+                                                <MuiBox
+                                                    sx={{
+                                                        width: 120,
+                                                        height: 120,
                                                         borderRadius: '8px',
                                                         backgroundColor: 'rgba(255, 255, 255, 0.05)',
                                                         border: '1px solid var(--color-border-glass)',
@@ -672,10 +693,10 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                                                 </MuiBox>
                                             )}
                                             <MuiBox sx={{ flex: 1, minWidth: 0 }}>
-                                                <MuiTypography 
-                                                    variant="body1" 
-                                                    sx={{ 
-                                                        fontWeight: 600, 
+                                                <MuiTypography
+                                                    variant="body1"
+                                                    sx={{
+                                                        fontWeight: 600,
                                                         mb: 1,
                                                         color: 'var(--color-text-primary)',
                                                         fontSize: '1rem'
@@ -684,9 +705,9 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                                                     {selectedTemplate.templateName || selectedTemplate.name || 'قالب بدون اسم'}
                                                 </MuiTypography>
                                                 {selectedTemplate.description ? (
-                                                    <MuiTypography 
-                                                        variant="body2" 
-                                                        sx={{ 
+                                                    <MuiTypography
+                                                        variant="body2"
+                                                        sx={{
                                                             color: 'var(--color-text-secondary)',
                                                             lineHeight: 1.6,
                                                             whiteSpace: 'pre-wrap',
@@ -696,9 +717,9 @@ export default function CreateEditHallDialog({ open, onClose, onSubmit, editingH
                                                         {selectedTemplate.description}
                                                     </MuiTypography>
                                                 ) : (
-                                                    <MuiTypography 
-                                                        variant="caption" 
-                                                        sx={{ 
+                                                    <MuiTypography
+                                                        variant="caption"
+                                                        sx={{
                                                             color: 'var(--color-text-secondary)',
                                                             fontStyle: 'italic'
                                                         }}

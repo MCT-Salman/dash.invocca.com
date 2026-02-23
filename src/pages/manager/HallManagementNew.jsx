@@ -14,6 +14,8 @@ import MuiTypography from '@/components/ui/MuiTypography'
 import MuiButton from '@/components/ui/MuiButton'
 import MuiChip from '@/components/ui/MuiChip'
 import MuiDivider from '@/components/ui/MuiDivider'
+import MuiIconButton from '@/components/ui/MuiIconButton'
+import MuiTextField from '@/components/ui/MuiTextField'
 import { LoadingScreen, EmptyState, SEOHead } from '@/components/common'
 import { QUERY_KEYS, API_CONFIG } from '@/config/constants'
 import { getManagerHall, updateHallInfo } from '@/api/manager'
@@ -37,6 +39,7 @@ import {
     Info,
     Phone,
     Mail,
+    Trash2,
     Tag,
     DollarSign,
     Image as ImageIcon,
@@ -455,24 +458,42 @@ export default function HallManagement() {
     }
 
     const handleSave = async (data) => {
-        // Clean and prepare data for API - ensure all values are properly formatted
-        const cleanData = {
-            name: String(data.name || '').trim(),
-            location: String(data.location || '').trim(),
-            capacity: Number(data.capacity) || 0,
-            tables: Number(data.tables) || 0,
-            chairs: Number(data.chairs) || 0
-        }
+        // Create FormData as required by the API
+        const formData = new FormData()
         
-        // Add description only if it exists and is not empty
+        // Add basic fields
+        formData.append('name', String(data.name || '').trim())
+        formData.append('location', String(data.location || '').trim())
+        formData.append('capacity', String(Number(data.capacity) || 0))
+        formData.append('tables', String(Number(data.tables) || 0))
+        formData.append('chairs', String(Number(data.chairs) || 0))
+        formData.append('defaultPrices', String(Number(data.defaultPrices) || 0))
+        
+        // Add description if exists
         if (data.description && String(data.description).trim()) {
-            cleanData.description = String(data.description).trim()
+            formData.append('description', String(data.description).trim())
         }
         
-        // Use handleUpdate which will call updateMutation
-        const result = await handleUpdate(null, cleanData)
+        // Add templates as JSON string if they exist (from API example)
+        if (data.templates && Array.isArray(data.templates) && data.templates.length > 0) {
+            formData.append('templates', JSON.stringify(data.templates))
+        }
+        
+        // Note: Images are handled separately in the EditHallDialog
+        // The images array from data.images contains the updated image information
+        
+        // Debug: Log what we're sending
+        console.log('Submitting hall FormData:')
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value)
+        }
+        
+        // Use handleUpdate which will call updateMutation with FormData
+        const result = await handleUpdate(null, formData)
         if (result?.success) {
             closeDialog()
+            // Refetch to get updated data including images
+            refetch()
         }
     }
 
@@ -483,6 +504,10 @@ export default function HallManagement() {
     if (isLoading) {
         return <LoadingScreen />
     }
+
+    // Debug: Log hall data to see image structure
+    console.log('Hall data loaded:', hall)
+    console.log('Hall images:', hall?.images)
 
     return (
         <>
@@ -853,9 +878,9 @@ export default function HallManagement() {
                                     </MuiBox>
                                     <MuiGrid container spacing={2}>
                                         {hall.images.map((image, index) => {
-                                            const imageUrl = image.url?.startsWith('http') 
-                                                ? image.url 
-                                                : `${import.meta.env.VITE_API_BASE}${image.url}`
+                                            const imageUrl = getImageUrl(image.url)
+                                            console.log('Image data:', image)
+                                            console.log('Image URL:', imageUrl)
                                             return (
                                                 <MuiGrid item xs={12} sm={6} md={4} key={image._id || index}>
                                                     <MuiPaper
@@ -873,6 +898,14 @@ export default function HallManagement() {
                                                             src={imageUrl}
                                                             alt={image.caption || `صورة ${index + 1}`}
                                                             onClick={() => window.open(imageUrl, '_blank')}
+                                                            onError={(e) => {
+                                                                console.error('Image failed to load:', imageUrl)
+                                                                // Show error message instead of broken image
+                                                                e.target.style.display = 'none'
+                                                                if (e.target.nextSibling) {
+                                                                    e.target.nextSibling.style.display = 'flex'
+                                                                }
+                                                            }}
                                                             sx={{
                                                                 width: '100%',
                                                                 height: '200px',
@@ -886,6 +919,24 @@ export default function HallManagement() {
                                                                 }
                                                             }}
                                                         />
+                                                        <MuiBox
+                                                            sx={{
+                                                                display: 'none',
+                                                                width: '100%',
+                                                                height: '200px',
+                                                                borderRadius: '8px',
+                                                                mb: 1,
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                                                                border: '2px dashed rgba(255, 0, 0, 0.3)',
+                                                                color: 'var(--color-error)',
+                                                                fontSize: '0.875rem',
+                                                                fontWeight: 500,
+                                                            }}
+                                                        >
+                                                            فشل تحميل الصورة
+                                                        </MuiBox>
                                                         {image.isPrimary && (
                                                             <MuiChip
                                                                 label="رئيسية"
@@ -899,11 +950,6 @@ export default function HallManagement() {
                                                                     fontWeight: 600,
                                                                 }}
                                                             />
-                                                        )}
-                                                        {image.caption && (
-                                                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.75rem' }}>
-                                                                {image.caption}
-                                                            </MuiTypography>
                                                         )}
                                                     </MuiPaper>
                                                 </MuiGrid>
