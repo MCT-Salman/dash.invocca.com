@@ -25,9 +25,15 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
   const navigate = useNavigate()
   const isMobile = useMediaQuery('(max-width: 900px)')
 
-  // Map scanner role to employee menu
-  const role = user?.role === 'scanner' ? 'employee' : user?.role
-  const menuItems = role ? (ROLE_MENUS[role] || []) : []
+  // Handle roles as array - get the primary role for menu display
+  const userRoles = Array.isArray(user?.role) ? user.role : [user?.role]
+  
+  // Map scanner role to employee menu and get primary role for menu
+  const normalizedRoles = userRoles.map(role => 
+    role === 'scanner' ? 'employee' : role
+  )
+  const primaryRole = normalizedRoles[0] // Use first role for menu display
+  const menuItems = primaryRole ? (ROLE_MENUS[primaryRole] || []) : []
   const [mobileOpen, setMobileOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
 
