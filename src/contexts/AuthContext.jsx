@@ -64,22 +64,36 @@ export function AuthProvider({ children }) {
     // Helper: Navigate by Role
     // ─────────────────────────────────────────────────────────
 
-    const navigateByRole = useCallback((role) => {
-        switch (role) {
+    const navigateByRole = useCallback((roles) => {
+        // Handle roles as array - get the primary role for navigation
+        const roleArray = Array.isArray(roles) ? roles : [roles]
+        const primaryRole = roleArray[0] // Use first role as primary
+        
+        // console.log('🧭 Navigation - Input roles:', roles)
+        // console.log('🧭 Navigation - Role array:', roleArray)
+        // console.log('🧭 Navigation - Primary role:', primaryRole)
+        // console.log('🧭 Navigation - Target route for admin:', ROUTES.ADMIN.DASHBOARD)
+        
+        switch (primaryRole) {
             case USER_ROLES.ADMIN:
+                // console.log('🧭 Navigating to Admin Dashboard')
                 navigate(ROUTES.ADMIN.DASHBOARD)
                 break
             case USER_ROLES.MANAGER:
+                // console.log('🧭 Navigating to Manager Dashboard')
                 navigate(ROUTES.MANAGER.DASHBOARD)
                 break
             case USER_ROLES.CLIENT:
+                // console.log('🧭 Navigating to Client Dashboard')
                 navigate(ROUTES.CLIENT.DASHBOARD)
                 break
             case USER_ROLES.EMPLOYEE:
             case 'scanner': // Scanner role maps to employee routes
+                // console.log('🧭 Navigating to Employee Dashboard')
                 navigate(ROUTES.EMPLOYEE.DASHBOARD)
                 break
             default:
+                // console.log('🧭 Navigating to Home (default)')
                 navigate(ROUTES.HOME)
         }
     }, [navigate])
@@ -103,7 +117,10 @@ export function AuthProvider({ children }) {
                 // Store user as JSON string
                 setStorageItem(STORAGE_KEYS.USER, userData)
 
-                // Navigate based on role
+                // Navigate based on role (now array)
+                // console.log('🚀 Login - User role:', userData.role)
+                // console.log('🚀 Login - Role type:', typeof userData.role)
+                // console.log('🚀 Login - Is array:', Array.isArray(userData.role))
                 navigateByRole(userData.role)
 
                 return { success: true, user: userData }
@@ -141,7 +158,7 @@ export function AuthProvider({ children }) {
                 // Store user as JSON string
                 setStorageItem(STORAGE_KEYS.USER, user)
 
-                // Navigate based on role
+                // Navigate based on role (now array)
                 navigateByRole(user.role)
 
                 return { success: true, user }
@@ -229,7 +246,9 @@ export function AuthProvider({ children }) {
     // ─────────────────────────────────────────────────────────
 
     const hasRole = useCallback((role) => {
-        return user?.role === role
+        // Handle roles as array - check if user has the specified role
+        const userRoles = Array.isArray(user?.role) ? user.role : [user?.role]
+        return userRoles.includes(role)
     }, [user])
 
     const isAdmin = useCallback(() => hasRole(USER_ROLES.ADMIN), [hasRole])

@@ -46,10 +46,10 @@ const createHallSchema = (editingHall = null) => z.object({
     managerName: z.string().min(3, 'اسم المدير مطلوب').max(100, 'اسم المدير طويل جداً'),
     managerUsername: z.string().min(3, 'اسم المستخدم مطلوب').regex(/^[a-zA-Z0-9_]+$/, 'اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام فقط'),
 
-    managerPhone: z.string().regex(/^\d+$/, 'رقم الهاتف يجب أن يكون أرقام فقط').min(6, 'رقم الهاتف يجب أن يكون 6 أرقام على الأقل').max(15, 'رقم الهاتف طويل جداً'),
+    managerPhone: z.string().nonempty('رقم الهاتف مطلوب').regex(/^\d+$/, 'رقم الهاتف يجب أن يكون أرقام فقط').min(10, 'رقم الهاتف يجب أن يكون 10 أرقام على ').max(10, 'رقم الهاتف طويل جداً'),
     managerPassword: editingHall
-        ? z.string().min(6, 'كلمة المرور يجب أن تكون 6 أحرف على الأقل').optional().or(z.literal(''))
-        : z.string().min(6, 'كلمة المرور مطلوبة'),
+        ? z.string().min(8, 'كلمة المرور يجب أن تكون بين 8 و 20 حرف').max(20, 'كلمة المرور طويلة جداً').optional().or(z.literal(''))
+        : z.string().min(8, 'كلمة المرور يجب أن تكون بين 8 و 20 حرف').max(20, 'كلمة المرور طويلة جداً').optional().or(z.literal('')),
 
     description: z.string().optional(),
     isActive: z.boolean().default(true),

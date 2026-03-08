@@ -30,11 +30,16 @@ export default function ProtectedRoute({ children, requiredRole }) {
 
     // Check role if required
     if (requiredRole) {
+        // Handle roles as array - check if user has the required role
+        const userRoles = Array.isArray(user?.role) ? user.role : [user?.role]
+        
         // Scanner role should be treated as employee
-        const userRole = user?.role === 'scanner' ? 'employee' : user?.role
+        const userRolesNormalized = userRoles.map(role => 
+            role === 'scanner' ? 'employee' : role
+        )
         const requiredRoleNormalized = requiredRole === 'scanner' ? 'employee' : requiredRole
         
-        if (userRole !== requiredRoleNormalized) {
+        if (!userRolesNormalized.includes(requiredRoleNormalized)) {
             return <Navigate to={ROUTES.HOME} replace />
         }
     }
