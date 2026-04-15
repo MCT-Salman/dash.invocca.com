@@ -14,14 +14,19 @@ import Sidebar from './Sidebar';
 import { Menu, Bell, User } from 'lucide-react';
 import { useMediaQuery } from '@/hooks';
 
-const DRAWER_WIDTH = 280;
-
 export default function DashboardLayout() {
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [collapsed, setCollapsed] = useState(false);
     const isMobile = useMediaQuery('(max-width: 900px)');
+
+    const DRAWER_WIDTH = isMobile ? 280 : (collapsed ? 80 : 280);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+    };
+
+    const handleCollapsedChange = (isCollapsed) => {
+        setCollapsed(isCollapsed);
     };
 
     return (
@@ -44,29 +49,33 @@ export default function DashboardLayout() {
                 ))}
             </div>
 
-            {/* Sidebar */}
             <Sidebar
                 open={mobileOpen}
                 onClose={handleDrawerToggle}
-                variant="permanent"
+                variant={isMobile ? 'temporary' : 'permanent'}
                 drawerWidth={DRAWER_WIDTH}
+                collapsed={collapsed}
+                onCollapsedChange={handleCollapsedChange}
             />
 
             {/* Main Content */}
             <MuiBox
                 component="main"
-                className="flex-1 flex flex-col relative z-10"
+                className="flex-1 flex flex-col relative z-10 transition-all duration-300 ease-in-out"
                 style={{
                     marginRight: isMobile ? 0 : DRAWER_WIDTH,
+                    width: isMobile ? '100%' : `calc(100% - ${DRAWER_WIDTH}px)`,
                 }}
             >
                 {/* AppBar */}
                 <MuiAppBar
-                    position="sticky"
-                    className="!bg-white/80 !backdrop-blur-sm !shadow-lg !border-b !border-white/30"
+                    position="fixed"
+                    className="!bg-white/80 !backdrop-blur-sm !shadow-lg !border-b !border-white/30 transition-all duration-300 ease-in-out"
                     elevation={0}
                     sx={{
-                        width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
+                        width: isMobile ? '100%' : `calc(100% - ${DRAWER_WIDTH}px)`,
+                        marginRight: isMobile ? 0 : `${DRAWER_WIDTH}px`,
+                        left: 0,
                     }}
                 >
                     <MuiToolbar className="px-4 md:px-6 min-h-[72px]">
@@ -102,7 +111,16 @@ export default function DashboardLayout() {
                 </MuiAppBar>
 
                 {/* Page Content */}
-                <MuiBox className="flex-1 p-4 md:p-6 lg:p-8">
+                <MuiBox 
+                    component="section"
+                    sx={{ 
+                        flex: 1, 
+                        p: { xs: 2, md: 3, lg: 4 },
+                        pt: { xs: 10, md: 12 }, // Account for the 64px/72px header + extra space
+                        position: 'relative',
+                        zIndex: 1
+                    }}
+                >
                     <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/40 min-h-full">
                         <Outlet />
                     </div>

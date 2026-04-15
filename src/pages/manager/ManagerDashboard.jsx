@@ -234,27 +234,45 @@ function ManagerDashboardContent() {
                                 p: 3,
                                 height: '100%',
                                 background: 'var(--color-paper)',
-                                border: '1px solid var(--color-border)',
-                                borderRadius: '20px',
+                                border: '1px solid var(--color-border-glass)',
+                                borderRadius: '24px',
                                 position: 'relative',
                                 overflow: 'hidden',
-                                transition: 'all 0.3s ease',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 '&:hover': {
-                                    transform: 'translateY(-4px)',
-                                    boxShadow: 'var(--shadow-lg)',
-                                    borderColor: `var(--color-${config.color}-300)`,
+                                    transform: 'translateY(-6px)',
+                                    boxShadow: '0 12px 24px rgba(0, 0, 0, 0.2)',
+                                    borderColor: `var(--color-${config.color}-500)`,
                                 }
                             }}
                         >
-                            <MuiBox sx={{ position: 'relative', zIndex: 1 }}>
-                                <MuiBox sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
-                                    <MuiBox sx={{ flex: 1 }}>
+                            <MuiBox sx={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5 }}>
+                                    <MuiBox
+                                        sx={{
+                                            width: 52,
+                                            height: 52,
+                                            borderRadius: '14px',
+                                            background: `rgba(var(--color-${config.color}-500-rgb), 0.1)`,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: `var(--color-${config.color}-500)`,
+                                            border: `1px solid rgba(var(--color-${config.color}-500-rgb), 0.2)`
+                                        }}
+                                    >
+                                        <config.icon size={26} strokeWidth={2.5} />
+                                    </MuiBox>
+                                    <MuiBox sx={{ textAlign: 'left' }}>
                                         <MuiTypography
-                                            variant="body2"
+                                            variant="caption"
                                             sx={{
                                                 color: 'var(--color-text-secondary)',
-                                                mb: 1,
-                                                fontWeight: 600,
+                                                fontWeight: 700,
+                                                letterSpacing: 0.5,
+                                                display: 'block',
+                                                mb: 0.5,
+                                                textAlign: 'right'
                                             }}
                                         >
                                             {config.title}
@@ -263,61 +281,56 @@ function ManagerDashboardContent() {
                                             variant="h4"
                                             sx={{
                                                 color: 'var(--color-text-primary)',
-                                                fontWeight: 800,
-                                                fontSize: '1.75rem',
+                                                fontWeight: 900,
+                                                fontSize: '1.85rem',
+                                                lineHeight: 1,
+                                                textAlign: 'right'
                                             }}
                                         >
                                             {config.formatter(stats[config.key] || 0)}
                                         </MuiTypography>
                                     </MuiBox>
-                                    <MuiBox
-                                        sx={{
-                                            width: 56,
-                                            height: 56,
-                                            borderRadius: '16px',
-                                            background: `var(--color-${config.color}-50)`,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            color: `var(--color-${config.color}-500)`,
-                                        }}
-                                    >
-                                        <config.icon size={28} strokeWidth={2} />
-                                    </MuiBox>
                                 </MuiBox>
 
-                                {/* Trend Indicator */}
-                                {stats[`${config.key}Trend`] && (
-                                    <MuiBox
-                                        sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 1,
-                                            mt: 1
-                                        }}
-                                    >
+                                <MuiBox sx={{ mt: 'auto' }}>
+                                    {stats[`${config.key}Trend`] !== undefined ? (
                                         <MuiBox
                                             sx={{
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                color: stats[`${config.key}Trend`] > 0 ? 'var(--color-success-600)' : 'var(--color-error-600)',
-                                                gap: 0.5,
-                                                bgcolor: stats[`${config.key}Trend`] > 0 ? 'var(--color-success-50)' : 'var(--color-error-50)',
-                                                px: 1,
-                                                py: 0.5,
-                                                borderRadius: '8px',
-                                                fontSize: '0.75rem',
-                                                fontWeight: 700
+                                                gap: 1,
+                                                p: 1,
+                                                borderRadius: '10px',
+                                                background: 'rgba(255, 255, 255, 0.03)',
+                                                border: '1px solid rgba(255, 255, 255, 0.05)'
                                             }}
                                         >
-                                            {stats[`${config.key}Trend`] > 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                                            {Math.abs(stats[`${config.key}Trend`] || 0)}%
+                                            <MuiBox
+                                                sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    color: stats[`${config.key}Trend`] >= 0 ? '#22c55e' : '#ef4444',
+                                                    gap: 0.5,
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: 800
+                                                }}
+                                            >
+                                                {stats[`${config.key}Trend`] >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                                                {Math.abs(stats[`${config.key}Trend`])}%
+                                            </MuiBox>
+                                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>
+                                                منذ الشهر الماضي
+                                            </MuiTypography>
                                         </MuiBox>
-                                        <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
-                                            من الشهر الماضي
-                                        </MuiTypography>
-                                    </MuiBox>
-                                )}
+                                    ) : (
+                                        <MuiBox sx={{ height: 32, opacity: 0.5, display: 'flex', alignItems: 'center' }}>
+                                            <Activity size={14} style={{ marginRight: 8 }} color="var(--color-text-disabled)" />
+                                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-disabled)' }}>
+                                                مؤشر النشاط مستقر
+                                            </MuiTypography>
+                                        </MuiBox>
+                                    )}
+                                </MuiBox>
                             </MuiBox>
                         </MuiPaper>
                     </MuiGrid>

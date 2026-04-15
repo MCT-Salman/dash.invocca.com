@@ -31,7 +31,7 @@ export default function QRCodeDisplay({
     const qrRef = useRef(null)
 
     // Generate QR code URL using a QR code API
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}`
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}&charset-source=UTF-8`
 
     const handleDownload = () => {
         const link = document.createElement('a')

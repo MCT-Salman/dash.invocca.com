@@ -20,9 +20,7 @@ const MuiRating = ({
       size={size}
       disabled={disabled}
       readOnly={readOnly}
-      dir="ltr"
       sx={{
-        direction: 'ltr',
         '& .MuiRating-iconFilled': {
           color: 'var(--color-primary-500)',
         },

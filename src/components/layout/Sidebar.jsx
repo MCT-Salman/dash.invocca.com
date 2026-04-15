@@ -19,7 +19,7 @@ import Header from './Header'
 const DRAWER_WIDTH = 280
 const DRAWER_WIDTH_COLLAPSED = 80
 
-export default function Sidebar({ open, onClose, variant = 'permanent', onCollapsedChange }) {
+export default function Sidebar({ open, onClose, variant = 'permanent', collapsed, onCollapsedChange }) {
   const { user, logout } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
@@ -35,8 +35,6 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
   const primaryRole = normalizedRoles[0] // Use first role for menu display
   const menuItems = primaryRole ? (ROLE_MENUS[primaryRole] || []) : []
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [collapsed, setCollapsed] = useState(false)
-
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
   }
@@ -82,9 +80,7 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
       <MuiBox
         onClick={() => {
           if (!isMobile) {
-            const newCollapsed = !collapsed
-            setCollapsed(newCollapsed)
-            onCollapsedChange?.(newCollapsed)
+            onCollapsedChange?.(!collapsed)
           }
         }}
         sx={{
@@ -351,6 +347,7 @@ export default function Sidebar({ open, onClose, variant = 'permanent', onCollap
               width: collapsed ? DRAWER_WIDTH_COLLAPSED : DRAWER_WIDTH,
               transition: 'width 0.3s ease',
               border: 'none',
+              borderLeft: '1px solid var(--color-border)',
               background: 'transparent',
               boxShadow: 'none'
             },

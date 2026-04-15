@@ -98,20 +98,28 @@ export function normalizeDashboardStats(data) {
 export function normalizeRecentActivities(data) {
     const items = toArray(data)
 
-    return items.map(item => ({
-        id: item.id || item._id,
-        title: item.title || item.eventName || item.event_name || '',
-        clientName: item.clientName || item.client_name || item.client || item.customerName || item.customer_name || item.userName || item.user_name || item.name || '',
-        eventType: item.eventType || item.event_type || item.type || item.action || '',
-        date: extractDate(item),
-        status: item.status || item.state || '',
-        address: item.address || item.location || item.hallAddress || item.hall_address || '',
-        peopleCount: item.numOfPeople ?? item.num_of_people ?? item.peopleCount ?? item.chairsCount ?? item.chairs_count ?? null,
-        phone: item.phone || item.clientPhone || item.client_phone || '',
-        startTime: item.startTime || item.start_time || '',
-        endTime: item.endTime || item.end_time || '',
-        templateName: item.templateName || item.template_name || '',
-    }))
+    return items.map(item => {
+        const client = item.client || item.customer || item.user || {}
+        const clientName = item.clientName || item.client_name || item.customerName || item.customer_name || item.userName || item.user_name || client.name || client.fullName || (typeof client === 'string' ? client : '') || item.name || ''
+        
+        const eventTypeObj = item.eventType || item.event_type || item.type || item.action || ''
+        const eventType = typeof eventTypeObj === 'object' ? (eventTypeObj.label || eventTypeObj.name || String(eventTypeObj)) : eventTypeObj
+
+        return {
+            id: item.id || item._id,
+            title: item.title || item.eventName || item.event_name || '',
+            clientName,
+            eventType,
+            date: extractDate(item),
+            status: item.status || item.state || '',
+            address: item.address || item.location || item.hallAddress || item.hall_address || '',
+            peopleCount: item.numOfPeople ?? item.num_of_people ?? item.peopleCount ?? item.chairsCount ?? item.chairs_count ?? null,
+            phone: item.phone || item.clientPhone || item.client_phone || (typeof client === 'object' ? client.phone : ''),
+            startTime: item.startTime || item.start_time || '',
+            endTime: item.endTime || item.end_time || '',
+            templateName: item.templateName || item.template_name || '',
+        }
+    })
 }
 
 /**
@@ -149,16 +157,22 @@ export function normalizeHallInfo(data) {
 export function normalizeEvent(data) {
     if (!data) return null
 
+    const client = data.client || {}
+    const clientName = data.clientName || data.client_name || client.name || client.fullName || (typeof client === 'string' ? client : '') || ''
+    
+    const eventTypeObj = data.eventType || data.event_type || data.type || ''
+    const eventType = typeof eventTypeObj === 'object' ? (eventTypeObj.label || eventTypeObj.name || String(eventTypeObj)) : eventTypeObj
+
     return {
         id: data.id || data._id,
         eventName: data.eventName || data.event_name || data.name || '',
-        eventType: data.eventType || data.event_type || data.type || '',
+        eventType,
         eventDate: data.eventDate || data.event_date || data.date || null,
         startTime: data.startTime || data.start_time || '',
         endTime: data.endTime || data.end_time || '',
         status: data.status || '',
-        clientName: data.clientName || data.client_name || data.client || '',
-        clientPhone: data.clientPhone || data.client_phone || data.phone || '',
+        clientName,
+        clientPhone: data.clientPhone || data.client_phone || data.phone || (typeof client === 'object' ? client.phone : ''),
         numOfPeople: data.numOfPeople ?? data.num_of_people ?? data.chairsCount ?? data.chairs_count ?? 0,
         chairsCount: data.chairsCount ?? data.chairs_count ?? data.numOfPeople ?? data.num_of_people ?? 0,
         templateId: data.templateId || data.template_id || null,

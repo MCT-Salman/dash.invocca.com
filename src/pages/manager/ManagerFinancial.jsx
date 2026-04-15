@@ -420,6 +420,12 @@ function InvoiceCard({ invoice, onEdit, onPay }) {
                     </MuiTypography>
                 </MuiBox>
                 <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>السعر الأساسي</MuiTypography>
+                    <MuiTypography variant="body2" sx={{ fontWeight: 700, color: 'var(--color-primary-500)' }}>
+                        {invoice.amount || invoice.baseAmount || invoice.totalAmount || 0} ل.س
+                    </MuiTypography>
+                </MuiBox>
+                <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                     <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>المدفوع</MuiTypography>
                     <MuiTypography variant="body2" sx={{ fontWeight: 700, color: '#22c55e' }}>
                         {invoice.paidAmount?.toLocaleString()} ل.س
@@ -505,6 +511,7 @@ function InvoiceDialog({ open, onClose, invoice, onSubmit, loading }) {
         eventId: (typeof invoice?.eventId === 'string' ? invoice.eventId : (invoice?.eventId?._id || invoice?.eventId?.id)) || '',
         dueDate: formatForInput(invoice?.dueDate),
         type: invoice?.type || 'final',
+        totalAmount: invoice?.totalAmount || invoice?.amount || '',
         notes: invoice?.notes || ''
     })
 
@@ -514,6 +521,7 @@ function InvoiceDialog({ open, onClose, invoice, onSubmit, loading }) {
                 eventId: (typeof invoice?.eventId === 'string' ? invoice.eventId : (invoice?.eventId?._id || invoice?.eventId?.id)) || '',
                 dueDate: formatForInput(invoice?.dueDate),
                 type: invoice?.type || 'final',
+                totalAmount: invoice?.totalAmount || invoice?.amount || '',
                 notes: invoice?.notes || ''
             })
         }
@@ -619,6 +627,18 @@ function InvoiceDialog({ open, onClose, invoice, onSubmit, loading }) {
                             <MuiMenuItem value="preliminary">مبدئية</MuiMenuItem>
                             <MuiMenuItem value="final">نهائية</MuiMenuItem>
                         </MuiTextField>
+
+                        <MuiTextField
+                            label="المبلغ الإجمالي (ل.س)"
+                            type="number"
+                            value={formData.totalAmount}
+                            onChange={handleChange('totalAmount')}
+                            required
+                            fullWidth
+                            InputProps={{
+                                inputProps: { min: 0 }
+                            }}
+                        />
 
                         <MuiTextField
                             label="ملاحظات"
