@@ -305,27 +305,6 @@ export default function ClientSongs() {
         )
       },
     },
-    {
-      id: 'source',
-      label: 'المصدر',
-      align: 'center',
-      format: (value, row) => {
-        const isHallSong = !!(row.songId || row.song?._id || row.song?.id || row.isHallSong);
-        return (
-          <MuiChip
-            label={isHallSong ? 'مكتبة القاعة' : 'أغنيتي'}
-            sx={{
-              backgroundColor: isHallSong ? 'rgba(2, 132, 199, 0.1)' : 'rgba(34, 197, 94, 0.1)',
-              color: isHallSong ? '#0284c7' : '#22c55e',
-              fontWeight: 600,
-              border: '1px solid',
-              borderColor: isHallSong ? 'rgba(2, 132, 199, 0.2)' : 'rgba(34, 197, 94, 0.2)',
-            }}
-            size="small"
-          />
-        )
-      },
-    },
     // {
     //   id: 'duration',
     //   label: 'المدة',
@@ -425,7 +404,6 @@ export default function ClientSongs() {
     const submitData = {
       title: data.title,
       artist: data.artist,
-      url: data.url || '',
       order: data.order || nextOrder,
       category: data.category || 'other',
       notes: data.notes || '',

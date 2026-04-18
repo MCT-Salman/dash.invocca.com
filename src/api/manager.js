@@ -521,6 +521,19 @@ export const updateEvent = async (eventId, eventData) => {
 }
 
 /**
+ * PUT - تغيير عميل الفعالية
+ * PUT /manager/events/:eventId/client
+ */
+export const changeEventClient = async (eventId, clientId) => {
+  try {
+    const response = await api.put(`/manager/events/${eventId}/client`, { clientId })
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
  * DELETE - حذف فعالية
  * DELETE /manager/events/:id
  */
@@ -672,6 +685,18 @@ export const updateClient = async (clientId, clientData) => {
   }
 }
 
+/**
+ * PATCH - تفعيل/تعطيل حساب العميل
+ * PATCH /manager/clients/active/:clientId
+ */
+export const toggleClientStatus = async (clientId) => {
+  try {
+    const response = await api.patch(`/manager/clients/active/${clientId}`)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
 
 // ==================== Complaints Management ====================
 
@@ -903,6 +928,7 @@ export default {
   getEventById,
   createEvent,
   updateEvent,
+  changeEventClient,
   deleteEvent,
 
   // Event Scanners
@@ -919,6 +945,7 @@ export default {
   createClient,
   updateClient,
   deleteClient,
+  toggleClientStatus,
 
   // Staff
   getStaff,

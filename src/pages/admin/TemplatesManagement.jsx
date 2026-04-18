@@ -33,9 +33,9 @@ import ViewTemplateDialog from './components/ViewTemplateDialog'
 import CreateEditTemplateDialog from './components/CreateEditTemplateDialog'
 
 // Hooks & Utilities
-import { useDebounce, useDialogState, useCRUD } from '@/hooks'
+import { useDebounce, useDialogState, useCRUD, useNotification } from '@/hooks'
 import { QUERY_KEYS } from '@/config/constants'
-import { getTemplates, createTemplate, updateTemplate, deleteTemplate } from '@/api/admin'
+import { getTemplates, createTemplate, updateTemplate, deleteTemplate, toggleTemplateStatus } from '@/api/admin'
 import { formatDate, generateExportFileName } from '@/utils/helpers'
 
 // Icons
@@ -69,11 +69,12 @@ import {
 export default function TemplatesManagement() {
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+    const { addNotification: showNotification } = useNotification()
 
     // State
     const [searchTerm, setSearchTerm] = useState('')
     const debouncedSearch = useDebounce(searchTerm, 500)
-    const [viewMode, setViewMode] = useState('card') // 'card' or 'table'
+    const [viewMode, setViewMode] = useState('table') // 'card' or 'table'
 
     // Dialog state management
     const {
@@ -108,6 +109,32 @@ export default function TemplatesManagement() {
         successMessage: 'تمت العملية بنجاح',
         errorMessage: 'حدث خطأ أثناء العملية',
     })
+
+    // Toggle status mutation
+    const toggleStatusMutation = useMutation({
+        mutationFn: ({ id, isActive }) => toggleTemplateStatus(id, isActive),
+        onSuccess: (data) => {
+            refetch()
+            showNotification({
+                title: 'تم',
+                message: data?.message || 'تم تغيير حالة القالب بنجاح',
+                type: 'success'
+            })
+        },
+        onError: (error) => {
+            showNotification({
+                title: 'خطأ',
+                message: error?.response?.data?.message || 'حدث خطأ أثناء تغيير الحالة',
+                type: 'error'
+            })
+        }
+    })
+
+    const handleToggleStatus = async (template) => {
+        const id = template?._id || template?.id
+        if (!id) return
+        await toggleStatusMutation.mutateAsync({ id, isActive: !template.isActive })
+    }
 
     // Fetch Templates
     const { data: templatesData, isLoading, refetch } = useQuery({
@@ -231,6 +258,43 @@ export default function TemplatesManagement() {
         //     )
         // },
         {
+            id: 'isActive',
+            label: 'الحالة',
+            align: 'center',
+            format: (value, row) => (
+                <MuiChip
+                    label={value ? 'مفعّل' : 'معطّل'}
+                    size="small"
+                    sx={{
+                        backgroundColor: value ? 'rgba(46, 204, 113, 0.15)' : 'rgba(231, 76, 60, 0.15)',
+                        color: value ? '#27ae60' : '#e74c3c',
+                        fontWeight: 600,
+                        borderRadius: '8px'
+                    }}
+                />
+            )
+        },
+        {
+            id: 'hallsCount',
+            label: 'عدد القاعات',
+            align: 'center',
+            format: (value, row) => (
+                <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <MuiChip
+                        label={value || 0}
+                        size="small"
+                        icon={<Building2 size={14} />}
+                        sx={{
+                            backgroundColor: 'var(--color-primary-100)',
+                            color: 'var(--color-primary-600)',
+                            fontWeight: 600,
+                            borderRadius: '8px'
+                        }}
+                    />
+                </MuiBox>
+            )
+        },
+        {
             id: 'createdAt',
             label: 'تاريخ الإنشاء',
             align: 'center',
@@ -345,10 +409,8 @@ export default function TemplatesManagement() {
                     'موقع قاعة/صالة': template.hallId?.location || '—',
                     'السعة': template.hallId?.capacity || '—',
                     'الطاولات': template.hallId?.tables || '—',
-                    'الكراسي': template.hallId?.chairs || '—',
                     'السعر الافتراضي': template.hallId?.defaultPrices ? `${template.hallId.defaultPrices} ريال` : '—',
                     'الوصف': template.hallId?.description || '—',
-                    'الحالة': template.isActive !== false ? 'نشط' : 'معطل',
                     'تاريخ الإضافة': formatDate(template.createdAt, 'DD/MM/YYYY'),
                     'تاريخ التحديث': formatDate(template.updatedAt, 'DD/MM/YYYY'),
                     'معرّف القالب': template._id,
@@ -425,7 +487,7 @@ export default function TemplatesManagement() {
 
             {/* Stats Cards */}
             <MuiGrid container spacing={3} sx={{ mb: 4 }}>
-                <MuiGrid item xs={12} sm={6} md={3}>
+                <MuiGrid item xs={12} sm={6} md={4}>
                     <StatCard
                         title="عدد القوالب"
                         value={filteredTemplates.length}
@@ -433,28 +495,20 @@ export default function TemplatesManagement() {
                         color="primary"
                     />
                 </MuiGrid>
-                <MuiGrid item xs={12} sm={6} md={3}>
+                <MuiGrid item xs={12} sm={6} md={4}>
                     <StatCard
-                        title="قوالب نشطة"
-                        value={filteredTemplates.filter(t => t.isActive !== false).length}
+                        title="القوالب المفعّلة"
+                        value={filteredTemplates.filter(t => t.isActive).length}
                         icon={<CheckCircle size={24} />}
                         color="success"
                     />
                 </MuiGrid>
-                <MuiGrid item xs={12} sm={6} md={3}>
+                <MuiGrid item xs={12} sm={6} md={4}>
                     <StatCard
-                        title="قوالب معطلة"
-                        value={filteredTemplates.filter(t => t.isActive === false).length}
+                        title="القوالب المعطّلة"
+                        value={filteredTemplates.filter(t => !t.isActive).length}
                         icon={<XCircle size={24} />}
                         color="error"
-                    />
-                </MuiGrid>
-                <MuiGrid item xs={12} sm={6} md={3}>
-                    <StatCard
-                        title="الفئات"
-                        value={[...new Set(filteredTemplates.map(t => t.category).filter(Boolean))].length}
-                        icon={<Filter size={24} />}
-                        color="info"
                     />
                 </MuiGrid>
             </MuiGrid>
@@ -500,8 +554,9 @@ export default function TemplatesManagement() {
                     onEdit={openEditDialog}
                     onDelete={openDeleteDialog}
                     onView={openViewDialog}
+                    onToggleStatus={handleToggleStatus}
                     loading={isLoading}
-                    emptyMessage="لا توجد خدمات متاحة"
+                    emptyMessage="لا توجد قوالب متاحة"
                     showActions={true}
                 />
             ) : (
@@ -538,13 +593,16 @@ export default function TemplatesManagement() {
                 onClose={closeDialog}
                 onSubmit={async (formData) => {
                     if (isCreate) {
-                        await handleCreate(formData)
+                        const result = await handleCreate(formData)
+                        closeDialog()
+                        return result
                     } else {
                         const id = selectedTemplate?._id || selectedTemplate?.id
                         if (!id) return
-                        await handleUpdate(id, formData)
+                        const result = await handleUpdate(id, formData)
+                        closeDialog()
+                        return result
                     }
-                    closeDialog()
                 }}
                 editingTemplate={isEdit ? selectedTemplate : null}
                 loading={crudLoading}

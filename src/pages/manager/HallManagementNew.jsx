@@ -98,7 +98,13 @@ import {
 
     Music,
 
-    FileImage
+    FileImage,
+
+    Briefcase,
+
+    Layers,
+
+    Palette
 
 } from 'lucide-react'
 
@@ -110,7 +116,7 @@ import {
 
  */
 
-function InfoCard({ icon: Icon, label, value, color = 'var(--color-primary-500)', gradient }) {
+function InfoCard({ icon: Icon, label, value }) {
 
     return (
 
@@ -142,67 +148,17 @@ function InfoCard({ icon: Icon, label, value, color = 'var(--color-primary-500)'
 
                 cursor: 'pointer',
 
-                '&::before': {
-
-                    content: '""',
-
-                    position: 'absolute',
-
-                    top: 0,
-
-                    left: 0,
-
-                    right: 0,
-
-                    height: '3px',
-
-                    background: `linear-gradient(90deg, ${color} 0%, ${color}80 50%, transparent 100%)`,
-
-                    opacity: 0.6,
-
-                },
-
-                '&::after': {
-
-                    content: '""',
-
-                    position: 'absolute',
-
-                    top: '-50%',
-
-                    right: '-50%',
-
-                    width: '200%',
-
-                    height: '200%',
-
-                    background: `radial-gradient(circle, ${color}08 0%, transparent 70%)`,
-
-                    opacity: 0,
-
-                    transition: 'opacity 0.4s ease',
-
-                },
-
                 '&:hover': {
 
                     transform: 'translateY(-8px) scale(1.02)',
 
-                    boxShadow: `0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px ${color}20`,
-
-                    borderColor: `${color}60`,
-
-                    '&::after': {
-
-                        opacity: 1,
-
-                    },
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
 
                     '& .info-icon': {
 
                         transform: 'scale(1.1) rotate(5deg)',
 
-                        background: gradient || `linear-gradient(135deg, ${color}, ${color}CC)`,
+                        background: 'var(--color-surface-hover)',
 
                     }
 
@@ -226,7 +182,7 @@ function InfoCard({ icon: Icon, label, value, color = 'var(--color-primary-500)'
 
                         borderRadius: '16px',
 
-                        background: `linear-gradient(135deg, ${color}20, ${color}10)`,
+                        background: 'var(--color-surface)',
 
                         display: 'flex',
 
@@ -234,17 +190,17 @@ function InfoCard({ icon: Icon, label, value, color = 'var(--color-primary-500)'
 
                         justifyContent: 'center',
 
-                        border: `2px solid ${color}30`,
+                        border: '2px solid var(--color-border)',
 
                         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
 
-                        boxShadow: `0 4px 12px ${color}15`,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
 
                     }}
 
                 >
 
-                    <Icon size={32} style={{ color, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                    <Icon size={32} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
 
                 </MuiBox>
 
@@ -274,17 +230,17 @@ function InfoCard({ icon: Icon, label, value, color = 'var(--color-primary-500)'
 
                     </MuiTypography>
 
-                    <MuiTypography 
+                    <MuiTypography
 
-                        variant="h4" 
+                        variant="p"
 
-                        sx={{ 
+                        sx={{
 
-                            fontWeight: 700,
+                            fontWeight: 500,
 
-                            fontSize: typeof value === 'string' && (value.includes('/') || value.includes('ل.س')) ? '1rem' : '1.75rem',
+                            fontSize: typeof value === 'string' && (value.includes('/') || value.includes('ل.س')) ? '0.9rem' : '1.25rem',
 
-                            color: color,
+                            color: 'var(--color-text-primary)',
 
                         }}
 
@@ -1618,6 +1574,96 @@ export default function HallManagement() {
 
                             </MuiGrid>
 
+                            <MuiGrid item xs={12} sm={6} md={3}>
+
+                                <InfoCard
+
+                                    icon={Briefcase}
+
+                                    label="الموظفين الأقصى"
+
+                                    value={hall.maxEmployees || 0}
+
+                                    color="#0ea5e9"
+
+                                    gradient="linear-gradient(135deg, #0ea5e9, #0284c7)"
+
+                                />
+
+                            </MuiGrid>
+
+                            <MuiGrid item xs={12} sm={6} md={3}>
+
+                                <InfoCard
+
+                                    icon={MapPin}
+
+                                    label="الموقع"
+
+                                    value={hall.location || '—'}
+
+                                    color="#8b5cf6"
+
+                                    gradient="linear-gradient(135deg, #8b5cf6, #7c3aed)"
+
+                                />
+
+                            </MuiGrid>
+
+                            <MuiGrid item xs={12} sm={6} md={3}>
+
+                                <InfoCard
+
+                                    icon={CheckCircle}
+
+                                    label="الخدمات المتاحة"
+
+                                    value={hall.services?.length || 0}
+
+                                    color="#06b6d4"
+
+                                    gradient="linear-gradient(135deg, #06b6d4, #0891b2)"
+
+                                />
+
+                            </MuiGrid>
+
+                            <MuiGrid item xs={12} sm={6} md={3}>
+
+                                <InfoCard
+
+                                    icon={ImageIcon}
+
+                                    label="عدد الصور"
+
+                                    value={hall.images?.length || 0}
+
+                                    color="#ec4899"
+
+                                    gradient="linear-gradient(135deg, #ec4899, #db2777)"
+
+                                />
+
+                            </MuiGrid>
+
+                            <MuiGrid item xs={12} sm={6} md={3}>
+
+                                <InfoCard
+
+                                    icon={Palette}
+
+                                    label="القوالب المتاحة"
+
+                                    value={hall.templates?.length || 0}
+
+                                    color="#f97316"
+
+                                    gradient="linear-gradient(135deg, #f97316, #ea580c)"
+
+                                />
+
+                            </MuiGrid>
+
                         </MuiGrid>
 
 
@@ -1961,6 +2007,7 @@ export default function HallManagement() {
                         WebkitBackdropFilter: 'blur(20px)',
 
                         overflow: 'hidden',
+                        mb: 4.5,
 
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
 
@@ -2101,218 +2148,6 @@ export default function HallManagement() {
                     </MuiBox>
 
                 </MuiPaper>
-
-
-
-                {/* Manager Info Section */}
-
-                {hall.generalManager && (
-
-                    <MuiPaper
-
-                        elevation={0}
-
-                        sx={{
-
-                            borderRadius: '24px',
-
-                            border: '1px solid var(--color-border-glass)',
-
-                            background: 'var(--color-paper)',
-
-                            backdropFilter: 'blur(20px)',
-
-                            WebkitBackdropFilter: 'blur(20px)',
-
-                            overflow: 'hidden',
-
-                            mb: 4.5,
-
-                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-
-                        }}
-
-                    >
-
-                        <MuiBox 
-
-                            sx={{ 
-
-                                p: { xs: 3, sm: 4, md: 5 },
-
-                                background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.1), rgba(255, 227, 108, 0.05))',
-
-                                borderBottom: '1px solid var(--color-border-glass)',
-
-                            }}
-
-                        >
-
-                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-
-                                <MuiBox 
-
-                                    sx={{ 
-
-                                        width: { xs: 56, sm: 64 },
-
-                                        height: { xs: 56, sm: 64 },
-
-                                        borderRadius: '16px',
-
-                                        background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
-
-                                        display: 'flex',
-
-                                        alignItems: 'center',
-
-                                        justifyContent: 'center',
-
-                                        boxShadow: '0 8px 20px rgba(216, 185, 138, 0.3)',
-
-                                        border: '2px solid rgba(216, 185, 138, 0.3)',
-
-                                    }}
-
-                                >
-
-                                    <User size={28} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
-
-                                </MuiBox>
-
-                                <MuiBox>
-
-                                    <MuiTypography 
-
-                                        variant="h5" 
-
-                                        sx={{ 
-
-                                            fontWeight: 800, 
-
-                                            color: 'var(--color-text-primary)',
-
-                                            mb: 0.5,
-
-                                            fontSize: { xs: '1.25rem', sm: '1.5rem' }
-
-                                        }}
-
-                                    >
-
-                                        معلومات المدير
-
-                                    </MuiTypography>
-
-                                    <MuiTypography 
-
-                                        variant="body2" 
-
-                                        sx={{ 
-
-                                            color: 'var(--color-text-secondary)',
-
-                                            fontSize: '0.9rem'
-
-                                        }}
-
-                                    >
-
-                                        {typeof hall.generalManager === 'object' 
-
-                                            ? (hall.generalManager.name || hall.generalManager.username || '—')
-
-                                            : hall.generalManager
-
-                                        }
-
-                                    </MuiTypography>
-
-                                </MuiBox>
-
-                            </MuiBox>
-
-                        </MuiBox>
-
-                        <MuiBox sx={{ p: { xs: 3, sm: 4, md: 5 } }}>
-
-                            <MuiGrid container spacing={3}>
-
-                                {typeof hall.generalManager === 'object' && (
-
-                                    <>
-
-                                        {hall.generalManager.name && (
-
-                                            <MuiGrid item xs={12} md={6}>
-
-                                                <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
-
-                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>الاسم</MuiTypography>
-
-                                                    <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
-
-                                                        {hall.generalManager.name}
-
-                                                    </MuiTypography>
-
-                                                </MuiBox>
-
-                                            </MuiGrid>
-
-                                        )}
-
-                                        {hall.generalManager.username && (
-
-                                            <MuiGrid item xs={12} md={6}>
-
-                                                <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
-
-                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>اسم المستخدم</MuiTypography>
-
-                                                    <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
-
-                                                        {hall.generalManager.username}
-
-                                                    </MuiTypography>
-
-                                                </MuiBox>
-
-                                            </MuiGrid>
-
-                                        )}
-
-                                        {hall.generalManager.phone && (
-
-                                            <MuiGrid item xs={12} md={6}>
-
-                                                <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
-
-                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>رقم الهاتف</MuiTypography>
-
-                                                    <MuiTypography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
-
-                                                        {hall.generalManager.phone}
-
-                                                    </MuiTypography>
-
-                                                </MuiBox>
-
-                                            </MuiGrid>
-
-                                        )}
-
-                                    </>
-
-                                )}
-
-                            </MuiGrid>
-
-                        </MuiBox>
-
-                    </MuiPaper>
-
-                )}
 
 
 

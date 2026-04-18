@@ -125,19 +125,25 @@ export function formatNumber(num) {
 }
 
 /**
- * Format currency (Syrian Pound)
+ * Format currency (Syrian Pound or Saudi Riyal)
  * @param {number} amount - Amount to format
- * @param {string} currency - Currency code (default: SYP)
+ * @param {string} currency - Currency code (default: SYP, options: SYP, SAR)
  * @returns {string} Formatted currency
  */
-export function formatCurrency(amount) {
-    if (amount === null || amount === undefined) return '0 ل.س'
+export function formatCurrency(amount, currency = 'SYP') {
+    if (amount === null || amount === undefined) {
+        return currency === 'SAR' ? '0 ر.س' : '0 ل.س'
+    }
 
     const formatted = new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
     }).format(amount)
 
+    // Use Arabic currency symbols without $
+    if (currency === 'SAR') {
+        return `${formatted} ر.س`
+    }
     return `${formatted} ل.س`
 }
 

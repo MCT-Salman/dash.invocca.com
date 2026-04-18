@@ -24,8 +24,8 @@ export const ROLE_MENUS = {
     { label: 'التقارير', path: '/admin/reports', icon: BarChart3 },
     { label: 'قاعة/صالة', path: '/admin/halls', icon: Building2 },
     { label: 'القوالب', path: '/admin/templates', icon: Image },
-    { label: 'المستخدمون', path: '/admin/users', icon: Users },
-    { label: 'المدراء', path: '/admin/managers', icon: UserPlus },
+    { label: 'مدراء النظام', path: '/admin/users', icon: Users },
+    { label: 'مدراء الصالات', path: '/admin/hall-managers', icon: UserPlus },
     { label: 'الملف الشخصي', path: ROUTES.ADMIN.PROFILE, icon: User },
   ],
   manager: [

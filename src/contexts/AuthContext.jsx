@@ -26,6 +26,7 @@ export function AuthProvider({ children }) {
     // State
     const [user, setUser] = useState(null)
     const [token, setToken] = useState(null)
+    const [refreshToken, setRefreshToken] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
 
@@ -36,13 +37,15 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const initAuth = () => {
             try {
-                // Get token as raw string (not JSON.parse)
+                // Get tokens as raw string (not JSON.parse)
                 const storedToken = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
+                const storedRefreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)
                 // Get user as JSON object
                 const storedUser = getStorageItem(STORAGE_KEYS.USER)
 
                 if (storedToken && storedUser) {
                     setToken(storedToken)
+                    setRefreshToken(storedRefreshToken)
                     setUser(storedUser)
                     setIsAuthenticated(true)
                 }
@@ -103,17 +106,21 @@ export function AuthProvider({ children }) {
             const data = await authAPI.login(phone, password)
 
             if (data?.data?.accessToken && data?.data?.user) {
-                const { accessToken } = data.data
+                const { accessToken, refreshToken: newRefreshToken } = data.data
                 const userData = data.data.user
 
                 // Update state
                 setToken(accessToken)
+                setRefreshToken(newRefreshToken)
                 setUser(userData)
                 setIsAuthenticated(true)
 
                 // Persist to storage
-                // Store token as raw string (not JSON.stringify)
+                // Store tokens as raw string (not JSON.stringify)
                 localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken)
+                if (newRefreshToken) {
+                    localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, newRefreshToken)
+                }
                 // Store user as JSON string
                 setStorageItem(STORAGE_KEYS.USER, userData)
 
@@ -185,11 +192,13 @@ export function AuthProvider({ children }) {
         } finally {
             // Clear state
             setToken(null)
+            setRefreshToken(null)
             setUser(null)
             setIsAuthenticated(false)
 
             // Clear storage
             removeStorageItem(STORAGE_KEYS.ACCESS_TOKEN)
+            removeStorageItem(STORAGE_KEYS.REFRESH_TOKEN)
             removeStorageItem(STORAGE_KEYS.USER)
 
             // Navigate to login
@@ -219,6 +228,43 @@ export function AuthProvider({ children }) {
             }
         }
     }, [])
+
+    // ─────────────────────────────────────────────────────────
+    // Refresh Access Token
+    // ─────────────────────────────────────────────────────────
+
+    const doRefreshToken = useCallback(async () => {
+        try {
+            const currentRefreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)
+            if (!currentRefreshToken) {
+                throw new Error('No refresh token available')
+            }
+
+            const data = await authAPI.refreshToken(currentRefreshToken)
+
+            if (data?.data?.accessToken) {
+                const { accessToken, refreshToken: newRefreshToken } = data.data
+
+                // Update state
+                setToken(accessToken)
+                if (newRefreshToken) {
+                    setRefreshToken(newRefreshToken)
+                    localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, newRefreshToken)
+                }
+
+                // Persist to storage
+                localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken)
+
+                return { success: true, accessToken, refreshToken: newRefreshToken }
+            }
+
+            return { success: false, error: 'Invalid response from server' }
+        } catch (error) {
+            // If refresh fails, logout the user
+            logout()
+            return { success: false, error: error.message || 'فشل تجديد الجلسة' }
+        }
+    }, [logout])
 
     // ─────────────────────────────────────────────────────────
     // Refresh User Data
@@ -267,6 +313,7 @@ export function AuthProvider({ children }) {
         // State
         user,
         token,
+        refreshToken,
         isLoading,
         isAuthenticated,
 
@@ -276,6 +323,7 @@ export function AuthProvider({ children }) {
         logout,
         updateProfile,
         refreshUser,
+        doRefreshToken,
 
         // Helpers
         hasRole,

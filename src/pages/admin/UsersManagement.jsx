@@ -13,6 +13,9 @@ import MuiChip from '@/components/ui/MuiChip'
 import MuiAvatar from '@/components/ui/MuiAvatar'
 import MuiInputAdornment from '@/components/ui/MuiInputAdornment'
 import MuiSelect from '@/components/ui/MuiSelect'
+import MuiTabs from '@mui/material/Tabs'
+import MuiTab from '@mui/material/Tab'
+import Box from '@mui/material/Box'
 
 // Layout & Common Components
 import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog, PageHeader, StatCard } from '@/components/common'
@@ -41,6 +44,9 @@ import {
 
 // ====================== Roles Badge ======================
 const UserRoleBadge = ({ role }) => {
+  // Handle role as array or string
+  const roles = Array.isArray(role) ? role : [role]
+  
   const roleConfig = {
     [USER_ROLES.ADMIN]: { label: 'مدير نظام', color: 'error', icon: Shield },
     [USER_ROLES.MANAGER]: { label: 'مدير قاعة/صالة', color: 'secondary', icon: Users },
@@ -48,7 +54,9 @@ const UserRoleBadge = ({ role }) => {
     [USER_ROLES.EMPLOYEE]: { label: 'موظف', color: 'success', icon: Users }
   }
 
-  const config = roleConfig[role] || roleConfig[USER_ROLES.CLIENT]
+  // Get primary role (first match)
+  const primaryRole = roles.find(r => roleConfig[r]) || USER_ROLES.CLIENT
+  const config = roleConfig[primaryRole] || roleConfig[USER_ROLES.CLIENT]
   const Icon = config.icon
 
   return (
@@ -72,7 +80,8 @@ export default function UsersManagement() {
   // State
   const [searchTerm, setSearchTerm] = useState('')
   const debouncedSearch = useDebounce(searchTerm, 500)
-  const [roleFilter, setRoleFilter] = useState('all')
+  // Show only admins by default
+  const [roleFilter, setRoleFilter] = useState(USER_ROLES.ADMIN)
 
   // Dialog state management
   const {
@@ -125,7 +134,10 @@ export default function UsersManagement() {
     }
 
     if (roleFilter !== 'all') {
-      filtered = filtered.filter(user => user.role === roleFilter)
+      filtered = filtered.filter(user => {
+        const userRoles = Array.isArray(user.role) ? user.role : [user.role]
+        return userRoles.includes(roleFilter)
+      })
     }
 
     return filtered
@@ -140,6 +152,7 @@ export default function UsersManagement() {
       format: (value, row) => (
         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <MuiAvatar
+            src={row.avatar || row.image ? ((row.avatar || row.image).startsWith('http') ? (row.avatar || row.image) : `${import.meta.env.VITE_API_BASE}${(row.avatar || row.image)}`) : undefined}
             sx={{
               width: 36,
               height: 36,
@@ -195,10 +208,11 @@ export default function UsersManagement() {
     }
   ]
 
-  // Create Admin mutation
   const addAdminMutation = useMutation({
     mutationFn: async (payload) => {
-      const res = await api.post('/admin/users/add', payload)
+      const res = await api.post('/admin/users/add', payload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
       return res.data
     },
     onSuccess: (data) => {
@@ -247,9 +261,9 @@ export default function UsersManagement() {
       <SEOHead title="إدارة المستخدمين | INVOCCA" />
 
       <PageHeader
-        icon={Users}
-        title={`إدارة المستخدمين (${filteredUsers.length})`}
-        subtitle="إدارة جميع حسابات المستخدمين وصلاحياتهم في النظام"
+        icon={Shield}
+        title={`مدراء النظام (${filteredUsers.length})`}
+        subtitle="إدارة حسابات مدراء النظام وصلاحياتهم"
         actions={
           <MuiBox sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             <MuiButton
@@ -270,37 +284,28 @@ export default function UsersManagement() {
         }
       />
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Admin Focused */}
       <MuiGrid container spacing={3} sx={{ mb: 4 }}>
-        <MuiGrid item xs={12} sm={6} md={3}>
+        <MuiGrid item xs={12} sm={6}>
           <StatCard
-            title="إجمالي المستخدمين"
-            value={users.length}
-            icon={<Users size={24} />}
-          />
-        </MuiGrid>
-        <MuiGrid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="مدراء النظام"
-            value={users.filter(u => u.role === USER_ROLES.ADMIN).length}
+            title="إجمالي مدراء النظام"
+            value={users.filter(u => {
+              const roles = Array.isArray(u.role) ? u.role : [u.role]
+              return roles.includes(USER_ROLES.ADMIN)
+            }).length}
             icon={<Shield size={24} />}
             sx={{ borderTop: '4px solid var(--color-error-500)' }}
           />
         </MuiGrid>
-        <MuiGrid item xs={12} sm={6} md={3}>
+        <MuiGrid item xs={12} sm={6}>
           <StatCard
-            title="مدراء قاعات/صالات"
-            value={users.filter(u => u.role === USER_ROLES.MANAGER).length}
-            icon={<Users size={24} />}
-            sx={{ borderTop: '4px solid var(--color-secondary-500)' }}
-          />
-        </MuiGrid>
-        <MuiGrid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="العملاء"
-            value={users.filter(u => u.role === USER_ROLES.CLIENT).length}
-            icon={<User size={24} />}
-            sx={{ borderTop: '4px solid var(--color-info-500)' }}
+            title="المدراء النشطون"
+            value={users.filter(u => {
+              const roles = Array.isArray(u.role) ? u.role : [u.role]
+              return roles.includes(USER_ROLES.ADMIN) && u.isActive !== false
+            }).length}
+            icon={<CheckCircle size={24} />}
+            color="success"
           />
         </MuiGrid>
       </MuiGrid>
@@ -317,7 +322,7 @@ export default function UsersManagement() {
         }}
       >
         <MuiGrid container spacing={2} alignItems="center">
-          <MuiGrid item xs={12} md={8}>
+          <MuiGrid item xs={12} md={12}>
             <MuiTextField
               fullWidth
               placeholder="البحث بالاسم، الهاتف، أو البريد..."
@@ -326,22 +331,30 @@ export default function UsersManagement() {
               startIcon={<Search size={20} />}
             />
           </MuiGrid>
-          <MuiGrid item xs={12} md={4}>
-            <MuiSelect
-              fullWidth
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              options={[
-                { label: 'الكل', value: 'all' },
-                { label: 'مدير نظام', value: USER_ROLES.ADMIN },
-                { label: 'مدير قاعة/صالة', value: USER_ROLES.MANAGER },
-                { label: 'عميل', value: USER_ROLES.CLIENT },
-                { label: 'موظف', value: USER_ROLES.EMPLOYEE }
-              ]}
-            />
-          </MuiGrid>
         </MuiGrid>
       </MuiPaper>
+
+      {/* Tabs hidden - only showing admins */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3, display: 'none' }}>
+        <MuiTabs
+          value={USER_ROLES.ADMIN}
+          sx={{
+            '& .MuiTab-root': {
+              color: 'var(--color-text-secondary)',
+              fontWeight: 'bold',
+              fontSize: '1rem',
+              '&.Mui-selected': {
+                color: 'var(--color-primary-500)',
+              }
+            },
+            '& .MuiTabs-indicator': {
+              backgroundColor: 'var(--color-primary-500)',
+            }
+          }}
+        >
+          <MuiTab label="مدراء النظام" value={USER_ROLES.ADMIN} />
+        </MuiTabs>
+      </Box>
 
       {/* Users Table */}
       {filteredUsers.length === 0 ? (

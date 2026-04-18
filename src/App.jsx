@@ -21,6 +21,7 @@ import ServicesManagement from './pages/admin/ServicesManagement'
 import TemplatesManagement from './pages/admin/TemplatesManagement'
 import ReportsManagement from './pages/admin/ReportsManagement'
 import ManagersManagement from './pages/admin/ManagersManagement'
+import HallManagersManagement from './pages/admin/HallManagersManagement'
 import EventsManagementAdmin from './pages/admin/EventsManagement'
 import ClientsManagementAdmin from './pages/admin/ClientsManagement'
 import AdminProfile from './pages/admin/AdminProfile'
@@ -81,6 +82,7 @@ export default function App() {
                 <Route path={ROUTES.ADMIN.DASHBOARD} element={<AdminDashboard />} />
                 <Route path={ROUTES.ADMIN.USERS} element={<UsersManagement />} />
                 <Route path="/admin/managers" element={<ManagersManagement />} />
+                <Route path="/admin/hall-managers" element={<HallManagersManagement />} />
                 <Route path={ROUTES.ADMIN.HALLS} element={<HallsManagement />} />
                 <Route path={ROUTES.ADMIN.SERVICES} element={<ServicesManagement />} />
                 <Route path={ROUTES.ADMIN.EVENTS} element={<EventsManagementAdmin />} />

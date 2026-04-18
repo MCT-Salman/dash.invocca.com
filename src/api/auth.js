@@ -4,7 +4,20 @@ import { setStorageItem } from '@/utils/helpers'
 
 export async function login(phone, password) {
   const res = await api.post('/auth/login', { phone, password })
-  return res.data
+  const data = res.data
+  
+  // Store tokens in localStorage
+  if (data?.data?.accessToken) {
+    localStorage.setItem('access_token', data.data.accessToken)
+  }
+  if (data?.data?.refreshToken) {
+    localStorage.setItem('refresh_token', data.data.refreshToken)
+  }
+  if (data?.data?.user) {
+    localStorage.setItem('user', JSON.stringify(data.data.user))
+  }
+  
+  return data
 }
 
 export async function register(payload) {
@@ -50,11 +63,21 @@ export async function logout() {
     // Logout error - silently fail
   }
   localStorage.removeItem('access_token')
+  localStorage.removeItem('refresh_token')
   localStorage.removeItem('user')
 }
 
 export function getToken() {
   return localStorage.getItem('access_token')
+}
+
+export function getRefreshToken() {
+  return localStorage.getItem('refresh_token')
+}
+
+export async function refreshToken(refreshToken) {
+  const res = await api.post('/auth/refresh', { refreshToken })
+  return res.data
 }
 
 export function getUser() {

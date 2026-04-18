@@ -38,7 +38,7 @@ import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog } from '@/
 
 import { QUERY_KEYS } from '@/config/constants'
 
-import { getClients, deleteClient, createClient, updateClient } from '@/api/manager'
+import { getClients, deleteClient, createClient, updateClient, toggleClientStatus } from '@/api/manager'
 
 import { formatDate } from '@/utils/helpers'
 
@@ -220,15 +220,17 @@ export default function ClientsManagement() {
 
 
 
-    // Toggle client status
+    // Toggle client status using PATCH endpoint
 
-    const handleToggleStatus = async (clientId, currentStatus) => {
+    const handleToggleStatus = async (row) => {
 
         try {
 
-            const newStatus = !currentStatus
+            const clientId = row._id || row.id
 
-            const result = await updateClient(clientId, { isActive: newStatus })
+            const currentStatus = row.isActive !== false
+
+            const result = await toggleClientStatus(clientId)
 
 
 
@@ -238,23 +240,17 @@ export default function ClientsManagement() {
 
                 queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MANAGER_CLIENTS })
 
-                success(`تم ${newStatus ? 'تفعيل' : 'تعطيل'} العميل بنجاح`)
+                success(result?.message || `تم ${currentStatus ? 'تعطيل' : 'تفعيل'} العميل بنجاح`)
 
+            } else {
 
-
-                // Show success message from backend if available
-
-                if (result.message) {
-
-                    success(result.message)
-
-                }
+                showError(result?.message || 'حدث خطأ في تحديث حالة العميل')
 
             }
 
         } catch (err) {
 
-            showError('حدث خطأ في تحديث حالة العميل')
+            showError(err?.response?.data?.message || 'حدث خطأ في تحديث حالة العميل')
 
         }
 
@@ -396,52 +392,6 @@ export default function ClientsManagement() {
 
         },
 
-        {
-            id: 'isActive',
-            label: 'الحالة',
-            align: 'center',
-            format: (value, row) => (
-                <MuiBox
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        // Use row._id or row.id reliably
-                        handleToggleStatus(row._id || row.id, value !== false);
-                    }}
-                    sx={{
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 1.5,
-                        px: 2,
-                        py: 0.75,
-                        borderRadius: '12px',
-                        backgroundColor: (value !== false) ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                        border: '1px solid',
-                        borderColor: (value !== false) ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                        transition: 'all 0.2s ease',
-                        '&:hover': {
-                            backgroundColor: (value !== false) ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                            transform: 'translateY(-1px)'
-                        }
-                    }}
-                >
-                    <MuiBox sx={{
-                        width: 10,
-                        height: 10,
-                        borderRadius: '50%',
-                        bgcolor: (value !== false) ? '#22c55e' : '#ef4444',
-                        boxShadow: `0 0 8px ${(value !== false) ? '#22c55e' : '#ef4444'}`
-                    }} />
-                    <MuiTypography variant="body2" sx={{
-                        fontWeight: 700,
-                        color: (value !== false) ? '#22c55e' : '#ef4444'
-                    }}>
-                        {(value !== false) ? 'نشط' : 'معطل'}
-                    </MuiTypography>
-                    {value !== false ? <UserCheck size={16} color="#22c55e" /> : <UserX size={16} color="#ef4444" />}
-                </MuiBox>
-            )
-        }
 
     ]
 
@@ -1318,6 +1268,8 @@ export default function ClientsManagement() {
                     onEdit={openEditDialog}
 
                     onDelete={openDeleteDialog}
+
+                    onToggleStatus={handleToggleStatus}
 
                     showActions={true}
 

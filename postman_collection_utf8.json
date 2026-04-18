@@ -1,0 +1,595 @@
+﻿{
+    "info":  {
+                 "_postman_id":  "8f72a141-546f-4fd4-8be8-85eb4aad30a8",
+                 "name":  "parties",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+                 "toc":  [
+
+                         ],
+                 "description":  "\u003chtml\u003e\u003chead\u003e\u003c/head\u003e\u003cbody\u003e\u003c/body\u003e\u003c/html\u003e",
+                 "owner":  "49402330",
+                 "collectionId":  "8f72a141-546f-4fd4-8be8-85eb4aad30a8",
+                 "publishedId":  "2sB3dHVsuA",
+                 "public":  true,
+                 "customColor":  {
+                                     "top-bar":  "FFFFFF",
+                                     "right-sidebar":  "303030",
+                                     "highlight":  "FF6C37"
+                                 },
+                 "publishDate":  "2025-11-23T13:44:47.000Z"
+             },
+    "item":  [
+                 {
+                     "name":  "admin",
+                     "item":  [
+                                  {
+                                      "name":  "halls",
+                                      "item":  "     ",
+                                      "id":  "e48851bd-b057-4108-86ba-4e4e6e507496",
+                                      "_postman_id":  "e48851bd-b057-4108-86ba-4e4e6e507496",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "users",
+                                      "item":  "    ",
+                                      "id":  "6ddeff50-a6e0-4f8c-b00d-a1c5161e3d77",
+                                      "_postman_id":  "6ddeff50-a6e0-4f8c-b00d-a1c5161e3d77",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "managers",
+                                      "item":  "    ",
+                                      "id":  "c9a4fc70-b0c9-4107-bcb6-245e8772a579",
+                                      "_postman_id":  "c9a4fc70-b0c9-4107-bcb6-245e8772a579",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "financial",
+                                      "item":  "    ",
+                                      "id":  "76daeb7b-8552-472c-b9e0-ff5e243da569",
+                                      "_postman_id":  "76daeb7b-8552-472c-b9e0-ff5e243da569",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "templates",
+                                      "item":  "       ",
+                                      "id":  "a6cc78b2-ba69-4c83-8469-a9853c4b7c5c",
+                                      "_postman_id":  "a6cc78b2-ba69-4c83-8469-a9853c4b7c5c",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "stats",
+                                      "item":  "  ",
+                                      "id":  "fe9439de-8581-4cd9-91a7-c5b672d1253d",
+                                      "_postman_id":  "fe9439de-8581-4cd9-91a7-c5b672d1253d",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "dashboard",
+                                      "id":  "49b298f0-137e-42fa-b5be-ab7fc2fba469",
+                                      "protocolProfileBehavior":  "@{disableBodyPruning=True}",
+                                      "request":  "@{auth=; method=GET; header=System.Object[]; url=http://127.0.0.1:5000/admin/dashboard; urlObject=}",
+                                      "response":  "",
+                                      "_postman_id":  "49b298f0-137e-42fa-b5be-ab7fc2fba469"
+                                  },
+                                  {
+                                      "name":  "إحصائيات",
+                                      "id":  "b096bd7b-8639-4f07-bb8d-a82a5bbd3f2f",
+                                      "protocolProfileBehavior":  "@{disableBodyPruning=True}",
+                                      "request":  "@{method=GET; header=System.Object[]; url=https://127.0.0.1/admin/stats; urlObject=}",
+                                      "response":  "",
+                                      "_postman_id":  "b096bd7b-8639-4f07-bb8d-a82a5bbd3f2f"
+                                  },
+                                  {
+                                      "name":  "تقارير",
+                                      "id":  "726d2418-c0e5-47c6-92fb-76e9e8ed0375",
+                                      "protocolProfileBehavior":  "@{disableBodyPruning=True}",
+                                      "request":  "@{method=GET; header=System.Object[]; url=https://127.0.0.1/admin/reports; urlObject=}",
+                                      "response":  "",
+                                      "_postman_id":  "726d2418-c0e5-47c6-92fb-76e9e8ed0375"
+                                  }
+                              ],
+                     "id":  "43d48e5f-4ec0-4c1a-8b8c-3c3d555c6689",
+                     "_postman_id":  "43d48e5f-4ec0-4c1a-8b8c-3c3d555c6689",
+                     "description":  ""
+                 },
+                 {
+                     "name":  "manager",
+                     "item":  [
+                                  {
+                                      "name":  "hall",
+                                      "item":  " ",
+                                      "id":  "e76e9eb2-d35d-49d1-a135-6ea02adc537b",
+                                      "_postman_id":  "e76e9eb2-d35d-49d1-a135-6ea02adc537b",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "services",
+                                      "item":  "   ",
+                                      "id":  "0a18c183-8c7a-43cb-9eda-71f645b6e779",
+                                      "_postman_id":  "0a18c183-8c7a-43cb-9eda-71f645b6e779",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "events",
+                                      "item":  "      ",
+                                      "id":  "4080c5c2-b2dd-4f2f-8ce4-5e4dcaf6dc89",
+                                      "_postman_id":  "4080c5c2-b2dd-4f2f-8ce4-5e4dcaf6dc89",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "client",
+                                      "item":  "    ",
+                                      "id":  "2574a4d0-0dd2-45cf-b756-7f676f9a87d9",
+                                      "_postman_id":  "2574a4d0-0dd2-45cf-b756-7f676f9a87d9",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "employees",
+                                      "item":  "    ",
+                                      "id":  "0149778d-2d6e-4343-8ffe-8f5774545bd6",
+                                      "_postman_id":  "0149778d-2d6e-4343-8ffe-8f5774545bd6",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "templates",
+                                      "item":  "   ",
+                                      "id":  "9de85cf3-19c7-40f6-9cb5-2b888faa132a",
+                                      "_postman_id":  "9de85cf3-19c7-40f6-9cb5-2b888faa132a",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "complaints",
+                                      "item":  " ",
+                                      "id":  "02445b9d-2c88-4a4b-b40e-e3ca5df5dc0b",
+                                      "_postman_id":  "02445b9d-2c88-4a4b-b40e-e3ca5df5dc0b",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "financial",
+                                      "item":  "      ",
+                                      "id":  "327202cb-3564-4c7c-bb57-bfa2d66fef16",
+                                      "_postman_id":  "327202cb-3564-4c7c-bb57-bfa2d66fef16",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "songs",
+                                      "item":  "      ",
+                                      "id":  "4f245c81-8f15-42f2-aa5a-2534cb71f5a8",
+                                      "_postman_id":  "4f245c81-8f15-42f2-aa5a-2534cb71f5a8",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "ratings",
+                                      "item":  " ",
+                                      "id":  "0405bc84-41c8-4e02-99b0-78be1b4c91ba",
+                                      "_postman_id":  "0405bc84-41c8-4e02-99b0-78be1b4c91ba",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "dashboard",
+                                      "id":  "c21f3367-2c40-46c9-b7bf-9890291fad54",
+                                      "protocolProfileBehavior":  "@{disableBodyPruning=True}",
+                                      "request":  "@{auth=; method=GET; header=System.Object[]; url=http://192.168.3.11:5000/manager/dashboard; urlObject=}",
+                                      "response":  "",
+                                      "_postman_id":  "c21f3367-2c40-46c9-b7bf-9890291fad54"
+                                  },
+                                  {
+                                      "name":  "reports",
+                                      "id":  "0418a46f-3bec-450e-8396-dab61fa1db36",
+                                      "protocolProfileBehavior":  "@{disableBodyPruning=True}",
+                                      "request":  "@{auth=; method=GET; header=System.Object[]; url=https://127.0.0.1/manager/reports; urlObject=}",
+                                      "response":  "",
+                                      "_postman_id":  "0418a46f-3bec-450e-8396-dab61fa1db36"
+                                  }
+                              ],
+                     "id":  "11ef5731-3a0c-450a-a681-1c5f012d172c",
+                     "_postman_id":  "11ef5731-3a0c-450a-a681-1c5f012d172c",
+                     "description":  ""
+                 },
+                 {
+                     "name":  "client",
+                     "item":  [
+                                  {
+                                      "name":  "event",
+                                      "item":  "",
+                                      "id":  "20b19a63-079f-4b39-9a5f-1682dce133d6",
+                                      "_postman_id":  "20b19a63-079f-4b39-9a5f-1682dce133d6",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "invitations",
+                                      "item":  "     ",
+                                      "id":  "b497e4f6-0493-4a1e-9331-c171e5ba4fa4",
+                                      "_postman_id":  "b497e4f6-0493-4a1e-9331-c171e5ba4fa4",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "songs",
+                                      "item":  "      ",
+                                      "id":  "dd806db1-a974-491d-8d9e-3e871f8fd8eb",
+                                      "_postman_id":  "dd806db1-a974-491d-8d9e-3e871f8fd8eb",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "rating",
+                                      "item":  "  ",
+                                      "id":  "4dbc36e6-001d-44ea-a7a0-77b1f56efe8e",
+                                      "_postman_id":  "4dbc36e6-001d-44ea-a7a0-77b1f56efe8e",
+                                      "description":  ""
+                                  },
+                                  {
+                                      "name":  "reports",
+                                      "id":  "ebda58c6-9bd4-46e3-a770-fd320f8db302",
+                                      "protocolProfileBehavior":  "@{disableBodyPruning=True}",
+                                      "request":  "@{auth=; method=GET; header=System.Object[]; url=http://127.0.0.1:5000/client/reports; urlObject=}",
+                                      "response":  "",
+                                      "_postman_id":  "ebda58c6-9bd4-46e3-a770-fd320f8db302"
+                                  }
+                              ],
+                     "id":  "417b3a2a-943c-4e6d-9c18-da39f80c8c7b",
+                     "_postman_id":  "417b3a2a-943c-4e6d-9c18-da39f80c8c7b",
+                     "description":  ""
+                 },
+                 {
+                     "name":  "Scanner",
+                     "item":  [
+                                  {
+                                      "name":  "dashboard",
+                                      "id":  "5aeed177-8c09-4c5a-ae43-f5f7216b07c7",
+                                      "protocolProfileBehavior":  "@{disableBodyPruning=True}",
+                                      "request":  "@{auth=; method=GET; header=System.Object[]; url=http://127.0.0.1:5000/scanner/dashboard; urlObject=}",
+                                      "response":  "",
+                                      "_postman_id":  "5aeed177-8c09-4c5a-ae43-f5f7216b07c7"
+                                  },
+                                  {
+                                      "name":  "reports",
+                                      "id":  "f69d9ed2-8179-4910-b4f6-652997221938",
+                                      "protocolProfileBehavior":  "@{disableBodyPruning=True}",
+                                      "request":  "@{auth=; method=GET; header=System.Object[]; url=http://127.0.0.1:5000/scanner/reports; urlObject=}",
+                                      "response":  "",
+                                      "_postman_id":  "f69d9ed2-8179-4910-b4f6-652997221938"
+                                  },
+                                  {
+                                      "name":  "view event",
+                                      "id":  "c3601c98-1bfe-4d98-90ba-d34d103d233f",
+                                      "protocolProfileBehavior":  "@{disableBodyPruning=True}",
+                                      "request":  "@{auth=; method=GET; header=System.Object[]; url={{invocca}}/scanner/events?filter=new; urlObject=}",
+                                      "response":  " ",
+                                      "_postman_id":  "c3601c98-1bfe-4d98-90ba-d34d103d233f"
+                                  },
+                                  {
+                                      "name":  "view invitations",
+                                      "id":  "ea507101-03ea-481f-a44c-c901edcd600a",
+                                      "protocolProfileBehavior":  "@{disableBodyPruning=True}",
+                                      "request":  "@{auth=; method=GET; header=System.Object[]; url={{invocca}}/scanner/events/692eda325487b81af182f458/invitations; urlObject=}",
+                                      "response":  "",
+                                      "_postman_id":  "ea507101-03ea-481f-a44c-c901edcd600a"
+                                  },
+                                  {
+                                      "name":  "detalie invitation",
+                                      "id":  "eb8fa351-2f69-43e5-a8dc-2eb40729c186",
+                                      "protocolProfileBehavior":  "@{disableBodyPruning=True}",
+                                      "request":  "@{method=GET; header=System.Object[]; url=http://127.0.0.1:5000/scanner/invitations/692edbf05487b81af182f471; urlObject=}",
+                                      "response":  "",
+                                      "_postman_id":  "eb8fa351-2f69-43e5-a8dc-2eb40729c186"
+                                  },
+                                  {
+                                      "name":  "check qr",
+                                      "id":  "e9e83a8c-ae7c-41ee-8630-a3efdfc18029",
+                                      "protocolProfileBehavior":  "@{disableBodyPruning=True}",
+                                      "request":  "@{auth=; method=GET; header=System.Object[]; url=http://127.0.0.1:5000/scanner/verify/صالحمنصور37338; urlObject=}",
+                                      "response":  "",
+                                      "_postman_id":  "e9e83a8c-ae7c-41ee-8630-a3efdfc18029"
+                                  },
+                                  {
+                                      "name":  "scan",
+                                      "id":  "490c7a4b-5680-4e47-b26e-3a312f278394",
+                                      "protocolProfileBehavior":  "@{disableBodyPruning=True}",
+                                      "request":  "@{auth=; method=GET; header=System.Object[]; url=http://127.0.0.1:5000/scanner/scan/saleh3738?guestNames=أحمد محمد; urlObject=}",
+                                      "response":  " ",
+                                      "_postman_id":  "490c7a4b-5680-4e47-b26e-3a312f278394"
+                                  }
+                              ],
+                     "id":  "53fd3e3e-8292-4aff-b31d-0a0ce182cec6",
+                     "_postman_id":  "53fd3e3e-8292-4aff-b31d-0a0ce182cec6",
+                     "description":  ""
+                 },
+                 {
+                     "name":  "login",
+                     "id":  "314ab95d-844d-4206-962b-907b584e87d6",
+                     "protocolProfileBehavior":  {
+                                                     "disableBodyPruning":  true
+                                                 },
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\r\n    \"phone\": \"testinv\",\r\n    \"password\": \"PassWord@123\"\r\n}",
+                                                  "options":  "@{raw=}"
+                                              },
+                                     "url":  "{{invlocal}}/auth/login",
+                                     "urlObject":  {
+                                                       "path":  "auth login",
+                                                       "host":  "{{invlocal}}",
+                                                       "query":  "",
+                                                       "variable":  ""
+                                                   }
+                                 },
+                     "response":  [
+                                      {
+                                          "id":  "37f01f87-1ca5-4cd5-b2b4-c2dda84bb586",
+                                          "name":  "login",
+                                          "originalRequest":  "@{method=POST; header=System.Object[]; body=; url=http://192.168.3.11:5000/auth/login}",
+                                          "status":  "OK",
+                                          "code":  200,
+                                          "_postman_previewlanguage":  null,
+                                          "header":  "                        ",
+                                          "cookie":  "",
+                                          "responseTime":  null,
+                                          "body":  "{\n    \"success\": true,\n    \"message\": \"تم تسجيل الدخول بنجاح\",\n    \"data\": {\n        \"user\": {\n            \"_id\": \"692edb505487b81af182f467\",\n            \"name\": \"خالد أحمد\",\n            \"phone\": \"878787\",\n            \"role\": \"scanner\",\n            \"hallId\": \"68f8912870c1f99fa73a3837\"\n        },\n        \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MmVkYjUwNTQ4N2I4MWFmMTgyZjQ2NyIsInNpZCI6IjY5MzA0NjQ3YWRmYWZkNTY4N2RjMmYyZCIsInJvbGUiOiJzY2FubmVyIiwiaWF0IjoxNzY0ODQyMDU5LCJleHAiOjE3NjU0NDY4NTl9.ZPo-sGQJRIEh4i4CNP5BMRVU6U0Gqrb6gt3uco6TiFM\",\n        \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MmVkYjUwNTQ4N2I4MWFmMTgyZjQ2NyIsInNpZCI6IjY5MzA0NjQ3YWRmYWZkNTY4N2RjMmYyZCIsInR5cGUiOiJyZWZyZXNoIiwiaWF0IjoxNzY0ODQyMDU5LCJleHAiOjE3NjQ4NDIxMTl9.LBBsaQl2wKDzX-d5S0bHMNSRbF4pWs3NNUrNWuDadsc\",\n        \"expiresIn\": 604800\n    }\n}"
+                                      }
+                                  ],
+                     "_postman_id":  "314ab95d-844d-4206-962b-907b584e87d6"
+                 },
+                 {
+                     "name":  "logout",
+                     "id":  "f6dfb2a5-ffed-4044-a6ac-8b3d9a484334",
+                     "protocolProfileBehavior":  {
+                                                     "disableBodyPruning":  true
+                                                 },
+                     "request":  {
+                                     "auth":  {
+                                                  "type":  "bearer",
+                                                  "bearer":  "@{basicConfig=System.Object[]}",
+                                                  "isInherited":  false
+                                              },
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  "https://127.0.0.1/auth/logout",
+                                     "urlObject":  {
+                                                       "protocol":  "https",
+                                                       "path":  "auth logout",
+                                                       "host":  "127 0 0 1",
+                                                       "query":  "",
+                                                       "variable":  ""
+                                                   }
+                                 },
+                     "response":  [
+                                      {
+                                          "id":  "972c2707-6727-4b6e-809d-aadcff85ed59",
+                                          "name":  "true",
+                                          "originalRequest":  "@{method=GET; header=System.Object[]; url=https://127.0.0.1/auth/logout}",
+                                          "status":  "OK",
+                                          "code":  200,
+                                          "_postman_previewlanguage":  null,
+                                          "header":  "                      ",
+                                          "cookie":  "",
+                                          "responseTime":  null,
+                                          "body":  "{\n    \"message\": \"تم تسجيل الخروج بنجاح\"\n}"
+                                      }
+                                  ],
+                     "_postman_id":  "f6dfb2a5-ffed-4044-a6ac-8b3d9a484334"
+                 },
+                 {
+                     "name":  "profile",
+                     "id":  "62d6ed38-1311-4951-9592-768689eb642b",
+                     "protocolProfileBehavior":  {
+                                                     "disableBodyPruning":  true
+                                                 },
+                     "request":  {
+                                     "auth":  {
+                                                  "type":  "bearer",
+                                                  "bearer":  "@{basicConfig=System.Object[]}",
+                                                  "isInherited":  false
+                                              },
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  "https://127.0.0.1/auth/me",
+                                     "urlObject":  {
+                                                       "protocol":  "https",
+                                                       "path":  "auth me",
+                                                       "host":  "127 0 0 1",
+                                                       "query":  "",
+                                                       "variable":  ""
+                                                   }
+                                 },
+                     "response":  [
+                                      {
+                                          "id":  "3521a78e-edc2-46a8-bfc3-54d1c1e0d299",
+                                          "name":  "true",
+                                          "originalRequest":  "@{method=GET; header=System.Object[]; url=https://127.0.0.1/auth/me}",
+                                          "status":  "OK",
+                                          "code":  200,
+                                          "_postman_previewlanguage":  null,
+                                          "header":  "                    ",
+                                          "cookie":  "",
+                                          "responseTime":  null,
+                                          "body":  "{\n    \"user\": {\n        \"clientInfo\": {\n            \"totalEvents\": 0\n        },\n        \"staffInfo\": {\n            \"hireDate\": \"2025-10-22T07:45:22.719Z\"\n        },\n        \"settings\": {\n            \"language\": \"ar\",\n            \"notifications\": true,\n            \"theme\": \"light\"\n        },\n        \"_id\": \"68f88b92fefff9749340f85f\",\n        \"name\": \"مدير عام\",\n        \"phone\": \"123456\",\n        \"password\": \"$2b$10$bQxVetl6xkZsNFqRosMPG.0U0MhrsgAa94M/0dBjSUkIUlEIqJRo6\",\n        \"role\": \"admin\",\n        \"permissions\": [\n            \"manage_halls\",\n            \"manage_managers\",\n            \"manage_templates\",\n            \"view_all_stats\",\n            \"manage_complaints\",\n            \"manage_users\"\n        ],\n        \"isActive\": true,\n        \"createdAt\": \"2025-10-22T07:45:22.722Z\",\n        \"updatedAt\": \"2025-10-22T07:45:22.722Z\",\n        \"__v\": 0\n    }\n}"
+                                      }
+                                  ],
+                     "_postman_id":  "62d6ed38-1311-4951-9592-768689eb642b"
+                 },
+                 {
+                     "name":  "edit profile",
+                     "id":  "c6a78fc2-19c0-4edf-bbc5-ef9257886a6a",
+                     "protocolProfileBehavior":  {
+                                                     "disableBodyPruning":  true
+                                                 },
+                     "request":  {
+                                     "auth":  {
+                                                  "type":  "bearer",
+                                                  "bearer":  "@{basicConfig=System.Object[]}",
+                                                  "isInherited":  false
+                                              },
+                                     "method":  "PUT",
+                                     "header":  [
+
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\r\n    \"name\": \"admin\",\r\n    \"username\": \"admin\",\r\n    \"phone\": \"123456\",\r\n    \"password\": \"654321\"\r\n}",
+                                                  "options":  "@{raw=}"
+                                              },
+                                     "url":  "https://127.0.0.1/auth/profile",
+                                     "urlObject":  {
+                                                       "protocol":  "https",
+                                                       "path":  "auth profile",
+                                                       "host":  "127 0 0 1",
+                                                       "query":  "",
+                                                       "variable":  ""
+                                                   }
+                                 },
+                     "response":  [
+                                      {
+                                          "id":  "96ceecb7-f7b2-4889-aef6-a9345a899184",
+                                          "name":  "true",
+                                          "originalRequest":  "@{method=PUT; header=System.Object[]; body=; url=https://127.0.0.1/auth/profile}",
+                                          "status":  "OK",
+                                          "code":  200,
+                                          "_postman_previewlanguage":  null,
+                                          "header":  "                    ",
+                                          "cookie":  "",
+                                          "responseTime":  null,
+                                          "body":  "{\n    \"message\": \"تم تحديث الملف الشخصي بنجاح\",\n    \"user\": {\n        \"clientInfo\": {\n            \"totalEvents\": 0\n        },\n        \"staffInfo\": {\n            \"hireDate\": \"2025-10-22T07:45:22.719Z\"\n        },\n        \"settings\": {\n            \"language\": \"ar\",\n            \"notifications\": true,\n            \"theme\": \"light\"\n        },\n        \"_id\": \"68f88b92fefff9749340f85f\",\n        \"name\": \"admin\",\n        \"phone\": \"123456\",\n        \"password\": \"$2b$10$jZoz43RdLfU3.SO6yZUduOsFPnvWy0gGPRhGwZEEFRG6.Kqxk501i\",\n        \"role\": \"admin\",\n        \"permissions\": [\n            \"manage_halls\",\n            \"manage_managers\",\n            \"manage_templates\",\n            \"view_all_stats\",\n            \"manage_complaints\",\n            \"manage_users\"\n        ],\n        \"isActive\": true,\n        \"createdAt\": \"2025-10-22T07:45:22.722Z\",\n        \"updatedAt\": \"2025-11-20T10:52:43.143Z\",\n        \"__v\": 0\n    }\n}"
+                                      }
+                                  ],
+                     "_postman_id":  "c6a78fc2-19c0-4edf-bbc5-ef9257886a6a"
+                 },
+                 {
+                     "name":  "Refresh Token",
+                     "id":  "b0da1e62-e2dc-45ac-b4bb-633df509bd84",
+                     "protocolProfileBehavior":  {
+                                                     "disableBodyPruning":  true
+                                                 },
+                     "request":  {
+                                     "auth":  {
+                                                  "type":  "noauth",
+                                                  "isInherited":  false
+                                              },
+                                     "method":  "POST",
+                                     "header":  [
+
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\r\n  \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NjM4ZGMwNmU1ZmU5OGJlNTM3YmFkMyIsInNpZCI6IjY5NjM5NWNmMzRkYjY0Mjg2MzYwMGIzNCIsInR5cGUiOiJyZWZyZXNoIiwiaWF0IjoxNzc2MTcwMTQ4LCJleHAiOjE3NzYxNzAyMDh9.BbRwh93EFIgbZVYKAhgokWf-YMhwW7duSDcJoxTPkaI\"\r\n}",
+                                                  "options":  "@{raw=}"
+                                              },
+                                     "url":  "{{invlocal}}/auth/refresh",
+                                     "urlObject":  {
+                                                       "path":  "auth refresh",
+                                                       "host":  "{{invlocal}}",
+                                                       "query":  "",
+                                                       "variable":  ""
+                                                   }
+                                 },
+                     "response":  [
+                                      {
+                                          "id":  "2000af31-e8d7-40a4-850f-9a2d26f8f116",
+                                          "name":  "true",
+                                          "originalRequest":  "@{method=POST; header=System.Object[]; body=; url={{invlocal}}/auth/refresh}",
+                                          "status":  "OK",
+                                          "code":  200,
+                                          "_postman_previewlanguage":  null,
+                                          "header":  "                   ",
+                                          "cookie":  "",
+                                          "responseTime":  null,
+                                          "body":  "{\n    \"success\": true,\n    \"message\": \"Token refreshed successfully\",\n    \"data\": {\n        \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NjM4ZGMwNmU1ZmU5OGJlNTM3YmFkMyIsInNpZCI6IjY5NjM5NWNmMzRkYjY0Mjg2MzYwMGIzNCIsInJvbGUiOlsiYWRtaW4iXSwiaWF0IjoxNzc2MTcwMTYyLCJleHAiOjE3NzY3NzQ5NjJ9.PZd4rZYx_TbASVJkb4X4V6wZG-4v_0oPRRF4OqesGCE\",\n        \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NjM4ZGMwNmU1ZmU5OGJlNTM3YmFkMyIsInNpZCI6IjY5NjM5NWNmMzRkYjY0Mjg2MzYwMGIzNCIsInR5cGUiOiJyZWZyZXNoIiwiaWF0IjoxNzc2MTcwMTYyLCJleHAiOjE3NzYxNzAyMjJ9.ka5ncSQJj6iFb0YPtvn82nMyOReubD4PW-cnpksKhWw\",\n        \"expiresIn\": 604800\n    }\n}"
+                                      }
+                                  ],
+                     "_postman_id":  "b0da1e62-e2dc-45ac-b4bb-633df509bd84"
+                 },
+                 {
+                     "name":  "Profile",
+                     "id":  "056907e0-fd6e-42eb-85d3-932baef902e5",
+                     "protocolProfileBehavior":  {
+                                                     "disableBodyPruning":  true
+                                                 },
+                     "request":  {
+                                     "auth":  {
+                                                  "type":  "bearer",
+                                                  "bearer":  "@{basicConfig=System.Object[]}",
+                                                  "isInherited":  false
+                                              },
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  "{{invlocal}}/auth/profile",
+                                     "urlObject":  {
+                                                       "path":  "auth profile",
+                                                       "host":  "{{invlocal}}",
+                                                       "query":  "",
+                                                       "variable":  ""
+                                                   }
+                                 },
+                     "response":  [
+                                      {
+                                          "id":  "bce70add-b7a5-4655-bb08-269863263106",
+                                          "name":  "true",
+                                          "originalRequest":  "@{method=GET; header=System.Object[]; url={{invlocal}}/auth/profile}",
+                                          "status":  "OK",
+                                          "code":  200,
+                                          "_postman_previewlanguage":  null,
+                                          "header":  "                   ",
+                                          "cookie":  "",
+                                          "responseTime":  null,
+                                          "body":  "{\n    \"user\": {\n        \"clientInfo\": {\n            \"totalEvents\": 0\n        },\n        \"staffInfo\": {\n            \"hireDate\": \"2026-01-11T11:47:12.765Z\"\n        },\n        \"settings\": {\n            \"language\": \"ar\",\n            \"notifications\": true,\n            \"theme\": \"light\"\n        },\n        \"profileImage\": {\n            \"filename\": null,\n            \"originalName\": null,\n            \"path\": null,\n            \"url\": null,\n            \"size\": null,\n            \"mimeType\": null,\n            \"uploadedAt\": null\n        },\n        \"_id\": \"69638dc06e5fe98be537bad3\",\n        \"name\": \"مدير عام\",\n        \"username\": \"admin\",\n        \"phone\": \"+963599000000\",\n        \"role\": [\n            \"admin\"\n        ],\n        \"permissions\": [\n            \"manage_invitations\",\n            \"view_own_events\"\n        ],\n        \"isActive\": true,\n        \"isVerified\": true,\n        \"country\": null,\n        \"countryCode\": null,\n        \"fcmToken\": null,\n        \"currentSessionId\": \"696395cf34db642863600b34\",\n        \"createdAt\": \"2026-01-11T11:47:12.768Z\",\n        \"updatedAt\": \"2026-04-14T12:40:10.258Z\",\n        \"__v\": 0\n    }\n}"
+                                      }
+                                  ],
+                     "_postman_id":  "056907e0-fd6e-42eb-85d3-932baef902e5"
+                 },
+                 {
+                     "name":  "update profile",
+                     "id":  "a2437c17-6109-4011-86b0-cebe00c6d6af",
+                     "protocolProfileBehavior":  {
+                                                     "disableBodyPruning":  true
+                                                 },
+                     "request":  {
+                                     "auth":  {
+                                                  "type":  "bearer",
+                                                  "bearer":  "@{basicConfig=System.Object[]}",
+                                                  "isInherited":  false
+                                              },
+                                     "method":  "PUT",
+                                     "header":  [
+
+                                                ],
+                                     "body":  {
+                                                  "mode":  "formdata",
+                                                  "formdata":  "   "
+                                              },
+                                     "url":  "{{invlocal}}/auth/profile",
+                                     "urlObject":  {
+                                                       "path":  "auth profile",
+                                                       "host":  "{{invlocal}}",
+                                                       "query":  "",
+                                                       "variable":  ""
+                                                   }
+                                 },
+                     "response":  [
+                                      {
+                                          "id":  "2dd0ad25-756b-418f-9af2-d5cbb75c2588",
+                                          "name":  "true",
+                                          "originalRequest":  "@{method=PUT; header=System.Object[]; body=; url={{invlocal}}/auth/profile}",
+                                          "status":  "OK",
+                                          "code":  200,
+                                          "_postman_previewlanguage":  null,
+                                          "header":  "                    ",
+                                          "cookie":  "",
+                                          "responseTime":  null,
+                                          "body":  "{\n    \"message\": \"Profile updated successfully\",\n    \"user\": {\n        \"clientInfo\": {\n            \"totalEvents\": 0\n        },\n        \"staffInfo\": {\n            \"hireDate\": \"2026-01-11T11:47:12.765Z\"\n        },\n        \"settings\": {\n            \"language\": \"ar\",\n            \"notifications\": true,\n            \"theme\": \"light\"\n        },\n        \"profileImage\": {\n            \"filename\": \"1776170590362-df9334b8c09fc1093e5fbad5cb9e0172.jpg\",\n            \"originalName\": \"pexels-pixabay-460672.jpg\",\n            \"path\": \"C:\\\\Users\\\\User2\\\\Videos\\\\NewParties\\\\uploads\\\\profiles\\\\1776170590362-df9334b8c09fc1093e5fbad5cb9e0172.jpg\",\n            \"url\": \"/uploads/profiles/1776170590362-df9334b8c09fc1093e5fbad5cb9e0172.jpg\",\n            \"size\": 168225,\n            \"mimeType\": \"image/jpeg\",\n            \"uploadedAt\": \"2026-04-14T12:43:10.369Z\"\n        },\n        \"_id\": \"69638dc06e5fe98be537bad3\",\n        \"name\": \"مدير عام\",\n        \"username\": \"admin\",\n        \"phone\": \"+123456\",\n        \"password\": \"$2b$10$GOA9lh3vfV1eVZj8MQhoFOcY0OYOMJ.KwM5fU9/OTxLXuGinWxE7C\",\n        \"role\": [\n            \"admin\"\n        ],\n        \"permissions\": [\n            \"manage_invitations\",\n            \"view_own_events\"\n        ],\n        \"isActive\": true,\n        \"isVerified\": true,\n        \"country\": null,\n        \"countryCode\": null,\n        \"fcmToken\": null,\n        \"currentSessionId\": \"696395cf34db642863600b34\",\n        \"createdAt\": \"2026-01-11T11:47:12.768Z\",\n        \"updatedAt\": \"2026-04-14T12:43:10.374Z\",\n        \"__v\": 0\n    }\n}"
+                                      }
+                                  ],
+                     "_postman_id":  "a2437c17-6109-4011-86b0-cebe00c6d6af"
+                 }
+             ]
+}

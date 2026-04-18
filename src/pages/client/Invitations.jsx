@@ -343,29 +343,30 @@ const columns = [
   },
 
   {
-
-    id: 'createdAt',
-
-    label: 'تاريخ الإنشاء',
-
+    id: 'sentAt',
+    label: 'تاريخ الإرسال',
     align: 'right',
-
-    format: (value) => (
-
+    format: (value, row) => (
       <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-
-        <Calendar size={14} style={{ color: 'var(--color-text-secondary)' }} />
-
+        <Send size={14} style={{ color: 'var(--color-text-secondary)' }} />
         <MuiTypography variant="body2">
-
-          {value ? formatDate(value, 'MM/DD/YYYY') : '—'}
-
+          {value ? formatDate(value, 'MM/DD/YYYY') : (row.status === 'sent' && row.updatedAt) ? formatDate(row.updatedAt, 'MM/DD/YYYY') : '—'}
         </MuiTypography>
-
       </MuiBox>
-
     )
-
+  },
+  {
+    id: 'createdAt',
+    label: 'تاريخ الإنشاء',
+    align: 'right',
+    format: (value) => (
+      <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Calendar size={14} style={{ color: 'var(--color-text-secondary)' }} />
+        <MuiTypography variant="body2">
+          {value ? formatDate(value, 'MM/DD/YYYY') : '—'}
+        </MuiTypography>
+      </MuiBox>
+    )
   }
 
 ]

@@ -42,7 +42,7 @@ import { getClients, getManagerHall, getHallServices, listManagerTemplates, getS
 
 import { QUERY_KEYS, API_CONFIG } from '@/config/constants'
 
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, Building2 } from 'lucide-react'
 
 
 
@@ -63,6 +63,8 @@ const createEventSchema = (editingEvent = null) => {
         endTime: z.string().min(1, 'وقت النهاية مطلوب'),
 
         guestCount: z.coerce.number().min(1, 'عدد الضيوف مطلوب'),
+
+        requiredEmployees: z.coerce.number().min(0, 'عدد الموظفين مطلوب'),
 
         services: z.array(z.object({
 
@@ -511,7 +513,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
             endTime: editingEvent?.endTime || '',
 
-            guestCount: editingEvent?.guestCount || 0,
+            guestCount: editingEvent?.guestCount || '',
 
             services: editingEvent?.services?.map(s => ({
 
@@ -627,7 +629,9 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
                 endTime: editingEvent.endTime || '',
 
-                guestCount: editingEvent.guestCount || 0,
+                guestCount: editingEvent.guestCount || '',
+
+                requiredEmployees: editingEvent.requiredEmployees || 1,
 
                 services: editingEvent.services?.map(s => ({
 
@@ -685,7 +689,9 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
                 endTime: '',
 
-                guestCount: 0,
+                guestCount: '',
+
+                requiredEmployees: 1,
 
                 services: [],
 
@@ -735,6 +741,8 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
             guestCount: data.guestCount,
 
+            requiredEmployees: data.requiredEmployees,
+
             services: data.services || [],
 
             specialRequests: data.specialRequests || '',
@@ -768,6 +776,9 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
         // Add client data based on selection
 
         const clientSelection = data.clientSelection || 'new'
+
+        // Include clientSelection in submitData
+        submitData.clientSelection = clientSelection
 
 
 
@@ -826,15 +837,13 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
 
             // API expects 'clientName' and 'clientusername' for new client
-
+            // But we add 'name' and 'username' as well for broad compatibility
             submitData.clientName = clientName
-
             submitData.clientusername = clientusername || clientName
-
+            submitData.name = clientName
+            submitData.username = clientusername || clientName
             submitData.phone = phone
-
             submitData.password = password
-
         }
 
 
@@ -894,6 +903,128 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                     </MuiTypography>
 
                 </MuiGrid>
+
+
+
+                {/* Hall Info Display */}
+
+                {hallData?.data?.hall && (
+
+                    <MuiGrid item xs={12}>
+
+                        <MuiPaper
+
+                            elevation={0}
+
+                            sx={{
+
+                                p: 2,
+
+                                borderRadius: '12px',
+
+                                background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.1), rgba(216, 185, 138, 0.05))',
+
+                                border: '1px solid rgba(216, 185, 138, 0.2)'
+
+                            }}
+
+                        >
+
+                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+
+                                <Building2 size={20} color="var(--color-primary-500)" />
+
+                                <MuiTypography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'var(--color-primary-500)' }}>
+
+                                    {hallData.data.hall.name}
+
+                                </MuiTypography>
+
+                            </MuiBox>
+
+                            <MuiGrid container spacing={2}>
+
+                                <MuiGrid item xs={6} sm={3}>
+
+                                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+
+                                        الطاولات
+
+                                    </MuiTypography>
+
+                                    <MuiTypography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
+
+                                        {hallData.data.hall.tables || 0}
+
+                                    </MuiTypography>
+
+                                </MuiGrid>
+
+                                <MuiGrid item xs={6} sm={3}>
+
+                                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+
+                                        الكراسي
+
+                                    </MuiTypography>
+
+                                    <MuiTypography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
+
+                                        {hallData.data.hall.chairs || 0}
+
+                                    </MuiTypography>
+
+                                </MuiGrid>
+
+                                <MuiGrid item xs={6} sm={3}>
+
+                                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+
+                                        السعة
+
+                                    </MuiTypography>
+
+                                    <MuiTypography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
+
+                                        {hallData.data.hall.capacity || 0}
+
+                                    </MuiTypography>
+
+                                </MuiGrid>
+
+                                <MuiGrid item xs={6} sm={3}>
+
+                                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+
+                                        الموظفين الأقصى
+
+                                    </MuiTypography>
+
+                                    <MuiTypography variant="body2" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
+
+                                        {hallData.data.hall.maxEmployees || 0}
+
+                                    </MuiTypography>
+
+                                </MuiGrid>
+
+                            </MuiGrid>
+
+                            {hallData.data.hall.description && (
+
+                                <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', mt: 1, display: 'block' }}>
+
+                                    {hallData.data.hall.description}
+
+                                </MuiTypography>
+
+                            )}
+
+                        </MuiPaper>
+
+                    </MuiGrid>
+
+                )}
 
 
 
@@ -1112,35 +1243,39 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                 <MuiGrid item xs={12} sm={6}>
 
                     <Controller
-
                         name="guestCount"
-
                         control={control}
-
                         render={({ field }) => (
-
                             <MuiTextField
-
                                 {...field}
-
                                 label="عدد الضيوف"
-
+                                placeholder="أدخل عدد الضيوف"
                                 type="number"
-
                                 fullWidth
-
                                 required
-
                                 error={!!errors.guestCount}
-
                                 helperText={errors.guestCount?.message}
-
                             />
-
                         )}
-
                     />
+                </MuiGrid>
 
+                <MuiGrid item xs={12} sm={6}>
+                    <Controller
+                        name="requiredEmployees"
+                        control={control}
+                        render={({ field }) => (
+                            <MuiTextField
+                                {...field}
+                                label="عدد الموظفين المطلوب"
+                                type="number"
+                                fullWidth
+                                required
+                                error={!!errors.requiredEmployees}
+                                helperText={errors.requiredEmployees?.message}
+                            />
+                        )}
+                    />
                 </MuiGrid>
 
 
@@ -1693,7 +1828,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
                                             {...field}
 
-                                            label="السعر (من الريسبونس)"
+                                            label="السعر (الإفرادي)"
 
                                             type="number"
 

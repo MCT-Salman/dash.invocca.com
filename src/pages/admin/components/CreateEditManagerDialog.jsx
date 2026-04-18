@@ -11,7 +11,7 @@ import MuiSelect from '@/components/ui/MuiSelect'
 import MuiMenuItem from '@/components/ui/MuiMenuItem'
 import MuiSwitch from '@/components/ui/MuiSwitch'
 import { FormDialog } from '@/components/common'
-import { getHallsList } from '@/api/admin'
+import { getAllHalls } from '@/api/admin'
 import { useNotification } from '@/hooks'
 
 // Validation Schema
@@ -31,15 +31,19 @@ const createManagerSchema = (editingManager = null) => z.object({
 export default function CreateEditManagerDialog({ open, onClose, onSubmit, editingManager, loading }) {
     const { addNotification: showNotification } = useNotification()
 
-    const { data: hallsData } = useQuery({
+    const { data: hallsData, isLoading: hallsLoading } = useQuery({
         queryKey: ['admin', 'halls-list'],
-        queryFn: getHallsList,
-        staleTime: 5 * 60 * 1000
+        queryFn: getAllHalls,
+        enabled: open,
+        staleTime: 2 * 60 * 1000,
+        refetchOnMount: true
     })
 
     const hallsList = Array.isArray(hallsData)
         ? hallsData
-        : (Array.isArray(hallsData?.data) ? hallsData.data : (hallsData?.halls || []))
+        : (Array.isArray(hallsData?.data) ? hallsData.data
+            : (Array.isArray(hallsData?.halls) ? hallsData.halls
+                : (Array.isArray(hallsData?.data?.halls) ? hallsData.data.halls : [])))
 
     const {
         control,
@@ -200,15 +204,21 @@ export default function CreateEditManagerDialog({ open, onClose, onSubmit, editi
                                 label="قاعة/صالة"
                                 error={!!errors.hallId}
                                 fullWidth
+                                disabled={hallsLoading}
                             >
                                 <MuiMenuItem value="">
-                                    <em>غير معين</em>
+                                    <em>{hallsLoading ? 'جاري تحميل القاعات...' : 'غير معين'}</em>
                                 </MuiMenuItem>
-                                {Array.isArray(hallsList) && hallsList.map(hall => (
+                                {!hallsLoading && Array.isArray(hallsList) && hallsList.map(hall => (
                                     <MuiMenuItem key={hall._id || hall.id} value={hall._id || hall.id}>
                                         {hall.name}
                                     </MuiMenuItem>
                                 ))}
+                                {!hallsLoading && Array.isArray(hallsList) && hallsList.length === 0 && (
+                                    <MuiMenuItem disabled>
+                                        <em>لا توجد قاعات متاحة</em>
+                                    </MuiMenuItem>
+                                )}
                             </MuiSelect>
                         )}
                     />

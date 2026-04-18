@@ -90,9 +90,8 @@ export default function AdminProfile() {
     },
   })
 
-  // Change password mutation
   const changePasswordMutation = useMutation({
-    mutationFn: (data) => updateProfile({ password: data.newPassword }),
+    mutationFn: (data) => updateProfile({ currentPassword: data.currentPassword, oldPassword: data.currentPassword, password: data.newPassword }),
     onSuccess: () => {
       success('تم تغيير كلمة المرور بنجاح')
       resetPassword()

@@ -7,7 +7,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { useAuth } from '@/hooks'
-import { normalizeDashboardStats, computeStatsFromEvents } from '@/api/utils/normalizers'
 import MuiBox from '@/components/ui/MuiBox'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiTypography from '@/components/ui/MuiTypography'
@@ -16,7 +15,7 @@ import MuiChip from '@/components/ui/MuiChip'
 import MuiDivider from '@/components/ui/MuiDivider'
 import { LoadingScreen, EmptyState, SEOHead } from '@/components/common'
 import { QUERY_KEYS } from '@/config/constants'
-import { getManagerDashboard, getManagerEvents } from '@/api/manager'
+import { getManagerDashboard } from '@/api/manager'
 import { formatNumber, formatCurrency } from '@/utils/helpers'
 import {
     Building2,
@@ -34,7 +33,15 @@ import {
     LayoutDashboard,
     UserPlus,
     FileText,
-    Music
+    Music,
+    CreditCard,
+    Receipt,
+    MessageSquare,
+    Briefcase,
+    MapPin,
+    Phone,
+    Mail,
+    Users2
 } from 'lucide-react'
 
 const statsConfig = [
@@ -46,25 +53,39 @@ const statsConfig = [
         color: 'primary',
     },
     {
-        key: 'todayBookings',
-        title: 'حجوزات اليوم',
+        key: 'upcomingEventsCount',
+        title: 'الفعاليات القادمة',
         icon: Clock,
         formatter: formatNumber,
         color: 'warning',
     },
     {
-        key: 'activeBookings',
-        title: 'الحجوزات النشطة',
+        key: 'confirmedEvents',
+        title: 'الفعاليات المؤكدة',
         icon: CheckCircle,
         formatter: formatNumber,
         color: 'success',
     },
     {
-        key: 'monthlyRevenue',
-        title: 'الإيرادات الشهرية',
+        key: 'monthRevenue',
+        title: 'إيرادات الشهر',
         icon: DollarSign,
-        formatter: formatCurrency,
+        formatter: (value) => formatCurrency(value, 'SY'),
         color: 'info',
+    },
+    {
+        key: 'totalClients',
+        title: 'إجمالي العملاء',
+        icon: Users,
+        formatter: formatNumber,
+        color: 'secondary',
+    },
+    {
+        key: 'totalInvitations',
+        title: 'إجمالي الدعوات',
+        icon: FileText,
+        formatter: formatNumber,
+        color: 'primary',
     },
 ]
 
@@ -81,49 +102,71 @@ function ManagerDashboardContent() {
         queryFn: getManagerDashboard,
     })
 
-    // Normalize dashboard stats
-    const normalizedStats = useMemo(() => normalizeDashboardStats(data), [data])
-
-    // Check if totalEvents needs to be calculated from events
-    const needsEventsData = useMemo(() => {
-        if (isLoading || !data) return false
-        return !normalizedStats.totalEvents || normalizedStats.totalEvents === 0
-    }, [isLoading, data, normalizedStats.totalEvents])
-
-    // Fetch events to calculate totalEvents if not provided by dashboard API
-    const { data: eventsData } = useQuery({
-        queryKey: [QUERY_KEYS.MANAGER_EVENTS],
-        queryFn: getManagerEvents,
-        enabled: needsEventsData, // Only fetch if totalEvents is missing or 0
-    })
-
-    // If totalEvents is missing or 0, calculate it from events
-    // This hook must be called before any early returns to maintain hooks order
+    // Normalize dashboard stats from the new API structure
     const stats = useMemo(() => {
-        let finalStats = { ...normalizedStats }
+        if (!data?.data) return {}
 
-        if (needsEventsData && eventsData) {
-            const events = Array.isArray(eventsData?.events)
-                ? eventsData.events
-                : Array.isArray(eventsData?.data)
-                    ? eventsData.data
-                    : Array.isArray(eventsData)
-                        ? eventsData
-                        : []
+        const { summary, recentActivity, hall, upcomingEvents } = data.data
 
-            if (events.length > 0) {
-                const computedStats = computeStatsFromEvents(events)
-                finalStats = {
-                    ...finalStats,
-                    totalEvents: computedStats.totalEvents || events.length,
-                    todayBookings: finalStats.todayBookings || computedStats.todayBookings || 0,
-                    activeBookings: finalStats.activeBookings || computedStats.activeBookings || 0,
-                }
-            }
+        return {
+            // Events stats
+            totalEvents: summary?.events?.total || 0,
+            upcomingEventsCount: summary?.events?.upcoming || 0,
+            todayEvents: summary?.events?.today || 0,
+            thisWeekEvents: summary?.events?.thisWeek || 0,
+            thisMonthEvents: summary?.events?.thisMonth || 0,
+            completedEvents: summary?.events?.completed || 0,
+            cancelledEvents: summary?.events?.cancelled || 0,
+            pendingEvents: summary?.events?.pending || 0,
+            confirmedEvents: summary?.events?.confirmed || 0,
+            inProgressEvents: summary?.events?.inProgress || 0,
+            eventsByType: summary?.events?.byType || {},
+            eventsByStatus: summary?.events?.byStatus || {},
+
+            // Clients stats
+            totalClients: summary?.clients?.total || 0,
+            activeClients: summary?.clients?.active || 0,
+            newClientsThisMonth: summary?.clients?.newThisMonth || 0,
+
+            // Invitations stats
+            totalInvitations: summary?.invitations?.total || 0,
+            usedInvitations: summary?.invitations?.used || 0,
+            pendingInvitations: summary?.invitations?.pending || 0,
+            todayCreatedInvitations: summary?.invitations?.todayCreated || 0,
+            checkedInGuests: summary?.invitations?.checkedInGuests || 0,
+            invitationsUsageRate: summary?.invitations?.usageRate || '0',
+
+            // Financial stats
+            totalRevenue: summary?.financial?.totalRevenue || 0,
+            monthRevenue: summary?.financial?.monthRevenue || 0,
+            totalPaid: summary?.financial?.totalPaid || 0,
+            totalUnpaid: summary?.financial?.totalUnpaid || 0,
+            pendingPayments: summary?.financial?.pendingPayments || 0,
+            completedPayments: summary?.financial?.completedPayments || 0,
+            currency: 'SY',
+
+            // Complaints stats
+            totalComplaints: summary?.complaints?.total || 0,
+            openComplaints: summary?.complaints?.open || 0,
+            resolvedComplaints: summary?.complaints?.resolved || 0,
+            urgentComplaints: summary?.complaints?.urgent || 0,
+            complaintsByStatus: summary?.complaints?.byStatus || {},
+
+            // Staff stats
+            totalStaff: summary?.staff?.total || 0,
+            activeStaff: summary?.staff?.active || 0,
+
+            // Hall info
+            hallInfo: hall || null,
+
+            // Recent activity
+            recentEvents: recentActivity?.events || [],
+            recentComplaints: recentActivity?.complaints || [],
+
+            // Upcoming events
+            upcomingEvents: upcomingEvents || [],
         }
-
-        return finalStats
-    }, [normalizedStats, needsEventsData, eventsData])
+    }, [data])
 
     if (isLoading) {
         return <LoadingScreen message="جاري تحميل البيانات..." fullScreen={false} />
@@ -325,9 +368,6 @@ function ManagerDashboardContent() {
                                     ) : (
                                         <MuiBox sx={{ height: 32, opacity: 0.5, display: 'flex', alignItems: 'center' }}>
                                             <Activity size={14} style={{ marginRight: 8 }} color="var(--color-text-disabled)" />
-                                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-disabled)' }}>
-                                                مؤشر النشاط مستقر
-                                            </MuiTypography>
                                         </MuiBox>
                                     )}
                                 </MuiBox>
@@ -445,13 +485,13 @@ function ManagerDashboardContent() {
                                             mb: 1,
                                             fontWeight: 600
                                         }}>
-                                            الطاولات
+                                            السعة
                                         </MuiTypography>
                                         <MuiTypography variant="h4" sx={{
                                             fontWeight: 700,
                                             color: 'var(--color-primary-700)'
                                         }}>
-                                            {stats.hallInfo.tables || 0}
+                                            {stats.hallInfo.capacity || 0}
                                         </MuiTypography>
                                     </MuiBox>
 
@@ -469,13 +509,13 @@ function ManagerDashboardContent() {
                                             mb: 1,
                                             fontWeight: 600
                                         }}>
-                                            الكراسي
+                                            السعر الافتراضي
                                         </MuiTypography>
                                         <MuiTypography variant="h4" sx={{
                                             fontWeight: 700,
                                             color: 'var(--color-secondary-700)'
                                         }}>
-                                            {stats.hallInfo.chairs || 0}
+                                            {formatCurrency(stats.hallInfo.defaultPrices || 0, 'SY')}
                                         </MuiTypography>
                                     </MuiBox>
                                 </MuiBox>
@@ -484,7 +524,7 @@ function ManagerDashboardContent() {
                     </MuiGrid>
                 )}
 
-                {/* Recent Bookings */}
+                {/* Recent Events */}
                 <MuiGrid item xs={12} md={stats.hallInfo ? 8 : 12}>
                     <MuiPaper
                         elevation={0}
@@ -524,10 +564,10 @@ function ManagerDashboardContent() {
                                             fontWeight: 700,
                                             color: 'var(--color-text-primary)'
                                         }}>
-                                            الحجوزات الأخيرة
+                                            الفعاليات الأخيرة
                                         </MuiTypography>
                                         <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                                            آخر {stats.recentBookings?.length || 0} حجوزات
+                                            آخر {stats.recentEvents?.length || 0} فعاليات
                                         </MuiTypography>
                                     </MuiBox>
                                 </MuiBox>
@@ -535,11 +575,11 @@ function ManagerDashboardContent() {
                         </MuiBox>
 
                         {/* Content */}
-                        {stats.recentBookings && stats.recentBookings.length > 0 ? (
+                        {stats.recentEvents && stats.recentEvents.length > 0 ? (
                             <MuiBox sx={{ position: 'relative', zIndex: 1 }}>
-                                {stats.recentBookings.map((booking, index) => (
+                                {stats.recentEvents.map((event, index) => (
                                     <MuiBox
-                                        key={`${booking.clientName}-${index}`}
+                                        key={event._id || index}
                                         sx={{
                                             p: 3,
                                             transition: 'all 0.3s ease',
@@ -563,11 +603,11 @@ function ManagerDashboardContent() {
                                                         color: 'var(--color-primary-600)'
                                                     }
                                                 }}>
-                                                    {booking.clientName}
+                                                    {event.name || 'فعالية بدون اسم'}
                                                 </MuiTypography>
                                                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                                                     <MuiChip
-                                                        label={typeof booking.eventType === 'object' ? (booking.eventType.label || booking.eventType.name || String(booking.eventType)) : (booking.eventType || 'فعالية')}
+                                                        label={event.type === 'graduation' ? 'تخرج' : event.type === 'wedding' ? 'زفاف' : event.type === 'birthday' ? 'عيد ميلاد' : event.type === 'other' ? 'أخرى' : event.type || 'فعالية'}
                                                         size="small"
                                                         sx={{
                                                             backgroundColor: 'var(--color-primary-50)',
@@ -579,47 +619,71 @@ function ManagerDashboardContent() {
                                                         }}
                                                     />
                                                     <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
-                                                        • {booking.date}
+                                                        • {event.date ? new Date(event.date).toLocaleDateString('ar-SA') : '-'}
                                                     </MuiTypography>
                                                 </MuiBox>
                                             </MuiBox>
 
-                                            <MuiChip
-                                                label={booking.status === 'confirmed' ? 'مؤكد' : 'قيد الانتظار'}
-                                                size="small"
-                                                sx={{
-                                                    backgroundColor: booking.status === 'confirmed' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(216, 185, 138, 0.1)',
-                                                    color: booking.status === 'confirmed' ? '#22c55e' : 'var(--color-primary-500)',
-                                                    fontWeight: 700,
-                                                    fontSize: '0.75rem',
-                                                    height: 28,
-                                                    borderRadius: '8px',
-                                                    border: booking.status === 'confirmed' ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid rgba(216, 185, 138, 0.2)'
-                                                }}
-                                            />
+                                            <MuiBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
+                                                <MuiChip
+                                                    label={event.status === 'pending' ? 'قيد الانتظار' : event.status === 'confirmed' ? 'مؤكد' : event.status === 'completed' ? 'مكتمل' : event.status || 'نشط'}
+                                                    size="small"
+                                                    sx={{
+                                                        backgroundColor: event.status === 'pending' ? 'rgba(216, 185, 138, 0.1)' : event.status === 'confirmed' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                                                        color: event.status === 'pending' ? 'var(--color-primary-500)' : event.status === 'confirmed' ? '#22c55e' : '#3b82f6',
+                                                        fontWeight: 700,
+                                                        fontSize: '0.75rem',
+                                                        height: 28,
+                                                        borderRadius: '8px',
+                                                        border: event.status === 'pending' ? '1px solid rgba(216, 185, 138, 0.2)' : event.status === 'confirmed' ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid rgba(59, 130, 246, 0.2)'
+                                                    }}
+                                                />
+                                                {event.totalPrice > 0 && (
+                                                    <MuiTypography variant="caption" sx={{
+                                                        color: 'var(--color-primary-600)',
+                                                        fontWeight: 600
+                                                    }}>
+                                                        {formatCurrency(event.totalPrice, 'SY')}
+                                                    </MuiTypography>
+                                                )}
+                                            </MuiBox>
                                         </MuiBox>
 
-                                        {booking.phone && (
-                                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
-                                                <MuiBox sx={{
-                                                    width: 32,
-                                                    height: 32,
-                                                    borderRadius: '8px',
-                                                    background: 'rgba(216, 185, 138, 0.1)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}>
-                                                    <Users size={16} style={{ color: 'var(--color-primary-500)' }} />
+                                        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
+                                            {event.client?.name && (
+                                                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Users size={14} style={{ color: 'var(--color-text-secondary)' }} />
+                                                    <MuiTypography variant="body2" sx={{
+                                                        color: 'var(--color-text-secondary)',
+                                                        fontWeight: 500
+                                                    }}>
+                                                        {event.client.name}
+                                                    </MuiTypography>
                                                 </MuiBox>
-                                                <MuiTypography variant="body2" sx={{
-                                                    color: 'var(--color-text-secondary)',
-                                                    fontWeight: 500
-                                                }}>
-                                                    {booking.phone}
-                                                </MuiTypography>
-                                            </MuiBox>
-                                        )}
+                                            )}
+                                            {event.guestCount > 0 && (
+                                                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Users2 size={14} style={{ color: 'var(--color-text-secondary)' }} />
+                                                    <MuiTypography variant="body2" sx={{
+                                                        color: 'var(--color-text-secondary)',
+                                                        fontWeight: 500
+                                                    }}>
+                                                        {event.guestCount} ضيف
+                                                    </MuiTypography>
+                                                </MuiBox>
+                                            )}
+                                            {event.paidAmount > 0 && (
+                                                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <DollarSign size={14} style={{ color: 'var(--color-text-secondary)' }} />
+                                                    <MuiTypography variant="body2" sx={{
+                                                        color: 'var(--color-text-secondary)',
+                                                        fontWeight: 500
+                                                    }}>
+                                                        مدفوع: {formatCurrency(event.paidAmount, 'SY')}
+                                                    </MuiTypography>
+                                                </MuiBox>
+                                            )}
+                                        </MuiBox>
                                     </MuiBox>
                                 ))}
                             </MuiBox>
@@ -635,10 +699,405 @@ function ManagerDashboardContent() {
                                     mb: 2,
                                     fontWeight: 700
                                 }}>
-                                    لا توجد حجوزات
+                                    لا توجد فعاليات حديثة
                                 </MuiTypography>
                                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-disabled)' }}>
-                                    لم يتم تسجيل أي حجوزات حتى الآن
+                                    لم يتم تسجيل أي فعاليات حديثة حتى الآن
+                                </MuiTypography>
+                            </MuiBox>
+                        )}
+                    </MuiPaper>
+                </MuiGrid>
+            </MuiGrid>
+
+            {/* Summary Cards Section */}
+            <MuiGrid container spacing={3} sx={{ mt: 2 }}>
+                {/* Events Summary */}
+                <MuiGrid item xs={12} md={6} lg={4}>
+                    <MuiPaper
+                        elevation={0}
+                        sx={{
+                            background: 'var(--color-paper)',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: '24px',
+                            overflow: 'hidden',
+                            height: '100%',
+                            boxShadow: 'var(--shadow-lg)'
+                        }}
+                    >
+                        <MuiBox sx={{
+                            p: 3,
+                            background: 'linear-gradient(135deg, var(--color-info-600), var(--color-info-800))',
+                        }}>
+                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <MuiBox sx={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: '10px',
+                                    background: 'rgba(255, 255, 255, 0.2)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    <Calendar size={20} style={{ color: '#fff' }} />
+                                </MuiBox>
+                                <MuiTypography variant="h6" sx={{ fontWeight: 700, color: '#fff' }}>
+                                    ملخص الفعاليات
+                                </MuiTypography>
+                            </MuiBox>
+                        </MuiBox>
+                        <MuiBox sx={{ p: 3 }}>
+                            <MuiGrid container spacing={2}>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="اليوم" value={stats.todayEvents} color="primary" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="هذا الأسبوع" value={stats.thisWeekEvents} color="info" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="هذا الشهر" value={stats.thisMonthEvents} color="success" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="قيد الانتظار" value={stats.pendingEvents} color="warning" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="مؤكدة" value={stats.confirmedEvents} color="success" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="مكتملة" value={stats.completedEvents} color="primary" />
+                                </MuiGrid>
+                            </MuiGrid>
+                            {Object.keys(stats.eventsByType || {}).length > 0 && (
+                                <>
+                                    <MuiDivider sx={{ my: 2 }} />
+                                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 1 }}>
+                                        حسب النوع
+                                    </MuiTypography>
+                                    <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                        {Object.entries(stats.eventsByType || {}).map(([type, count]) => (
+                                            <MuiChip
+                                                key={type}
+                                                label={`${type === 'wedding' ? 'زفاف' : type === 'graduation' ? 'تخرج' : type === 'birthday' ? 'عيد ميلاد' : type === 'other' ? 'أخرى' : type}: ${count}`}
+                                                size="small"
+                                                sx={{
+                                                    backgroundColor: 'var(--color-info-50)',
+                                                    color: 'var(--color-info-700)',
+                                                    fontWeight: 600
+                                                }}
+                                            />
+                                        ))}
+                                    </MuiBox>
+                                </>
+                            )}
+                        </MuiBox>
+                    </MuiPaper>
+                </MuiGrid>
+
+                {/* Financial Summary */}
+                <MuiGrid item xs={12} md={6} lg={4}>
+                    <MuiPaper
+                        elevation={0}
+                        sx={{
+                            background: 'var(--color-paper)',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: '24px',
+                            overflow: 'hidden',
+                            height: '100%',
+                            boxShadow: 'var(--shadow-lg)'
+                        }}
+                    >
+                        <MuiBox sx={{
+                            p: 3,
+                            background: 'linear-gradient(135deg, var(--color-success-600), var(--color-success-800))',
+                        }}>
+                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <MuiBox sx={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: '10px',
+                                    background: 'rgba(255, 255, 255, 0.2)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    <DollarSign size={20} style={{ color: '#fff' }} />
+                                </MuiBox>
+                                <MuiTypography variant="h6" sx={{ fontWeight: 700, color: '#fff' }}>
+                                    الملخص المالي
+                                </MuiTypography>
+                            </MuiBox>
+                        </MuiBox>
+                        <MuiBox sx={{ p: 3 }}>
+                            <MuiGrid container spacing={2}>
+                                <MuiGrid item xs={12}>
+                                    <SummaryItem
+                                        label="إجمالي الإيرادات"
+                                        value={formatCurrency(stats.totalRevenue, stats.currency)}
+                                        color="primary"
+                                        fullWidth
+                                    />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="إيرادات الشهر" value={formatCurrency(stats.monthRevenue, stats.currency)} color="success" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="المدفوع" value={formatCurrency(stats.totalPaid, stats.currency)} color="info" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="المتبقي" value={formatCurrency(stats.totalUnpaid, stats.currency)} color="warning" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="مكتمل" value={formatCurrency(stats.completedPayments, stats.currency)} color="success" />
+                                </MuiGrid>
+                            </MuiGrid>
+                        </MuiBox>
+                    </MuiPaper>
+                </MuiGrid>
+
+                {/* Invitations & Clients Summary */}
+                <MuiGrid item xs={12} md={6} lg={4}>
+                    <MuiPaper
+                        elevation={0}
+                        sx={{
+                            background: 'var(--color-paper)',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: '24px',
+                            overflow: 'hidden',
+                            height: '100%',
+                            boxShadow: 'var(--shadow-lg)'
+                        }}
+                    >
+                        <MuiBox sx={{
+                            p: 3,
+                            background: 'linear-gradient(135deg, var(--color-secondary-600), var(--color-secondary-800))',
+                        }}>
+                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <MuiBox sx={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: '10px',
+                                    background: 'rgba(255, 255, 255, 0.2)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    <FileText size={20} style={{ color: '#fff' }} />
+                                </MuiBox>
+                                <MuiTypography variant="h6" sx={{ fontWeight: 700, color: '#fff' }}>
+                                    الدعوات والعملاء
+                                </MuiTypography>
+                            </MuiBox>
+                        </MuiBox>
+                        <MuiBox sx={{ p: 3 }}>
+                            <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600, mb: 2 }}>
+                                الدعوات
+                            </MuiTypography>
+                            <MuiGrid container spacing={2} sx={{ mb: 3 }}>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="إجمالي الدعوات" value={stats.totalInvitations} color="primary" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="المستخدمة" value={stats.usedInvitations} color="success" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="المعلقة" value={stats.pendingInvitations} color="warning" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="الحضور" value={stats.checkedInGuests} color="info" />
+                                </MuiGrid>
+                            </MuiGrid>
+                            <MuiDivider sx={{ my: 2 }} />
+                            <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600, mb: 2 }}>
+                                العملاء
+                            </MuiTypography>
+                            <MuiGrid container spacing={2}>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="إجمالي العملاء" value={stats.totalClients} color="secondary" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="النشطين" value={stats.activeClients} color="success" />
+                                </MuiGrid>
+                                <MuiGrid item xs={12}>
+                                    <SummaryItem label="جدد هذا الشهر" value={stats.newClientsThisMonth} color="info" />
+                                </MuiGrid>
+                            </MuiGrid>
+                        </MuiBox>
+                    </MuiPaper>
+                </MuiGrid>
+
+                {/* Complaints & Staff Summary */}
+                <MuiGrid item xs={12} md={6} lg={4}>
+                    <MuiPaper
+                        elevation={0}
+                        sx={{
+                            background: 'var(--color-paper)',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: '24px',
+                            overflow: 'hidden',
+                            height: '100%',
+                            boxShadow: 'var(--shadow-lg)'
+                        }}
+                    >
+                        <MuiBox sx={{
+                            p: 3,
+                            background: 'linear-gradient(135deg, var(--color-warning-600), var(--color-warning-800))',
+                        }}>
+                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <MuiBox sx={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: '10px',
+                                    background: 'rgba(255, 255, 255, 0.2)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    <MessageSquare size={20} style={{ color: '#fff' }} />
+                                </MuiBox>
+                                <MuiTypography variant="h6" sx={{ fontWeight: 700, color: '#fff' }}>
+                                    الشكاوى والموظفين
+                                </MuiTypography>
+                            </MuiBox>
+                        </MuiBox>
+                        <MuiBox sx={{ p: 3 }}>
+                            <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600, mb: 2 }}>
+                                الشكاوى
+                            </MuiTypography>
+                            <MuiGrid container spacing={2} sx={{ mb: 3 }}>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="إجمالي الشكاوى" value={stats.totalComplaints} color="warning" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="المفتوحة" value={stats.openComplaints} color="error" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="المحلولة" value={stats.resolvedComplaints} color="success" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="العاجلة" value={stats.urgentComplaints} color="error" />
+                                </MuiGrid>
+                            </MuiGrid>
+                            <MuiDivider sx={{ my: 2 }} />
+                            <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600, mb: 2 }}>
+                                الموظفين
+                            </MuiTypography>
+                            <MuiGrid container spacing={2}>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="إجمالي الموظفين" value={stats.totalStaff} color="secondary" />
+                                </MuiGrid>
+                                <MuiGrid item xs={6}>
+                                    <SummaryItem label="النشطين" value={stats.activeStaff} color="success" />
+                                </MuiGrid>
+                            </MuiGrid>
+                        </MuiBox>
+                    </MuiPaper>
+                </MuiGrid>
+
+                {/* Upcoming Events */}
+                <MuiGrid item xs={12} md={6} lg={8}>
+                    <MuiPaper
+                        elevation={0}
+                        sx={{
+                            background: 'var(--color-paper)',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: '24px',
+                            overflow: 'hidden',
+                            height: '100%',
+                            boxShadow: 'var(--shadow-lg)'
+                        }}
+                    >
+                        <MuiBox sx={{
+                            p: 3,
+                            borderBottom: '1px solid var(--color-border)',
+                        }}>
+                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <MuiBox sx={{
+                                    width: 48,
+                                    height: 48,
+                                    borderRadius: '12px',
+                                    background: 'var(--color-success-50)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'var(--color-success-600)'
+                                }}>
+                                    <Clock size={24} strokeWidth={2.5} />
+                                </MuiBox>
+                                <MuiBox>
+                                    <MuiTypography variant="h6" sx={{
+                                        fontWeight: 700,
+                                        color: 'var(--color-text-primary)'
+                                    }}>
+                                        الفعاليات القادمة
+                                    </MuiTypography>
+                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
+                                        {stats.upcomingEvents?.length || 0} فعاليات قادمة
+                                    </MuiTypography>
+                                </MuiBox>
+                            </MuiBox>
+                        </MuiBox>
+
+                        {stats.upcomingEvents && stats.upcomingEvents.length > 0 ? (
+                            <MuiBox sx={{ p: 3 }}>
+                                <MuiGrid container spacing={2}>
+                                    {stats.upcomingEvents.map((event, index) => (
+                                        <MuiGrid item xs={12} sm={6} key={event._id || index}>
+                                            <MuiBox sx={{
+                                                p: 2,
+                                                borderRadius: '12px',
+                                                background: 'var(--color-surface)',
+                                                border: '1px solid var(--color-border)',
+                                            }}>
+                                                <MuiTypography variant="subtitle2" sx={{
+                                                    fontWeight: 700,
+                                                    color: 'var(--color-text-primary)',
+                                                    mb: 1
+                                                }}>
+                                                    {event.name || 'فعالية بدون اسم'}
+                                                </MuiTypography>
+                                                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                                                    <MuiChip
+                                                        label={event.type === 'graduation' ? 'تخرج' : event.type === 'wedding' ? 'زفاف' : event.type === 'birthday' ? 'عيد ميلاد' : event.type === 'other' ? 'أخرى' : event.type || 'فعالية'}
+                                                        size="small"
+                                                        sx={{
+                                                            backgroundColor: 'var(--color-success-50)',
+                                                            color: 'var(--color-success-700)',
+                                                            fontWeight: 600,
+                                                            fontSize: '0.75rem',
+                                                            height: 24,
+                                                            border: '1px solid var(--color-success-100)'
+                                                        }}
+                                                    />
+                                                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+                                                        {event.date ? new Date(event.date).toLocaleDateString('ar-SA') : '-'}
+                                                    </MuiTypography>
+                                                </MuiBox>
+                                                {event.client?.name && (
+                                                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mt: 1 }}>
+                                                        العميل: {event.client.name}
+                                                    </MuiTypography>
+                                                )}
+                                            </MuiBox>
+                                        </MuiGrid>
+                                    ))}
+                                </MuiGrid>
+                            </MuiBox>
+                        ) : (
+                            <MuiBox sx={{ p: 6, textAlign: 'center' }}>
+                                <Clock size={64} style={{
+                                    color: 'var(--color-text-disabled)',
+                                    opacity: 0.5,
+                                    margin: '0 auto 1rem'
+                                }} />
+                                <MuiTypography variant="h6" sx={{
+                                    color: 'var(--color-text-secondary)',
+                                    mb: 2,
+                                    fontWeight: 700
+                                }}>
+                                    لا توجد فعاليات قادمة
+                                </MuiTypography>
+                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-disabled)' }}>
+                                    لم يتم تسجيل أي فعاليات قادمة
                                 </MuiTypography>
                             </MuiBox>
                         )}
@@ -660,6 +1119,35 @@ function InfoField({ label, value, prominent = false }) {
                 className={`${prominent ? 'font-bold text-lg' : 'font-medium text-base'} text-text-primary`}
             >
                 {value || '-'}
+            </MuiTypography>
+        </MuiBox>
+    )
+}
+
+function SummaryItem({ label, value, color = 'primary', fullWidth = false }) {
+    return (
+        <MuiBox sx={{
+            p: 1.5,
+            borderRadius: '10px',
+            background: `var(--color-${color}-50)`,
+            border: `1px solid var(--color-${color}-100)`,
+            textAlign: 'center',
+            width: fullWidth ? '100%' : 'auto'
+        }}>
+            <MuiTypography variant="caption" sx={{
+                color: `var(--color-${color}-600)`,
+                display: 'block',
+                mb: 0.5,
+                fontWeight: 600
+            }}>
+                {label}
+            </MuiTypography>
+            <MuiTypography variant="h6" sx={{
+                fontWeight: 700,
+                color: `var(--color-${color}-700)`,
+                fontSize: '1.1rem'
+            }}>
+                {value}
             </MuiTypography>
         </MuiBox>
     )

@@ -23,6 +23,7 @@ export default function EditUserDialog({ open, onClose, user, onSuccess }) {
     role: ''
   })
   const [loading, setLoading] = useState(false)
+  const [previewImage, setPreviewImage] = useState(null)
 
   useEffect(() => {
     if (user) {
@@ -33,6 +34,7 @@ export default function EditUserDialog({ open, onClose, user, onSuccess }) {
         password: '', // Don't pre-fill password for security
         role: user.role || ''
       })
+      setPreviewImage(null)
     }
   }, [user])
 
@@ -49,11 +51,20 @@ export default function EditUserDialog({ open, onClose, user, onSuccess }) {
     setLoading(true)
     try {
       const userId = user._id || user.id
-      const submitData = { ...formData }
+      const submitData = new FormData()
       
-      // Only include password if it's provided
-      if (!submitData.password) {
-        delete submitData.password
+      Object.keys(formData).forEach(key => {
+        if (key === 'password' && !formData[key]) {
+            // Only include password if it's provided
+            return
+        }
+        if (formData[key] !== undefined && formData[key] !== '') {
+            submitData.append(key, formData[key])
+        }
+      })
+
+      if (previewImage) {
+        submitData.append('image', previewImage)
       }
 
       await editUser(userId, submitData)
@@ -64,6 +75,21 @@ export default function EditUserDialog({ open, onClose, user, onSuccess }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB Limit
+        // could show notification here
+        return
+      }
+      setPreviewImage(file)
+    }
+  }
+
+  const removeImage = () => {
+    setPreviewImage(null)
   }
 
   const roleOptions = [
@@ -167,6 +193,104 @@ export default function EditUserDialog({ open, onClose, user, onSuccess }) {
                   options={roleOptions}
                   startIcon={<Shield size={20} />}
                 />
+              </MuiGrid>
+
+              {/* Image Upload */}
+              <MuiGrid item xs={12}>
+                  <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--color-primary-500)' }}>
+                      صورة المستخدم
+                  </MuiTypography>
+                  <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <MuiBox
+                          sx={{
+                              border: '2px dashed var(--color-border-glass)',
+                              borderRadius: '12px',
+                              p: 3,
+                              textAlign: 'center',
+                              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                              cursor: 'pointer',
+                              '&:hover': {
+                                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                  borderColor: 'var(--color-primary-500)',
+                              }
+                          }}
+                      >
+                          <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleImageChange}
+                              style={{ display: 'none' }}
+                              id="user-edit-image-upload"
+                          />
+                          <label htmlFor="user-edit-image-upload">
+                              <MuiBox sx={{ cursor: 'pointer' }}>
+                                  <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
+                                      انقر لرفع صورة أو اسحب وأفلت
+                                  </MuiTypography>
+                                  <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+                                      (PNG, JPG - الحد الأقصى 5MB)
+                                  </MuiTypography>
+                              </MuiBox>
+                          </label>
+                      </MuiBox>
+
+                      {/* Existing Image */}
+                      {user?.avatar && !previewImage && (
+                          <MuiBox sx={{ position: 'relative', display: 'inline-block' }}>
+                              <img
+                                  src={user.avatar.startsWith('http') ? user.avatar : `${import.meta.env.VITE_API_BASE}${user.avatar}`}
+                                  alt="Current User Avatar"
+                                  style={{
+                                      width: '100px',
+                                      height: '100px',
+                                      objectFit: 'cover',
+                                      borderRadius: '50%',
+                                      border: '2px solid var(--color-border-glass)'
+                                  }}
+                              />
+                              <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', mt: 1, display: 'block' }}>
+                                  الصورة الحالية
+                              </MuiTypography>
+                          </MuiBox>
+                      )}
+
+                      {/* New Image Preview */}
+                      {previewImage && (
+                          <MuiBox sx={{ position: 'relative', display: 'inline-block' }}>
+                              <img
+                                  src={URL.createObjectURL(previewImage)}
+                                  alt="Preview"
+                                  style={{
+                                      width: '100px',
+                                      height: '100px',
+                                      objectFit: 'cover',
+                                      borderRadius: '50%',
+                                      border: '2px solid var(--color-primary-500)'
+                                  }}
+                              />
+                              <MuiBox
+                                  onClick={removeImage}
+                                  sx={{
+                                      position: 'absolute',
+                                      top: 0,
+                                      right: 0,
+                                      backgroundColor: 'rgba(239, 68, 68, 0.9)',
+                                      color: '#fff',
+                                      width: 24,
+                                      height: 24,
+                                      borderRadius: '50%',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      cursor: 'pointer',
+                                      '&:hover': { backgroundColor: 'rgba(220, 38, 38, 1)' }
+                                  }}
+                              >
+                                  <span style={{ fontSize: '14px', lineHeight: 1 }}>×</span>
+                              </MuiBox>
+                          </MuiBox>
+                      )}
+                  </MuiBox>
               </MuiGrid>
             </MuiGrid>
           </MuiDialogContent>

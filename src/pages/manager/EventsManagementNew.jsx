@@ -40,7 +40,7 @@ import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog } from '@/
 
 import { QUERY_KEYS } from '@/config/constants'
 
-import { getManagerEvents, deleteEvent, createEvent, updateEvent, getEventScanners, addEventScanners, removeEventScanner } from '@/api/manager'
+import { getManagerEvents, deleteEvent, createEvent, updateEvent, changeEventClient, getEventScanners, addEventScanners, removeEventScanner } from '@/api/manager'
 
 import { formatDate } from '@/utils/helpers'
 
@@ -829,37 +829,25 @@ export default function EventsManagement() {
         },
 
         {
-            id: 'createdAt',
-            label: 'تاريخ الإنشاء',
-            align: 'right',
-            format: (value) => (
-                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Calendar size={14} style={{ color: 'var(--color-primary-400)' }} />
-                    <MuiTypography variant="body2">{formatDate(value, 'MM/DD/YYYY HH:mm') || '—'}</MuiTypography>
-                </MuiBox>
-            )
-        },
-        {
-            id: 'sentAt',
-            label: 'تاريخ الإرسال',
-            align: 'right',
-            format: (value) => (
-                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CheckCircle size={14} style={{ color: value ? '#16a34a' : 'var(--color-text-secondary)' }} />
-                    <MuiTypography variant="body2">{value ? formatDate(value, 'MM/DD/YYYY HH:mm') : 'لم يرسل بعد'}</MuiTypography>
-                </MuiBox>
-            )
-        },
-        {
+
             id: 'eventDate',
+
             label: 'التاريخ',
+
             align: 'right',
+
             format: (value, row) => (
+
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+
                     <Calendar size={14} style={{ color: 'var(--color-primary-400)' }} />
+
                     <MuiTypography variant="body2">{formatDate(value || row.date, 'MM/DD/YYYY') || '---'}</MuiTypography>
+
                 </MuiBox>
+
             )
+
         },
 
         {
@@ -977,12 +965,67 @@ export default function EventsManagement() {
 
 
     const handleUpdateSubmit = async (data) => {
+
         const id = selectedEvent?._id || selectedEvent?.id
+
         if (!id) return
 
-        // Send all data including scanners if the API supports it
-        // If not, we still need to avoid deleting it from the local copy if we use it later
-        const result = await handleUpdate(id, data)
+        console.log('Received data from dialog:', data)
+        console.log('Data clientSelection:', data.clientSelection)
+        console.log('Data clientId:', data.clientId)
+
+
+
+        // Check if client has changed
+        console.log('Selected event full:', selectedEvent)
+        console.log('Selected event client:', selectedEvent?.client)
+        console.log('Selected event clientId:', selectedEvent?.clientId)
+
+        const currentClientId = selectedEvent?.client?._id || selectedEvent?.client?.id || selectedEvent?.clientId
+        const newClientId = data.clientId?.toString()
+
+        console.log('Client change check:', {
+            currentClientId,
+            newClientId,
+            clientSelection: data.clientSelection,
+            selectedEventId: selectedEvent?._id || selectedEvent?.id,
+            willChange: data.clientSelection === 'existing' && newClientId && currentClientId && newClientId !== currentClientId?.toString()
+        })
+
+        // If client changed and we have existing client selection, update client first
+        if (data.clientSelection === 'existing' && newClientId && currentClientId && newClientId !== currentClientId?.toString()) {
+            console.log('Changing event client from', currentClientId, 'to', newClientId)
+            console.log('Using changeEventClient endpoint:', `/manager/events/${id}/client`)
+            try {
+                // Use dedicated endpoint to change client
+                const result = await changeEventClient(id, newClientId)
+                console.log('Client change result:', result)
+                success('تم تغيير العميل بنجاح')
+            } catch (error) {
+                console.error('Client change error full:', error)
+                console.error('Error response:', error?.response)
+                console.error('Error response data:', error?.response?.data)
+                console.error('Error response status:', error?.response?.status)
+                showError(error?.response?.data?.message || error?.response?.data?.error || 'حدث خطأ أثناء تغيير العميل')
+                return
+            }
+        }
+
+
+
+        // Separate scanners from other data
+
+        const scanners = data.scanners || []
+
+        const eventDataWithoutScanners = { ...data }
+
+        delete eventDataWithoutScanners.scanners
+
+
+
+        // Update event data (without scanners)
+
+        const result = await handleUpdate(id, eventDataWithoutScanners)
 
 
 

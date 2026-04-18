@@ -21,6 +21,9 @@ const MuiRating = ({
       disabled={disabled}
       readOnly={readOnly}
       sx={{
+        // Fix RTL star reversal: MUI Rating fills from right-to-left in RTL
+        // which reverses the visual meaning. Force LTR direction on the component.
+        direction: 'ltr',
         '& .MuiRating-iconFilled': {
           color: 'var(--color-primary-500)',
         },

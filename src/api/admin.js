@@ -69,6 +69,20 @@ export const deleteHall = async (id) => {
 }
 
 /**
+ * PUT - تغيير حالة قاعة/صالة (تفعيل/تعطيل)
+ * PUT /admin/halls/:id/status
+ */
+export const toggleHallStatus = async (id, isActive) => {
+  try {
+    const response = await api.put(`/admin/halls/edit/${id}`, { isActive })
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+
+/**
  * POST - إضافة خدمة لقاعة/صالة
  * POST /admin/halls/:id/services
  */
@@ -201,7 +215,9 @@ export const getUserById = async (id) => {
  */
 export const createUser = async (userData) => {
   try {
-    const response = await api.post('/admin/users', userData)
+    const response = await api.post('/admin/users', userData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
     return response.data
   } catch (error) {
     throw error
@@ -227,7 +243,9 @@ export const updateUser = async (id, userData) => {
  */
 export const editUser = async (id, userData) => {
   try {
-    const response = await api.put(`/admin/user/edit/${id}`, userData)
+    const response = await api.put(`/admin/user/edit/${id}`, userData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
     return response.data
   } catch (error) {
     throw error
@@ -315,12 +333,12 @@ export const deleteManager = async (id) => {
 }
 
 /**
- * POST - تفعيل/إلغاء تفعيل مدير
- * POST /admin/managers/:id/activate
+ * PUT - تفعيل/إلغاء تفعيل مدير
+ * PUT /admin/managers/:id/activate
  */
 export const toggleManagerStatus = async (id) => {
   try {
-    const response = await api.post(`/admin/managers/${id}/activate`)
+    const response = await api.put(`/admin/managers/${id}/activate`)
     return response.data
   } catch (error) {
     throw error
@@ -425,6 +443,19 @@ export const updateTemplate = async (templateId, formData) => {
 export const deleteTemplate = async (templateId) => {
   try {
     const response = await api.delete(`/admin/templates/delete/${templateId}`)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * PUT - تفعيل/تعطيل قالب
+ * PUT /admin/templates/:id/active
+ */
+export const toggleTemplateStatus = async (templateId, isActive) => {
+  try {
+    const response = await api.put(`/admin/templates/${templateId}/active`, { isActive })
     return response.data
   } catch (error) {
     throw error
@@ -651,6 +682,7 @@ export default {
   createTemplate,
   updateTemplate,
   deleteTemplate,
+  toggleTemplateStatus,
   getHallTemplates,
   assignTemplateToHall,
   unassignTemplateFromHall,

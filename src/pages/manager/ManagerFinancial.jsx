@@ -143,6 +143,16 @@ export default function ManagerFinancial() {
     const invoices = invoicesData?.data || invoicesData?.invoices || []
     const pagination = invoicesData?.pagination || {}
 
+    // Calculate totals for summary cards
+    const statsSummary = useMemo(() => {
+        return invoices.reduce((acc, inv) => {
+            acc.total += inv.totalAmount || 0
+            acc.paid += inv.paidAmount || 0
+            acc.pending += (inv.totalAmount || 0) - (inv.paidAmount || 0)
+            return acc
+        }, { total: 0, paid: 0, pending: 0 })
+    }, [invoices])
+
 
     return (
         <MuiBox sx={{
@@ -170,6 +180,28 @@ export default function ManagerFinancial() {
                     إدارة الفواتير والمبالغ المستحقة للعملاء ومتابعة حالة الدفع
                 </MuiTypography>
             </MuiBox>
+
+            {/* Price Summary Cards */}
+            <MuiGrid container spacing={3} sx={{ mb: 4 }}>
+                <MuiGrid item xs={12} md={4}>
+                    <MuiPaper sx={{ p: 3, borderRadius: '20px', background: 'var(--color-paper)', border: '1px solid var(--color-border-glass)', textAlign: 'center' }}>
+                        <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', fontWeight: 600 }}>إجمالي الفواتير</MuiTypography>
+                        <MuiTypography variant="h5" sx={{ mt: 1, fontWeight: 800, color: 'var(--color-text-primary)' }}>{statsSummary.total.toLocaleString()} ل.س</MuiTypography>
+                    </MuiPaper>
+                </MuiGrid>
+                <MuiGrid item xs={12} md={4}>
+                    <MuiPaper sx={{ p: 3, borderRadius: '20px', background: 'var(--color-paper)', border: '1px solid rgba(34, 197, 94, 0.2)', textAlign: 'center' }}>
+                        <MuiTypography variant="caption" sx={{ color: '#22c55e', fontWeight: 600 }}>إجمالي المحصل</MuiTypography>
+                        <MuiTypography variant="h5" sx={{ mt: 1, fontWeight: 800, color: '#22c55e' }}>{statsSummary.paid.toLocaleString()} ل.س</MuiTypography>
+                    </MuiPaper>
+                </MuiGrid>
+                <MuiGrid item xs={12} md={4}>
+                    <MuiPaper sx={{ p: 3, borderRadius: '20px', background: 'var(--color-paper)', border: '1px solid rgba(220, 38, 38, 0.2)', textAlign: 'center' }}>
+                        <MuiTypography variant="caption" sx={{ color: '#ef4444', fontWeight: 600 }}>الإجمالي المتبقي</MuiTypography>
+                        <MuiTypography variant="h5" sx={{ mt: 1, fontWeight: 800, color: '#ef4444' }}>{statsSummary.pending.toLocaleString()} ل.س</MuiTypography>
+                    </MuiPaper>
+                </MuiGrid>
+            </MuiGrid>
 
             {/* Controls */}
             <MuiPaper
@@ -512,7 +544,10 @@ function InvoiceDialog({ open, onClose, invoice, onSubmit, loading }) {
         dueDate: formatForInput(invoice?.dueDate),
         type: invoice?.type || 'final',
         totalAmount: invoice?.totalAmount || invoice?.amount || '',
-        notes: invoice?.notes || ''
+        notes: invoice?.notes || '',
+        // Calculator helper
+        guestCountCalc: '',
+        pricePerGuestCalc: ''
     })
 
     useEffect(() => {
@@ -522,7 +557,9 @@ function InvoiceDialog({ open, onClose, invoice, onSubmit, loading }) {
                 dueDate: formatForInput(invoice?.dueDate),
                 type: invoice?.type || 'final',
                 totalAmount: invoice?.totalAmount || invoice?.amount || '',
-                notes: invoice?.notes || ''
+                notes: invoice?.notes || '',
+                guestCountCalc: '',
+                pricePerGuestCalc: ''
             })
         }
     }, [open, invoice])
@@ -628,8 +665,50 @@ function InvoiceDialog({ open, onClose, invoice, onSubmit, loading }) {
                             <MuiMenuItem value="final">نهائية</MuiMenuItem>
                         </MuiTextField>
 
+                        <MuiBox sx={{ 
+                            p: 2, 
+                            borderRadius: '12px', 
+                            background: 'rgba(216, 185, 138, 0.05)', 
+                            border: '1px dashed var(--color-primary-200)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 1
+                        }}>
+                            <MuiTypography variant="caption" sx={{ color: 'var(--color-primary-500)', fontWeight: 700, mb: 1 }}>حاسبة المبلغ الإجمالي (اختياري)</MuiTypography>
+                            <MuiBox sx={{ display: 'flex', gap: 1 }}>
+                                <MuiTextField
+                                    size="small"
+                                    label="عدد الضيوف"
+                                    type="number"
+                                    value={formData.guestCountCalc}
+                                    onChange={(e) => {
+                                        const guests = e.target.value;
+                                        setFormData(prev => ({ 
+                                            ...prev, 
+                                            guestCountCalc: guests,
+                                            totalAmount: (guests && prev.pricePerGuestCalc) ? (Number(guests) * Number(prev.pricePerGuestCalc)) : prev.totalAmount
+                                        }))
+                                    }}
+                                />
+                                <MuiTextField
+                                    size="small"
+                                    label="سعر الشخص"
+                                    type="number"
+                                    value={formData.pricePerGuestCalc}
+                                    onChange={(e) => {
+                                        const price = e.target.value;
+                                        setFormData(prev => ({ 
+                                            ...prev, 
+                                            pricePerGuestCalc: price,
+                                            totalAmount: (price && prev.guestCountCalc) ? (Number(price) * Number(prev.guestCountCalc)) : prev.totalAmount
+                                        }))
+                                    }}
+                                />
+                            </MuiBox>
+                        </MuiBox>
+
                         <MuiTextField
-                            label="المبلغ الإجمالي (ل.س)"
+                            label="المبلغ الإجمالي النهائي (ل.س)"
                             type="number"
                             value={formData.totalAmount}
                             onChange={handleChange('totalAmount')}

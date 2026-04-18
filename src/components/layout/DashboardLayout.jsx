@@ -17,7 +17,7 @@ import { useMediaQuery } from '@/hooks';
 export default function DashboardLayout() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [collapsed, setCollapsed] = useState(false);
-    const isMobile = useMediaQuery('(max-width: 900px)');
+    const isMobile = useMediaQuery('(max-width: 767px)'); // Changed to match Tailwind's 'md' (768px)
 
     const DRAWER_WIDTH = isMobile ? 280 : (collapsed ? 80 : 280);
 
@@ -80,15 +80,17 @@ export default function DashboardLayout() {
                 >
                     <MuiToolbar className="px-4 md:px-6 min-h-[72px]">
                         {/* Mobile Menu Toggle */}
-                        <MuiIconButton
-                            color="inherit"
-                            aria-label="open drawer"
-                            edge="start"
-                            onClick={handleDrawerToggle}
-                            className="md:hidden ml-2 text-primary-700"
-                        >
-                            <Menu size={28} />
-                        </MuiIconButton>
+                        {isMobile && (
+                            <MuiIconButton
+                                color="inherit"
+                                aria-label="open drawer"
+                                edge="start"
+                                onClick={handleDrawerToggle}
+                                sx={{ ml: 2, color: 'var(--color-primary-700)' }}
+                            >
+                                <Menu size={28} />
+                            </MuiIconButton>
+                        )}
 
                         {/* Title */}
                         <MuiTypography
@@ -121,7 +123,7 @@ export default function DashboardLayout() {
                         zIndex: 1
                     }}
                 >
-                    <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/40 min-h-full">
+                    <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-4 md:p-6 border border-white/40 min-h-full overflow-x-hidden">
                         <Outlet />
                     </div>
                 </MuiBox>

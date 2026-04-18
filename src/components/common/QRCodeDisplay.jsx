@@ -30,8 +30,8 @@ export default function QRCodeDisplay({
 }) {
     const qrRef = useRef(null)
 
-    // Generate QR code URL using a QR code API
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}&charset-source=UTF-8`
+    // Use Google Charts API which generally handles UTF-8 Arabic characters better
+    const qrCodeUrl = `https://chart.googleapis.com/chart?cht=qr&chs=${size}x${size}&chl=${encodeURIComponent(value)}&choe=UTF-8`
 
     const handleDownload = () => {
         const link = document.createElement('a')

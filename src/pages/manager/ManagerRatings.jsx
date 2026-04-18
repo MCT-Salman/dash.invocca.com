@@ -113,12 +113,25 @@ function RatingCard({ rating }) {
                             borderRadius: '12px', 
                             background: 'rgba(255, 255, 255, 0.02)',
                             border: '1px solid rgba(255, 255, 255, 0.05)',
-                            textAlign: 'center'
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center'
                         }}>
-                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', mb: 0.5, display: 'block' }}>
+                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', mb: 1, display: 'block' }}>
                                 {item.label}
                             </MuiTypography>
-                            <MuiTypography variant="body2" sx={{ fontWeight: 700, color: getScoreColor(item.score) }}>
+                            <MuiBox sx={{ display: 'flex', gap: 0.25 }}>
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star 
+                                        key={star} 
+                                        size={12} 
+                                        fill={star <= (item.score || 0) ? getScoreColor(item.score) : 'transparent'} 
+                                        stroke={star <= (item.score || 0) ? getScoreColor(item.score) : 'var(--color-text-secondary)'}
+                                        style={{ opacity: star <= (item.score || 0) ? 1 : 0.3 }}
+                                    />
+                                ))}
+                            </MuiBox>
+                            <MuiTypography variant="caption" sx={{ mt: 0.5, fontWeight: 700, color: getScoreColor(item.score), fontSize: '0.7rem' }}>
                                 {item.score ? `${item.score}/5` : '—'}
                             </MuiTypography>
                         </MuiBox>
