@@ -1440,9 +1440,6 @@ export default function HallManagement() {
 
                                     value={staffCount}
 
-                                    color="#9333ea"
-
-                                    gradient="linear-gradient(135deg, #9333ea, #7e22ce)"
 
                                 />
 
@@ -1458,9 +1455,6 @@ export default function HallManagement() {
 
                                     value={hall.capacity || 0}
 
-                                    color="#3b82f6"
-
-                                    gradient="linear-gradient(135deg, #3b82f6, #2563eb)"
 
                                 />
 
@@ -1476,9 +1470,6 @@ export default function HallManagement() {
 
                                     value={hall.chairs || 0}
 
-                                    color="#FFE36C"
-
-                                    gradient="linear-gradient(135deg, #FFE36C, #ffd93d)"
 
                                 />
 
@@ -1494,9 +1485,6 @@ export default function HallManagement() {
 
                                     value={hall.tables || 0}
 
-                                    color="var(--color-primary-500)"
-
-                                    gradient="linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))"
 
                                 />
 
@@ -1512,9 +1500,6 @@ export default function HallManagement() {
 
                                     value={hall.defaultPrices ? `${hall.defaultPrices.toLocaleString()} ل.س` : '—'}
 
-                                    color="#16a34a"
-
-                                    gradient="linear-gradient(135deg, #16a34a, #15803d)"
 
                                 />
 
@@ -1530,9 +1515,6 @@ export default function HallManagement() {
 
                                     value={hall.updatedAt ? new Date(hall.updatedAt).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) : '—'}
 
-                                    color="#f59e0b"
-
-                                    gradient="linear-gradient(135deg, #f59e0b, #d97706)"
 
                                 />
 
@@ -1548,9 +1530,6 @@ export default function HallManagement() {
 
                                     value={hall.createdAt ? new Date(hall.createdAt).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) : '—'}
 
-                                    color="#3b82f6"
-
-                                    gradient="linear-gradient(135deg, #3b82f6, #2563eb)"
 
                                 />
 
@@ -1566,9 +1545,6 @@ export default function HallManagement() {
 
                                     value={hall.isActive !== false ? 'نشط' : 'غير نشط'}
 
-                                    color={hall.isActive !== false ? '#16a34a' : '#dc2626'}
-
-                                    gradient={hall.isActive !== false ? 'linear-gradient(135deg, #16a34a, #15803d)' : 'linear-gradient(135deg, #dc2626, #b91c1c)'}
 
                                 />
 
@@ -1584,9 +1560,6 @@ export default function HallManagement() {
 
                                     value={hall.maxEmployees || 0}
 
-                                    color="#0ea5e9"
-
-                                    gradient="linear-gradient(135deg, #0ea5e9, #0284c7)"
 
                                 />
 
@@ -1602,9 +1575,6 @@ export default function HallManagement() {
 
                                     value={hall.location || '—'}
 
-                                    color="#8b5cf6"
-
-                                    gradient="linear-gradient(135deg, #8b5cf6, #7c3aed)"
 
                                 />
 
@@ -1620,9 +1590,6 @@ export default function HallManagement() {
 
                                     value={hall.services?.length || 0}
 
-                                    color="#06b6d4"
-
-                                    gradient="linear-gradient(135deg, #06b6d4, #0891b2)"
 
                                 />
 
@@ -1638,9 +1605,6 @@ export default function HallManagement() {
 
                                     value={hall.images?.length || 0}
 
-                                    color="#ec4899"
-
-                                    gradient="linear-gradient(135deg, #ec4899, #db2777)"
 
                                 />
 
@@ -1656,9 +1620,6 @@ export default function HallManagement() {
 
                                     value={hall.templates?.length || 0}
 
-                                    color="#f97316"
-
-                                    gradient="linear-gradient(135deg, #f97316, #ea580c)"
 
                                 />
 
