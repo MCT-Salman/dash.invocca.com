@@ -52,8 +52,6 @@ import {
 
     Users,
 
-    Armchair,
-
     Table,
 
     Edit2,
@@ -906,8 +904,6 @@ export default function HallManagement() {
 
         formData.append('tables', String(Number(data.tables) || 0))
 
-        formData.append('chairs', String(Number(data.chairs) || 0))
-
         formData.append('defaultPrices', String(Number(data.defaultPrices) || 0))
 
         
@@ -1454,21 +1450,6 @@ export default function HallManagement() {
                                     label="السعة القصوى"
 
                                     value={hall.capacity || 0}
-
-
-                                />
-
-                            </MuiGrid>
-
-                            <MuiGrid item xs={12} sm={6} md={3}>
-
-                                <InfoCard
-
-                                    icon={Armchair}
-
-                                    label="عدد الكراسي"
-
-                                    value={hall.chairs || 0}
 
 
                                 />

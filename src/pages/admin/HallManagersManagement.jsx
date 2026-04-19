@@ -21,7 +21,7 @@ import CreateAdminDialog from './components/CreateAdminDialog'
 // Hooks & Utilities
 import { useDebounce, useDialogState, useNotification } from '@/hooks'
 import { QUERY_KEYS, USER_ROLES } from '@/config/constants'
-import { getUsers, toggleUserStatus, deleteUser } from '@/api/admin'
+import { getManagers, toggleUserStatus, deleteUser } from '@/api/admin'
 import { formatPhoneNumber } from '@/utils/helpers'
 
 // Icons
@@ -65,20 +65,20 @@ export default function HallManagersManagement() {
         isDelete,
     } = useDialogState()
 
-    // Fetch Users
-    const { data: usersData, isLoading, error, refetch } = useQuery({
-        queryKey: QUERY_KEYS.ADMIN_USERS,
-        queryFn: () => getUsers(),
+    // Fetch Managers
+    const { data: managersData, isLoading, error, refetch } = useQuery({
+        queryKey: QUERY_KEYS.ADMIN_MANAGERS,
+        queryFn: () => getManagers(),
     })
 
-    const users = usersData?.users || usersData?.data || []
+    const managers = managersData?.managers || managersData?.data?.managers || managersData?.data || []
 
-    // Filter managers (users with hallId)
+    // Filter managers
     const filteredManagers = useMemo(() => {
-        let filtered = Array.isArray(users) ? users : []
+        let filtered = Array.isArray(managers) ? managers : []
         
-        // Filter to only get users with hallId (managers)
-        filtered = filtered.filter(user => user.hallId && (user.hallId._id || user.hallId))
+        // Filter by search term
+        filtered = filtered.filter(manager => manager.hallId && (manager.hallId._id || manager.hallId))
 
         if (debouncedSearch) {
             filtered = filtered.filter(user =>
@@ -89,7 +89,7 @@ export default function HallManagersManagement() {
         }
 
         return filtered
-    }, [users, debouncedSearch])
+    }, [managers, debouncedSearch])
 
     // Table Columns - Same style as UsersManagement
     const columns = [
@@ -165,8 +165,8 @@ export default function HallManagersManagement() {
     const toggleStatusMutation = useMutation({
         mutationFn: toggleUserStatus,
         onSuccess: (_, userId) => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_USERS })
-            const user = users.find(u => u._id === userId)
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_MANAGERS })
+            const user = managers.find(u => u._id === userId)
             success(`تم ${user?.isActive ? 'إلغاء تفعيل' : 'تفعيل'} المستخدم بنجاح`)
         },
         onError: (err) => {
@@ -183,7 +183,7 @@ export default function HallManagersManagement() {
         if (!id) return
         try {
             await deleteUser(id)
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_USERS })
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_MANAGERS })
             success('تم حذف المستخدم بنجاح')
             closeDialog()
         } catch (err) {
@@ -192,7 +192,7 @@ export default function HallManagersManagement() {
     }
 
     const handleEditSuccess = () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_USERS })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_MANAGERS })
         success('تم تحديث بيانات المستخدم بنجاح')
     }
 

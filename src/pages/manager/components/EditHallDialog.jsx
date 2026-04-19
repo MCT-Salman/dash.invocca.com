@@ -30,8 +30,6 @@ const editHallSchema = z.object({
 
     tables: z.coerce.number().min(0, 'عدد الطاولات يجب أن يكون 0 أو أكثر').max(1000, 'عدد الطاولات كبير جداً'),
 
-    chairs: z.coerce.number().min(0, 'عدد الكراسي يجب أن يكون 0 أو أكثر').max(10000, 'عدد الكراسي كبير جداً'),
-
     defaultPrices: z.coerce.number().min(0, 'السعر يجب أن يكون 0 أو أكثر').max(100000, 'السعر كبير جداً'),
 
     description: z.string().optional(),
@@ -70,8 +68,6 @@ export default function EditHallDialog({ open, onClose, onSubmit, hall, loading 
 
             tables: hall?.tables || 0,
 
-            chairs: hall?.chairs || 0,
-
             defaultPrices: hall?.defaultPrices || 0,
 
             description: hall?.description || ''
@@ -95,8 +91,6 @@ export default function EditHallDialog({ open, onClose, onSubmit, hall, loading 
                 capacity: hall.capacity || 0,
 
                 tables: hall.tables || 0,
-
-                chairs: hall.chairs || 0,
 
                 defaultPrices: hall.defaultPrices || 0,
 
@@ -123,8 +117,6 @@ export default function EditHallDialog({ open, onClose, onSubmit, hall, loading 
             capacity: data.capacity,
 
             tables: data.tables,
-
-            chairs: data.chairs,
 
             defaultPrices: data.defaultPrices,
 
@@ -341,40 +333,6 @@ export default function EditHallDialog({ open, onClose, onSubmit, hall, loading 
                                 error={!!errors.tables}
 
                                 helperText={errors.tables?.message}
-
-                            />
-
-                        )}
-
-                    />
-
-                </MuiGrid>
-
-
-
-                <MuiGrid item xs={12} sm={4}>
-
-                    <Controller
-
-                        name="chairs"
-
-                        control={control}
-
-                        render={({ field }) => (
-
-                            <MuiTextField
-
-                                {...field}
-
-                                label="عدد الكراسي"
-
-                                type="number"
-
-                                fullWidth
-
-                                error={!!errors.chairs}
-
-                                helperText={errors.chairs?.message}
 
                             />
 
