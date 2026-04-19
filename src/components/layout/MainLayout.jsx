@@ -28,6 +28,7 @@ export default function MainLayout() {
         open={sidebarOpen} 
         onClose={() => setSidebarOpen(false)}
         onToggleSidebar={handleToggleSidebar}
+        collapsed={sidebarCollapsed}
         onCollapsedChange={handleCollapsedChange}
       />
       

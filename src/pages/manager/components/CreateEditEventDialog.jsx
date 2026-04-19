@@ -1350,7 +1350,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                         startIcon={<Plus size={20} />}
                         onClick={() => appendScanner({ scannerId: '' })}
                         variant="outlined"
-                        disabled={scanners.length === 0}
+                        disabled={scanners.length === 0 || scannerFields.length >= scanners.length}
                         sx={{ borderRadius: '12px', borderColor: 'var(--color-border-glass)', color: 'var(--color-primary-500)', borderStyle: 'dashed' }}
                     >
                         إضافة ماسح ضوئي آخر
@@ -1390,7 +1390,7 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
                                 {...field}
 
-                                label="اختر نوع العميل"
+                                label={editingEvent ? 'تغيير العميل' : 'اختر نوع العميل'}
 
                                 fullWidth
 
@@ -1406,7 +1406,11 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
                                 <MuiMenuItem value="existing">عميل موجود</MuiMenuItem>
 
-                                <MuiMenuItem value="new">عميل جديد</MuiMenuItem>
+                                {!editingEvent && (
+
+                                    <MuiMenuItem value="new">عميل جديد</MuiMenuItem>
+
+                                )}
 
                             </MuiSelect>
 
@@ -1904,6 +1908,8 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
                         variant="outlined"
 
+                        disabled={servicesList.length === 0 || fields.length >= servicesList.length}
+
                         sx={{ borderRadius: '12px', borderColor: 'var(--color-border-glass)', color: 'var(--color-text-secondary)' }}
 
                     >
@@ -1959,10 +1965,45 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
                                             </MuiMenuItem>
                                         ))}
                                     </MuiSelect>
+
+                                    {/* Template Preview Card */}
+
+                                    {selectedTemplate && (
+
+                                        <MuiBox sx={{ mt: 2, p: 2, border: '1px solid var(--color-border)', borderRadius: '8px', backgroundColor: 'var(--color-surface)' }}>
+
+                                            <MuiTypography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+
+                                                {selectedTemplate.templateName || selectedTemplate.name}
+
+                                            </MuiTypography>
+
+                                            {selectedTemplate.imageUrl && (
+
+                                                <img
+
+                                                    src={selectedTemplate.imageUrl}
+
+                                                    alt={selectedTemplate.templateName || selectedTemplate.name}
+
+                                                    style={{ width: '100%', maxHeight: '150px', objectFit: 'cover', borderRadius: '4px' }}
+
+                                                />
+
+                                            )}
+
+                                        </MuiBox>
+
+                                    )}
+
                                 </MuiBox>
+
                             );
+
                         }}
+
                     />
+
                 </MuiGrid>
 
 

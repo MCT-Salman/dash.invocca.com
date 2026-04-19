@@ -1953,6 +1953,14 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
   const templateImage = useMemo(() => {
 
+    // If user explicitly selected "No Template", return null
+
+    if (selectedTemplateId === null) {
+
+      return null
+
+    }
+
     // Priority 1: Selected template from dropdown
 
     if (selectedTemplate) {
@@ -2017,7 +2025,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
     return null
 
-  }, [selectedTemplate, currentEvent, invitation, event, dashboardData])
+  }, [selectedTemplateId, selectedTemplate, currentEvent, invitation, event, dashboardData])
 
 
 
@@ -4227,27 +4235,27 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
 
 
-          {/* Templates Grid */}
+          {/* Templates Stories Style Horizontal Scroll */}
 
           <MuiBox
 
             sx={{
 
-              display: 'grid',
-
-              gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(2, 1fr)', md: 'repeat(2, 1fr)' },
+              display: 'flex',
 
               gap: 2,
 
-              overflowY: 'auto',
+              overflowX: 'auto',
 
-              pr: 1,
+              overflowY: 'hidden',
 
               pb: 2,
 
+              px: 1,
+
               '&::-webkit-scrollbar': {
 
-                width: '8px',
+                height: '6px',
 
               },
 
@@ -4255,7 +4263,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                 background: 'var(--color-surface)',
 
-                borderRadius: '4px',
+                borderRadius: '3px',
 
               },
 
@@ -4263,7 +4271,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                 background: 'var(--color-primary-400)',
 
-                borderRadius: '4px',
+                borderRadius: '3px',
 
                 '&:hover': {
 
@@ -4277,51 +4285,21 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
           >
 
-            {/* No Template Option */}
+            {/* No Template Option - Instagram Story Style */}
 
             <MuiBox
 
-              onClick={() => onTemplateChange(null)}
-
               sx={{
 
-                position: 'relative',
+                display: 'flex',
 
-                width: '100%',
+                flexDirection: 'column',
 
-                aspectRatio: '3/4',
+                alignItems: 'center',
 
-                borderRadius: '16px',
+                gap: 0.5,
 
-                overflow: 'hidden',
-
-                cursor: 'pointer',
-
-                border: selectedTemplateId === null
-
-                  ? '3px solid var(--color-primary-500)'
-
-                  : '2px solid rgba(216, 185, 138, 0.3)',
-
-                backgroundColor: 'var(--color-surface-dark)',
-
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-
-                boxShadow: selectedTemplateId === null
-
-                  ? '0 12px 32px rgba(216, 185, 138, 0.5), 0 0 0 4px rgba(216, 185, 138, 0.1)'
-
-                  : '0 4px 16px rgba(0, 0, 0, 0.3)',
-
-                '&:hover': {
-
-                  transform: 'translateY(-6px) scale(1.02)',
-
-                  borderColor: 'var(--color-primary-500)',
-
-                  boxShadow: '0 16px 40px rgba(216, 185, 138, 0.6), 0 0 0 4px rgba(216, 185, 138, 0.15)',
-
-                },
+                flexShrink: 0,
 
               }}
 
@@ -4329,83 +4307,59 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
               <MuiBox
 
+                onClick={() => onTemplateChange(null)}
+
                 sx={{
 
-                  width: '100%',
+                  position: 'relative',
 
-                  height: '100%',
+                  width: 80,
 
-                  display: 'flex',
+                  height: 80,
 
-                  flexDirection: 'column',
+                  borderRadius: '50%',
 
-                  alignItems: 'center',
+                  overflow: 'hidden',
 
-                  justifyContent: 'center',
+                  cursor: 'pointer',
 
-                  background: 'var(--color-surface)',
+                  border: selectedTemplateId === null
 
-                  gap: 1.5,
+                    ? '3px solid var(--color-primary-500)'
 
-                  border: '2px dashed rgba(216, 185, 138, 0.3)',
+                    : '2px solid rgba(216, 185, 138, 0.3)',
 
-                  borderRadius: '16px',
+                  backgroundColor: 'var(--color-surface-dark)',
+
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+
+                  boxShadow: selectedTemplateId === null
+
+                    ? '0 4px 16px rgba(216, 185, 138, 0.5)'
+
+                    : '0 2px 8px rgba(0, 0, 0, 0.3)',
+
+                  '&:hover': {
+
+                    transform: 'scale(1.08)',
+
+                    borderColor: 'var(--color-primary-500)',
+
+                    boxShadow: '0 6px 20px rgba(216, 185, 138, 0.6)',
+
+                  },
 
                 }}
 
               >
 
-                <ImageIcon size={48} style={{ color: 'var(--color-primary-500)', opacity: 0.7 }} />
-
-                <MuiTypography
-
-                  variant="body2"
-
-                  sx={{
-
-                    color: 'var(--color-text-primary)',
-
-                    fontWeight: 600,
-
-                    fontSize: { xs: '0.75rem', sm: '0.85rem' },
-
-                    textAlign: 'center',
-
-                    px: 2,
-
-                  }}
-
-                >
-
-                  بدون قالب
-
-                </MuiTypography>
-
-              </MuiBox>
-
-
-
-              {/* Selected Indicator */}
-
-              {selectedTemplateId === null && (
-
                 <MuiBox
 
                   sx={{
 
-                    position: 'absolute',
+                    width: '100%',
 
-                    top: { xs: 8, sm: 10 },
-
-                    right: { xs: 8, sm: 10 },
-
-                    width: { xs: 28, sm: 32 },
-
-                    height: { xs: 28, sm: 32 },
-
-                    borderRadius: '50%',
-
-                    backgroundColor: 'var(--color-primary-500)',
+                    height: '100%',
 
                     display: 'flex',
 
@@ -4413,17 +4367,85 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                     justifyContent: 'center',
 
-                    boxShadow: '0 4px 12px rgba(216, 185, 138, 0.6), 0 0 0 3px rgba(216, 185, 138, 0.2)',
+                    background: 'var(--color-surface)',
 
                   }}
 
                 >
 
-                  <CheckCircle size={18} style={{ color: '#fff' }} />
+                  <X size={24} style={{ color: 'var(--color-primary-500)', opacity: 0.7 }} />
 
                 </MuiBox>
 
-              )}
+
+
+                {/* Selected Indicator */}
+
+                {selectedTemplateId === null && (
+
+                  <MuiBox
+
+                    sx={{
+
+                      position: 'absolute',
+
+                      bottom: 2,
+
+                      right: 2,
+
+                      width: 20,
+
+                      height: 20,
+
+                      borderRadius: '50%',
+
+                      backgroundColor: 'var(--color-primary-500)',
+
+                      display: 'flex',
+
+                      alignItems: 'center',
+
+                      justifyContent: 'center',
+
+                      boxShadow: '0 2px 6px rgba(216, 185, 138, 0.6)',
+
+                    }}
+
+                  >
+
+                    <CheckCircle size={12} style={{ color: '#fff' }} />
+
+                  </MuiBox>
+
+                )}
+
+              </MuiBox>
+
+              {/* Label for No Template */}
+
+              <MuiTypography
+
+                variant="caption"
+
+                sx={{
+
+                  color: selectedTemplateId === null ? 'var(--color-primary-500)' : 'var(--color-text-secondary)',
+
+                  fontWeight: selectedTemplateId === null ? 600 : 400,
+
+                  fontSize: '0.7rem',
+
+                  whiteSpace: 'nowrap',
+
+                  textAlign: 'center',
+
+                }}
+
+              >
+
+                بدون قالب
+
+              </MuiTypography>
 
             </MuiBox>
 
@@ -4491,181 +4513,159 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                   key={templateId}
 
-                  onClick={() => onTemplateChange(templateId)}
-
                   sx={{
 
-                    position: 'relative',
+                    display: 'flex',
 
-                    width: '100%',
+                    flexDirection: 'column',
 
-                    aspectRatio: '3/4',
+                    alignItems: 'center',
 
-                    borderRadius: '16px',
+                    gap: 0.5,
 
-                    overflow: 'hidden',
-
-                    cursor: 'pointer',
-
-                    border: isSelected
-
-                      ? '3px solid var(--color-primary-500)'
-
-                      : '2px solid rgba(216, 185, 138, 0.3)',
-
-                    backgroundColor: 'var(--color-surface-dark)',
-
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-
-                    boxShadow: isSelected
-
-                      ? '0 12px 32px rgba(216, 185, 138, 0.5), 0 0 0 4px rgba(216, 185, 138, 0.1)'
-
-                      : '0 4px 16px rgba(0, 0, 0, 0.3)',
-
-                    '&:hover': {
-
-                      transform: 'translateY(-6px) scale(1.02)',
-
-                      borderColor: 'var(--color-primary-500)',
-
-                      boxShadow: '0 16px 40px rgba(216, 185, 138, 0.6), 0 0 0 4px rgba(216, 185, 138, 0.15)',
-
-                    },
+                    flexShrink: 0,
 
                   }}
 
                 >
 
-                  {/* Template Preview Image */}
-
-                  {templateImgUrl ? (
-
-                    <MuiBox
-
-                      sx={{
-
-                        width: '100%',
-
-                        height: '100%',
-
-                        backgroundImage: `url(${templateImgUrl})`,
-
-                        backgroundSize: 'cover',
-
-                        backgroundPosition: 'center',
-
-                        backgroundRepeat: 'no-repeat',
-
-                        transition: 'transform 0.3s ease',
-
-                        '&:hover': {
-
-                          transform: 'scale(1.05)',
-
-                        },
-
-                      }}
-
-                    />
-
-                  ) : (
-
-                    <MuiBox
-
-                      sx={{
-
-                        width: '100%',
-
-                        height: '100%',
-
-                        display: 'flex',
-
-                        flexDirection: 'column',
-
-                        alignItems: 'center',
-
-                        justifyContent: 'center',
-
-                        background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.2), rgba(255, 227, 108, 0.1))',
-
-                        gap: 1,
-
-                      }}
-
-                    >
-
-                      <ImageIcon size={48} style={{ color: 'var(--color-primary-500)', opacity: 0.6 }} />
-
-                      <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.7rem' }}>
-
-                        بدون صورة
-
-                      </MuiTypography>
-
-                    </MuiBox>
-
-                  )}
-
-
-
-                  {/* Overlay with Template Name */}
+                  {/* Instagram Story Style Template Circle */}
 
                   <MuiBox
 
+                    onClick={() => onTemplateChange(templateId)}
+
                     sx={{
 
-                      position: 'absolute',
+                      position: 'relative',
 
-                      bottom: 0,
+                      width: 80,
 
-                      left: 0,
+                      height: 80,
 
-                      right: 0,
+                      borderRadius: '50%',
 
-                      background: 'linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 50%, transparent 100%)',
+                      overflow: 'hidden',
 
-                      p: { xs: 1.5, sm: 2 },
+                      cursor: 'pointer',
 
-                      pt: 3,
+                      border: isSelected
+
+                        ? '3px solid var(--color-primary-500)'
+
+                        : '2px solid rgba(216, 185, 138, 0.3)',
+
+                      backgroundColor: 'var(--color-surface-dark)',
+
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+
+                      boxShadow: isSelected
+
+                        ? '0 4px 16px rgba(216, 185, 138, 0.5)'
+
+                        : '0 2px 8px rgba(0, 0, 0, 0.3)',
+
+                      '&:hover': {
+
+                        transform: 'scale(1.08)',
+
+                        borderColor: 'var(--color-primary-500)',
+
+                        boxShadow: '0 6px 20px rgba(216, 185, 138, 0.6)',
+
+                      },
 
                     }}
 
                   >
 
-                    <MuiTypography
+                    {/* Template Preview Image */}
 
-                      variant="body2"
+                    {templateImgUrl ? (
 
-                      sx={{
+                      <MuiBox
 
-                        color: '#fff',
+                        sx={{
 
-                        fontWeight: 600,
+                          width: '100%',
 
-                        textAlign: 'center',
+                          height: '100%',
 
-                        display: 'block',
+                          backgroundImage: `url(${templateImgUrl})`,
 
-                        overflow: 'hidden',
+                          backgroundSize: 'cover',
 
-                        textOverflow: 'ellipsis',
+                          backgroundPosition: 'center',
 
-                        whiteSpace: 'nowrap',
+                          backgroundRepeat: 'no-repeat',
 
-                        fontSize: { xs: '0.75rem', sm: '0.85rem' },
+                        }}
 
-                        textShadow: '0 2px 4px rgba(0, 0, 0, 0.8)',
+                      />
 
-                      }}
+                    ) : (
 
-                    >
+                      <MuiBox
 
-                      {template.templateName || template.name || 'قالب بدون اسم'}
+                        sx={{
 
-                    </MuiTypography>
+                          width: '100%',
+
+                          height: '100%',
+
+                          display: 'flex',
+
+                          alignItems: 'center',
+
+                          justifyContent: 'center',
+
+                          background: 'linear-gradient(135deg, rgba(216, 185, 138, 0.2), rgba(255, 227, 108, 0.1))',
+
+                        }}
+
+                      >
+
+                        <ImageIcon size={32} style={{ color: 'var(--color-primary-500)', opacity: 0.6 }} />
+
+                      </MuiBox>
+
+                    )}
 
                   </MuiBox>
+
+
+
+                  {/* Template Name Label */}
+
+                  <MuiTypography
+
+                    variant="caption"
+
+                    sx={{
+
+                      color: isSelected ? 'var(--color-primary-500)' : 'var(--color-text-secondary)',
+
+                      fontWeight: isSelected ? 600 : 400,
+
+                      fontSize: '0.7rem',
+
+                      whiteSpace: 'nowrap',
+
+                      maxWidth: 80,
+
+                      overflow: 'hidden',
+
+                      textOverflow: 'ellipsis',
+
+                      textAlign: 'center',
+
+                    }}
+
+                  >
+
+                    {template.templateName || template.name || 'قالب'}
+
+                  </MuiTypography>
 
 
 
@@ -4679,13 +4679,13 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                         position: 'absolute',
 
-                        top: { xs: 8, sm: 10 },
+                        bottom: 20,
 
-                        right: { xs: 8, sm: 10 },
+                        right: 2,
 
-                        width: { xs: 28, sm: 32 },
+                        width: 20,
 
-                        height: { xs: 28, sm: 32 },
+                        height: 20,
 
                         borderRadius: '50%',
 
@@ -4697,61 +4697,13 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                         justifyContent: 'center',
 
-                        boxShadow: '0 4px 12px rgba(216, 185, 138, 0.6), 0 0 0 3px rgba(216, 185, 138, 0.2)',
-
-                        animation: 'pulse 2s infinite',
-
-                        '@keyframes pulse': {
-
-                          '0%, 100%': {
-
-                            boxShadow: '0 4px 12px rgba(216, 185, 138, 0.6), 0 0 0 3px rgba(216, 185, 138, 0.2)',
-
-                          },
-
-                          '50%': {
-
-                            boxShadow: '0 4px 16px rgba(216, 185, 138, 0.8), 0 0 0 4px rgba(216, 185, 138, 0.3)',
-
-                          },
-
-                        },
+                        boxShadow: '0 2px 6px rgba(216, 185, 138, 0.6)',
 
                       }}
 
                     >
 
-                      <MuiBox
-
-                        component="svg"
-
-                        sx={{
-
-                          width: { xs: 16, sm: 18 },
-
-                          height: { xs: 16, sm: 18 },
-
-                          color: '#1A1A1A',
-
-                        }}
-
-                        fill="currentColor"
-
-                        viewBox="0 0 20 20"
-
-                      >
-
-                        <path
-
-                          fillRule="evenodd"
-
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-
-                          clipRule="evenodd"
-
-                        />
-
-                      </MuiBox>
+                      <CheckCircle size={12} style={{ color: '#fff' }} />
 
                     </MuiBox>
 
@@ -4759,25 +4711,19 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                 </MuiBox>
 
-              )
+              );
 
             }) : (
 
-              <MuiBox
+              <MuiBox sx={{
 
-                sx={{
+                textAlign: 'center',
 
-                  gridColumn: '1 / -1',
+                py: 4,
 
-                  textAlign: 'center',
+                color: 'var(--color-text-secondary)',
 
-                  py: 4,
-
-                  color: 'var(--color-text-secondary)',
-
-                }}
-
-              >
+              }}>
 
                 <ImageIcon size={48} style={{ opacity: 0.5, marginBottom: 16 }} />
 
@@ -4794,6 +4740,8 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
           </MuiBox>
 
         </MuiBox>
+
+
 
       </MuiBox>
 
@@ -5620,6 +5568,3 @@ function CreateEditInvitationDialog({ open, onClose, editingInvitation, onSubmit
   )
 
 }
-
-
-

@@ -12,7 +12,7 @@
 
 import { useState, useMemo } from 'react'
 
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 
 import { useDebounce, useDialogState, useCRUD, useNotification } from '@/hooks'
 
@@ -164,6 +164,32 @@ export default function ClientsManagement() {
 
 
 
+    // Toggle status mutation (separate from CRUD)
+
+    const toggleStatusMutation = useMutation({
+
+        mutationFn: toggleClientStatus,
+
+        onSuccess: (_, clientId) => {
+
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MANAGER_CLIENTS })
+
+            const client = clients.find(c => c._id === clientId)
+
+            success(`تم ${client?.isActive ? 'تعطيل' : 'تفعيل'} العميل بنجاح`)
+
+        },
+
+        onError: (err) => {
+
+            showError(err?.response?.data?.message || 'فشل في تحديث حالة العميل')
+
+        },
+
+    })
+
+
+
     // Memoize clients to avoid dependency issues
 
     const clients = useMemo(() => {
@@ -220,39 +246,11 @@ export default function ClientsManagement() {
 
 
 
-    // Toggle client status using PATCH endpoint
+    // Toggle client status handler
 
     const handleToggleStatus = async (row) => {
 
-        try {
-
-            const clientId = row._id || row.id
-
-            const currentStatus = row.isActive !== false
-
-            const result = await toggleClientStatus(clientId)
-
-
-
-            if (result?.success) {
-
-                // Invalidate queries to refresh data
-
-                queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MANAGER_CLIENTS })
-
-                success(result?.message || `تم ${currentStatus ? 'تعطيل' : 'تفعيل'} العميل بنجاح`)
-
-            } else {
-
-                showError(result?.message || 'حدث خطأ في تحديث حالة العميل')
-
-            }
-
-        } catch (err) {
-
-            showError(err?.response?.data?.message || 'حدث خطأ في تحديث حالة العميل')
-
-        }
+        await toggleStatusMutation.mutateAsync(row._id || row.id)
 
     }
 
