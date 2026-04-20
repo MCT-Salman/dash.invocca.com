@@ -772,7 +772,7 @@ const HallsManagement = () => {
 
               >
 
-                <Building2 size={20} style={{ color: '#D8B98A' }} />
+                <Building2 size={20} style={{ color: 'var(--color-icon)' }} />
 
               </MuiBox>
 
@@ -804,7 +804,7 @@ const HallsManagement = () => {
 
         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
 
-          <Users size={16} style={{ color: '#0284c7' }} />
+          <Users size={16} style={{ color: 'var(--color-icon)' }} />
 
           <span style={{ color: 'var(--color-text-secondary)' }}>{value} شخص</span>
 
@@ -826,7 +826,7 @@ const HallsManagement = () => {
 
         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
 
-          <MapPin size={16} style={{ color: '#9333ea' }} />
+          <MapPin size={16} style={{ color: 'var(--color-icon)' }} />
 
           <span style={{ color: 'var(--color-text-secondary)' }}>{truncateText(value, 30)}</span>
 
@@ -848,7 +848,7 @@ const HallsManagement = () => {
 
         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
 
-          <DollarSign size={16} style={{ color: '#16a34a' }} />
+          <DollarSign size={16} style={{ color: 'var(--color-icon)' }} />
 
           <span style={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>{formatCurrency(value) || `${value} ل.س`}</span>
 

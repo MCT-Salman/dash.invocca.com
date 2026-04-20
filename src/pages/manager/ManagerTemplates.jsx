@@ -259,7 +259,7 @@ export default function ManagerTemplates() {
                                 boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
                             }}
                         >
-                            <ImageIcon size={28} style={{ color: '#fff' }} />
+                            <ImageIcon size={28} style={{ color: 'var(--color-text-primary)' }} />
                         </MuiBox>
                         <MuiBox>
                             <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary)', fontWeight: 700, mb: 0.5 }}>
@@ -277,7 +277,7 @@ export default function ManagerTemplates() {
                         onClick={openCreateDialog}
                         sx={{
                             background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-800))',
-                            color: '#fff',
+                            color: 'var(--color-text-primary)',
                             fontWeight: 600,
                             px: 3,
                             py: 1,
@@ -337,7 +337,7 @@ export default function ManagerTemplates() {
                                     justifyContent: 'center',
                                 }}
                             >
-                                <ImageIcon size={24} style={{ color: '#D8B98A' }} />
+                                <ImageIcon size={24} style={{ color: 'var(--color-icon)' }} />
                             </MuiBox>
                         </MuiBox>
                     </MuiPaper>

@@ -53,7 +53,7 @@ export default function Scanner() {
             width: '100%',
             maxWidth: 400,
             aspectRatio: '1/1',
-            background: status === 'scanning' ? '#000' : 'var(--color-surface-dark)',
+            background: status === 'scanning' ? 'var(--color-text-primary)' : 'var(--color-surface-dark)',
             borderRadius: '24px',
             border: '2px solid var(--color-border-glass)',
             position: 'relative',
@@ -91,7 +91,7 @@ export default function Scanner() {
                 startIcon={<QrCode size={20} />}
                 sx={{
                   background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
-                  color: '#000',
+                  color: 'var(--color-text-primary)',
                   fontWeight: 600,
                   px: 4,
                   py: 1.5,
@@ -145,10 +145,10 @@ export default function Scanner() {
                   justifyContent: 'center',
                   mx: 'auto',
                   mb: 3,
-                  border: '2px solid #22c55e',
+                  border: '2px solid var(--color-icon)',
                 }}
               >
-                <CheckCircle2 size={40} style={{ color: '#22c55e' }} />
+                <CheckCircle2 size={40} style={{ color: 'var(--color-icon)' }} />
               </MuiBox>
               <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 1 }}>
                 تم المسح بنجاح
@@ -157,7 +157,7 @@ export default function Scanner() {
                 label="مؤكد"
                 sx={{
                   backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                  color: '#22c55e',
+                  color: 'var(--color-icon)',
                   fontWeight: 600,
                   mb: 2,
                 }}

@@ -67,7 +67,7 @@ export default function BaseViewDialog({
                                 top: 16,
                                 right: 16,
                                 backgroundColor: 'rgba(255,255,255,0.1)',
-                                color: '#fff',
+                                color: 'var(--color-text-primary)',
                                 backdropFilter: 'blur(4px)',
                                 '&:hover': {
                                     backgroundColor: 'rgba(255,255,255,0.2)',

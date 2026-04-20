@@ -47,7 +47,7 @@ export default function ViewStaffDialog({ open, onClose, staff }) {
                 </MuiTypography>
             </MuiBox>
             <MuiBox sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }} />
-            <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: '#fff' }}>
+            <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: 'var(--color-text-primary)' }}>
                 <MuiTypography variant="h4" sx={{ fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
                     {formatEmptyValue(staff.name)}
                 </MuiTypography>
@@ -76,7 +76,7 @@ export default function ViewStaffDialog({ open, onClose, staff }) {
                         icon={staff.isActive !== false ? <CheckCircle size={14} /> : <XCircle size={14} />}
                         sx={{
                             backgroundColor: staff.isActive !== false ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)',
-                            color: staff.isActive !== false ? '#16a34a' : '#dc2626',
+                            color: staff.isActive !== false ? 'var(--color-icon)' : 'var(--color-icon)',
                             fontWeight: 'bold',
                             border: 'none',
                         }}
@@ -86,7 +86,7 @@ export default function ViewStaffDialog({ open, onClose, staff }) {
                         icon={<RoleIcon size={14} />}
                         sx={{
                             backgroundColor: staff.role === 'manager' ? 'rgba(147, 51, 234, 0.2)' : staff.role === 'supervisor' ? 'rgba(217, 155, 61, 0.2)' : 'rgba(59, 130, 246, 0.2)',
-                            color: staff.role === 'manager' ? '#9333ea' : staff.role === 'supervisor' ? '#D99B3D' : '#3b82f6',
+                            color: staff.role === 'manager' ? 'var(--color-icon)' : staff.role === 'supervisor' ? 'var(--color-icon)' : 'var(--color-icon)',
                             fontWeight: 'bold',
                             border: 'none',
                         }}

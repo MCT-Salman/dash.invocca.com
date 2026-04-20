@@ -226,9 +226,9 @@ export default function ServicesManagement() {
                     size="small"
                     sx={{
                         backgroundColor: value ? 'rgba(22, 163, 74, 0.1)' : 'rgba(220, 38, 38, 0.1)',
-                        color: value ? '#16a34a' : '#dc2626',
+                        color: value ? 'var(--color-icon)' : 'var(--color-icon)',
                         fontWeight: 600,
-                        border: `1px solid ${value ? '#16a34a' : '#dc2626'}33`,
+                        border: `1px solid ${value ? 'var(--color-icon)' : 'var(--color-icon)'}33`,
                     }}
                     icon={value ? <CheckCircle size={14} /> : <XCircle size={14} />}
                 />

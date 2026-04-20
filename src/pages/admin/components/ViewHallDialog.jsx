@@ -100,7 +100,7 @@ export default function ViewHallDialog({ open, onClose, hall }) {
                             top: 16,
                             right: 16,
                             backgroundColor: 'rgba(255,255,255,0.1)',
-                            color: '#fff',
+                            color: 'var(--color-text-primary)',
                             backdropFilter: 'blur(4px)',
                             '&:hover': {
                                 backgroundColor: 'rgba(255,255,255,0.2)',
@@ -110,7 +110,7 @@ export default function ViewHallDialog({ open, onClose, hall }) {
                         <X size={20} />
                     </MuiIconButton>
 
-                    <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: '#fff' }}>
+                    <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: 'var(--color-text-primary)' }}>
                         <MuiTypography variant="h4" sx={{ fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
                             {hall.name}
                         </MuiTypography>
@@ -132,7 +132,7 @@ export default function ViewHallDialog({ open, onClose, hall }) {
                                 icon={hall.isActive ? <CheckCircle size={14} /> : <XCircle size={14} />}
                                 sx={{
                                     backgroundColor: hall.isActive ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)',
-                                    color: hall.isActive ? '#16a34a' : '#dc2626',
+                                    color: hall.isActive ? 'var(--color-icon)' : 'var(--color-icon)',
                                     fontWeight: 'bold',
                                     border: 'none',
                                 }}

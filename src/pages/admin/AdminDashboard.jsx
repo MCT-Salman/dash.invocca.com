@@ -59,7 +59,7 @@ const roleLabels = {
     scanner: 'ماسح',
 }
 
-const CHART_COLORS = ['#D8B98A', '#22c55e', '#3b82f6', '#a855f7', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899']
+const CHART_COLORS = ['var(--color-icon)', 'var(--color-icon)', 'var(--color-icon)', 'var(--color-icon)', 'var(--color-icon)', 'var(--color-icon)', 'var(--color-icon)', 'var(--color-icon)']
 
 const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -210,13 +210,13 @@ function AdminDashboardContent() {
                                 backdropFilter: 'blur(10px)',
                             }}
                         >
-                            <LayoutDashboard size={36} style={{ color: '#fff' }} />
+                            <LayoutDashboard size={36} style={{ color: 'var(--color-text-primary)' }} />
                         </MuiBox>
                         <MuiBox sx={{ flex: 1 }}>
                             <MuiTypography
                                 variant="h4"
                                 sx={{
-                                    color: '#fff',
+                                    color: 'var(--color-text-primary)',
                                     fontWeight: 800,
                                     mb: 1,
                                     fontSize: { xs: '1.5rem', sm: '2rem' },
@@ -247,7 +247,7 @@ function AdminDashboardContent() {
                         bottom: 0,
                         left: 0,
                         opacity: 0.1,
-                        background: 'radial-gradient(circle at top right, #fff 0%, transparent 60%)',
+                        background: 'radial-gradient(circle at top right, var(--color-text-primary) 0%, transparent 60%)',
                     }}
                 />
             </MuiBox>
@@ -589,7 +589,7 @@ function AdminDashboardContent() {
                                                     size="small"
                                                     sx={{
                                                         backgroundColor: event.status === 'pending' ? 'rgba(216, 185, 138, 0.1)' : 'rgba(34, 197, 94, 0.1)',
-                                                        color: event.status === 'pending' ? 'var(--color-primary-500)' : '#22c55e',
+                                                        color: event.status === 'pending' ? 'var(--color-primary-500)' : 'var(--color-icon)',
                                                         fontWeight: 700,
                                                         fontSize: '0.75rem',
                                                         height: 28,
@@ -677,8 +677,8 @@ function AdminDashboardContent() {
                                         <XAxis dataKey="name" tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }} />
                                         <YAxis tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }} />
                                         <Tooltip content={<CustomTooltip />} />
-                                        <Bar dataKey="إيرادات" fill="#D8B98A" radius={[6, 6, 0, 0]} />
-                                        <Bar dataKey="فعاليات" fill="#22c55e" radius={[6, 6, 0, 0]} />
+                                        <Bar dataKey="إيرادات" fill="var(--color-icon)" radius={[6, 6, 0, 0]} />
+                                        <Bar dataKey="فعاليات" fill="var(--color-icon)" radius={[6, 6, 0, 0]} />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </MuiBox>

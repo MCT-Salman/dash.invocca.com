@@ -406,7 +406,7 @@ export default function ServicesManagement() {
 
                     >
 
-                        <Package size={20} style={{ color: '#D8B98A' }} />
+                        <Package size={20} style={{ color: 'var(--color-icon)' }} />
 
                     </MuiBox>
 
@@ -546,7 +546,7 @@ export default function ServicesManagement() {
 
                         backgroundColor: value ? 'rgba(22, 163, 74, 0.1)' : 'rgba(220, 38, 38, 0.1)',
 
-                        color: value ? '#16a34a' : '#dc2626',
+                        color: value ? 'var(--color-icon)' : 'var(--color-icon)',
 
                         fontWeight: 600,
 

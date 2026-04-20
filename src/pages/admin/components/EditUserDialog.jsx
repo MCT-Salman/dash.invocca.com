@@ -275,7 +275,7 @@ export default function EditUserDialog({ open, onClose, user, onSuccess }) {
                                       top: 0,
                                       right: 0,
                                       backgroundColor: 'rgba(239, 68, 68, 0.9)',
-                                      color: '#fff',
+                                      color: 'var(--color-text-primary)',
                                       width: 24,
                                       height: 24,
                                       borderRadius: '50%',

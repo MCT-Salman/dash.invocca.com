@@ -267,7 +267,7 @@ export default function TemplatesManagement() {
                     size="small"
                     sx={{
                         backgroundColor: value ? 'rgba(46, 204, 113, 0.15)' : 'rgba(231, 76, 60, 0.15)',
-                        color: value ? '#27ae60' : '#e74c3c',
+                        color: value ? 'var(--color-icon)' : 'var(--color-icon)',
                         fontWeight: 600,
                         borderRadius: '8px'
                     }}

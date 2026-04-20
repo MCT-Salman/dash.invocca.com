@@ -280,7 +280,7 @@ export default function ReportsManagement() {
                         <MuiBox sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                             <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>القاعات النشطة</MuiTypography>
-                                <MuiTypography variant="body2" sx={{ color: '#fff', fontWeight: 600 }}>
+                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                                     {stats.activeHalls || 0} / {stats.totalHalls || 0}
                                 </MuiTypography>
                             </MuiBox>
@@ -290,7 +290,7 @@ export default function ReportsManagement() {
 
                             <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>القاعات غير نشطة</MuiTypography>
-                                <MuiTypography variant="body2" sx={{ color: '#fff', fontWeight: 600 }}>
+                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                                     {stats.inactiveHalls || 0}
                                 </MuiTypography>
                             </MuiBox>
@@ -313,7 +313,7 @@ export default function ReportsManagement() {
                                     <MuiBox key={label} sx={{ mb: 2 }}>
                                         <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                                             <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>{label}</MuiTypography>
-                                            <MuiTypography variant="caption" sx={{ color: '#fff', fontWeight: 600 }}>{count}</MuiTypography>
+                                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>{count}</MuiTypography>
                                         </MuiBox>
                                         <MuiBox sx={{ height: '6px', width: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '3px', overflow: 'hidden' }}>
                                             <MuiBox sx={{ height: '100%', width: `${halls.length > 0 ? (count / halls.length) * 100 : 0}%`, background: 'var(--color-primary-500)', borderRadius: '3px' }} />
@@ -358,13 +358,13 @@ export default function ReportsManagement() {
                                             justifyContent: 'center',
                                             flexDirection: 'column'
                                         }}>
-                                            <User size={24} style={{ color: '#fff' }} />
-                                            <MuiTypography variant="caption" sx={{ color: '#fff', fontWeight: 600 }}>
+                                            <User size={24} style={{ color: 'var(--color-text-primary)' }} />
+                                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                                                 {role.count || 0}
                                             </MuiTypography>
                                         </MuiBox>
                                         <MuiBox sx={{ flex: 1 }}>
-                                            <MuiTypography variant="body1" sx={{ color: '#fff', fontWeight: 600, mb: 0.5 }}>
+                                            <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600, mb: 0.5 }}>
                                                 {roleName}
                                             </MuiTypography>
                                             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
@@ -440,7 +440,7 @@ export default function ReportsManagement() {
                                                         size="small"
                                                         sx={{
                                                             backgroundColor: hall.isActive ? 'rgba(34, 197, 94, 0.9)' : 'rgba(239, 68, 68, 0.9)',
-                                                            color: '#fff',
+                                                            color: 'var(--color-text-primary)',
                                                             fontWeight: 700,
                                                             fontSize: '0.7rem',
                                                             height: 24,
@@ -452,7 +452,7 @@ export default function ReportsManagement() {
 
                                             {/* Hall Info */}
                                             <MuiBox sx={{ p: 2.5 }}>
-                                                <MuiTypography variant="h6" sx={{ color: '#fff', fontWeight: 700, mb: 1, fontSize: '1rem' }}>
+                                                <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary)', fontWeight: 700, mb: 1, fontSize: '1rem' }}>
                                                     {hall.name || 'قاعة بدون اسم'}
                                                 </MuiTypography>
 
@@ -510,7 +510,7 @@ export default function ReportsManagement() {
                                                         </MuiTypography>
                                                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                                                             <User size={12} style={{ color: 'var(--color-text-secondary)' }} />
-                                                            <MuiTypography variant="caption" sx={{ color: '#fff', fontWeight: 500 }}>
+                                                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-primary)', fontWeight: 500 }}>
                                                                 {hall.generalManager.name}
                                                             </MuiTypography>
                                                         </MuiBox>
@@ -594,7 +594,7 @@ export default function ReportsManagement() {
                                     }}>
                                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                             <Building2 size={20} style={{ color: 'var(--color-primary-400)' }} />
-                                            <MuiTypography variant="body1" sx={{ color: '#fff', fontWeight: 600 }}>
+                                            <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                                                 {hall.hallName || hall.name || 'قاعة غير معروفة'}
                                             </MuiTypography>
                                         </MuiBox>
@@ -631,7 +631,7 @@ export default function ReportsManagement() {
                                         background: 'rgba(255,255,255,0.03)',
                                         border: '1px solid var(--color-border-glass)',
                                     }}>
-                                        <MuiTypography variant="body2" sx={{ color: '#fff', fontWeight: 500 }}>
+                                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', fontWeight: 500 }}>
                                             {activity.description || activity.message || 'نشاط'}
                                         </MuiTypography>
                                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
@@ -672,7 +672,7 @@ export default function ReportsManagement() {
                                     }}>
                                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                             <Calendar size={20} style={{ color: 'var(--color-info-400)' }} />
-                                            <MuiTypography variant="body1" sx={{ color: '#fff', fontWeight: 600 }}>
+                                            <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                                                 {hall.hallName || hall.name || 'قاعة غير معروفة'}
                                             </MuiTypography>
                                         </MuiBox>

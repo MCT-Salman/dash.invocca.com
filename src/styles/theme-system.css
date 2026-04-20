@@ -1,0 +1,181 @@
+/* src/styles/theme-system.css
+   Centralized color + global style system */
+
+:root {
+  --color-dark: #1A1A1A;
+  --color-light: #FFF8DA;
+  --color-gold: #D8B98A;
+
+  /* Light mode mapping */
+  --color-bg: var(--color-light);
+  --color-paper: var(--color-light);
+  --color-surface: var(--color-light);
+  --color-surface-hover: var(--color-light);
+  --color-surface-glass: color-mix(in srgb, var(--color-light) 85%, transparent);
+  --color-overlay: color-mix(in srgb, var(--color-dark) 65%, transparent);
+
+  --color-text-primary: var(--color-dark);
+  --color-text-secondary: var(--color-dark);
+  --color-text-muted: var(--color-dark);
+  --color-text-on-primary: var(--color-light);
+  --color-text-on-dark: var(--color-light);
+
+  --color-icon: var(--color-gold);
+  --color-icon-filter: none;
+
+  --color-border: var(--color-gold);
+  --color-border-glass: color-mix(in srgb, var(--color-gold) 35%, transparent);
+  --color-divider: var(--color-gold);
+
+  /* Keep semantic aliases mapped to the same 3-color system */
+  --color-primary-50: var(--color-gold);
+  --color-primary-100: var(--color-gold);
+  --color-primary-200: var(--color-gold);
+  --color-primary-300: var(--color-gold);
+  --color-primary-400: var(--color-gold);
+  --color-primary-500: var(--color-gold);
+  --color-primary-600: var(--color-gold);
+  --color-primary-700: var(--color-gold);
+  --color-primary-800: var(--color-gold);
+  --color-primary-900: var(--color-gold);
+  --color-primary-950: var(--color-gold);
+
+  --color-secondary-50: var(--color-dark);
+  --color-secondary-100: var(--color-dark);
+  --color-secondary-200: var(--color-dark);
+  --color-secondary-300: var(--color-dark);
+  --color-secondary-400: var(--color-dark);
+  --color-secondary-500: var(--color-dark);
+  --color-secondary-600: var(--color-dark);
+  --color-secondary-700: var(--color-dark);
+  --color-secondary-800: var(--color-dark);
+  --color-secondary-900: var(--color-dark);
+  --color-secondary-950: var(--color-dark);
+
+  --color-success-50: var(--color-gold);
+  --color-success-500: var(--color-gold);
+  --color-success-700: var(--color-gold);
+  --color-error-50: var(--color-gold);
+  --color-error-500: var(--color-gold);
+  --color-error-700: var(--color-gold);
+  --color-warning-50: var(--color-gold);
+  --color-warning-500: var(--color-gold);
+  --color-warning-700: var(--color-gold);
+  --color-info-50: var(--color-gold);
+  --color-info-500: var(--color-gold);
+  --color-info-700: var(--color-gold);
+}
+
+.dark {
+  /* Dark mode mapping */
+  --color-bg: var(--color-dark);
+  --color-paper: var(--color-dark);
+  --color-surface: var(--color-dark);
+  --color-surface-hover: var(--color-dark);
+  --color-surface-glass: color-mix(in srgb, var(--color-dark) 82%, transparent);
+  --color-overlay: color-mix(in srgb, var(--color-dark) 78%, transparent);
+
+  --color-text-primary: var(--color-light);
+  --color-text-secondary: var(--color-light);
+  --color-text-muted: var(--color-light);
+
+  --color-icon: var(--color-gold);
+  --color-icon-filter: invert(1) brightness(2);
+
+  --color-border: var(--color-gold);
+  --color-border-glass: color-mix(in srgb, var(--color-gold) 35%, transparent);
+  --color-divider: var(--color-gold);
+}
+
+/* Global enforcement for pages/components */
+body,
+#root {
+  background-color: var(--color-bg) !important;
+  color: var(--color-text-primary) !important;
+}
+
+h1, h2, h3, h4, h5, h6, p, span, strong, small, label, a, li, td, th {
+  color: var(--color-text-primary);
+}
+
+svg,
+.lucide,
+.MuiSvgIcon-root {
+  color: var(--color-icon) !important;
+}
+
+.MuiBadge-badge {
+  background-color: var(--color-icon) !important;
+  color: var(--color-dark) !important;
+}
+
+.MuiPaper-root,
+.MuiCard-root,
+.MuiDialog-paper,
+.MuiMenu-paper,
+.MuiDrawer-paper {
+  background-color: var(--color-paper) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+.MuiInputBase-root,
+.MuiFormLabel-root,
+.MuiTypography-root,
+.MuiTableCell-root,
+.MuiButton-root,
+.MuiChip-root {
+  color: var(--color-text-primary) !important;
+}
+
+/* ------------------------------------------------------------------
+   Hardcoded-color enforcement layer (for legacy inline styles/SVG attrs)
+   ------------------------------------------------------------------ */
+[style*="color:#"],
+[style*="color: #"] {
+  color: var(--color-text-primary) !important;
+}
+
+[style*="border-color:#"],
+[style*="border-color: #"],
+[style*="border: 1px solid #"],
+[style*="border:1px solid #"],
+[style*="border: 2px solid #"],
+[style*="border:2px solid #"] {
+  border-color: var(--color-border) !important;
+}
+
+[style*="background-color:#"],
+[style*="background-color: #"] {
+  background-color: var(--color-paper) !important;
+}
+
+/* Normalize colored badges/pills/chips/status to icon accent */
+.MuiChip-filled,
+.MuiChip-colorSuccess,
+.MuiChip-colorError,
+.MuiChip-colorWarning,
+.MuiChip-colorInfo,
+.MuiAlert-standardSuccess,
+.MuiAlert-standardError,
+.MuiAlert-standardWarning,
+.MuiAlert-standardInfo {
+  background-color: var(--color-icon) !important;
+  color: var(--color-dark) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Convert legacy SVG hardcoded colors to centralized icon/text colors */
+svg [fill="#22c55e"], svg [fill="#16a34a"], svg [fill="#0284c7"], svg [fill="#3b82f6"],
+svg [fill="#9333ea"], svg [fill="#dc2626"], svg [fill="#ef4444"], svg [fill="#f97316"],
+svg [fill="#fbbf24"], svg [fill="#D99B3D"], svg [fill="#d99b3d"], svg [fill="#fff"],
+svg [fill="#ffffff"], svg [fill="#000"], svg [fill="#000000"] {
+  fill: var(--color-icon) !important;
+}
+
+svg [stroke="#22c55e"], svg [stroke="#16a34a"], svg [stroke="#0284c7"], svg [stroke="#3b82f6"],
+svg [stroke="#9333ea"], svg [stroke="#dc2626"], svg [stroke="#ef4444"], svg [stroke="#f97316"],
+svg [stroke="#fbbf24"], svg [stroke="#D99B3D"], svg [stroke="#d99b3d"], svg [stroke="#fff"],
+svg [stroke="#ffffff"], svg [stroke="#000"], svg [stroke="#000000"] {
+  stroke: var(--color-icon) !important;
+}

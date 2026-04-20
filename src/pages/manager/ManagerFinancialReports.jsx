@@ -22,7 +22,7 @@ import autoTable from 'jspdf-autotable'
 const premiumMenuProps = {
     PaperProps: {
         sx: {
-            bgcolor: '#1E1E1E',
+            bgcolor: 'var(--color-bg)',
             border: '1px solid rgba(216, 185, 138, 0.2)',
             borderRadius: '12px',
             mt: 1,
@@ -183,7 +183,7 @@ export default function ManagerFinancialReports() {
                     color: 'var(--color-primary-500)',
                     mb: 1,
                     textShadow: '0 0 30px rgba(216, 185, 138, 0.2)',
-                    background: 'linear-gradient(135deg, #D49B55 0%, #F5DEB3 50%, #D49B55 100%)',
+                    background: 'linear-gradient(135deg, var(--color-icon) 0%, var(--color-bg) 50%, var(--color-icon) 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text'
@@ -273,7 +273,7 @@ export default function ManagerFinancialReports() {
                                     borderRadius: '12px',
                                     py: 1.5,
                                     background: 'linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%)',
-                                    color: '#000',
+                                    color: 'var(--color-text-primary)',
                                     fontWeight: 700,
                                     boxShadow: '0 4px 15px rgba(216, 185, 138, 0.3)',
                                     '&:hover': {
@@ -421,8 +421,8 @@ function ReportCard({ report, onExportExcel, onExportPDF }) {
                         borderColor: 'rgba(255, 255, 255, 0.1)',
                         color: 'var(--color-text-secondary)',
                         '&:hover': {
-                            borderColor: '#10b981',
-                            color: '#10b981',
+                            borderColor: 'var(--color-icon)',
+                            color: 'var(--color-icon)',
                             background: 'rgba(16, 185, 129, 0.05)'
                         }
                     }}

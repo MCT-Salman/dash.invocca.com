@@ -91,9 +91,9 @@ export default function Login() {
                         sx={{ 
                             mb: 3,
                             borderRadius: '12px',
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            border: '1px solid rgba(239, 68, 68, 0.3)',
-                            color: '#ef4444'
+                            backgroundColor: 'var(--color-error-100)',
+                            border: '1px solid var(--color-error-300)',
+                            color: 'var(--color-error-500)'
                         }}
                     >
                         {serverError}
@@ -124,41 +124,41 @@ export default function Login() {
                         sx={{
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: '12px',
-                                backgroundColor: 'rgba(255, 255, 255, 1)',
-                                border: '2px solid rgba(216, 185, 138, 0.2)',
+                                backgroundColor: 'var(--color-white)',
+                                border: '2px solid var(--color-primary-200)',
                                 '&:hover': {
-                                    backgroundColor: '#fff',
+                                    backgroundColor: 'var(--color-white)',
                                     borderColor: 'var(--color-primary-500)',
                                 },
                                 '&.Mui-focused': {
-                                    backgroundColor: '#fff',
+                                    backgroundColor: 'var(--color-white)',
                                     borderColor: 'var(--color-primary-500)',
-                                    boxShadow: '0 0 0 3px rgba(216, 185, 138, 0.15)',
+                                    boxShadow: '0 0 0 3px var(--color-primary-100)',
                                 },
                                 '& .MuiInputBase-input': {
-                                    color: '#000000 !important',
-                                    WebkitTextFillColor: '#000000 !important',
+                                    color: 'var(--color-black)',
+                                    WebkitTextFillColor: 'var(--color-black)',
                                     fontWeight: 600,
                                     fontSize: '1rem',
                                     '&:focus': {
-                                        color: '#000000 !important',
-                                        WebkitTextFillColor: '#000000 !important',
+                                        color: 'var(--color-black)',
+                                        WebkitTextFillColor: 'var(--color-black)',
                                     },
                                     '&::placeholder': {
-                                        color: 'rgba(0, 0, 0, 0.5) !important',
+                                        color: 'var(--color-gray-500)',
                                         opacity: 1,
                                         fontWeight: 400,
-                                        WebkitTextFillColor: 'rgba(0, 0, 0, 0.5) !important',
+                                        WebkitTextFillColor: 'var(--color-gray-500)',
                                     },
                                     '&:-webkit-autofill': {
-                                        WebkitBoxShadow: '0 0 0 100px #ffffff inset !important',
-                                        WebkitTextFillColor: '#000000 !important',
-                                        color: '#000000 !important',
+                                        WebkitBoxShadow: '0 0 0 100px var(--color-white) inset !important',
+                                        WebkitTextFillColor: 'var(--color-black)',
+                                        color: 'var(--color-black)',
                                     },
                                     '&:autofill': {
-                                        WebkitBoxShadow: '0 0 0 100px #ffffff inset !important',
-                                        WebkitTextFillColor: '#000000 !important',
-                                        color: '#000000 !important',
+                                        WebkitBoxShadow: '0 0 0 100px var(--color-white) inset !important',
+                                        WebkitTextFillColor: 'var(--color-black)',
+                                        color: 'var(--color-black)',
                                     }
                                 }
                             },
@@ -177,11 +177,11 @@ export default function Login() {
                                 }
                             },
                             '& .MuiFormHelperText-root': {
-                                color: 'rgba(0, 0, 0, 0.7) !important',
+                                color: 'var(--color-gray-700) !important',
                                 fontWeight: 500,
                                 fontSize: '0.875rem',
                                 '&.Mui-error': {
-                                    color: '#d32f2f !important',
+                                    color: 'var(--color-error-500) !important',
                                 }
                             }
                         }}
@@ -215,7 +215,7 @@ export default function Login() {
                                         sx={{
                                             color: 'var(--color-primary-500)',
                                             '&:hover': {
-                                                backgroundColor: 'rgba(216, 185, 138, 0.1)',
+                                                backgroundColor: 'var(--color-primary-100)',
                                             }
                                         }}
                                     >
@@ -227,41 +227,41 @@ export default function Login() {
                         sx={{
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: '12px',
-                                backgroundColor: 'rgba(255, 255, 255, 1)',
-                                border: '2px solid rgba(216, 185, 138, 0.2)',
+                                backgroundColor: 'var(--color-white)',
+                                border: '2px solid var(--color-primary-200)',
                                 '&:hover': {
-                                    backgroundColor: '#fff',
+                                    backgroundColor: 'var(--color-white)',
                                     borderColor: 'var(--color-primary-500)',
                                 },
                                 '&.Mui-focused': {
-                                    backgroundColor: '#fff',
+                                    backgroundColor: 'var(--color-white)',
                                     borderColor: 'var(--color-primary-500)',
-                                    boxShadow: '0 0 0 3px rgba(216, 185, 138, 0.15)',
+                                    boxShadow: '0 0 0 3px var(--color-primary-100)',
                                 },
                                 '& .MuiInputBase-input': {
-                                    color: '#000000 !important',
-                                    WebkitTextFillColor: '#000000 !important',
+                                    color: 'var(--color-black)',
+                                    WebkitTextFillColor: 'var(--color-black)',
                                     fontWeight: 600,
                                     fontSize: '1rem',
                                     '&:focus': {
-                                        color: '#000000 !important',
-                                        WebkitTextFillColor: '#000000 !important',
+                                        color: 'var(--color-black)',
+                                        WebkitTextFillColor: 'var(--color-black)',
                                     },
                                     '&::placeholder': {
-                                        color: 'rgba(0, 0, 0, 0.5) !important',
+                                        color: 'var(--color-gray-500)',
                                         opacity: 1,
                                         fontWeight: 400,
-                                        WebkitTextFillColor: 'rgba(0, 0, 0, 0.5) !important',
+                                        WebkitTextFillColor: 'var(--color-gray-500)',
                                     },
                                     '&:-webkit-autofill': {
-                                        WebkitBoxShadow: '0 0 0 100px #ffffff inset !important',
-                                        WebkitTextFillColor: '#000000 !important',
-                                        color: '#000000 !important',
+                                        WebkitBoxShadow: '0 0 0 100px var(--color-white) inset !important',
+                                        WebkitTextFillColor: 'var(--color-black)',
+                                        color: 'var(--color-black)',
                                     },
                                     '&:autofill': {
-                                        WebkitBoxShadow: '0 0 0 100px #ffffff inset !important',
-                                        WebkitTextFillColor: '#000000 !important',
-                                        color: '#000000 !important',
+                                        WebkitBoxShadow: '0 0 0 100px var(--color-white) inset !important',
+                                        WebkitTextFillColor: 'var(--color-black)',
+                                        color: 'var(--color-black)',
                                     }
                                 }
                             },
@@ -280,11 +280,11 @@ export default function Login() {
                                 }
                             },
                             '& .MuiFormHelperText-root': {
-                                color: 'rgba(0, 0, 0, 0.7) !important',
+                                color: 'var(--color-gray-700) !important',
                                 fontWeight: 500,
                                 fontSize: '0.875rem',
                                 '&.Mui-error': {
-                                    color: '#d32f2f !important',
+                                    color: 'var(--color-error-500) !important',
                                 }
                             }
                         }}
@@ -304,22 +304,22 @@ export default function Login() {
                         fontSize: '1rem',
                         fontWeight: 700,
                         background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
-                        color: '#fff',
-                        boxShadow: '0 4px 16px rgba(216, 185, 138, 0.4)',
-                        border: '2px solid rgba(216, 185, 138, 0.3)',
+                        color: 'var(--color-white)',
+                        boxShadow: '0 4px 16px var(--color-primary-100)',
+                        border: '2px solid var(--color-primary-300)',
                         textTransform: 'none',
                         transition: 'all 0.3s ease',
                         '&:hover': {
                             background: 'linear-gradient(135deg, var(--color-primary-700), var(--color-primary-800))',
-                            boxShadow: '0 6px 24px rgba(216, 185, 138, 0.5)',
+                            boxShadow: '0 6px 24px var(--color-primary-200)',
                             transform: 'translateY(-2px)',
                         },
                         '&:active': {
                             transform: 'translateY(0)',
                         },
                         '&:disabled': {
-                            background: 'rgba(216, 185, 138, 0.3)',
-                            color: 'rgba(255, 255, 255, 0.5)',
+                            background: 'var(--color-primary-200)',
+                            color: 'var(--color-white-500)',
                         }
                     }}
                 >

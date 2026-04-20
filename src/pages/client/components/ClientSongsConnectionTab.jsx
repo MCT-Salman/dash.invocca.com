@@ -224,7 +224,7 @@ export default function ClientSongsConnectionTab({ selectedEventId: initialSelec
               borderRadius: '12px',
               py: 1.5,
               background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
-              color: '#1A1A1A',
+              color: 'var(--color-text-primary)',
               boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
               '&:hover': {
                 background: 'linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800))',

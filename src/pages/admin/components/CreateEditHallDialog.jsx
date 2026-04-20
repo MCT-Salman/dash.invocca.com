@@ -625,9 +625,9 @@ export default function CreateEditHallDialog({
 
             {/* {error && (
 
-                <MuiBox sx={{ mb: 3, p: 2, backgroundColor: 'rgba(211, 47, 47, 0.1)', border: '1px solid #d32f2f', borderRadius: '8px' }}>
+                <MuiBox sx={{ mb: 3, p: 2, backgroundColor: 'rgba(211, 47, 47, 0.1)', border: '1px solid var(--color-icon)', borderRadius: '8px' }}>
 
-                    <MuiTypography variant="body2" sx={{ color: '#d32f2f', fontWeight: 500 }}>
+                    <MuiTypography variant="body2" sx={{ color: 'var(--color-icon)', fontWeight: 500 }}>
 
                         {error.errors?.[0]?.message || error.message || 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.'}
 

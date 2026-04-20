@@ -23,9 +23,9 @@ function RatingCard({ rating }) {
 
     const getScoreColor = (score) => {
         if (!score || score === '—') return 'var(--color-text-secondary)'
-        if (score >= 4) return '#22c55e'
-        if (score >= 3) return '#fbbf24'
-        return '#ef4444'
+        if (score >= 4) return 'var(--color-icon)'
+        if (score >= 3) return 'var(--color-icon)'
+        return 'var(--color-icon)'
     }
 
     return (
@@ -78,8 +78,8 @@ function RatingCard({ rating }) {
                     alignItems: 'center',
                     gap: 0.5
                 }}>
-                    <Star size={16} fill="#fbbf24" stroke="#fbbf24" />
-                    <MuiTypography sx={{ fontWeight: 800, color: '#fbbf24', fontSize: '1rem' }}>
+                    <Star size={16} fill="var(--color-icon)" stroke="var(--color-icon)" />
+                    <MuiTypography sx={{ fontWeight: 800, color: 'var(--color-icon)', fontSize: '1rem' }}>
                         {overallRating}
                     </MuiTypography>
                 </MuiBox>

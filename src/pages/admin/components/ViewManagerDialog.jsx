@@ -47,7 +47,7 @@ export default function ViewManagerDialog({ open, onClose, manager }) {
                                 top: 16,
                                 right: 16,
                                 backgroundColor: 'rgba(255,255,255,0.1)',
-                                color: '#fff',
+                                color: 'var(--color-text-primary)',
                                 backdropFilter: 'blur(4px)',
                                 '&:hover': {
                                     backgroundColor: 'rgba(255,255,255,0.2)',
@@ -57,7 +57,7 @@ export default function ViewManagerDialog({ open, onClose, manager }) {
                             <X size={20} />
                         </MuiIconButton>
 
-                        <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: '#fff' }}>
+                        <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: 'var(--color-text-primary)' }}>
                             <MuiTypography variant="h4" sx={{ fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
                                 {manager.name}
                             </MuiTypography>
@@ -79,7 +79,7 @@ export default function ViewManagerDialog({ open, onClose, manager }) {
                                     icon={manager.isActive !== false ? <CheckCircle size={14} /> : <XCircle size={14} />}
                                     sx={{
                                         backgroundColor: manager.isActive !== false ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)',
-                                        color: manager.isActive !== false ? '#16a34a' : '#dc2626',
+                                        color: manager.isActive !== false ? 'var(--color-icon)' : 'var(--color-icon)',
                                         fontWeight: 'bold',
                                         border: 'none',
                                     }}

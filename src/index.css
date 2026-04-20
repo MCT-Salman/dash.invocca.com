@@ -1,6 +1,7 @@
 /* src\index.css */
 @import "tailwindcss";
 @import "./styles/fonts.css";
+@import "./styles/theme-system.css";
 
 /* ═══════════════════════════════════════════════════════════
     GLOBAL RESET & BASE STYLES
@@ -40,83 +41,7 @@ body {
     DESIGN SYSTEM - TAILWIND @theme FOR INVOCA APP
    ═══════════════════════════════════════════════════════════ */
 @theme {
-  /* ─────────────────────────────────────────────────────────
-     PRIMARY COLORS - Nescafee / Coffee Theme
-     ───────────────────────────────────────────────────────── */
-  --color-primary-50: #F8F3F0;
-  --color-primary-100: #EFE6E0;
-  --color-primary-200: #DFCDC1;
-  --color-primary-300: #CBA893;
-  --color-primary-400: #B58463;
-  --color-primary-500: #9C6644;
-  /* Nescafee Main */
-  --color-primary-600: #7F5539;
-  --color-primary-700: #6B4423;
-  --color-primary-800: #582F0E;
-  --color-primary-900: #3D2B1F;
-  --color-primary-950: #26170F;
-
-  /* ─────────────────────────────────────────────────────────
-     SECONDARY COLORS - Roasted Bean / Dark Tones
-     ───────────────────────────────────────────────────────── */
-  --color-secondary-50: #fafaf9;
-  --color-secondary-100: #f5f5f4;
-  --color-secondary-200: #e7e5e4;
-  --color-secondary-300: #d6d3d1;
-  --color-secondary-400: #a8a29e;
-  --color-secondary-500: #78716c;
-  --color-secondary-600: #57534e;
-  --color-secondary-700: #44403c;
-  --color-secondary-800: #292524;
-  --color-secondary-900: #1c1917;
-  --color-secondary-950: #0c0a09;
-
-  /* ─────────────────────────────────────────────────────────
-     SEMANTIC COLORS
-     ───────────────────────────────────────────────────────── */
-  /* Standard semantic colors adjusted for coffee theme harmony */
-  --color-success-50: #f0fdf4;
-  --color-success-500: #15803d;
-  --color-success-700: #14532d;
-
-  --color-error-50: #fef2f2;
-  --color-error-500: #dc2626;
-  --color-error-700: #991b1b;
-
-  --color-warning-50: #fffbeb;
-  --color-warning-500: #ca8a04;
-  --color-warning-700: #854d0e;
-
-  --color-info-50: #eff6ff;
-  --color-info-500: #2563eb;
-  --color-info-700: #1e3a8a;
-
-  /* ─────────────────────────────────────────────────────────
-     BACKGROUND & SURFACE COLORS (Light Mode - Nescafee Cream)
-     ───────────────────────────────────────────────────────── */
-  --color-bg: #FDFCFB;
-  --color-paper: #ffffff;
-  --color-surface: #F8F3F0;
-  --color-surface-hover: #F1E6D3;
-  --color-surface-glass: rgba(255, 255, 255, 0.75);
-  --color-overlay: rgba(0, 0, 0, 0.4);
-  --color-icon-filter: none;
-
-  /* ─────────────────────────────────────────────────────────
-     TEXT COLORS (Espresso Tones)
-     ───────────────────────────────────────────────────────── */
-  --color-text-primary: #2C1810;
-  --color-text-secondary: #582F0E;
-  --color-text-muted: #82736C;
-  --color-text-on-primary: #ffffff;
-  --color-text-on-dark: #ffffff;
-
-  /* ─────────────────────────────────────────────────────────
-     BORDER & DIVIDER COLORS
-     ───────────────────────────────────────────────────────── */
-  --color-border: #E8E0D9;
-  --color-border-glass: rgba(75, 44, 32, 0.08);
-  --color-divider: #F1E6D3;
+  /* Colors are centralized in src/styles/theme-system.css */
 
   /* ─────────────────────────────────────────────────────────
      SPACING SYSTEM - نظام المسافات
@@ -298,29 +223,7 @@ body {
   --breakpoint-2xl: 1536px;
 }
 
-/* ═══════════════════════════════════════════════════════════
-    DARK MODE OVERRIDES
-   ═══════════════════════════════════════════════════════════ */
-.dark {
-  /* Background & Surface Colors */
-  --color-bg: #050505;
-  --color-paper: #0F0F0F;
-  --color-surface: #1A1A1A;
-  --color-surface-hover: #252525;
-  --color-surface-glass: rgba(15, 15, 15, 0.7);
-  --color-overlay: rgba(0, 0, 0, 0.7);
-  --color-icon-filter: invert(1) brightness(2);
-
-  /* Text Colors */
-  --color-text-primary: #EDEDED;
-  --color-text-secondary: #A1A1AA;
-  --color-text-muted: #52525B;
-
-  /* Border & Divider Colors */
-  --color-border: #27272A;
-  --color-border-glass: rgba(255, 255, 255, 0.08);
-  --color-divider: #27272A;
-}
+/* Dark mode overrides are centralized in src/styles/theme-system.css */
 
 /* ═══════════════════════════════════════════════════════════
     ANIMATIONS & KEYFRAMES
@@ -534,10 +437,20 @@ html {
 }
 
 .glass-card {
-  background: linear-gradient(145deg, rgba(20, 20, 20, 0.6) 0%, rgba(10, 10, 10, 0.8) 100%);
+  background: var(--color-surface-glass);
   backdrop-filter: blur(10px);
   border: 1px solid var(--color-border-glass);
   transition: all 0.3s ease;
+}
+
+svg,
+.lucide {
+  color: var(--color-icon);
+}
+
+.MuiBadge-badge {
+  background-color: var(--color-icon) !important;
+  color: var(--color-dark) !important;
 }
 
 .glass-card:hover {

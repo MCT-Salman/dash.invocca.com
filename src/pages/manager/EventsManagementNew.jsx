@@ -96,15 +96,15 @@ function EventStatusBadge({ status }) {
 
     const statusConfig = {
 
-        pending: { label: 'قيد الانتظار', color: '#D99B3D', bg: '#FFF8DA' },
+        pending: { label: 'قيد الانتظار', color: 'var(--color-icon)', bg: 'var(--color-bg)' },
 
-        confirmed: { label: 'مؤكد', color: '#0284c7', bg: '#e0f2fe' },
+        confirmed: { label: 'مؤكد', color: 'var(--color-icon)', bg: 'var(--color-bg)' },
 
-        in_progress: { label: 'جاري', color: '#9333ea', bg: '#f3e8ff' },
+        in_progress: { label: 'جاري', color: 'var(--color-icon)', bg: 'var(--color-bg)' },
 
-        completed: { label: 'مكتمل', color: '#16a34a', bg: '#dcfce7' },
+        completed: { label: 'مكتمل', color: 'var(--color-icon)', bg: 'var(--color-bg)' },
 
-        cancelled: { label: 'ملغي', color: '#dc2626', bg: '#fee2e2' }
+        cancelled: { label: 'ملغي', color: 'var(--color-icon)', bg: 'var(--color-bg)' }
 
     }
 
@@ -878,7 +878,7 @@ export default function EventsManagement() {
 
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
 
-                    <Users size={14} style={{ color: '#FFE36C' }} />
+                    <Users size={14} style={{ color: 'var(--color-icon)' }} />
 
                     <MuiTypography variant="body2">{value || 0}</MuiTypography>
 
@@ -1339,7 +1339,7 @@ export default function EventsManagement() {
 
                             >
 
-                                <Calendar size={36} style={{ color: '#fff', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }} />
+                                <Calendar size={36} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }} />
 
                             </MuiBox>
 
@@ -1651,7 +1651,7 @@ export default function EventsManagement() {
 
                                     height: '3px',
 
-                                    background: 'linear-gradient(90deg, #D99B3D, transparent)',
+                                    background: 'linear-gradient(90deg, var(--color-icon), transparent)',
 
                                 }
 
@@ -1691,7 +1691,7 @@ export default function EventsManagement() {
 
                                     fontWeight: 800,
 
-                                    color: '#D99B3D',
+                                    color: 'var(--color-icon)',
 
                                     fontSize: '2rem'
 
@@ -1755,7 +1755,7 @@ export default function EventsManagement() {
 
                                     height: '3px',
 
-                                    background: 'linear-gradient(90deg, #3b82f6, transparent)',
+                                    background: 'linear-gradient(90deg, var(--color-icon), transparent)',
 
                                 }
 
@@ -1795,7 +1795,7 @@ export default function EventsManagement() {
 
                                     fontWeight: 800,
 
-                                    color: '#3b82f6',
+                                    color: 'var(--color-icon)',
 
                                     fontSize: '2rem'
 
@@ -1859,7 +1859,7 @@ export default function EventsManagement() {
 
                                     height: '3px',
 
-                                    background: 'linear-gradient(90deg, #16a34a, transparent)',
+                                    background: 'linear-gradient(90deg, var(--color-icon), transparent)',
 
                                 }
 
@@ -1899,7 +1899,7 @@ export default function EventsManagement() {
 
                                     fontWeight: 800,
 
-                                    color: '#16a34a',
+                                    color: 'var(--color-icon)',
 
                                     fontSize: '2rem'
 

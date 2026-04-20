@@ -214,13 +214,13 @@ function ManagerDashboardContent() {
                                 backdropFilter: 'blur(10px)',
                             }}
                         >
-                            <LayoutDashboard size={36} style={{ color: '#fff' }} />
+                            <LayoutDashboard size={36} style={{ color: 'var(--color-text-primary)' }} />
                         </MuiBox>
                         <MuiBox sx={{ flex: 1 }}>
                             <MuiTypography
                                 variant="h4"
                                 sx={{
-                                    color: '#fff',
+                                    color: 'var(--color-text-primary)',
                                     fontWeight: 800,
                                     mb: 1,
                                     fontSize: { xs: '1.5rem', sm: '2rem' },
@@ -251,7 +251,7 @@ function ManagerDashboardContent() {
                         bottom: 0,
                         left: 0,
                         opacity: 0.1,
-                        background: 'radial-gradient(circle at top right, #fff 0%, transparent 60%)',
+                        background: 'radial-gradient(circle at top right, var(--color-text-primary) 0%, transparent 60%)',
                     }}
                 />
             </MuiBox>
@@ -352,7 +352,7 @@ function ManagerDashboardContent() {
                                                 sx={{
                                                     display: 'flex',
                                                     alignItems: 'center',
-                                                    color: stats[`${config.key}Trend`] >= 0 ? '#22c55e' : '#ef4444',
+                                                    color: stats[`${config.key}Trend`] >= 0 ? 'var(--color-icon)' : 'var(--color-icon)',
                                                     gap: 0.5,
                                                     fontSize: '0.75rem',
                                                     fontWeight: 800
@@ -415,11 +415,11 @@ function ManagerDashboardContent() {
                                         alignItems: 'center',
                                         justifyContent: 'center'
                                     }}>
-                                        <Building2 size={24} style={{ color: '#fff' }} strokeWidth={2.5} />
+                                        <Building2 size={24} style={{ color: 'var(--color-text-primary)' }} strokeWidth={2.5} />
                                     </MuiBox>
                                     <MuiTypography variant="h6" sx={{
                                         fontWeight: 700,
-                                        color: '#fff'
+                                        color: 'var(--color-text-primary)'
                                     }}>
                                         معلومات قاعة/صالة
                                     </MuiTypography>
@@ -630,7 +630,7 @@ function ManagerDashboardContent() {
                                                     size="small"
                                                     sx={{
                                                         backgroundColor: event.status === 'pending' ? 'rgba(216, 185, 138, 0.1)' : event.status === 'confirmed' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-                                                        color: event.status === 'pending' ? 'var(--color-primary-500)' : event.status === 'confirmed' ? '#22c55e' : '#3b82f6',
+                                                        color: event.status === 'pending' ? 'var(--color-primary-500)' : event.status === 'confirmed' ? 'var(--color-icon)' : 'var(--color-icon)',
                                                         fontWeight: 700,
                                                         fontSize: '0.75rem',
                                                         height: 28,
@@ -739,9 +739,9 @@ function ManagerDashboardContent() {
                                     alignItems: 'center',
                                     justifyContent: 'center'
                                 }}>
-                                    <Calendar size={20} style={{ color: '#fff' }} />
+                                    <Calendar size={20} style={{ color: 'var(--color-text-primary)' }} />
                                 </MuiBox>
-                                <MuiTypography variant="h6" sx={{ fontWeight: 700, color: '#fff' }}>
+                                <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
                                     ملخص الفعاليات
                                 </MuiTypography>
                             </MuiBox>
@@ -820,9 +820,9 @@ function ManagerDashboardContent() {
                                     alignItems: 'center',
                                     justifyContent: 'center'
                                 }}>
-                                    <DollarSign size={20} style={{ color: '#fff' }} />
+                                    <DollarSign size={20} style={{ color: 'var(--color-text-primary)' }} />
                                 </MuiBox>
-                                <MuiTypography variant="h6" sx={{ fontWeight: 700, color: '#fff' }}>
+                                <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
                                     الملخص المالي
                                 </MuiTypography>
                             </MuiBox>
@@ -881,9 +881,9 @@ function ManagerDashboardContent() {
                                     alignItems: 'center',
                                     justifyContent: 'center'
                                 }}>
-                                    <FileText size={20} style={{ color: '#fff' }} />
+                                    <FileText size={20} style={{ color: 'var(--color-text-primary)' }} />
                                 </MuiBox>
-                                <MuiTypography variant="h6" sx={{ fontWeight: 700, color: '#fff' }}>
+                                <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
                                     الدعوات والعملاء
                                 </MuiTypography>
                             </MuiBox>
@@ -952,9 +952,9 @@ function ManagerDashboardContent() {
                                     alignItems: 'center',
                                     justifyContent: 'center'
                                 }}>
-                                    <MessageSquare size={20} style={{ color: '#fff' }} />
+                                    <MessageSquare size={20} style={{ color: 'var(--color-text-primary)' }} />
                                 </MuiBox>
-                                <MuiTypography variant="h6" sx={{ fontWeight: 700, color: '#fff' }}>
+                                <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
                                     الشكاوى والموظفين
                                 </MuiTypography>
                             </MuiBox>

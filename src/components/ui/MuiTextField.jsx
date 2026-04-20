@@ -381,7 +381,6 @@ const MuiTextField = ({
                         right: 0,
                         left: 'auto',
                         transformOrigin: 'top right',
-                        transformOrigin: 'top right',
                         '&.Mui-focused': {
                             color: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
                             fontWeight: 600,

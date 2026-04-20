@@ -101,11 +101,11 @@ export default function ViewEventDialog({ open, onClose, event }) {
     const [activeTab, setActiveTab] = useState('details')
 
     const statusConfig = {
-        pending: { label: 'قيد الانتظار', color: '#D99B3D', bg: '#FFF8DA', icon: AlertCircle },
-        confirmed: { label: 'مؤكد', color: '#0284c7', bg: '#e0f2fe', icon: CheckCircle },
-        in_progress: { label: 'جاري', color: '#9333ea', bg: '#f3e8ff', icon: Clock },
-        completed: { label: 'مكتمل', color: '#16a34a', bg: '#dcfce7', icon: CheckCircle },
-        cancelled: { label: 'ملغي', color: '#dc2626', bg: '#fee2e2', icon: XCircle }
+        pending: { label: 'قيد الانتظار', color: 'var(--color-icon)', bg: 'var(--color-bg)', icon: AlertCircle },
+        confirmed: { label: 'مؤكد', color: 'var(--color-icon)', bg: 'var(--color-bg)', icon: CheckCircle },
+        in_progress: { label: 'جاري', color: 'var(--color-icon)', bg: 'var(--color-bg)', icon: Clock },
+        completed: { label: 'مكتمل', color: 'var(--color-icon)', bg: 'var(--color-bg)', icon: CheckCircle },
+        cancelled: { label: 'ملغي', color: 'var(--color-icon)', bg: 'var(--color-bg)', icon: XCircle }
     }
 
     if (!event) return null
@@ -498,12 +498,12 @@ export default function ViewEventDialog({ open, onClose, event }) {
                                                 <MuiGrid item xs={12}>
                                                     <MuiPaper sx={{ p: 2, backgroundColor: 'rgba(220, 38, 38, 0.1)', border: '1px solid rgba(220, 38, 38, 0.3)', borderRadius: '12px' }}>
                                                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                            <AlertCircle size={20} style={{ color: '#dc2626' }} />
+                                                            <AlertCircle size={20} style={{ color: 'var(--color-icon)' }} />
                                                             <MuiBox>
                                                                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.75rem' }}>
                                                                     المبلغ المتبقي
                                                                 </MuiTypography>
-                                                                <MuiTypography variant="body1" sx={{ color: '#dc2626', fontWeight: 600 }}>
+                                                                <MuiTypography variant="body1" sx={{ color: 'var(--color-icon)', fontWeight: 600 }}>
                                                                     {((event.totalPrice || 0) - (event.paidAmount || 0)).toLocaleString()} ل.س
                                                                 </MuiTypography>
                                                             </MuiBox>
@@ -591,7 +591,7 @@ export default function ViewEventDialog({ open, onClose, event }) {
                                                             maxHeight: '300px',
                                                             objectFit: 'contain',
                                                             borderRadius: '12px',
-                                                            backgroundColor: '#f5f5f5'
+                                                            backgroundColor: 'var(--color-bg)'
                                                         }}
                                                     />
                                                 </MuiBox>

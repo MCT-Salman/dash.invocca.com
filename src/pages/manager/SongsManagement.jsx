@@ -744,7 +744,7 @@ export default function ManagerSongsManagement() {
 
           >
 
-            <Music size={26} style={{ color: '#fff' }} />
+            <Music size={26} style={{ color: 'var(--color-text-primary)' }} />
 
           </MuiBox>
 

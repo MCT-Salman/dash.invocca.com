@@ -891,7 +891,7 @@ export default function Invitations() {
 
               background: 'linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%)',
 
-              color: '#fff',
+              color: 'var(--color-text-primary)',
 
               fontWeight: 600,
 
@@ -2195,7 +2195,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                   if (!computedStyle.color || computedStyle.color === 'rgb(0, 0, 0)' || computedStyle.color === 'black') {
 
-                    el.style.color = '#D8B98A'
+                    el.style.color = 'var(--color-icon)'
 
                   }
 
@@ -2363,7 +2363,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                   if (!color || color === 'rgb(0, 0, 0)' || color === 'black' || color === 'rgba(0, 0, 0, 0)') {
 
-                    el.style.color = '#D8B98A'
+                    el.style.color = 'var(--color-icon)'
 
                   }
 
@@ -2869,7 +2869,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                 ? `url("${templateImageUrl}") center/cover no-repeat`
 
-                : 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)',
+                : 'linear-gradient(135deg, var(--color-dark) 0%, var(--color-bg) 100%)',
 
               borderRadius: '20px',
 
@@ -3009,7 +3009,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                 gap: { xs: 0.75, sm: 1 },
 
-                color: '#fff',
+                color: 'var(--color-text-primary)',
 
                 flex: 1,
 
@@ -3035,7 +3035,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                       height: { xs: '90px', sm: '100px', md: '110px' },
 
-                      border: '2px solid #D8B98A',
+                      border: '2px solid var(--color-gold)',
 
                       borderRadius: '8px',
 
@@ -3073,7 +3073,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                         borderRadius: '4px',
 
-                        backgroundColor: '#ffffff',
+                        backgroundColor: 'var(--color-light)',
 
                         imageRendering: 'crisp-edges',
 
@@ -3093,7 +3093,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                       height: { xs: '90px', sm: '100px', md: '110px' },
 
-                      border: '2px solid #D8B98A',
+                      border: '2px solid var(--color-gold)',
 
                       borderRadius: '8px',
 
@@ -3121,7 +3121,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                   fontWeight: 700,
 
-                  color: '#fff',
+                  color: 'var(--color-text-on-dark)',
 
                   fontSize: { xs: '1rem', sm: '1.15rem', md: '1.3rem' },
 
@@ -3159,7 +3159,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                   height: '2px',
 
-                  background: 'linear-gradient(90deg, transparent 0%, #D8B98A 20%, #D8B98A 80%, transparent 100%)',
+                  background: 'linear-gradient(90deg, transparent 0%, var(--color-icon) 20%, var(--color-icon) 80%, transparent 100%)',
 
                   mb: { xs: 0.75, sm: 1 },
 
@@ -3179,7 +3179,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                   sx={{
 
-                    border: '2px solid #D8B98A',
+                    border: '2px solid var(--color-icon)',
 
                     borderRadius: '8px',
 
@@ -3215,7 +3215,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                       fontWeight: 700,
 
-                      color: '#fff',
+                      color: 'var(--color-text-on-dark)',
 
                       fontSize: { xs: '1rem', sm: '1.15rem', md: '1.3rem' },
 
@@ -3265,7 +3265,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                           fontWeight: 600,
 
-                          color: '#D8B98A',
+                          color: 'var(--color-gold)',
 
                           fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.95rem' },
 
@@ -3311,7 +3311,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                     fontWeight: 800,
 
-                    color: '#fff',
+                    color: 'var(--color-text-on-dark)',
 
                     fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
 
@@ -3439,7 +3439,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                             sx={{
 
-                              color: '#D8B98A',
+                              color: 'var(--color-gold)',
 
                               fontSize: { xs: '0.6rem', sm: '0.65rem' },
 
@@ -3515,7 +3515,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                         backgroundColor: 'rgba(216, 185, 138, 0.2)',
 
-                        border: '2px solid #D8B98A',
+                        border: '2px solid var(--color-gold)',
 
                         display: 'flex',
 
@@ -3531,7 +3531,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                     >
 
-                      <Clock size={18} style={{ color: '#D8B98A' }} />
+                      <Clock size={18} style={{ color: 'var(--color-gold)' }} />
 
                     </MuiBox>
 
@@ -3543,7 +3543,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                         height: '2px',
 
-                        background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
+                        background: 'linear-gradient(90deg, transparent 0%, var(--color-icon) 50%, transparent 100%)',
 
                         mb: 0.4,
 
@@ -3561,7 +3561,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                           sx={{
 
-                            color: '#fff',
+                            color: 'var(--color-text-on-dark)',
 
                             fontSize: { xs: '0.6rem', sm: '0.65rem' },
 
@@ -3595,7 +3595,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                           sx={{
 
-                            color: '#fff',
+                            color: 'var(--color-text-on-dark)',
 
                             fontSize: { xs: '0.6rem', sm: '0.65rem' },
 
@@ -3631,7 +3631,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                         sx={{
 
-                          color: '#fff',
+                          color: 'var(--color-text-on-dark)',
 
                           fontSize: { xs: '0.6rem', sm: '0.65rem' },
 
@@ -3677,7 +3677,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                       height: { xs: '50px', sm: '55px' },
 
-                      background: 'linear-gradient(180deg, transparent 0%, #D8B98A 50%, transparent 100%)',
+                      background: 'linear-gradient(180deg, transparent 0%, var(--color-icon) 50%, transparent 100%)',
 
                       mx: 0.3,
 
@@ -3707,7 +3707,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                         backgroundColor: 'rgba(216, 185, 138, 0.2)',
 
-                        border: '2px solid #D8B98A',
+                        border: '2px solid var(--color-gold)',
 
                         display: 'flex',
 
@@ -3723,7 +3723,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                     >
 
-                      <Calendar size={18} style={{ color: '#D8B98A' }} />
+                      <Calendar size={18} style={{ color: 'var(--color-gold)' }} />
 
                     </MuiBox>
 
@@ -3735,7 +3735,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                         height: '2px',
 
-                        background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
+                        background: 'linear-gradient(90deg, transparent 0%, var(--color-icon) 50%, transparent 100%)',
 
                         mb: 0.4,
 
@@ -3749,7 +3749,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                       sx={{
 
-                        color: '#fff',
+                        color: 'var(--color-text-on-dark)',
 
                         fontSize: { xs: '0.6rem', sm: '0.65rem' },
 
@@ -3799,7 +3799,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                           height: { xs: '50px', sm: '55px' },
 
-                          background: 'linear-gradient(180deg, transparent 0%, #D8B98A 50%, transparent 100%)',
+                          background: 'linear-gradient(180deg, transparent 0%, var(--color-icon) 50%, transparent 100%)',
 
                           mx: 0.3,
 
@@ -3823,7 +3823,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                           backgroundColor: 'rgba(216, 185, 138, 0.2)',
 
-                          border: '2px solid #D8B98A',
+                          border: '2px solid var(--color-gold)',
 
                           display: 'flex',
 
@@ -3839,7 +3839,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                       >
 
-                        <MapPin size={18} style={{ color: '#D8B98A' }} />
+                        <MapPin size={18} style={{ color: 'var(--color-gold)' }} />
 
                       </MuiBox>
 
@@ -3851,7 +3851,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                           height: '2px',
 
-                          background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
+                          background: 'linear-gradient(90deg, transparent 0%, var(--color-icon) 50%, transparent 100%)',
 
                           mb: 0.4,
 
@@ -3865,7 +3865,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                         sx={{
 
-                          color: '#fff',
+                          color: 'var(--color-text-on-dark)',
 
                           fontSize: { xs: '0.6rem', sm: '0.65rem' },
 
@@ -4051,7 +4051,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                   sx={{
 
-                    color: '#D8B98A',
+                    color: 'var(--color-gold)',
 
                     fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
 
@@ -4107,7 +4107,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                       height: '2px',
 
-                      background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
+                      background: 'linear-gradient(90deg, transparent 0%, var(--color-icon) 50%, transparent 100%)',
 
                     }}
 
@@ -4121,7 +4121,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                       height: '2px',
 
-                      background: 'linear-gradient(90deg, transparent 0%, #D8B98A 50%, transparent 100%)',
+                      background: 'linear-gradient(90deg, transparent 0%, var(--color-icon) 50%, transparent 100%)',
 
                     }}
 
@@ -4413,7 +4413,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                   >
 
-                    <CheckCircle size={12} style={{ color: '#fff' }} />
+                    <CheckCircle size={12} style={{ color: 'var(--color-text-primary)' }} />
 
                   </MuiBox>
 
@@ -4703,7 +4703,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
                     >
 
-                      <CheckCircle size={12} style={{ color: '#fff' }} />
+                      <CheckCircle size={12} style={{ color: 'var(--color-text-primary)' }} />
 
                     </MuiBox>
 

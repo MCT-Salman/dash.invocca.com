@@ -100,7 +100,7 @@ function ActionCard({ title, description, icon: Icon, onClick, color = 'var(--co
             boxShadow: `0 4px 12px ${color}40`
           }}
         >
-          <Icon size={28} style={{ color: '#fff' }} />
+          <Icon size={28} style={{ color: 'var(--color-text-primary)' }} />
         </MuiBox>
         <MuiBox sx={{ flex: 1 }}>
           <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-text-primary-dark)', mb: 0.5 }}>

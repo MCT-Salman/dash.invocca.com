@@ -6,14 +6,14 @@
  */
 export const dashboardTokens = {
   palette: {
-    primary: 'var(--color-primary-500)',
-    primaryDark: 'var(--color-primary-700)',
-    secondary: 'var(--color-secondary-500)',
-    accent: 'var(--color-primary-300)',
-    paper: 'var(--color-paper-dark)',
-    background: 'var(--color-bg-dark)',
-    border: 'var(--color-border-dark)',
-    textPrimary: 'var(--color-text-primary-dark)',
+    primary: 'var(--color-icon)',
+    primaryDark: 'var(--color-icon)',
+    secondary: 'var(--color-text-primary)',
+    accent: 'var(--color-icon)',
+    paper: 'var(--color-paper)',
+    background: 'var(--color-bg)',
+    border: 'var(--color-border)',
+    textPrimary: 'var(--color-text-primary)',
     textSecondary: 'var(--color-text-secondary)',
     success: 'var(--color-success-500)',
     info: 'var(--color-info-500)',

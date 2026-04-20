@@ -8,7 +8,7 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
   border: `1px solid ${theme.palette.divider || 'rgba(0, 0, 0, 0.12)'}`,
   overflow: 'hidden',
-  backgroundColor: theme.palette.background.paper || '#ffffff',
+  backgroundColor: theme.palette.background.paper || 'var(--color-text-primary)',
   '& .MuiTable-root': {
     minWidth: 650,
   },

@@ -49,6 +49,9 @@ export default function QRCodeDisplay({
         <head>
           <title>طباعة QR Code</title>
           <style>
+            :root {
+              --color-text-primary: var(--color-text-primary, black);
+            }
             body {
               display: flex;
               flex-direction: column;
@@ -67,7 +70,7 @@ export default function QRCodeDisplay({
             }
             .subtitle {
               font-size: 16px;
-              color: #666;
+              color: var(--color-text-primary);
               margin-bottom: 20px;
               text-align: center;
             }
@@ -125,7 +128,7 @@ export default function QRCodeDisplay({
                     ref={qrRef}
                     sx={{
                         p: 2,
-                        backgroundColor: '#fff', // QR codes always need high contrast white bg
+                        backgroundColor: 'var(--color-text-primary)', // QR codes always need high contrast white bg
                         borderRadius: '16px',
                         boxShadow: 'var(--shadow-sm)',
                         border: '2px solid var(--color-primary-500)'

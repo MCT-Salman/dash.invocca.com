@@ -169,7 +169,7 @@ export default function ManagerFinancial() {
                     color: 'var(--color-primary-500)',
                     mb: 1,
                     textShadow: '0 0 30px rgba(216, 185, 138, 0.2)',
-                    background: 'linear-gradient(135deg, #D49B55 0%, #F5DEB3 50%, #D49B55 100%)',
+                    background: 'linear-gradient(135deg, var(--color-icon) 0%, var(--color-bg) 50%, var(--color-icon) 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text'
@@ -191,14 +191,14 @@ export default function ManagerFinancial() {
                 </MuiGrid>
                 <MuiGrid item xs={12} md={4}>
                     <MuiPaper sx={{ p: 3, borderRadius: '20px', background: 'var(--color-paper)', border: '1px solid rgba(34, 197, 94, 0.2)', textAlign: 'center' }}>
-                        <MuiTypography variant="caption" sx={{ color: '#22c55e', fontWeight: 600 }}>إجمالي المحصل</MuiTypography>
-                        <MuiTypography variant="h5" sx={{ mt: 1, fontWeight: 800, color: '#22c55e' }}>{statsSummary.paid.toLocaleString()} ل.س</MuiTypography>
+                        <MuiTypography variant="caption" sx={{ color: 'var(--color-icon)', fontWeight: 600 }}>إجمالي المحصل</MuiTypography>
+                        <MuiTypography variant="h5" sx={{ mt: 1, fontWeight: 800, color: 'var(--color-icon)' }}>{statsSummary.paid.toLocaleString()} ل.س</MuiTypography>
                     </MuiPaper>
                 </MuiGrid>
                 <MuiGrid item xs={12} md={4}>
                     <MuiPaper sx={{ p: 3, borderRadius: '20px', background: 'var(--color-paper)', border: '1px solid rgba(220, 38, 38, 0.2)', textAlign: 'center' }}>
-                        <MuiTypography variant="caption" sx={{ color: '#ef4444', fontWeight: 600 }}>الإجمالي المتبقي</MuiTypography>
-                        <MuiTypography variant="h5" sx={{ mt: 1, fontWeight: 800, color: '#ef4444' }}>{statsSummary.pending.toLocaleString()} ل.س</MuiTypography>
+                        <MuiTypography variant="caption" sx={{ color: 'var(--color-icon)', fontWeight: 600 }}>الإجمالي المتبقي</MuiTypography>
+                        <MuiTypography variant="h5" sx={{ mt: 1, fontWeight: 800, color: 'var(--color-icon)' }}>{statsSummary.pending.toLocaleString()} ل.س</MuiTypography>
                     </MuiPaper>
                 </MuiGrid>
             </MuiGrid>
@@ -231,7 +231,7 @@ export default function ManagerFinancial() {
                         py: 1.5,
                         px: 3,
                         background: 'linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%)',
-                        color: '#000',
+                        color: 'var(--color-text-primary)',
                         fontWeight: 700,
                         whiteSpace: 'nowrap',
                         '&:hover': {
@@ -375,7 +375,7 @@ function InvoiceCard({ invoice, onEdit, onPay }) {
                     right: 0,
                     width: '4px',
                     height: '100%',
-                    background: isPaid ? '#22c55e' : isOverdue ? '#ef4444' : 'var(--color-primary-500)',
+                    background: isPaid ? 'var(--color-icon)' : isOverdue ? 'var(--color-icon)' : 'var(--color-primary-500)',
                     opacity: 0.8
                 }
             }}
@@ -402,9 +402,9 @@ function InvoiceCard({ invoice, onEdit, onPay }) {
                                 invoice.paymentStatus === 'partial' ? 'rgba(216, 185, 138, 0.1)' :
                                     isOverdue ? 'rgba(220, 38, 38, 0.1)' : 'rgba(107, 114, 128, 0.1)',
                         color:
-                            isPaid ? '#22c55e' :
+                            isPaid ? 'var(--color-icon)' :
                                 invoice.paymentStatus === 'partial' ? 'var(--color-primary-500)' :
-                                    isOverdue ? '#dc2626' : 'var(--color-text-secondary)',
+                                    isOverdue ? 'var(--color-icon)' : 'var(--color-text-secondary)',
                         fontWeight: 700,
                         borderRadius: '8px',
                         border: `1px solid ${isPaid ? 'rgba(34, 197, 94, 0.2)' :
@@ -459,7 +459,7 @@ function InvoiceCard({ invoice, onEdit, onPay }) {
                 </MuiBox>
                 <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                     <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>المدفوع</MuiTypography>
-                    <MuiTypography variant="body2" sx={{ fontWeight: 700, color: '#22c55e' }}>
+                    <MuiTypography variant="body2" sx={{ fontWeight: 700, color: 'var(--color-icon)' }}>
                         {invoice.paidAmount?.toLocaleString()} ل.س
                     </MuiTypography>
                 </MuiBox>
@@ -467,7 +467,7 @@ function InvoiceCard({ invoice, onEdit, onPay }) {
                     <MuiBox sx={{
                         width: `${Math.min((invoice.paidAmount / invoice.totalAmount) * 100, 100)}%`,
                         height: '100%',
-                        background: '#22c55e',
+                        background: 'var(--color-icon)',
                         borderRadius: '2px'
                     }} />
                 </MuiBox>
@@ -482,10 +482,10 @@ function InvoiceCard({ invoice, onEdit, onPay }) {
                     sx={{
                         borderRadius: '10px',
                         borderColor: isPaid ? 'transparent' : 'rgba(34, 197, 94, 0.3)',
-                        color: '#22c55e',
+                        color: 'var(--color-icon)',
                         background: isPaid ? 'transparent' : 'rgba(34, 197, 94, 0.05)',
                         '&:hover': {
-                            borderColor: '#22c55e',
+                            borderColor: 'var(--color-icon)',
                             background: 'rgba(34, 197, 94, 0.1)',
                         },
                         opacity: isPaid ? 0.5 : 1
@@ -738,7 +738,7 @@ function InvoiceDialog({ open, onClose, invoice, onSubmit, loading }) {
                                     borderRadius: '12px',
                                     py: 1.5,
                                     background: 'linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%)',
-                                    color: '#000',
+                                    color: 'var(--color-text-primary)',
                                     fontWeight: 700,
                                     '&:hover': {
                                         background: 'linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%)',
@@ -829,7 +829,7 @@ function PaymentDialog({ open, onClose, paymentData, onSubmit, loading }) {
             >
                 <MuiTypography variant="h5" sx={{
                     fontWeight: 700,
-                    color: '#22c55e',
+                    color: 'var(--color-icon)',
                     mb: 1,
                     textAlign: 'center'
                 }}>
@@ -857,8 +857,8 @@ function PaymentDialog({ open, onClose, paymentData, onSubmit, loading }) {
                                     borderRadius: '12px',
                                     backgroundColor: 'rgba(255, 255, 255, 0.03)',
                                     border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    '&:hover': { borderColor: '#22c55e' },
-                                    '&.Mui-focused': { borderColor: '#22c55e' }
+                                    '&:hover': { borderColor: 'var(--color-icon)' },
+                                    '&.Mui-focused': { borderColor: 'var(--color-icon)' }
                                 },
                                 '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
                                 '& .MuiInputBase-input': { color: 'var(--color-text-primary)' }
@@ -877,8 +877,8 @@ function PaymentDialog({ open, onClose, paymentData, onSubmit, loading }) {
                                         borderRadius: '12px',
                                         backgroundColor: 'rgba(255, 255, 255, 0.03)',
                                         border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        '&:hover': { borderColor: '#22c55e' },
-                                        '&.Mui-focused': { borderColor: '#22c55e' }
+                                        '&:hover': { borderColor: 'var(--color-icon)' },
+                                        '&.Mui-focused': { borderColor: 'var(--color-icon)' }
                                     },
                                     '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
                                     '& .MuiSelect-select': { color: 'var(--color-text-primary)' }
@@ -902,8 +902,8 @@ function PaymentDialog({ open, onClose, paymentData, onSubmit, loading }) {
                                     borderRadius: '12px',
                                     backgroundColor: 'rgba(255, 255, 255, 0.03)',
                                     border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    '&:hover': { borderColor: '#22c55e' },
-                                    '&.Mui-focused': { borderColor: '#22c55e' }
+                                    '&:hover': { borderColor: 'var(--color-icon)' },
+                                    '&.Mui-focused': { borderColor: 'var(--color-icon)' }
                                 },
                                 '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
                                 '& .MuiInputBase-input': { color: 'var(--color-text-primary)' }
@@ -922,8 +922,8 @@ function PaymentDialog({ open, onClose, paymentData, onSubmit, loading }) {
                                     borderRadius: '12px',
                                     backgroundColor: 'rgba(255, 255, 255, 0.03)',
                                     border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    '&:hover': { borderColor: '#22c55e' },
-                                    '&.Mui-focused': { borderColor: '#22c55e' }
+                                    '&:hover': { borderColor: 'var(--color-icon)' },
+                                    '&.Mui-focused': { borderColor: 'var(--color-icon)' }
                                 },
                                 '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
                                 '& .MuiInputBase-input': { color: 'var(--color-text-primary)' }
@@ -939,11 +939,11 @@ function PaymentDialog({ open, onClose, paymentData, onSubmit, loading }) {
                                 sx={{
                                     borderRadius: '12px',
                                     py: 1.5,
-                                    background: 'linear-gradient(135deg, #22c55e 0%, #166534 100%)',
-                                    color: '#fff',
+                                    background: 'linear-gradient(135deg, var(--color-icon) 0%, var(--color-icon) 100%)',
+                                    color: 'var(--color-text-primary)',
                                     fontWeight: 700,
                                     '&:hover': {
-                                        background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                                        background: 'linear-gradient(135deg, var(--color-icon) 0%, var(--color-icon) 100%)',
                                         transform: 'translateY(-1px)'
                                     },
                                     transition: 'all 0.2s'

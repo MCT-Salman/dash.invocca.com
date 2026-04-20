@@ -282,7 +282,7 @@ export default function ClientsManagement() {
 
                             background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
 
-                            color: '#fff',
+                            color: 'var(--color-text-primary)',
 
                             fontWeight: 600,
 
@@ -579,7 +579,7 @@ export default function ClientsManagement() {
 
                             >
 
-                                <Users size={36} style={{ color: '#fff', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }} />
+                                <Users size={36} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }} />
 
                             </MuiBox>
 
@@ -821,7 +821,7 @@ export default function ClientsManagement() {
 
                                 >
 
-                                    <Users size={28} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                                    <Users size={28} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
 
                                 </MuiBox>
 
@@ -927,7 +927,7 @@ export default function ClientsManagement() {
 
                                     height: '3px',
 
-                                    background: 'linear-gradient(90deg, #16a34a, transparent)',
+                                    background: 'linear-gradient(90deg, var(--color-icon), transparent)',
 
                                 }
 
@@ -947,7 +947,7 @@ export default function ClientsManagement() {
 
                                         borderRadius: '14px',
 
-                                        background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                                        background: 'linear-gradient(135deg, var(--color-icon), var(--color-icon))',
 
                                         display: 'flex',
 
@@ -961,7 +961,7 @@ export default function ClientsManagement() {
 
                                 >
 
-                                    <UserCheck size={28} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                                    <UserCheck size={28} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
 
                                 </MuiBox>
 
@@ -999,7 +999,7 @@ export default function ClientsManagement() {
 
                                             fontWeight: 800,
 
-                                            color: '#16a34a',
+                                            color: 'var(--color-icon)',
 
                                             fontSize: '2rem'
 
@@ -1067,7 +1067,7 @@ export default function ClientsManagement() {
 
                                     height: '3px',
 
-                                    background: 'linear-gradient(90deg, #dc2626, transparent)',
+                                    background: 'linear-gradient(90deg, var(--color-icon), transparent)',
 
                                 }
 
@@ -1087,7 +1087,7 @@ export default function ClientsManagement() {
 
                                         borderRadius: '14px',
 
-                                        background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
+                                        background: 'linear-gradient(135deg, var(--color-icon), var(--color-icon))',
 
                                         display: 'flex',
 
@@ -1101,7 +1101,7 @@ export default function ClientsManagement() {
 
                                 >
 
-                                    <UserX size={28} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                                    <UserX size={28} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
 
                                 </MuiBox>
 
@@ -1139,7 +1139,7 @@ export default function ClientsManagement() {
 
                                             fontWeight: 800,
 
-                                            color: '#dc2626',
+                                            color: 'var(--color-icon)',
 
                                             fontSize: '2rem'
 

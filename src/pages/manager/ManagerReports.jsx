@@ -38,9 +38,9 @@ const StatCard = ({ title, value, subtitle, icon: Icon, color = 'primary' }) => 
     const colors = {
         primary: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
         secondary: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
-        success: 'linear-gradient(135deg, #22c55e, #16a34a)',
-        warning: 'linear-gradient(135deg, #f59e0b, #d97706)',
-        info: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+        success: 'linear-gradient(135deg, var(--color-icon), var(--color-icon))',
+        warning: 'linear-gradient(135deg, var(--color-icon), var(--color-icon))',
+        info: 'linear-gradient(135deg, var(--color-icon), var(--color-icon))',
     }
 
     return (
@@ -100,7 +100,7 @@ const StatCard = ({ title, value, subtitle, icon: Icon, color = 'primary' }) => 
                             p: 3,
                             borderRadius: '16px',
                             background: colors[color],
-                            color: '#fff',
+                            color: 'var(--color-text-primary)',
                             boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
                             transition: 'transform 0.3s ease',
                             '&:hover': {
@@ -113,7 +113,7 @@ const StatCard = ({ title, value, subtitle, icon: Icon, color = 'primary' }) => 
                     {subtitle && (
                         <MuiTypography variant="caption" sx={{ 
                             background: 'rgba(34, 197, 94, 0.1)', 
-                            color: '#22c55e', 
+                            color: 'var(--color-icon)', 
                             px: 2, 
                             py: 1, 
                             borderRadius: '20px', 
@@ -224,7 +224,7 @@ export default function ManagerReports() {
                                 boxShadow: '0 10px 30px rgba(216, 185, 138, 0.3), 0 0 20px rgba(216, 185, 138, 0.2)',
                             }}
                         >
-                            <BarChart3 size={36} style={{ color: '#fff', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }} />
+                            <BarChart3 size={36} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }} />
                         </MuiBox>
                         <MuiBox sx={{ flex: 1 }}>
                             <MuiTypography 
@@ -490,7 +490,7 @@ export default function ManagerReports() {
                                         </MuiTypography>
                                     </MuiBox>
                                     <MuiBox sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                        <Star size={20} style={{ color: '#fbbf24', marginRight: '8px' }} />
+                                        <Star size={20} style={{ color: 'var(--color-icon)', marginRight: '8px' }} />
                                         <MuiTypography variant="h5" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
                                             {item.rating?.overallRating}/5
                                         </MuiTypography>

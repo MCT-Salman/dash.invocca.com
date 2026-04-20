@@ -62,7 +62,7 @@ export default function ManagerFinancialDashboard() {
                         title="إجمالي الإيرادات"
                         value={formatCurrency(currentMonth.totalRevenue || 0)}
                         icon={DollarSign}
-                        color="#22c55e"
+                        color="var(--color-icon)"
                         bgColor="rgba(34, 197, 94, 0.1)"
                         trend="up"
                     />
@@ -74,7 +74,7 @@ export default function ManagerFinancialDashboard() {
                         title="إجمالي المصروفات"
                         value={formatCurrency(currentMonth.totalExpenses || 0)}
                         icon={TrendingDown}
-                        color="#ef4444"
+                        color="var(--color-icon)"
                         bgColor="rgba(239, 68, 68, 0.1)"
                         trend="down"
                     />
@@ -98,7 +98,7 @@ export default function ManagerFinancialDashboard() {
                         title="عدد المعاملات"
                         value={currentMonth.transactionCount || 0}
                         icon={Activity}
-                        color="#3b82f6"
+                        color="var(--color-icon)"
                         bgColor="rgba(59, 130, 246, 0.1)"
                         trend="neutral"
                     />
@@ -155,7 +155,7 @@ export default function ManagerFinancialDashboard() {
                         }}
                     >
                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                            <AlertCircle size={24} style={{ color: overdueInvoices.length > 0 ? '#ef4444' : '#22c55e' }} />
+                            <AlertCircle size={24} style={{ color: overdueInvoices.length > 0 ? 'var(--color-icon)' : 'var(--color-icon)' }} />
                             <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-primary-500)' }}>
                                 فواتير متأخرة
                             </MuiTypography>
@@ -171,8 +171,8 @@ export default function ManagerFinancialDashboard() {
                             </MuiBox>
                         ) : (
                             <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                                <InfoRow label="عدد الفواتير المتأخرة" value={invoices.overdueCount || 0} color="#ef4444" />
-                                <InfoRow label="المبلغ المتأخر" value={formatCurrency(invoices.overdueAmount || 0)} color="#ef4444" />
+                                <InfoRow label="عدد الفواتير المتأخرة" value={invoices.overdueCount || 0} color="var(--color-icon)" />
+                                <InfoRow label="المبلغ المتأخر" value={formatCurrency(invoices.overdueAmount || 0)} color="var(--color-icon)" />
                                 <MuiButton
                                     variant="outlined"
                                     color="error"
@@ -229,7 +229,6 @@ export default function ManagerFinancialDashboard() {
                                     alignItems: 'center',
                                     p: 2,
                                     borderRadius: '16px',
-                                    borderRadius: '16px',
                                     background: 'var(--color-surface)',
                                     border: '1px solid var(--color-border)',
                                     transition: 'all 0.2s ease',
@@ -251,8 +250,8 @@ export default function ManagerFinancialDashboard() {
                                         background: transaction.type === 'payment' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                                     }}>
                                         {transaction.type === 'payment' ?
-                                            <ArrowUpRight size={20} color="#22c55e" /> :
-                                            <ArrowDownRight size={20} color="#ef4444" />
+                                            <ArrowUpRight size={20} color="var(--color-icon)" /> :
+                                            <ArrowDownRight size={20} color="var(--color-icon)" />
                                         }
                                     </MuiBox>
                                     <MuiBox sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -268,7 +267,7 @@ export default function ManagerFinancialDashboard() {
                                     variant="body1"
                                     sx={{
                                         fontWeight: 700,
-                                        color: transaction.type === 'payment' ? '#22c55e' : '#ef4444',
+                                        color: transaction.type === 'payment' ? 'var(--color-icon)' : 'var(--color-icon)',
                                         fontFamily: 'monospace',
                                         fontSize: '1.1rem'
                                     }}
@@ -315,7 +314,7 @@ export default function ManagerFinancialDashboard() {
                                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block' }}>
                                             الإيرادات
                                         </MuiTypography>
-                                        <MuiTypography variant="body2" sx={{ fontWeight: 600, color: '#22c55e' }}>
+                                        <MuiTypography variant="body2" sx={{ fontWeight: 600, color: 'var(--color-icon)' }}>
                                             {formatCurrency(month.revenue)}
                                         </MuiTypography>
                                     </MuiBox>
@@ -323,7 +322,7 @@ export default function ManagerFinancialDashboard() {
                                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block' }}>
                                             المصروفات
                                         </MuiTypography>
-                                        <MuiTypography variant="body2" sx={{ fontWeight: 600, color: '#ef4444' }}>
+                                        <MuiTypography variant="body2" sx={{ fontWeight: 600, color: 'var(--color-icon)' }}>
                                             {formatCurrency(month.expenses)}
                                         </MuiTypography>
                                     </MuiBox>
@@ -402,12 +401,12 @@ function StatCard({ title, value, icon: Icon, color, bgColor, trend }) {
                         borderRadius: '8px'
                     }}>
                         {trend === 'up' ? (
-                            <ArrowUpRight size={16} style={{ color: '#22c55e' }} />
+                            <ArrowUpRight size={16} style={{ color: 'var(--color-icon)' }} />
                         ) : (
-                            <ArrowDownRight size={16} style={{ color: '#ef4444' }} />
+                            <ArrowDownRight size={16} style={{ color: 'var(--color-icon)' }} />
                         )}
                         <MuiTypography variant="caption" sx={{
-                            color: trend === 'up' ? '#22c55e' : '#ef4444',
+                            color: trend === 'up' ? 'var(--color-icon)' : 'var(--color-icon)',
                             fontWeight: 700
                         }}>
                             {trend === 'up' ? '+2.5%' : '-1.2%'}

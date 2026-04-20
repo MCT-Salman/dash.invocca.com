@@ -374,7 +374,7 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
 
                                             backgroundColor: 'rgba(239, 68, 68, 0.9)',
 
-                                            color: '#fff',
+                                            color: 'var(--color-text-primary)',
 
                                             '&:hover': {
 
@@ -472,7 +472,7 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
 
                                                 '&:hover': {
 
-                                                    backgroundColor: '#fff',
+                                                    backgroundColor: 'var(--color-text-primary)',
 
                                                 }
 

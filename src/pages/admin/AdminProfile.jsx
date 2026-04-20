@@ -183,14 +183,14 @@ export default function AdminProfile() {
                     width: 36,
                     height: 36,
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #dc2626, #991b1b)',
+                    background: 'linear-gradient(135deg, var(--color-icon), var(--color-icon))',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     border: '2px solid var(--color-surface-dark)',
                   }}
                 >
-                  <Crown size={16} style={{ color: '#fff' }} />
+                  <Crown size={16} style={{ color: 'var(--color-text-primary)' }} />
                 </MuiBox>
               </MuiBox>
               <MuiBox>
@@ -220,7 +220,7 @@ export default function AdminProfile() {
                 borderRadius: '12px',
                 px: 3,
                 background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
-                color: '#1A1A1A',
+                color: 'var(--color-text-primary)',
                 boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
               }}
             >
@@ -424,7 +424,7 @@ export default function AdminProfile() {
                   borderRadius: '12px',
                   px: 4,
                   background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
-                  color: '#1A1A1A',
+                  color: 'var(--color-text-primary)',
                   boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
                   mt: 1
                 }}
@@ -524,7 +524,7 @@ export default function AdminProfile() {
             startIcon={updateProfileMutation.isPending ? <ButtonLoading /> : <Save size={18} />}
             sx={{
               background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
-              color: '#1A1A1A',
+              color: 'var(--color-text-primary)',
               boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
             }}
           >

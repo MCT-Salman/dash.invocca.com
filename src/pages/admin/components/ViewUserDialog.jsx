@@ -58,7 +58,7 @@ export default function ViewUserDialog({ open, onClose, user }) {
                                 top: 16,
                                 right: 16,
                                 backgroundColor: 'rgba(255,255,255,0.1)',
-                                color: '#fff',
+                                color: 'var(--color-text-primary)',
                                 backdropFilter: 'blur(4px)',
                                 '&:hover': {
                                     backgroundColor: 'rgba(255,255,255,0.2)',
@@ -68,7 +68,7 @@ export default function ViewUserDialog({ open, onClose, user }) {
                             <X size={20} />
                         </MuiIconButton>
 
-                        <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: '#fff' }}>
+                        <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: 'var(--color-text-primary)' }}>
                             <MuiTypography variant="h4" sx={{ fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
                                 {user.name}
                             </MuiTypography>
@@ -90,7 +90,7 @@ export default function ViewUserDialog({ open, onClose, user }) {
                                     icon={user.isActive ? <CheckCircle size={14} /> : <XCircle size={14} />}
                                     sx={{
                                         backgroundColor: user.isActive ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)',
-                                        color: user.isActive ? '#16a34a' : '#dc2626',
+                                        color: user.isActive ? 'var(--color-icon)' : 'var(--color-icon)',
                                         fontWeight: 'bold',
                                         border: 'none',
                                     }}

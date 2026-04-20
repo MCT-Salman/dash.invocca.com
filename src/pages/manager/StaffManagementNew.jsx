@@ -60,13 +60,13 @@ function StaffRoleBadge({ role }) {
 
     const roleConfig = {
 
-        manager: { label: 'مدير', color: '#9333ea', bg: '#f3e8ff', icon: Shield },
+        manager: { label: 'مدير', color: 'var(--color-icon)', bg: 'var(--color-bg)', icon: Shield },
 
-        employee: { label: 'موظف', color: '#0284c7', bg: '#e0f2fe', icon: Briefcase },
+        employee: { label: 'موظف', color: 'var(--color-icon)', bg: 'var(--color-bg)', icon: Briefcase },
 
-        supervisor: { label: 'مشرف', color: '#D99B3D', bg: '#FFF8DA', icon: Award },
+        supervisor: { label: 'مشرف', color: 'var(--color-icon)', bg: 'var(--color-bg)', icon: Award },
 
-        scanner: { label: 'ماسح', color: '#16a34a', bg: '#dcfce7', icon: QrCode },
+        scanner: { label: 'ماسح', color: 'var(--color-icon)', bg: 'var(--color-bg)', icon: QrCode },
 
     }
 
@@ -285,9 +285,9 @@ export default function StaffManagement() {
 
                             height: 40,
 
-                            background: 'linear-gradient(135deg, #FFE36C, #ffd93d)',
+                            background: 'linear-gradient(135deg, var(--color-icon), var(--color-icon))',
 
-                            color: '#1A1A1A',
+                            color: 'var(--color-text-primary)',
 
                             fontWeight: 600,
 
@@ -373,7 +373,7 @@ export default function StaffManagement() {
 
                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
 
-                        <Calendar size={14} style={{ color: '#FFE36C' }} />
+                        <Calendar size={14} style={{ color: 'var(--color-icon)' }} />
 
                         <MuiTypography variant="body2">
 
@@ -411,11 +411,11 @@ export default function StaffManagement() {
 
                         backgroundColor: value !== false ? 'rgba(22, 163, 74, 0.1)' : 'rgba(220, 38, 38, 0.1)',
 
-                        color: value !== false ? '#16a34a' : '#dc2626',
+                        color: value !== false ? 'var(--color-icon)' : 'var(--color-icon)',
 
                         fontWeight: 600,
 
-                        border: `1px solid ${value !== false ? '#16a34a' : '#dc2626'}33`,
+                        border: `1px solid ${value !== false ? 'var(--color-icon)' : 'var(--color-icon)'}33`,
 
                     }}
 
@@ -602,7 +602,7 @@ export default function StaffManagement() {
 
                             >
 
-                                <Users size={36} style={{ color: '#fff', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }} />
+                                <Users size={36} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }} />
 
                             </MuiBox>
 
@@ -844,7 +844,7 @@ export default function StaffManagement() {
 
                                 >
 
-                                    <Users size={28} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                                    <Users size={28} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
 
                                 </MuiBox>
 
@@ -950,7 +950,7 @@ export default function StaffManagement() {
 
                                     height: '3px',
 
-                                    background: 'linear-gradient(90deg, #16a34a, transparent)',
+                                    background: 'linear-gradient(90deg, var(--color-icon), transparent)',
 
                                 }
 
@@ -970,7 +970,7 @@ export default function StaffManagement() {
 
                                         borderRadius: '14px',
 
-                                        background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                                        background: 'linear-gradient(135deg, var(--color-icon), var(--color-icon))',
 
                                         display: 'flex',
 
@@ -984,7 +984,7 @@ export default function StaffManagement() {
 
                                 >
 
-                                    <UserCheck size={28} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                                    <UserCheck size={28} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
 
                                 </MuiBox>
 
@@ -1022,7 +1022,7 @@ export default function StaffManagement() {
 
                                             fontWeight: 800,
 
-                                            color: '#16a34a',
+                                            color: 'var(--color-icon)',
 
                                             fontSize: '2rem'
 
@@ -1090,7 +1090,7 @@ export default function StaffManagement() {
 
                                     height: '3px',
 
-                                    background: 'linear-gradient(90deg, #9333ea, transparent)',
+                                    background: 'linear-gradient(90deg, var(--color-icon), transparent)',
 
                                 }
 
@@ -1110,7 +1110,7 @@ export default function StaffManagement() {
 
                                         borderRadius: '14px',
 
-                                        background: 'linear-gradient(135deg, #9333ea, #7e22ce)',
+                                        background: 'linear-gradient(135deg, var(--color-icon), var(--color-icon))',
 
                                         display: 'flex',
 
@@ -1124,7 +1124,7 @@ export default function StaffManagement() {
 
                                 >
 
-                                    <Shield size={28} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                                    <Shield size={28} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
 
                                 </MuiBox>
 
@@ -1162,7 +1162,7 @@ export default function StaffManagement() {
 
                                             fontWeight: 800,
 
-                                            color: '#9333ea',
+                                            color: 'var(--color-icon)',
 
                                             fontSize: '2rem'
 
@@ -1230,7 +1230,7 @@ export default function StaffManagement() {
 
                                     height: '3px',
 
-                                    background: 'linear-gradient(90deg, #3b82f6, transparent)',
+                                    background: 'linear-gradient(90deg, var(--color-icon), transparent)',
 
                                 }
 
@@ -1250,7 +1250,7 @@ export default function StaffManagement() {
 
                                         borderRadius: '14px',
 
-                                        background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                                        background: 'linear-gradient(135deg, var(--color-icon), var(--color-icon))',
 
                                         display: 'flex',
 
@@ -1264,7 +1264,7 @@ export default function StaffManagement() {
 
                                 >
 
-                                    <Briefcase size={28} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                                    <Briefcase size={28} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
 
                                 </MuiBox>
 
@@ -1302,7 +1302,7 @@ export default function StaffManagement() {
 
                                             fontWeight: 800,
 
-                                            color: '#3b82f6',
+                                            color: 'var(--color-icon)',
 
                                             fontSize: '2rem'
 

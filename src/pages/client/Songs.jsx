@@ -375,7 +375,7 @@ export default function ClientSongs() {
           pending: 'قيد الانتظار',
         }
         const statusLabel = statusMap[value] || formatEmptyValue(value)
-        const statusColor = value === 'playing' ? '#22c55e' : value === 'played' ? '#0284c7' : value === 'paused' ? '#f97316' : value === 'pending' ? '#d99b3d' : 'var(--color-text-secondary)'
+        const statusColor = value === 'playing' ? 'var(--color-icon)' : value === 'played' ? 'var(--color-icon)' : value === 'paused' ? 'var(--color-icon)' : value === 'pending' ? 'var(--color-icon)' : 'var(--color-text-secondary)'
         return (
           <MuiChip
             label={statusLabel}
@@ -649,7 +649,7 @@ export default function ClientSongs() {
                     borderRadius: '12px',
                     py: 1.5,
                     background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
-                    color: '#1A1A1A',
+                    color: 'var(--color-text-primary)',
                     boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
                     '&:hover': {
                       background: 'linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800))',
@@ -1028,7 +1028,7 @@ function ViewSongDialog({ open, onClose, song }) {
         </MuiTypography>
       </MuiBox>
       <MuiBox sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }} />
-      <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: '#fff' }}>
+      <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: 'var(--color-text-primary)' }}>
         <MuiTypography variant="h4" sx={{ fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
           {formatEmptyValue(song.title)}
         </MuiTypography>
@@ -1204,10 +1204,10 @@ function ViewSongDialog({ open, onClose, song }) {
                                     song.playStatus === 'paused' ? 'rgba(249, 115, 22, 0.1)' :
                                     song.playStatus === 'pending' ? 'rgba(217, 155, 61, 0.1)' :
                                     'rgba(216, 185, 138, 0.1)',
-                    color: song.playStatus === 'playing' ? '#22c55e' :
-                           song.playStatus === 'played' ? '#0284c7' :
-                           song.playStatus === 'paused' ? '#f97316' :
-                           song.playStatus === 'pending' ? '#d99b3d' :
+                    color: song.playStatus === 'playing' ? 'var(--color-icon)' :
+                           song.playStatus === 'played' ? 'var(--color-icon)' :
+                           song.playStatus === 'paused' ? 'var(--color-icon)' :
+                           song.playStatus === 'pending' ? 'var(--color-icon)' :
                            'var(--color-primary-400)',
                     fontWeight: 600,
                   }}
@@ -1243,7 +1243,7 @@ function ViewSongDialog({ open, onClose, song }) {
                 size="small"
                 sx={{
                   backgroundColor: song.isExplicit ? 'rgba(220, 38, 38, 0.1)' : 'rgba(34, 197, 94, 0.1)',
-                  color: song.isExplicit ? '#dc2626' : '#22c55e',
+                  color: song.isExplicit ? 'var(--color-icon)' : 'var(--color-icon)',
                   fontWeight: 600,
                 }}
               />

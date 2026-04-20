@@ -58,10 +58,10 @@ export default function Tasks() {
                         ? 'rgba(59, 130, 246, 0.2)'
                         : 'rgba(251, 191, 36, 0.2)',
                       color: task.status === 'completed' 
-                        ? '#22c55e' 
+                        ? 'var(--color-icon)' 
                         : task.status === 'in_progress'
-                        ? '#3b82f6'
-                        : '#fbbf24',
+                        ? 'var(--color-icon)'
+                        : 'var(--color-icon)',
                       fontWeight: 600,
                     }}
                   />

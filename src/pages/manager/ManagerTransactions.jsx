@@ -27,7 +27,7 @@ import { formatCurrency, formatDate } from '@/utils/helpers'
 const premiumMenuProps = {
     PaperProps: {
         sx: {
-            bgcolor: '#1E1E1E',
+            bgcolor: 'var(--color-bg)',
             border: '1px solid rgba(216, 185, 138, 0.2)',
             borderRadius: '12px',
             mt: 1,
@@ -149,7 +149,7 @@ export default function ManagerTransactions() {
                     color: 'var(--color-primary-500)',
                     mb: 1,
                     textShadow: '0 0 30px rgba(216, 185, 138, 0.2)',
-                    background: 'linear-gradient(135deg, #D49B55 0%, #F5DEB3 50%, #D49B55 100%)',
+                    background: 'linear-gradient(135deg, var(--color-icon) 0%, var(--color-bg) 50%, var(--color-icon) 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text'
@@ -242,7 +242,7 @@ export default function ManagerTransactions() {
                         px: 3,
                         py: 1.5,
                         background: 'linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%)',
-                        color: '#000',
+                        color: 'var(--color-text-primary)',
                         fontWeight: 700,
                         boxShadow: '0 4px 15px rgba(216, 185, 138, 0.3)',
                         '&:hover': {
@@ -314,7 +314,7 @@ export default function ManagerTransactions() {
 function TransactionCard({ transaction, onEdit }) {
     const isPayment = transaction.type === 'payment'
     const isCompleted = transaction.status === 'completed'
-    const color = isPayment ? '#22c55e' : '#ef4444'
+    const color = isPayment ? 'var(--color-icon)' : 'var(--color-icon)'
 
     return (
         <MuiPaper
@@ -376,7 +376,7 @@ function TransactionCard({ transaction, onEdit }) {
                     size="small"
                     sx={{
                         backgroundColor: isCompleted ? 'rgba(34, 197, 94, 0.1)' : 'rgba(107, 114, 128, 0.1)',
-                        color: isCompleted ? '#22c55e' : 'var(--color-text-secondary)',
+                        color: isCompleted ? 'var(--color-icon)' : 'var(--color-text-secondary)',
                         fontWeight: 600,
                         borderRadius: '8px',
                         border: `1px solid ${isCompleted ? 'rgba(34, 197, 94, 0.2)' : 'rgba(107, 114, 128, 0.2)'}`
@@ -697,7 +697,7 @@ function TransactionDialog({ open, onClose, onSubmit, loading, title, transactio
                                 borderRadius: '12px',
                                 py: 1.5,
                                 background: 'linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%)',
-                                color: '#000',
+                                color: 'var(--color-text-primary)',
                                 fontWeight: 700,
                                 '&:hover': {
                                     background: 'linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%)',

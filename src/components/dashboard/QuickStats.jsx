@@ -17,7 +17,7 @@ export function QuickStatCard({
   value,
   total,
   icon: Icon,
-  color = '#D8B98A',
+  color = 'var(--color-icon)',
   trend,
   trendValue
 }) {
@@ -75,7 +75,7 @@ export function QuickStatCard({
               borderRadius: 4,
               backgroundColor: 'var(--color-surface)',
               '& .MuiLinearProgress-bar': {
-                backgroundColor: color === '#D8B98A' ? 'var(--color-primary-500)' : color,
+                backgroundColor: color === 'var(--color-icon)' ? 'var(--color-primary-500)' : color,
                 borderRadius: 4,
               }
             }}

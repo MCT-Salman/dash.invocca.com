@@ -448,7 +448,7 @@ function ServiceCard({ service }) {
 
                     >
 
-                        <CheckCircle size={24} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                        <CheckCircle size={24} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
 
                     </MuiBox>
 
@@ -604,9 +604,9 @@ function ServiceCard({ service }) {
 
                             sx={{
 
-                                backgroundColor: '#FFE36C',
+                                backgroundColor: 'var(--color-icon)',
 
-                                color: '#1A1A1A',
+                                color: 'var(--color-text-primary)',
 
                                 fontWeight: 700,
 
@@ -650,7 +650,7 @@ function ServiceCard({ service }) {
 
                                 backgroundColor: isIncluded ? 'rgba(22, 163, 74, 0.1)' : 'rgba(220, 38, 38, 0.1)',
 
-                                color: isIncluded ? '#16a34a' : '#dc2626',
+                                color: isIncluded ? 'var(--color-icon)' : 'var(--color-icon)',
 
                                 fontSize: '0.7rem',
 
@@ -1102,7 +1102,7 @@ export default function HallManagement() {
 
                             >
 
-                                <Building2 size={36} style={{ color: '#fff', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }} />
+                                <Building2 size={36} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }} />
 
                             </MuiBox>
 
@@ -1354,7 +1354,7 @@ export default function HallManagement() {
 
                             >
 
-                                <Building2 size={40} style={{ color: '#fff', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                                <Building2 size={40} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
 
                             </MuiBox>
 
@@ -1368,7 +1368,7 @@ export default function HallManagement() {
 
                                         fontWeight: 800, 
 
-                                        color: '#fff',
+                                        color: 'var(--color-text-primary)',
 
                                         mb: 1.5,
 
@@ -1898,7 +1898,7 @@ export default function HallManagement() {
 
                                                                     backgroundColor: 'rgba(22, 163, 74, 0.9)',
 
-                                                                    color: '#fff',
+                                                                    color: 'var(--color-text-primary)',
 
                                                                     fontWeight: 600,
 
@@ -1999,7 +1999,7 @@ export default function HallManagement() {
 
                             >
 
-                                <Sparkles size={28} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                                <Sparkles size={28} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
 
                             </MuiBox>
 
@@ -2165,7 +2165,7 @@ export default function HallManagement() {
 
                                 >
 
-                                    <FileImage size={28} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                                    <FileImage size={28} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
 
                                 </MuiBox>
 
@@ -2391,7 +2391,7 @@ export default function HallManagement() {
 
                                                                 backgroundColor: 'rgba(22, 163, 74, 0.1)',
 
-                                                                color: '#16a34a',
+                                                                color: 'var(--color-icon)',
 
                                                                 alignSelf: 'flex-start',
 
@@ -2495,7 +2495,7 @@ export default function HallManagement() {
 
                                 >
 
-                                    <Music size={28} style={{ color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
+                                    <Music size={28} style={{ color: 'var(--color-text-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} strokeWidth={2.5} />
 
                                 </MuiBox>
 

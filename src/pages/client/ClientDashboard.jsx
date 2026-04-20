@@ -8,7 +8,7 @@ import MuiPaper from '@/components/ui/MuiPaper'
 import MuiTypography from '@/components/ui/MuiTypography'
 import { LoadingScreen, SEOHead } from '@/components/common'
 import { QUERY_KEYS } from '@/config/constants'
-import { getClientDashboard } from '@/api/client'
+import { getClientReports } from '@/api/client'
 import { formatNumber, formatDate, formatCurrency } from '@/utils/helpers'
 import { useAuth } from '@/hooks'
 import MuiChip from '@/components/ui/MuiChip'
@@ -97,23 +97,22 @@ export default function ClientDashboard() {
   const [currentInvitationIndex, setCurrentInvitationIndex] = useState(0)
 
   const { data, isLoading } = useQuery({
-    queryKey: QUERY_KEYS.CLIENT_DASHBOARD,
-    queryFn: getClientDashboard,
+    queryKey: QUERY_KEYS.CLIENT_REPORTS,
+    queryFn: getClientReports,
   })
 
-  // Extract data from the actual API response structure
+  // Extract data from the new API response structure (/client/reports)
   const responseData = data?.data || data || {}
-  const summary = responseData.summary || {}
-  const eventsSummary = summary.events || {}
-  const invitationsSummary = summary.invitations || {}
-  const financialSummary = summary.financial || {}
-  const complaintsSummary = summary.complaints || {}
-  const nextEvent = responseData.nextEvent
-  const recentActivity = responseData.recentActivity || {}
 
-  // Get events from different possible locations
-  const bookings = responseData.allEvents || recentActivity.events || responseData.events || []
-  const invitations = recentActivity.invitations || responseData.invitations || []
+  // New structure: { hasEvent, event, invitations, dailyUsage, period }
+  const hasEvent = responseData.hasEvent || false
+  const event = responseData.event || null
+  const invitations = responseData.invitations || []
+  const dailyUsage = responseData.dailyUsage || []
+  const period = responseData.period || 'all'
+
+  // Create event as a single item array for backward compatibility
+  const bookings = event ? [event] : []
 
   // Auto scroll for events - Must be called before any conditional returns
   useEffect(() => {
@@ -194,30 +193,39 @@ export default function ClientDashboard() {
     cancelled: 'ملغي'
   }
 
-  // Calculate stats from summary
+  // Calculate stats from new API response structure
+  const sentInvitations = invitations.filter(inv => inv.status === 'sent').length
+  const usedInvitations = invitations.filter(inv => inv.used).length
+  const totalGuests = invitations.reduce((sum, inv) => sum + (inv.numOfPeople || 0), 0)
+  const checkedInGuests = invitations.reduce((sum, inv) => {
+    const checkedIn = inv.guests?.filter(g => g.checkedIn).length || 0
+    return sum + checkedIn
+  }, 0)
+  const usageRate = totalGuests > 0 ? ((checkedInGuests / totalGuests) * 100).toFixed(2) : '0.00'
+
   const stats = {
-    totalBookings: eventsSummary.total || 0,
-    totalInvitations: invitationsSummary.total || 0,
-    upcomingEvents: eventsSummary.upcoming || 0,
-    pastEvents: eventsSummary.past || 0,
-    completedEvents: eventsSummary.completed || 0,
-    cancelledEvents: eventsSummary.cancelled || 0,
-    pendingEvents: eventsSummary.pending || 0,
-    confirmedEvents: eventsSummary.confirmed || 0,
-    sentInvitations: invitationsSummary.sent || 0,
-    usedInvitations: invitationsSummary.used || 0,
-    pendingInvitations: invitationsSummary.pending || 0,
-    totalGuests: invitationsSummary.totalGuests || 0,
-    checkedInGuests: invitationsSummary.checkedInGuests || 0,
-    usageRate: invitationsSummary.usageRate || '0.00',
-    checkInRate: invitationsSummary.checkInRate || 0,
-    totalSpent: financialSummary.totalSpent || 0,
-    totalPaid: financialSummary.totalPaid || 0,
-    totalUnpaid: financialSummary.totalUnpaid || 0,
-    currency: financialSummary.currency || 'ل.س',
-    totalComplaints: complaintsSummary.total || 0,
-    openComplaints: complaintsSummary.open || 0,
-    resolvedComplaints: complaintsSummary.resolved || 0,
+    totalBookings: hasEvent ? 1 : 0,
+    totalInvitations: invitations.length,
+    upcomingEvents: hasEvent ? 1 : 0,
+    pastEvents: 0,
+    completedEvents: 0,
+    cancelledEvents: 0,
+    pendingEvents: hasEvent && event?.status === 'pending' ? 1 : 0,
+    confirmedEvents: hasEvent && event?.status === 'confirmed' ? 1 : 0,
+    sentInvitations,
+    usedInvitations,
+    pendingInvitations: invitations.filter(inv => !inv.status || inv.status !== 'sent').length,
+    totalGuests,
+    checkedInGuests,
+    usageRate,
+    checkInRate: totalGuests > 0 ? Math.round((checkedInGuests / totalGuests) * 100) : 0,
+    totalSpent: event?.totalPrice || 0,
+    totalPaid: event?.paidAmount || 0,
+    totalUnpaid: event?.remainingBalance || (event?.totalPrice || 0) - (event?.paidAmount || 0),
+    currency: 'ل.س',
+    totalComplaints: 0,
+    openComplaints: 0,
+    resolvedComplaints: 0,
   }
 
   return (
@@ -257,7 +265,7 @@ export default function ClientDashboard() {
             title="الفعاليات المكتملة"
             value={stats.completedEvents}
             icon={CheckCircle}
-            color="#22c55e"
+            color="var(--color-primary-500)"
           />
         </MuiGrid>
         <MuiGrid item xs={12} sm={6} md={3}>
@@ -265,7 +273,7 @@ export default function ClientDashboard() {
             title="الفعاليات الملغاة"
             value={stats.cancelledEvents}
             icon={XCircle}
-            color="#dc2626"
+            color="var(--color-primary-600)"
           />
         </MuiGrid>
       </MuiGrid>
@@ -285,7 +293,7 @@ export default function ClientDashboard() {
             title="الدعوات المرسلة"
             value={stats.sentInvitations}
             icon={ClipboardList}
-            color="#3b82f6"
+            color="var(--color-gold)"
           />
         </MuiGrid>
         <MuiGrid item xs={12} sm={6} md={3}>
@@ -293,7 +301,7 @@ export default function ClientDashboard() {
             title="الدعوات المستخدمة"
             value={stats.usedInvitations}
             icon={CheckCircle}
-            color="#22c55e"
+            color="var(--color-primary-500)"
           />
         </MuiGrid>
         <MuiGrid item xs={12} sm={6} md={3}>
@@ -323,7 +331,7 @@ export default function ClientDashboard() {
               '&:hover': {
                 transform: 'translateY(-4px)',
                 boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                borderColor: '#f97316',
+                borderColor: 'var(--color-primary-500)',
               },
             }}
           >
@@ -345,10 +353,10 @@ export default function ClientDashboard() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1px solid #f97316',
+                  border: '1px solid var(--color-primary-500)',
                 }}
               >
-                <DollarSign size={28} style={{ color: '#f97316' }} />
+                <DollarSign size={28} style={{ color: 'var(--color-primary-500)' }} />
               </MuiBox>
             </MuiBox>
           </MuiPaper>
@@ -368,7 +376,7 @@ export default function ClientDashboard() {
               '&:hover': {
                 transform: 'translateY(-4px)',
                 boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                borderColor: '#22c55e',
+                borderColor: 'var(--color-gold)',
               },
             }}
           >
@@ -390,10 +398,10 @@ export default function ClientDashboard() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1px solid #22c55e',
+                  border: '1px solid var(--color-gold)',
                 }}
               >
-                <TrendingUp size={28} style={{ color: '#22c55e' }} />
+                <TrendingUp size={28} style={{ color: 'var(--color-gold)' }} />
               </MuiBox>
             </MuiBox>
           </MuiPaper>
@@ -413,7 +421,7 @@ export default function ClientDashboard() {
               '&:hover': {
                 transform: 'translateY(-4px)',
                 boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                borderColor: '#dc2626',
+                borderColor: 'var(--color-icon)',
               },
             }}
           >
@@ -435,10 +443,10 @@ export default function ClientDashboard() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1px solid #dc2626',
+                  border: '1px solid var(--color-icon)',
                 }}
               >
-                <DollarSign size={28} style={{ color: '#dc2626' }} />
+                <DollarSign size={28} style={{ color: 'var(--color-icon)' }} />
               </MuiBox>
             </MuiBox>
           </MuiPaper>
@@ -453,7 +461,7 @@ export default function ClientDashboard() {
               title="إجمالي الشكاوى"
               value={stats.totalComplaints}
               icon={AlertCircle}
-              color="#f59e0b"
+              color="var(--color-gold)"
             />
           </MuiGrid>
           <MuiGrid item xs={12} sm={6} md={4}>
@@ -461,7 +469,7 @@ export default function ClientDashboard() {
               title="الشكاوى المفتوحة"
               value={stats.openComplaints}
               icon={AlertCircle}
-              color="#dc2626"
+              color="var(--color-primary-600)"
             />
           </MuiGrid>
           <MuiGrid item xs={12} sm={6} md={4}>
@@ -469,14 +477,14 @@ export default function ClientDashboard() {
               title="الشكاوى المحلولة"
               value={stats.resolvedComplaints}
               icon={CheckCircle}
-              color="#22c55e"
+              color="var(--color-primary-500)"
             />
           </MuiGrid>
         </MuiGrid>
       )}
 
       {/* Next Event */}
-      {nextEvent && (
+      {event && (
         <MuiPaper
           elevation={0}
           sx={{
@@ -492,7 +500,7 @@ export default function ClientDashboard() {
               الفعالية القادمة
             </MuiTypography>
             <MuiChip
-              label={statusLabels[nextEvent.status] || nextEvent.status}
+              label={statusLabels[event.status] || event.status}
               size="small"
               sx={{
                 backgroundColor: 'rgba(216, 185, 138, 0.1)',
@@ -504,70 +512,70 @@ export default function ClientDashboard() {
           <MuiGrid container spacing={2}>
             <MuiGrid item xs={12} md={6}>
               <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 2 }}>
-                {nextEvent.name || 'فعالية بدون اسم'}
+                {event.name || 'فعالية بدون اسم'}
               </MuiTypography>
               <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Tag size={16} style={{ color: 'var(--color-primary-400)' }} />
                   <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                    النوع: {eventTypeLabels[nextEvent.type] || nextEvent.type || '—'}
+                    النوع: {eventTypeLabels[event.type] || event.type || '—'}
                   </MuiTypography>
                 </MuiBox>
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Calendar size={16} style={{ color: 'var(--color-primary-400)' }} />
                   <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                    التاريخ: {formatDate(nextEvent.date, 'MM/DD/YYYY')}
+                    التاريخ: {formatDate(event.date, 'MM/DD/YYYY')}
                   </MuiTypography>
                 </MuiBox>
-                {nextEvent.startTime && nextEvent.endTime && (
+                {event.startTime && event.endTime && (
                   <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Clock size={16} style={{ color: 'var(--color-primary-400)' }} />
                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                      الوقت: {nextEvent.startTime} - {nextEvent.endTime}
+                      الوقت: {event.startTime} - {event.endTime}
                     </MuiTypography>
                   </MuiBox>
                 )}
-                {nextEvent.hall && (
+                {event.hall && (
                   <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Building2 size={16} style={{ color: 'var(--color-primary-400)' }} />
                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                      قاعة/صالة: {nextEvent.hall.name || '—'}
+                      قاعة/صالة: {event.hall.name || '—'}
                     </MuiTypography>
                   </MuiBox>
                 )}
-                {nextEvent.hall?.location && (
+                {event.hall?.location && (
                   <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <MapPin size={16} style={{ color: 'var(--color-primary-400)' }} />
                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                      الموقع: {nextEvent.hall.location}
+                      الموقع: {event.hall.location}
                     </MuiTypography>
                   </MuiBox>
                 )}
-                {nextEvent.guestCount && (
+                {event.guestCount && (
                   <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Users size={16} style={{ color: 'var(--color-primary-400)' }} />
                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                      عدد الضيوف: {nextEvent.guestCount}
+                      عدد الضيوف: {event.guestCount}
                     </MuiTypography>
                   </MuiBox>
                 )}
-                {nextEvent.totalPrice !== undefined && (
+                {event.totalPrice !== undefined && (
                   <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <DollarSign size={16} style={{ color: 'var(--color-primary-400)' }} />
                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                      السعر الإجمالي: {formatCurrency(nextEvent.totalPrice)}
+                      السعر الإجمالي: {formatCurrency(event.totalPrice)}
                     </MuiTypography>
                   </MuiBox>
                 )}
               </MuiBox>
             </MuiGrid>
-            {nextEvent.template?.imageUrl && (
+            {event.template?.imageUrl && (
               <MuiGrid item xs={12} md={6}>
                 <MuiBox
                   onClick={() => {
-                    const imageUrl = nextEvent.template.imageUrl?.startsWith('http')
-                      ? nextEvent.template.imageUrl
-                      : `${import.meta.env.VITE_API_BASE}${nextEvent.template.imageUrl}`
+                    const imageUrl = event.template.imageUrl?.startsWith('http')
+                      ? event.template.imageUrl
+                      : `${import.meta.env.VITE_API_BASE}${event.template.imageUrl}`
                     window.open(imageUrl, '_blank')
                   }}
                   sx={{
@@ -586,9 +594,9 @@ export default function ClientDashboard() {
                   }}
                 >
                   <img
-                    src={nextEvent.template.imageUrl?.startsWith('http')
-                      ? nextEvent.template.imageUrl
-                      : `${import.meta.env.VITE_API_BASE}${nextEvent.template.imageUrl}`}
+                    src={event.template.imageUrl?.startsWith('http')
+                      ? event.template.imageUrl
+                      : `${import.meta.env.VITE_API_BASE}${event.template.imageUrl}`}
                     alt="قالب الفعالية"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
@@ -797,7 +805,7 @@ export default function ClientDashboard() {
                         size="small"
                         sx={{
                           backgroundColor: invitation.status === 'sent' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(216, 185, 138, 0.1)',
-                          color: invitation.status === 'sent' ? '#22c55e' : 'var(--color-primary-400)',
+                          color: invitation.status === 'sent' ? 'var(--color-icon)' : 'var(--color-primary-400)',
                           fontSize: '0.7rem',
                           height: 20
                         }}
@@ -843,7 +851,7 @@ export default function ClientDashboard() {
                           sx={{
                             mt: 0.5,
                             backgroundColor: invitation.used ? 'rgba(249, 115, 22, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-                            color: invitation.used ? '#f97316' : '#3b82f6',
+                            color: invitation.used ? 'var(--color-icon)' : 'var(--color-icon)',
                             fontSize: '0.7rem',
                             height: 18,
                             width: 'fit-content'

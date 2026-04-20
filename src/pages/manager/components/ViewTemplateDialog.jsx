@@ -106,7 +106,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                         position: 'relative',
                                         width: '100%',
                                         minHeight: '400px',
-                                        backgroundColor: '#f5f5f5',
+                                        backgroundColor: 'var(--color-bg)',
                                         borderRadius: '12px',
                                         overflow: 'hidden',
                                         border: '1px solid var(--color-border-glass)',
@@ -142,7 +142,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                             bottom: 16,
                                             right: 16,
                                             backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                                            color: '#fff',
+                                            color: 'var(--color-text-primary)',
                                             px: 2,
                                             py: 1,
                                             borderRadius: '8px',
@@ -388,7 +388,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                             top: 16,
                             right: 16,
                             backgroundColor: 'rgba(255,255,255,0.1)',
-                            color: '#fff',
+                            color: 'var(--color-text-primary)',
                             backdropFilter: 'blur(4px)',
                             zIndex: 10,
                             '&:hover': {
@@ -417,7 +417,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                         <MuiIconButton
                             onClick={() => setImageZoom(prev => Math.min(prev + 0.25, 3))}
                             sx={{
-                                color: '#fff',
+                                color: 'var(--color-text-primary)',
                                 '&:hover': {
                                     backgroundColor: 'rgba(255,255,255,0.1)',
                                 }
@@ -429,7 +429,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                         <MuiIconButton
                             onClick={() => setImageZoom(prev => Math.max(prev - 0.25, 0.5))}
                             sx={{
-                                color: '#fff',
+                                color: 'var(--color-text-primary)',
                                 '&:hover': {
                                     backgroundColor: 'rgba(255,255,255,0.1)',
                                 }
@@ -441,7 +441,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                         <MuiIconButton
                             onClick={() => setImageRotation(prev => (prev + 90) % 360)}
                             sx={{
-                                color: '#fff',
+                                color: 'var(--color-text-primary)',
                                 '&:hover': {
                                     backgroundColor: 'rgba(255,255,255,0.1)',
                                 }
@@ -457,7 +457,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                 setImagePosition({ x: 0, y: 0 })
                             }}
                             sx={{
-                                color: '#fff',
+                                color: 'var(--color-text-primary)',
                                 '&:hover': {
                                     backgroundColor: 'rgba(255,255,255,0.1)',
                                 }
@@ -493,7 +493,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                                     transform: `scale(${imageZoom}) rotate(${imageRotation}deg) translate(${imagePosition.x / imageZoom}px, ${imagePosition.y / imageZoom}px)`,
                                     transition: isDragging ? 'none' : 'transform 0.3s ease',
                                     userSelect: 'none',
-                                    backgroundColor: '#fff',
+                                    backgroundColor: 'var(--color-text-primary)',
                                     borderRadius: '8px',
                                     boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
                                 }}
@@ -510,7 +510,7 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                             left: '50%',
                             transform: 'translateX(-50%)',
                             backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                            color: '#fff',
+                            color: 'var(--color-text-primary)',
                             px: 2,
                             py: 1,
                             borderRadius: '8px',

@@ -214,7 +214,7 @@ export default function ClientRatings() {
                 alignItems: 'center',
                 gap: 1.5,
                 background: 'linear-gradient(145deg, rgba(216, 185, 138, 0.1) 0%, rgba(0, 0, 0, 0) 100%)',
-                border: '1px solid rgba(212, 155, 85, 0.5)', // Light shade of primary-400 (#D49B55)
+                border: '1px solid rgba(212, 155, 85, 0.5)', // Light shade of primary-400 (var(--color-icon))
                 borderRadius: '16px'
               }}
             >

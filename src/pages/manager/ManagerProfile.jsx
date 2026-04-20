@@ -360,7 +360,7 @@ export default function ManagerProfile() {
 
                     borderRadius: '50%',
 
-                    background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                    background: 'linear-gradient(135deg, var(--color-icon), var(--color-icon))',
 
                     display: 'flex',
 
@@ -374,7 +374,7 @@ export default function ManagerProfile() {
 
                 >
 
-                  <Briefcase size={16} style={{ color: '#fff' }} />
+                  <Briefcase size={16} style={{ color: 'var(--color-text-primary)' }} />
 
                 </MuiBox>
 
@@ -434,7 +434,7 @@ export default function ManagerProfile() {
 
                 background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
 
-                color: '#1A1A1A',
+                color: 'var(--color-text-primary)',
 
                 boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
 
@@ -840,7 +840,7 @@ export default function ManagerProfile() {
 
                   background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
 
-                  color: '#1A1A1A',
+                  color: 'var(--color-text-primary)',
 
                   boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
 
@@ -1040,7 +1040,7 @@ export default function ManagerProfile() {
 
               background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
 
-              color: '#1A1A1A',
+              color: 'var(--color-text-primary)',
 
               boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
 

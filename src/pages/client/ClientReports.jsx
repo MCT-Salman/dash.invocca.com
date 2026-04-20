@@ -307,7 +307,7 @@ export default function ClientReports() {
                 margin: '0 auto 1rem',
               }}
             >
-              <DollarSign size={28} style={{ color: '#22c55e' }} />
+              <DollarSign size={28} style={{ color: 'var(--color-icon)' }} />
             </MuiBox>
             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1 }}>
               إجمالي المبلغ
@@ -341,7 +341,7 @@ export default function ClientReports() {
                 margin: '0 auto 1rem',
               }}
             >
-              <TrendingUp size={28} style={{ color: '#f97316' }} />
+              <TrendingUp size={28} style={{ color: 'var(--color-icon)' }} />
             </MuiBox>
             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1 }}>
               المدفوع
@@ -375,7 +375,7 @@ export default function ClientReports() {
                 margin: '0 auto 1rem',
               }}
             >
-              <DollarSign size={28} style={{ color: '#dc2626' }} />
+              <DollarSign size={28} style={{ color: 'var(--color-icon)' }} />
             </MuiBox>
             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1 }}>
               المتبقي

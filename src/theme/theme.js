@@ -6,56 +6,56 @@ export const createAppTheme = (mode = 'light') => createTheme({
   palette: {
     mode: mode,
     primary: {
-      light: '#B58463', // var(--color-primary-400)
-      main: '#9C6644',  // var(--color-primary-500)
-      dark: '#6B4423',  // var(--color-primary-700)
-      contrastText: mode === 'dark' ? '#000000' : '#ffffff',
+      light: '#D8B98A',
+      main: '#D8B98A',
+      dark: '#D8B98A',
+      contrastText: mode === 'dark' ? '#1A1A1A' : '#FFF8DA',
     },
     secondary: {
-      light: '#d6d3d1', // var(--color-secondary-300)
-      main: '#78716c',  // var(--color-secondary-500)
-      dark: '#44403c',  // var(--color-secondary-700)
-      contrastText: '#ffffff',
+      light: mode === 'dark' ? '#FFF8DA' : '#1A1A1A',
+      main: mode === 'dark' ? '#FFF8DA' : '#1A1A1A',
+      dark: mode === 'dark' ? '#FFF8DA' : '#1A1A1A',
+      contrastText: mode === 'dark' ? '#1A1A1A' : '#FFF8DA',
     },
     success: {
-      light: '#f0fdf4', // var(--color-success-50)
-      main: '#15803d',  // var(--color-success-500)
-      dark: '#14532d',  // var(--color-success-700)
-      contrastText: '#ffffff',
+      light: '#D8B98A',
+      main: '#D8B98A',
+      dark: '#D8B98A',
+      contrastText: mode === 'dark' ? '#1A1A1A' : '#FFF8DA',
     },
     error: {
-      light: '#fef2f2', // var(--color-error-50)
-      main: '#dc2626',  // var(--color-error-500)
-      dark: '#991b1b',  // var(--color-error-700)
-      contrastText: '#ffffff',
+      light: '#D8B98A',
+      main: '#D8B98A',
+      dark: '#D8B98A',
+      contrastText: mode === 'dark' ? '#1A1A1A' : '#FFF8DA',
     },
     warning: {
-      light: '#fffbeb', // var(--color-warning-50)
-      main: '#ca8a04',  // var(--color-warning-500)
-      dark: '#854d0e',  // var(--color-warning-700)
-      contrastText: '#ffffff',
+      light: '#D8B98A',
+      main: '#D8B98A',
+      dark: '#D8B98A',
+      contrastText: mode === 'dark' ? '#1A1A1A' : '#FFF8DA',
     },
     info: {
-      light: '#eff6ff', // var(--color-info-50)
-      main: '#2563eb',  // var(--color-info-500)
-      dark: '#1e3a8a',  // var(--color-info-700)
-      contrastText: '#ffffff',
+      light: '#D8B98A',
+      main: '#D8B98A',
+      dark: '#D8B98A',
+      contrastText: mode === 'dark' ? '#1A1A1A' : '#FFF8DA',
     },
     background: {
-      default: mode === 'dark' ? '#050505' : '#FDFCFB',
-      paper: mode === 'dark' ? '#0F0F0F' : '#ffffff',
+      default: mode === 'dark' ? '#1A1A1A' : '#FFF8DA',
+      paper: mode === 'dark' ? '#1A1A1A' : '#FFF8DA',
     },
     text: {
-      primary: mode === 'dark' ? '#EDEDED' : '#2C1810',
-      secondary: mode === 'dark' ? '#A1A1AA' : '#582F0E',
-      disabled: mode === 'dark' ? '#52525B' : '#82736C',
+      primary: mode === 'dark' ? '#FFF8DA' : '#1A1A1A',
+      secondary: mode === 'dark' ? '#FFF8DA' : '#1A1A1A',
+      disabled: mode === 'dark' ? '#FFF8DA' : '#1A1A1A',
     },
     action: {
-      active: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.54)',
-      hover: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-      selected: mode === 'dark' ? 'rgba(255, 255, 255, 0.16)' : 'rgba(0, 0, 0, 0.08)',
-      disabled: mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.26)',
-      disabledBackground: mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
+      active: '#D8B98A',
+      hover: mode === 'dark' ? 'rgba(255, 248, 218, 0.10)' : 'rgba(26, 26, 26, 0.10)',
+      selected: mode === 'dark' ? 'rgba(255, 248, 218, 0.16)' : 'rgba(26, 26, 26, 0.16)',
+      disabled: mode === 'dark' ? 'rgba(255, 248, 218, 0.40)' : 'rgba(26, 26, 26, 0.40)',
+      disabledBackground: mode === 'dark' ? 'rgba(255, 248, 218, 0.12)' : 'rgba(26, 26, 26, 0.12)',
     },
   },
   typography: {
@@ -99,6 +99,9 @@ export const createAppTheme = (mode = 'light') => createTheme({
             backgroundColor: 'var(--color-bg)',
           },
         },
+        'svg, .lucide, .MuiSvgIcon-root': {
+          color: 'var(--color-icon)',
+        },
       },
     },
     MuiButton: {
@@ -109,6 +112,15 @@ export const createAppTheme = (mode = 'light') => createTheme({
         root: {
           borderRadius: 10,
           textTransform: 'none',
+          color: 'var(--color-text-primary)',
+        },
+      },
+    },
+    MuiBadge: {
+      styleOverrides: {
+        badge: {
+          backgroundColor: 'var(--color-icon)',
+          color: 'var(--color-dark)',
         },
       },
     },
