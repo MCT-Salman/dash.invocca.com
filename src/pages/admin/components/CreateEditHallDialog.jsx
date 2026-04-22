@@ -84,7 +84,7 @@ const createHallSchema = (editingHall = null) => z.object({
 
     defaultPrices: z.coerce.number().min(0, 'السعر مطلوب').max(1000000, 'السعر كبير جداً'),
 
-
+    maxEmployees: z.coerce.number().min(0, 'عدد الموظفين مطلوب').max(10000, 'عدد الموظفين كبير جداً').optional(),
 
     managerName: z.string().min(1, 'اسم المدير مطلوب'),
 
@@ -227,6 +227,8 @@ export default function CreateEditHallDialog({
 
             defaultPrices: editingHall?.defaultPrices || '',
 
+            maxEmployees: editingHall?.maxEmployees || '',
+
             managerName: editingHall?.generalManager?.name || editingHall?.managerName || '',
 
             managerUsername: editingHall?.generalManager?.username || editingHall?.managerUsername || '',
@@ -261,7 +263,7 @@ export default function CreateEditHallDialog({
 
     useEffect(() => {
 
-        if (!selectedManagerName || !managersList.length) return
+        if (editingHall || !selectedManagerName || !managersList.length) return
 
         const manager = managersList.find(m => m.name === selectedManagerName || m._id === selectedManagerName)
 
@@ -319,6 +321,8 @@ export default function CreateEditHallDialog({
 
                     defaultPrices: editingHall.defaultPrices,
 
+                    maxEmployees: editingHall.maxEmployees || '',
+
                     managerName: editingHall.generalManager?.name || editingHall.managerName || '',
 
                     managerUsername: editingHall.generalManager?.username || editingHall.managerUsername || '',
@@ -360,6 +364,8 @@ export default function CreateEditHallDialog({
                     tables: '',
 
                     defaultPrices: '',
+
+                    maxEmployees: '',
 
                     managerName: '',
 
@@ -496,6 +502,30 @@ export default function CreateEditHallDialog({
             formData.append('generalManagerPhone', data.managerPhone)
 
             formData.append('generalManager[phone]', data.managerPhone)
+
+        }
+
+
+
+        // When editing, also send manager name and username in generalManager format
+
+        if (editingHall) {
+
+            if (data.managerName) {
+
+                formData.append('generalManagerName', data.managerName)
+
+                formData.append('generalManager[name]', data.managerName)
+
+            }
+
+            if (data.managerUsername) {
+
+                formData.append('generalManagerUsername', data.managerUsername)
+
+                formData.append('generalManager[username]', data.managerUsername)
+
+            }
 
         }
 
@@ -875,6 +905,40 @@ export default function CreateEditHallDialog({
 
 
 
+                <MuiGrid item xs={6} md={3}>
+
+                    <Controller
+
+                        name="maxEmployees"
+
+                        control={control}
+
+                        render={({ field }) => (
+
+                            <MuiTextField
+
+                                {...field}
+
+                                label="الحد الأقصى للموظفين"
+
+                                type="number"
+
+                                fullWidth
+
+                                error={!!errors.maxEmployees}
+
+                                helperText={errors.maxEmployees?.message}
+
+                            />
+
+                        )}
+
+                    />
+
+                </MuiGrid>
+
+
+
                 <MuiGrid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'center' }}>
 
                     <Controller
@@ -929,35 +993,55 @@ export default function CreateEditHallDialog({
 
                         render={({ field }) => (
 
-                            <MuiSelect
+                            editingHall ? (
 
-                                {...field}
+                                <MuiTextField
 
-                                label="تحديد المدير"
+                                    {...field}
 
-                                fullWidth
+                                    label="اسم المدير"
 
-                                error={!!errors.managerName}
+                                    fullWidth
 
-                                helperText={errors.managerName?.message}
+                                    error={!!errors.managerName}
 
-                                displayEmpty
+                                    helperText={errors.managerName?.message}
 
-                            >
+                                />
 
-                                <MuiMenuItem value="" disabled>اختر المدير</MuiMenuItem>
+                            ) : (
 
-                                {managersList.map((manager) => (
+                                <MuiSelect
 
-                                    <MuiMenuItem key={manager._id || manager.id} value={manager.name}>
+                                    {...field}
 
-                                        {manager.name} ({manager.phone})
+                                    label="تحديد المدير"
 
-                                    </MuiMenuItem>
+                                    fullWidth
 
-                                ))}
+                                    error={!!errors.managerName}
 
-                            </MuiSelect>
+                                    helperText={errors.managerName?.message}
+
+                                    displayEmpty
+
+                                >
+
+                                    <MuiMenuItem value="" disabled>اختر المدير</MuiMenuItem>
+
+                                    {managersList.map((manager) => (
+
+                                        <MuiMenuItem key={manager._id || manager.id} value={manager.name}>
+
+                                            {manager.name} ({manager.phone})
+
+                                        </MuiMenuItem>
+
+                                    ))}
+
+                                </MuiSelect>
+
+                            )
 
                         )}
 
@@ -989,7 +1073,7 @@ export default function CreateEditHallDialog({
 
                                 helperText={errors.managerUsername?.message}
 
-                                disabled
+                                disabled={!editingHall}
 
                             />
 
@@ -1023,7 +1107,7 @@ export default function CreateEditHallDialog({
 
                                 helperText={errors.managerPhone?.message}
 
-                                disabled
+                                disabled={!editingHall}
 
                             />
 

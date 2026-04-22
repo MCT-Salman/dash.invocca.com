@@ -11,6 +11,7 @@ import MuiTypography from '@/components/ui/MuiTypography'
 import MuiDivider from '@mui/material/Divider'
 import MuiTooltip from '@mui/material/Tooltip'
 import { useAuth, useMediaQuery } from '@/hooks'
+import { useTheme } from '@/contexts/ThemeContext'
 import { ROLE_MENUS } from './menuConfig'
 import { LogOut } from 'lucide-react'
 import { useState } from 'react'
@@ -21,6 +22,7 @@ const DRAWER_WIDTH_COLLAPSED = 80
 
 export default function Sidebar({ open, onClose, variant = 'permanent', collapsed, onCollapsedChange }) {
   const { user, logout } = useAuth()
+  const { isDark } = useTheme()
   const location = useLocation()
   const navigate = useNavigate()
   const isMobile = useMediaQuery('(max-width: 900px)')
@@ -115,9 +117,9 @@ export default function Sidebar({ open, onClose, variant = 'permanent', collapse
           }}
         >
           <img
-            src="/logo/logo-white.png"
+            src={isDark ? "/logo/logo-white.png" : "/logo/invocca_icon.png"}
             alt="INVOCCA"
-            style={{ width: collapsed ? 24 : 28, height: collapsed ? 24 : 28, objectFit: 'contain', filter: 'brightness(0) saturate(100%)' }}
+            style={{ width: collapsed ? 24 : 28, height: collapsed ? 24 : 28, objectFit: 'contain' }}
           />
         </MuiBox>
         {!collapsed && (

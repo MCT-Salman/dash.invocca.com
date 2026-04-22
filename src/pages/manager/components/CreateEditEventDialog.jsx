@@ -84,7 +84,7 @@ const createEventSchema = (editingEvent = null) => {
             scannerId: z.string().min(1, 'الماسح مطلوب')
         })).min(1, 'يجب اختيار ماسح واحد على الأقل للفعالية'),
 
-        clientSelection: z.enum(['existing', 'new']).default('new'),
+        clientSelection: z.enum(['existing', 'new', 'edit']).default('new'),
 
         clientId: z.string().optional(),
 
@@ -114,7 +114,7 @@ const createEventSchema = (editingEvent = null) => {
 
             }
 
-        } else {
+        } else if (data.clientSelection === 'new') {
 
             // New client - all fields are required
 
@@ -231,6 +231,84 @@ const createEventSchema = (editingEvent = null) => {
                         message: 'كلمة المرور يجب أن تحتوي على رقم على الأقل',
 
                     })
+
+                }
+
+            }
+
+        } else if (data.clientSelection === 'edit') {
+
+            // Edit existing client - name and phone required, password optional
+
+            if (!data.clientName || !data.clientName.trim()) {
+
+                ctx.addIssue({
+
+                    code: z.ZodIssueCode.custom,
+
+                    message: 'اسم العميل مطلوب',
+
+                    path: ['clientName']
+
+                })
+
+            }
+
+            if (!data.clientusername || !data.clientusername.trim()) {
+
+                ctx.addIssue({
+
+                    code: z.ZodIssueCode.custom,
+
+                    message: 'اسم المستخدم مطلوب',
+
+                    path: ['clientusername']
+
+                })
+
+            }
+
+            if (!data.phone || !data.phone.trim()) {
+
+                ctx.addIssue({
+
+                    code: z.ZodIssueCode.custom,
+
+                    message: 'رقم الهاتف مطلوب',
+
+                    path: ['phone']
+
+                })
+
+            }
+
+            // Password is optional when editing - only validate if provided
+
+            if (data.password && data.password.trim()) {
+
+                const password = data.password.trim()
+
+                if (password.length < 6) {
+
+                    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['password'], message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' })
+
+                }
+
+                if (!/[A-Z]/.test(password)) {
+
+                    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['password'], message: 'كلمة المرور يجب أن تحتوي على حرف كبير على الأقل' })
+
+                }
+
+                if (!/[a-z]/.test(password)) {
+
+                    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['password'], message: 'كلمة المرور يجب أن تحتوي على حرف صغير على الأقل' })
+
+                }
+
+                if (!/[0-9]/.test(password)) {
+
+                    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['password'], message: 'كلمة المرور يجب أن تحتوي على رقم على الأقل' })
 
                 }
 
@@ -543,15 +621,15 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
                 })).filter(s => s.scannerId) || [{ scannerId: '' }]),
 
-            clientSelection: editingEvent ? 'existing' : 'new',
+            clientSelection: editingEvent ? 'edit' : 'new',
 
             clientId: editingEvent?.clientId?._id || editingEvent?.clientId || editingEvent?.client?._id || '',
 
-            clientName: '',
+            clientName: editingEvent?.clientId?.name || editingEvent?.client?.name || '',
 
-            clientusername: '',
+            clientusername: editingEvent?.clientId?.username || editingEvent?.client?.username || '',
 
-            phone: '',
+            phone: editingEvent?.clientId?.phone || editingEvent?.client?.phone || '',
 
             password: ''
 
@@ -661,15 +739,15 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
                     })).filter(s => s.scannerId) || []),
 
-                clientSelection: 'existing',
+                clientSelection: 'edit',
 
                 clientId: editingEvent.clientId?._id || editingEvent.clientId || editingEvent.client?._id || '',
 
-                clientName: '',
+                clientName: editingEvent.clientId?.name || editingEvent.client?.name || '',
 
-                clientusername: '',
+                clientusername: editingEvent.clientId?.username || editingEvent.client?.username || '',
 
-                phone: '',
+                phone: editingEvent.clientId?.phone || editingEvent.client?.phone || '',
 
                 password: ''
 
@@ -802,10 +880,46 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
             submitData.clientId = data.clientId.trim()
 
+        } else if (clientSelection === 'edit') {
+
+            // Edit existing client - send client fields with clientId
+
+            const clientName = (data.clientName || '').trim()
+
+            const clientusername = (data.clientusername || '').trim()
+
+            const phone = (data.phone || '').trim()
+
+            const password = (data.password || '').trim()
+
+
+            if (!clientName || !clientusername || !phone) {
+
+                showNotification({
+
+                    title: 'خطأ',
+
+                    message: 'يرجى إدخال اسم العميل واسم المستخدم ورقم الهاتف',
+
+                    type: 'error'
+
+                })
+
+                return
+
+            }
+
+            submitData.clientId = data.clientId || (editingEvent?.clientId?._id || editingEvent?.clientId || editingEvent?.client?._id || '')
+            submitData.clientName = clientName
+            submitData.clientusername = clientusername
+            submitData.phone = phone
+            if (password) {
+                submitData.password = password
+            }
+
         } else {
 
             // New client - API expects 'name' for the client
-
             // Ensure all required fields are present and not empty
 
             const clientName = (data.clientName || '').trim()
@@ -815,7 +929,6 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
             const phone = (data.phone || '').trim()
 
             const password = (data.password || '').trim()
-
 
 
             if (!clientName || !phone || !password) {
@@ -1404,13 +1517,15 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
                             >
 
-                                <MuiMenuItem value="existing">عميل موجود</MuiMenuItem>
+                                {editingEvent && (
 
-                                {!editingEvent && (
-
-                                    <MuiMenuItem value="new">عميل جديد</MuiMenuItem>
+                                    <MuiMenuItem value="edit">تعديل بيانات العميل</MuiMenuItem>
 
                                 )}
+
+                                <MuiMenuItem value="existing">عميل موجود</MuiMenuItem>
+
+                                <MuiMenuItem value="new">عميل جديد</MuiMenuItem>
 
                             </MuiSelect>
 
@@ -1598,13 +1713,13 @@ export default function CreateEditEventDialog({ open, onClose, onSubmit, editing
 
                                         {...field}
 
-                                        label="كلمة المرور"
+                                        label={clientSelection === 'edit' ? "كلمة المرور (اتركها فارغة لعدم التغيير)" : "كلمة المرور"}
 
                                         type="password"
 
                                         fullWidth
 
-                                        required
+                                        required={clientSelection !== 'edit'}
 
                                         error={!!errors.password}
 
