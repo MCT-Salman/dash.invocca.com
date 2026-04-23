@@ -84,6 +84,8 @@ import {
 
   ConfirmDialog,
 
+  AdvancedFilter,
+
 } from '@/components/common'
 
 import { BaseViewDialog } from '@/components/shared'
@@ -114,11 +116,11 @@ export default function ManagerSongsManagement() {
 
   const [activeTab, setActiveTab] = useState(0)
 
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
-  const debouncedSearch = useDebounce(searchTerm, 400)
+  const [activeFilters, setActiveFilters] = useState({})
 
-  const [categoryFilter, setCategoryFilter] = useState('all')
+  const debouncedSearch = useDebounce(searchQuery, 400)
 
 
 
@@ -214,19 +216,23 @@ export default function ManagerSongsManagement() {
 
     }
 
-
-
-    if (categoryFilter && categoryFilter !== 'all') {
-
-      list = list.filter((song) => song.category === categoryFilter)
-
+    // Apply category filter
+    if (activeFilters.category) {
+      list = list.filter((song) => song.category === activeFilters.category)
     }
 
-
+    // Apply status filter
+    if (activeFilters.status) {
+      list = list.filter((song) => {
+        if (activeFilters.status === 'active') return song.isActive === true
+        if (activeFilters.status === 'inactive') return song.isActive === false
+        return true
+      })
+    }
 
     return list
 
-  }, [songs, debouncedSearch, categoryFilter])
+  }, [songs, debouncedSearch, activeFilters])
 
 
 
@@ -379,6 +385,32 @@ export default function ManagerSongsManagement() {
     other: { label: 'أخرى', color: 'default' },
 
   }
+
+  // Filter configuration for AdvancedFilter
+  const filterConfig = useMemo(() => {
+    return [
+      {
+        key: 'category',
+        label: 'الفئة',
+        type: 'select',
+        options: [
+          { value: 'wedding', label: 'زفاف' },
+          { value: 'party', label: 'حفلة' },
+          { value: 'slow', label: 'هادئة' },
+          { value: 'other', label: 'أخرى' }
+        ]
+      },
+      {
+        key: 'status',
+        label: 'الحالة',
+        type: 'select',
+        options: [
+          { value: 'active', label: 'نشطة' },
+          { value: 'inactive', label: 'غير نشطة' }
+        ]
+      }
+    ]
+  }, [])
 
 
 
@@ -854,125 +886,29 @@ export default function ManagerSongsManagement() {
 
         <>
 
-      {/* Filters */}
+      {/* Advanced Filter */}
+      <AdvancedFilter
+        onSearch={setSearchQuery}
+        onFilterChange={setActiveFilters}
+        filters={filterConfig}
+        onRefresh={refetch}
+        searchPlaceholder="بحث..."
+      />
 
-      <MuiPaper
-
-        elevation={0}
-
-        sx={{
-
-          p: 3,
-
-          mb: 3,
-
-          background: 'var(--color-paper)',
-
-          border: '1px solid var(--color-border-glass)',
-
-          borderRadius: '16px',
-
-        }}
-
-      >
-
-        <MuiGrid container spacing={2} alignItems="center">
-
-          <MuiGrid item xs={12} md={6}>
-
-            <MuiTextField
-
-              fullWidth
-
-              placeholder="بحث عن أغنية أو فنان..."
-
-              value={searchTerm}
-
-              onChange={(e) => setSearchTerm(e.target.value)}
-
-              InputProps={{
-
-                startAdornment: (
-
-                  <MuiInputAdornment position="start">
-
-                    <Search size={18} style={{ color: 'var(--color-text-secondary)' }} />
-
-                  </MuiInputAdornment>
-
-                ),
-
-              }}
-
-            />
-
-          </MuiGrid>
-
-          <MuiGrid item xs={12} md={3}>
-
-            <MuiSelect
-
-              fullWidth
-
-              value={categoryFilter}
-
-              onChange={(e) => setCategoryFilter(e.target.value)}
-
-            >
-
-              <MuiMenuItem value="all">كل الفئات</MuiMenuItem>
-
-              <MuiMenuItem value="wedding">زفاف</MuiMenuItem>
-
-              <MuiMenuItem value="party">حفلة</MuiMenuItem>
-
-              <MuiMenuItem value="slow">هادئة</MuiMenuItem>
-
-              <MuiMenuItem value="other">أخرى</MuiMenuItem>
-
-            </MuiSelect>
-
-          </MuiGrid>
-
-          <MuiGrid item xs={12} md={3}>
-
-            <MuiBox sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-
-              <MuiButton
-
-                variant="contained"
-
-                color="primary"
-
-                startIcon={<Plus size={18} />}
-
-                onClick={handleCreateClick}
-
-              >
-
-                إضافة أغنية
-
-              </MuiButton>
-
-              <MuiIconButton color="info" onClick={handleRefresh}>
-
-                <RefreshCw size={18} />
-
-              </MuiIconButton>
-
-              <MuiIconButton color="success" onClick={handleExport}>
-
-                <Download size={18} />
-
-              </MuiIconButton>
-
-            </MuiBox>
-
-          </MuiGrid>
-
-        </MuiGrid>
-
-      </MuiPaper>
+      {/* Action Buttons */}
+      <MuiBox sx={{ display: 'flex', gap: 1, mb: 3, justifyContent: 'flex-end' }}>
+        <MuiButton
+          variant="contained"
+          color="primary"
+          startIcon={<Plus size={18} />}
+          onClick={handleCreateClick}
+        >
+          إضافة أغنية
+        </MuiButton>
+        <MuiIconButton color="success" onClick={handleExport}>
+          <Download size={18} />
+        </MuiIconButton>
+      </MuiBox>
 
 
 

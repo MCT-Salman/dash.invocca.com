@@ -501,7 +501,7 @@ function TransactionDialog({ open, onClose, onSubmit, loading, title, transactio
     }, [open, transaction])
 
     const handleSubmit = (e) => {
-        e.preventDefault()
+        if (e && typeof e.preventDefault === 'function') e.preventDefault()
         onSubmit(formData)
     }
 

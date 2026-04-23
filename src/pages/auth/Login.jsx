@@ -3,7 +3,7 @@
  * صفحة تسجيل الدخول
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -15,7 +15,7 @@ import MuiTypography from '@/components/ui/MuiTypography'
 import MuiAlert from '@/components/ui/MuiAlert'
 import AuthLayout from '@/components/layout/AuthLayout'
 import { useAuth, useNotification } from '@/hooks'
-import { ROUTES, VALIDATION, MESSAGES } from '@/config/constants'
+import { ROUTES, VALIDATION, MESSAGES, USER_ROLES } from '@/config/constants'
 import { ButtonLoading } from '@/components/common'
 import { Lock, Phone, Eye, EyeOff } from 'lucide-react'
 import MuiIconButton from '@/components/ui/MuiIconButton'
@@ -33,12 +33,38 @@ const loginSchema = z.object({
 
 export default function Login() {
     const navigate = useNavigate()
-    const { login } = useAuth()
+    const { login, user, isAuthenticated, isLoading: authLoading } = useAuth()
     const { success, error: showError } = useNotification()
 
     const [isLoading, setIsLoading] = useState(false)
     const [serverError, setServerError] = useState('')
     const [showPassword, setShowPassword] = useState(false)
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (!authLoading && isAuthenticated && user) {
+            const userRoles = Array.isArray(user.role) ? user.role : [user.role]
+            const primaryRole = userRoles[0]
+
+            switch (primaryRole) {
+                case USER_ROLES.ADMIN:
+                    navigate(ROUTES.ADMIN.DASHBOARD)
+                    break
+                case USER_ROLES.MANAGER:
+                    navigate(ROUTES.MANAGER.DASHBOARD)
+                    break
+                case USER_ROLES.CLIENT:
+                    navigate(ROUTES.CLIENT.DASHBOARD)
+                    break
+                case USER_ROLES.EMPLOYEE:
+                case 'scanner':
+                    navigate(ROUTES.EMPLOYEE.DASHBOARD)
+                    break
+                default:
+                    navigate(ROUTES.HOME)
+            }
+        }
+    }, [authLoading, isAuthenticated, user, navigate])
 
     // Form setup
     const {

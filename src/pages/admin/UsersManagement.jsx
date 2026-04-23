@@ -18,7 +18,7 @@ import MuiTab from '@mui/material/Tab'
 import Box from '@mui/material/Box'
 
 // Layout & Common Components
-import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog, PageHeader, StatCard } from '@/components/common'
+import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog, PageHeader, StatCard, AdvancedFilter } from '@/components/common'
 import ViewUserDialog from './components/ViewUserDialog'
 import CreateAdminDialog from './components/CreateAdminDialog'
 import EditUserDialog from './components/EditUserDialog'
@@ -78,8 +78,9 @@ export default function UsersManagement() {
   const { success, error: showError } = useNotification()
 
   // State
-  const [searchTerm, setSearchTerm] = useState('')
-  const debouncedSearch = useDebounce(searchTerm, 500)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [activeFilters, setActiveFilters] = useState({})
+  const debouncedSearch = useDebounce(searchQuery, 500)
   // Show only admins by default
   const [roleFilter, setRoleFilter] = useState(USER_ROLES.ADMIN)
 
@@ -121,6 +122,37 @@ export default function UsersManagement() {
 
   const users = usersData?.users || usersData?.data || []
 
+  // Filter configuration for AdvancedFilter
+  const filterConfig = useMemo(() => {
+    return [
+      {
+        key: 'role',
+        label: 'الدور',
+        type: 'select',
+        options: [
+          { value: USER_ROLES.ADMIN, label: 'مدير نظام' },
+          { value: USER_ROLES.MANAGER, label: 'مدير قاعة/صالة' },
+          { value: USER_ROLES.CLIENT, label: 'عميل' },
+          { value: USER_ROLES.EMPLOYEE, label: 'موظف' }
+        ]
+      },
+      {
+        key: 'status',
+        label: 'الحالة',
+        type: 'select',
+        options: [
+          { value: 'active', label: 'نشط' },
+          { value: 'inactive', label: 'معطل' }
+        ]
+      },
+      {
+        key: 'createdAt',
+        label: 'تاريخ الإنشاء',
+        type: 'dateRange'
+      }
+    ]
+  }, [])
+
   // Filtered Users
   const filteredUsers = useMemo(() => {
     let filtered = Array.isArray(users) ? users : []
@@ -133,6 +165,44 @@ export default function UsersManagement() {
       )
     }
 
+    // Apply role filter from activeFilters
+    if (activeFilters.role && activeFilters.role !== 'all') {
+      filtered = filtered.filter(user => {
+        const userRoles = Array.isArray(user.role) ? user.role : [user.role]
+        return userRoles.includes(activeFilters.role)
+      })
+    }
+
+    // Apply status filter from activeFilters
+    if (activeFilters.status) {
+      filtered = filtered.filter(user => {
+        if (activeFilters.status === 'active') return user.isActive !== false
+        if (activeFilters.status === 'inactive') return user.isActive === false
+        return true
+      })
+    }
+
+    // Apply date range filter
+    if (activeFilters.dateFrom || activeFilters.dateTo) {
+      filtered = filtered.filter(user => {
+        if (!user.createdAt) return false
+        const userDate = new Date(user.createdAt)
+        const fromDate = activeFilters.dateFrom ? new Date(activeFilters.dateFrom) : null
+        const toDate = activeFilters.dateTo ? new Date(activeFilters.dateTo) : null
+
+        // Set toDate to end of day to include the selected date
+        if (toDate) {
+          toDate.setHours(23, 59, 59, 999)
+        }
+
+        if (fromDate && userDate < fromDate) return false
+        if (toDate && userDate > toDate) return false
+
+        return true
+      })
+    }
+
+    // Apply default role filter for admins
     if (roleFilter !== 'all') {
       filtered = filtered.filter(user => {
         const userRoles = Array.isArray(user.role) ? user.role : [user.role]
@@ -141,7 +211,7 @@ export default function UsersManagement() {
     }
 
     return filtered
-  }, [users, debouncedSearch, roleFilter])
+  }, [users, debouncedSearch, activeFilters, roleFilter])
 
   // Table Columns
   const columns = [
@@ -310,29 +380,14 @@ export default function UsersManagement() {
         </MuiGrid>
       </MuiGrid>
 
-      {/* Search & Filter */}
-      <MuiPaper
-        elevation={0}
-        sx={{
-          p: 2,
-          mb: 3,
-          background: 'var(--color-paper)',
-          border: '1px solid var(--color-border)',
-          borderRadius: '16px'
-        }}
-      >
-        <MuiGrid container spacing={2} alignItems="center">
-          <MuiGrid item xs={12} md={12}>
-            <MuiTextField
-              fullWidth
-              placeholder="البحث بالاسم، الهاتف، أو البريد..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              startIcon={<Search size={20} />}
-            />
-          </MuiGrid>
-        </MuiGrid>
-      </MuiPaper>
+      {/* Advanced Filter */}
+      <AdvancedFilter
+        onSearch={setSearchQuery}
+        onFilterChange={setActiveFilters}
+        filters={filterConfig}
+        onRefresh={refetch}
+        searchPlaceholder="بحث..."
+      />
 
       {/* Tabs hidden - only showing admins */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3, display: 'none' }}>

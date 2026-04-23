@@ -16,11 +16,13 @@ import MuiIconButton from '@/components/ui/MuiIconButton'
 
 import MuiChip from '@/components/ui/MuiChip'
 
-import { LoadingScreen, EmptyState, SEOHead, ConfirmDialog, DataTable } from '@/components/common'
+import MuiTooltip from '@/components/ui/MuiTooltip'
+
+import { LoadingScreen, EmptyState, SEOHead, ConfirmDialog, DataTable, AdvancedFilter } from '@/components/common'
 
 import { BaseFormDialog, FormField } from '@/components/shared'
 
-import { useDialogState, useCRUD, useNotification } from '@/hooks'
+import { useDialogState, useCRUD, useNotification, useDebounce } from '@/hooks'
 
 import { QUERY_KEYS } from '@/config/constants'
 
@@ -34,7 +36,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { z } from 'zod'
 
-import { Mail, Plus, UserCheck, Users, Edit2, Trash2, X, UserPlus, Download, Calendar, MapPin, Clock, Eye, ArrowLeft, Image as ImageIcon, FileImage, FileText, CheckCircle, QrCode, Send, CheckCircle2, XCircle } from 'lucide-react'
+import { Mail, Plus, UserCheck, Users, Edit2, Trash2, X, UserPlus, Download, Calendar, MapPin, Clock, Eye, ArrowLeft, Image as ImageIcon, FileImage, FileText, CheckCircle, QrCode, Send, CheckCircle2, XCircle, Share2 } from 'lucide-react'
 
 import { useEffect, useMemo, useState, useRef } from 'react'
 
@@ -377,6 +379,9 @@ export default function Invitations() {
 
   const { addNotification: showNotification } = useNotification()
 
+  const [searchQuery, setSearchQuery] = useState('')
+  const [activeFilters, setActiveFilters] = useState({})
+  const debouncedSearch = useDebounce(searchQuery, 500)
 
 
   // State for invitation card display
@@ -386,6 +391,8 @@ export default function Invitations() {
   const [selectedInvitation, setSelectedInvitation] = useState(null)
 
   const [selectedTemplateId, setSelectedTemplateId] = useState(null)
+
+  const [autoDownloadPNG, setAutoDownloadPNG] = useState(false)
 
 
 
@@ -488,6 +495,87 @@ export default function Invitations() {
 
 
   const invitations = data?.invitations || data?.data || []
+
+  // Filter configuration for AdvancedFilter
+  const filterConfig = useMemo(() => {
+    return [
+      {
+        key: 'status',
+        label: 'الحالة',
+        type: 'select',
+        options: [
+          { value: 'sent', label: 'مرسلة' },
+          { value: 'pending', label: 'قيد الانتظار' }
+        ]
+      },
+      {
+        key: 'used',
+        label: 'الاستخدام',
+        type: 'select',
+        options: [
+          { value: 'used', label: 'مستخدمة' },
+          { value: 'unused', label: 'غير مستخدمة' }
+        ]
+      },
+      {
+        key: 'createdAt',
+        label: 'تاريخ الإنشاء',
+        type: 'dateRange'
+      }
+    ]
+  }, [])
+
+  // Filter invitations
+  const filteredInvitations = useMemo(() => {
+    let filtered = invitations
+
+    if (debouncedSearch) {
+      filtered = filtered.filter(inv => {
+        const guestName = inv.guestName || ''
+        const eventName = inv.eventId?.name || inv.event?.name || ''
+        return (
+          guestName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+          eventName.toLowerCase().includes(debouncedSearch.toLowerCase())
+        )
+      })
+    }
+
+    // Apply status filter
+    if (activeFilters.status) {
+      filtered = filtered.filter(inv => inv.status === activeFilters.status)
+    }
+
+    // Apply used filter
+    if (activeFilters.used) {
+      filtered = filtered.filter(inv => {
+        if (activeFilters.used === 'used') return inv.used === true
+        if (activeFilters.used === 'unused') return inv.used === false
+        return true
+      })
+    }
+
+    // Apply date range filter
+    if (activeFilters.dateFrom || activeFilters.dateTo) {
+      filtered = filtered.filter(inv => {
+        if (!inv.createdAt) return false
+        const invDate = new Date(inv.createdAt)
+        const fromDate = activeFilters.dateFrom ? new Date(activeFilters.dateFrom) : null
+        const toDate = activeFilters.dateTo ? new Date(activeFilters.dateTo) : null
+
+        // Set toDate to end of day to include the selected date
+        if (toDate) {
+          toDate.setHours(23, 59, 59, 999)
+        }
+
+        if (fromDate && invDate < fromDate) return false
+        if (toDate && invDate > toDate) return false
+
+        return true
+      })
+    }
+
+    return filtered
+  }, [invitations, debouncedSearch, activeFilters])
 
 
 
@@ -793,6 +881,74 @@ export default function Invitations() {
 
   }
 
+  const handleShareWhatsApp = (invitation) => {
+    // Generate WhatsApp share link
+    const invitationUrl = `${window.location.origin}/client/invitations/${invitation._id || invitation.id}`
+    const message = `أود دعوتك إلى مناسبتي. يمكنك الاطلاع على بطاقة الدعوة هنا: ${invitationUrl}`
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, '_blank')
+  }
+
+  const handleDownloadPNG = async (invitation) => {
+    // Create a hidden container to render the card
+    const hiddenContainer = document.createElement('div')
+    hiddenContainer.style.position = 'fixed'
+    hiddenContainer.style.left = '-9999px'
+    hiddenContainer.style.top = '0'
+    hiddenContainer.style.width = '600px'
+    hiddenContainer.style.zIndex = '-1'
+    hiddenContainer.style.backgroundColor = 'white'
+    document.body.appendChild(hiddenContainer)
+
+    try {
+      // Create a simple card HTML
+      const cardHTML = `
+        <div style="direction: rtl; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: Arial, sans-serif; border-radius: 20px; min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white;">
+          <h1 style="margin: 0 0 20px 0; font-size: 32px; text-align: center;">دعوة</h1>
+          <p style="margin: 10px 0; font-size: 18px;">إلى: ${invitation.guestName || 'الضيف'}</p>
+          <p style="margin: 10px 0; font-size: 18px;">عدد المدعوين: ${invitation.numOfPeople || 1}</p>
+          <p style="margin: 10px 0; font-size: 18px;">الحالة: ${invitation.status === 'sent' ? 'مرسلة' : 'قيد الانتظار'}</p>
+          <p style="margin: 20px 0 0 0; font-size: 14px; opacity: 0.8;">تم إنشاؤها بواسطة INVOCCA</p>
+        </div>
+      `
+      hiddenContainer.innerHTML = cardHTML
+
+      // Wait for rendering
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // Capture with html2canvas
+      const canvas = await html2canvas(hiddenContainer, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        allowTaint: true,
+      })
+
+      // Download
+      const link = document.createElement('a')
+      link.download = `invitation-${invitation.guestName || 'invitation'}.png`
+      link.href = canvas.toDataURL('image/png', 1.0)
+      link.click()
+
+      showNotification({
+        title: 'نجاح',
+        message: 'تم تحميل بطاقة الدعوة بنجاح',
+        type: 'success'
+      })
+    } catch (error) {
+      console.error('Error downloading PNG:', error)
+      showNotification({
+        title: 'خطأ',
+        message: 'فشل في تحميل بطاقة الدعوة',
+        type: 'error'
+      })
+    } finally {
+      // Clean up
+      document.body.removeChild(hiddenContainer)
+    }
+  }
+
 
 
   if (isLoading) {
@@ -911,10 +1067,21 @@ export default function Invitations() {
 
 
 
-      {invitations.length > 0 ? (
+      {/* Advanced Filter */}
+      <AdvancedFilter
+        onSearch={setSearchQuery}
+        onFilterChange={setActiveFilters}
+        filters={filterConfig}
+        onRefresh={() => window.location.reload()}
+        searchPlaceholder="بحث..."
+      />
+
+
+
+      {filteredInvitations.length > 0 ? (
         <DataTable
           columns={columns}
-          data={invitations}
+          data={filteredInvitations}
           onView={(invitation) => {
             setSelectedInvitation(invitation)
             setShowInvitationCard(true)
@@ -924,6 +1091,34 @@ export default function Invitations() {
           showActions={true}
           loading={isLoading}
           emptyMessage="لا توجد دعوات"
+          customActions={(invitation) => (
+            <>
+              <MuiTooltip title="تحميل PNG">
+                <MuiIconButton
+                  size="small"
+                  onClick={() => handleDownloadPNG(invitation)}
+                  sx={{
+                    color: 'var(--color-primary-500)',
+                    '&:hover': { background: 'var(--color-surface-hover)' }
+                  }}
+                >
+                  <Download size={18} />
+                </MuiIconButton>
+              </MuiTooltip>
+              <MuiTooltip title="مشاركة عبر واتساب">
+                <MuiIconButton
+                  size="small"
+                  onClick={() => handleShareWhatsApp(invitation)}
+                  sx={{
+                    color: '#25D366',
+                    '&:hover': { background: 'var(--color-surface-hover)' }
+                  }}
+                >
+                  <Share2 size={18} />
+                </MuiIconButton>
+              </MuiTooltip>
+            </>
+          )}
           sx={{
             background: 'var(--color-paper)',
             backdropFilter: 'blur(20px)',
@@ -937,7 +1132,7 @@ export default function Invitations() {
       ) : (
         <EmptyState
           title="لا توجد دعوات"
-          subtitle="لم تقم بإضافة أي دعوات لمناسبتك بعد. ابدأ بإضافة مدعوين لتنظيم حضور مناسبتك."
+          subtitle={searchQuery || activeFilters.status || activeFilters.used ? 'لم يتم العثور على دعوات تطابق البحث' : 'لم تقم بإضافة أي دعوات لمناسبتك بعد. ابدأ بإضافة مدعوين لتنظيم حضور مناسبتك.'}
           icon={Mail}
         />
       )}
@@ -1003,6 +1198,8 @@ export default function Invitations() {
 
             setSelectedTemplateId(null)
 
+            setAutoDownloadPNG(false)
+
           }}
 
           invitation={selectedInvitation}
@@ -1014,6 +1211,8 @@ export default function Invitations() {
           selectedTemplateId={selectedTemplateId}
 
           onTemplateChange={setSelectedTemplateId}
+
+          autoDownloadPNG={autoDownloadPNG}
 
         />
 
@@ -1029,9 +1228,28 @@ export default function Invitations() {
 
 // Invitation Card Full Page View Component
 
-function InvitationCardView({ open, onClose, invitation, bookings, dashboardData, selectedTemplateId, onTemplateChange }) {
+function InvitationCardView({ open, onClose, invitation, bookings, dashboardData, selectedTemplateId, onTemplateChange, autoDownloadPNG = false, sx = {} }) {
 
   const cardRef = useRef(null)
+
+  const [hasTriggeredDownload, setHasTriggeredDownload] = useState(false)
+
+  // Auto-trigger PNG download when requested
+  useEffect(() => {
+    if (autoDownloadPNG && !hasTriggeredDownload) {
+      const timer = setTimeout(async () => {
+        // Call the existing handleExportPNG function
+        const exportButton = document.querySelector('[data-export-png="true"]')
+        if (exportButton) {
+          exportButton.click()
+        }
+        setHasTriggeredDownload(true)
+        // Close the card after download starts
+        setTimeout(() => onClose(), 500)
+      }, 2000) // Wait for card to render
+      return () => clearTimeout(timer)
+    }
+  }, [autoDownloadPNG, hasTriggeredDownload, onClose])
 
 
 
@@ -2063,7 +2281,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
 
 
-  if (!open || !invitation) return null
+  if ((!open && !autoDownloadPNG) || !invitation) return null
 
 
 
@@ -2643,13 +2861,13 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
         top: 0,
 
-        left: 0,
+        left: autoDownloadPNG ? '-9999px' : 0,
 
         right: 0,
 
         bottom: 0,
 
-        zIndex: 9999,
+        zIndex: autoDownloadPNG ? -9999 : 9999,
 
         backgroundColor: 'var(--color-surface-dark)',
 
@@ -2659,6 +2877,7 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
 
         flexDirection: 'column',
 
+        ...sx
       }}
 
     >
@@ -2732,6 +2951,8 @@ function InvitationCardView({ open, onClose, invitation, bookings, dashboardData
             startIcon={<FileImage size={16} />}
 
             onClick={handleExportPNG}
+
+            data-export-png="true"
 
             sx={{
 

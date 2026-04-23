@@ -13,7 +13,7 @@ import MuiChip from '@/components/ui/MuiChip'
 import MuiAvatar from '@/components/ui/MuiAvatar'
 
 // Layout & Common Components
-import { LoadingScreen, EmptyState, SEOHead, PageHeader, StatCard, DataTable, ConfirmDialog } from '@/components/common'
+import { LoadingScreen, EmptyState, SEOHead, PageHeader, StatCard, DataTable, ConfirmDialog, AdvancedFilter } from '@/components/common'
 import ViewUserDialog from './components/ViewUserDialog'
 import EditUserDialog from './components/EditUserDialog'
 import CreateAdminDialog from './components/CreateAdminDialog'
@@ -46,8 +46,9 @@ export default function HallManagersManagement() {
     const { success, error: showError } = useNotification()
 
     // State
-    const [searchTerm, setSearchTerm] = useState('')
-    const debouncedSearch = useDebounce(searchTerm, 500)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [activeFilters, setActiveFilters] = useState({})
+    const debouncedSearch = useDebounce(searchQuery, 500)
 
     // Dialog state management
     const {
@@ -73,10 +74,43 @@ export default function HallManagersManagement() {
 
     const managers = managersData?.managers || managersData?.data?.managers || managersData?.data || []
 
+    // Get unique halls for filter
+    const uniqueHalls = useMemo(() => {
+        const halls = managers.map(m => m.hallId?.name).filter(Boolean)
+        return [...new Set(halls)]
+    }, [managers])
+
+    // Filter configuration for AdvancedFilter
+    const filterConfig = useMemo(() => {
+        const hallOptions = uniqueHalls.map(hall => ({ value: hall, label: hall }))
+        return [
+            {
+                key: 'hall',
+                label: 'الصالة/القاعة',
+                type: 'select',
+                options: hallOptions
+            },
+            {
+                key: 'status',
+                label: 'الحالة',
+                type: 'select',
+                options: [
+                    { value: 'active', label: 'نشط' },
+                    { value: 'inactive', label: 'معطل' }
+                ]
+            },
+            {
+                key: 'createdAt',
+                label: 'تاريخ الإنشاء',
+                type: 'dateRange'
+            }
+        ]
+    }, [uniqueHalls])
+
     // Filter managers
     const filteredManagers = useMemo(() => {
         let filtered = Array.isArray(managers) ? managers : []
-        
+
         // Filter by search term
         filtered = filtered.filter(manager => manager.hallId && (manager.hallId._id || manager.hallId))
 
@@ -88,8 +122,42 @@ export default function HallManagersManagement() {
             )
         }
 
+        // Apply hall filter
+        if (activeFilters.hall) {
+            filtered = filtered.filter(manager => manager.hallId?.name === activeFilters.hall)
+        }
+
+        // Apply status filter
+        if (activeFilters.status) {
+            filtered = filtered.filter(manager => {
+                if (activeFilters.status === 'active') return manager.isActive !== false
+                if (activeFilters.status === 'inactive') return manager.isActive === false
+                return true
+            })
+        }
+
+        // Apply date range filter
+        if (activeFilters.dateFrom || activeFilters.dateTo) {
+            filtered = filtered.filter(manager => {
+                if (!manager.createdAt) return false
+                const managerDate = new Date(manager.createdAt)
+                const fromDate = activeFilters.dateFrom ? new Date(activeFilters.dateFrom) : null
+                const toDate = activeFilters.dateTo ? new Date(activeFilters.dateTo) : null
+
+                // Set toDate to end of day to include the selected date
+                if (toDate) {
+                    toDate.setHours(23, 59, 59, 999)
+                }
+
+                if (fromDate && managerDate < fromDate) return false
+                if (toDate && managerDate > toDate) return false
+
+                return true
+            })
+        }
+
         return filtered
-    }, [managers, debouncedSearch])
+    }, [managers, debouncedSearch, activeFilters])
 
     // Table Columns - Same style as UsersManagement
     const columns = [
@@ -251,29 +319,14 @@ export default function HallManagersManagement() {
                 </MuiGrid>
             </MuiGrid>
 
-            {/* Search */}
-            <MuiPaper
-                elevation={0}
-                sx={{
-                    p: 2,
-                    mb: 3,
-                    background: 'var(--color-paper)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: '16px'
-                }}
-            >
-                <MuiGrid container spacing={2} alignItems="center">
-                    <MuiGrid item xs={12} md={12}>
-                        <MuiTextField
-                            fullWidth
-                            placeholder="البحث بالاسم، الهاتف، أو اسم الصالة..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            startIcon={<Search size={20} />}
-                        />
-                    </MuiGrid>
-                </MuiGrid>
-            </MuiPaper>
+            {/* Advanced Filter */}
+            <AdvancedFilter
+                onSearch={setSearchQuery}
+                onFilterChange={setActiveFilters}
+                filters={filterConfig}
+                onRefresh={refetch}
+                searchPlaceholder="بحث..."
+            />
 
             {/* Managers Table */}
             {filteredManagers.length === 0 ? (

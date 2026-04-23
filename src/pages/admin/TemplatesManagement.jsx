@@ -26,7 +26,7 @@ import MuiMenuItem from '@/components/ui/MuiMenuItem'
 import MuiAvatar from '@/components/ui/MuiAvatar'
 
 // Layout & Common Components
-import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog, PageHeader, StatCard, CardsView } from '@/components/common'
+import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog, PageHeader, StatCard, CardsView, AdvancedFilter } from '@/components/common'
 
 // Dialog Components
 import ViewTemplateDialog from './components/ViewTemplateDialog'
@@ -72,8 +72,9 @@ export default function TemplatesManagement() {
     const { addNotification: showNotification } = useNotification()
 
     // State
-    const [searchTerm, setSearchTerm] = useState('')
-    const debouncedSearch = useDebounce(searchTerm, 500)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [activeFilters, setActiveFilters] = useState({})
+    const debouncedSearch = useDebounce(searchQuery, 500)
     const [viewMode, setViewMode] = useState('table') // 'card' or 'table'
 
     // Dialog state management
@@ -144,6 +145,53 @@ export default function TemplatesManagement() {
 
     const templates = templatesData?.templates || templatesData?.data || templatesData || []
 
+    // Category translation mapping
+    const categoryTranslations = {
+        'wedding': 'زفاف',
+        'birthday': 'عيد ميلاد',
+        'other': 'عام',
+        'engagement': 'خطوبة',
+        'graduation': 'تخرج',
+        'corporate': 'شركات',
+        'anniversary': 'ذكرى سنوية'
+    }
+
+    // Get unique categories for filter
+    const uniqueCategories = useMemo(() => {
+        const categories = templates.map(t => t.category).filter(Boolean)
+        return [...new Set(categories)]
+    }, [templates])
+
+    // Filter configuration for AdvancedFilter
+    const filterConfig = useMemo(() => {
+        const categoryOptions = uniqueCategories.map(cat => ({
+            value: cat,
+            label: categoryTranslations[cat] || cat
+        }))
+        return [
+            {
+                key: 'category',
+                label: 'الفئة',
+                type: 'select',
+                options: categoryOptions
+            },
+            {
+                key: 'status',
+                label: 'الحالة',
+                type: 'select',
+                options: [
+                    { value: 'active', label: 'مفعّل' },
+                    { value: 'inactive', label: 'معطّل' }
+                ]
+            },
+            {
+                key: 'createdAt',
+                label: 'تاريخ الإنشاء',
+                type: 'dateRange'
+            }
+        ]
+    }, [uniqueCategories])
+
     // Filtered Templates
     const filteredTemplates = useMemo(() => {
         let filtered = Array.isArray(templates) ? templates : []
@@ -158,8 +206,42 @@ export default function TemplatesManagement() {
             )
         }
 
+        // Apply category filter
+        if (activeFilters.category) {
+            filtered = filtered.filter(template => template.category === activeFilters.category)
+        }
+
+        // Apply status filter
+        if (activeFilters.status) {
+            filtered = filtered.filter(template => {
+                if (activeFilters.status === 'active') return template.isActive === true
+                if (activeFilters.status === 'inactive') return template.isActive === false
+                return true
+            })
+        }
+
+        // Apply date range filter
+        if (activeFilters.dateFrom || activeFilters.dateTo) {
+            filtered = filtered.filter(template => {
+                if (!template.createdAt) return false
+                const templateDate = new Date(template.createdAt)
+                const fromDate = activeFilters.dateFrom ? new Date(activeFilters.dateFrom) : null
+                const toDate = activeFilters.dateTo ? new Date(activeFilters.dateTo) : null
+
+                // Set toDate to end of day to include the selected date
+                if (toDate) {
+                    toDate.setHours(23, 59, 59, 999)
+                }
+
+                if (fromDate && templateDate < fromDate) return false
+                if (toDate && templateDate > toDate) return false
+
+                return true
+            })
+        }
+
         return filtered
-    }, [templates, debouncedSearch])
+    }, [templates, debouncedSearch, activeFilters])
 
     // Table Columns
     const columns = [
@@ -346,7 +428,7 @@ export default function TemplatesManagement() {
                         </MuiBox>
                     )}
                     <MuiChip
-                        label={template.category || 'عام'}
+                        label={categoryTranslations[template.category] || template.category || 'عام'}
                         size="small"
                         sx={{ position: 'absolute', top: 12, right: 12, fontWeight: 700, background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)' }}
                     />
@@ -513,38 +595,14 @@ export default function TemplatesManagement() {
                 </MuiGrid>
             </MuiGrid>
 
-            <MuiPaper
-                elevation={0}
-                sx={{
-                    p: 2,
-                    mb: 3,
-                    background: 'var(--color-paper)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: '16px'
-                }}
-            >
-                <MuiGrid container spacing={2} alignItems="center">
-                    <MuiGrid item xs={12} md={8}>
-                        <MuiTextField
-                            fullWidth
-                            placeholder="البحث باسم القالب أو الفئة..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            startIcon={<Search size={20} />}
-                        />
-                    </MuiGrid>
-                    <MuiGrid item xs={12} md={4}>
-                        <MuiButton
-                            fullWidth
-                            variant="outlined"
-                            startIcon={<RefreshCw size={20} />}
-                            onClick={handleRefresh}
-                        >
-                            تحديث البيانات
-                        </MuiButton>
-                    </MuiGrid>
-                </MuiGrid>
-            </MuiPaper>
+            {/* Advanced Filter */}
+            <AdvancedFilter
+                onSearch={setSearchQuery}
+                onFilterChange={setActiveFilters}
+                filters={filterConfig}
+                onRefresh={refetch}
+                searchPlaceholder="بحث..."
+            />
 
             {/* Templates Grid/Table */}
             {viewMode === 'table' ? (

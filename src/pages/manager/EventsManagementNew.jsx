@@ -36,7 +36,7 @@ import MuiInputAdornment from '@/components/ui/MuiInputAdornment'
 
 import MuiAvatar from '@/components/ui/MuiAvatar'
 
-import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog } from '@/components/common'
+import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog, AdvancedFilter } from '@/components/common'
 
 import { QUERY_KEYS } from '@/config/constants'
 
@@ -618,6 +618,8 @@ export default function EventsManagement() {
 
     const [searchQuery, setSearchQuery] = useState('')
 
+    const [activeFilters, setActiveFilters] = useState({})
+
     const debouncedSearch = useDebounce(searchQuery, 500)
 
     const queryClient = useQueryClient()
@@ -722,6 +724,29 @@ export default function EventsManagement() {
 
 
 
+    // Filter configuration for AdvancedFilter
+    const filterConfig = useMemo(() => {
+        return [
+            {
+                key: 'status',
+                label: 'الحالة',
+                type: 'select',
+                options: [
+                    { value: 'pending', label: 'قيد الانتظار' },
+                    { value: 'confirmed', label: 'مؤكد' },
+                    { value: 'in_progress', label: 'جاري' },
+                    { value: 'completed', label: 'مكتمل' },
+                    { value: 'cancelled', label: 'ملغي' }
+                ]
+            },
+            {
+                key: 'eventDate',
+                label: 'تاريخ الفعالية',
+                type: 'dateRange'
+            }
+        ]
+    }, [])
+
     // Filter events
 
     const filteredEvents = useMemo(() => {
@@ -744,11 +769,34 @@ export default function EventsManagement() {
 
         }
 
+        // Apply status filter
+        if (activeFilters.status) {
+            filtered = filtered.filter(event => event.status === activeFilters.status)
+        }
 
+        // Apply date range filter
+        if (activeFilters.dateFrom || activeFilters.dateTo) {
+            filtered = filtered.filter(event => {
+                if (!event.eventDate && !event.date) return false
+                const eventDate = new Date(event.eventDate || event.date)
+                const fromDate = activeFilters.dateFrom ? new Date(activeFilters.dateFrom) : null
+                const toDate = activeFilters.dateTo ? new Date(activeFilters.dateTo) : null
+
+                // Set toDate to end of day to include the selected date
+                if (toDate) {
+                    toDate.setHours(23, 59, 59, 999)
+                }
+
+                if (fromDate && eventDate < fromDate) return false
+                if (toDate && eventDate > toDate) return false
+
+                return true
+            })
+        }
 
         return filtered
 
-    }, [events, debouncedSearch])
+    }, [events, debouncedSearch, activeFilters])
 
 
 
@@ -1919,97 +1967,14 @@ export default function EventsManagement() {
 
 
 
-                {/* Search & Filters */}
-
-                <MuiPaper
-
-                    elevation={0}
-
-                    sx={{
-
-                        p: 3,
-
-                        mb: 4.5,
-
-                        background: 'var(--color-paper)',
-
-                        backdropFilter: 'blur(20px)',
-
-                        WebkitBackdropFilter: 'blur(20px)',
-
-                        border: '1px solid var(--color-border-glass)',
-
-                        borderRadius: '20px',
-
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-
-                    }}
-
-                >
-
-                    <MuiBox sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
-
-                        <MuiTextField
-
-                            placeholder="البحث عن فعالية..."
-
-                            value={searchQuery}
-
-                            onChange={(e) => setSearchQuery(e.target.value)}
-
-                            sx={{
-
-                                flex: 1,
-
-                                '& .MuiOutlinedInput-root': {
-
-                                    borderRadius: '14px',
-
-                                    background: 'rgba(255, 255, 255, 0.03)',
-
-                                    border: '1px solid var(--color-border-glass)',
-
-                                    '&:hover': {
-
-                                        borderColor: 'rgba(216, 185, 138, 0.3)',
-
-                                    },
-
-                                    '&.Mui-focused': {
-
-                                        borderColor: 'var(--color-primary-500)',
-
-                                    }
-
-                                },
-
-                                '& .MuiOutlinedInput-input': {
-
-                                    color: 'var(--color-text-primary)',
-
-                                }
-
-                            }}
-
-                            InputProps={{
-
-                                startAdornment: (
-
-                                    <MuiInputAdornment position="start">
-
-                                        <Search size={20} style={{ color: 'var(--color-text-secondary)' }} />
-
-                                    </MuiInputAdornment>
-
-                                ),
-
-                            }}
-
-                        />
-
-                    </MuiBox>
-
-                </MuiPaper>
+                {/* Advanced Filter */}
+                <AdvancedFilter
+                    onSearch={setSearchQuery}
+                    onFilterChange={setActiveFilters}
+                    filters={filterConfig}
+                    onRefresh={refetch}
+                    searchPlaceholder="بحث..."
+                />
 
 
 

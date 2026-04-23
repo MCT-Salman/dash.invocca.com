@@ -74,7 +74,7 @@ import MuiIconButton from '@/components/ui/MuiIconButton'
 
 import DashboardLayout from '@/components/layout/DashboardLayout'
 
-import { LoadingScreen, EmptyState, ConfirmDialog, SEOHead, CardsView, TablePagination, DataTable, PageHeader, StatCard } from '@/components/common'
+import { LoadingScreen, EmptyState, ConfirmDialog, SEOHead, CardsView, TablePagination, DataTable, PageHeader, StatCard, AdvancedFilter } from '@/components/common'
 
 import CreateEditHallDialog from './components/CreateEditHallDialog'
 
@@ -368,15 +368,15 @@ const HallsManagement = () => {
 
   const [error, setError] = useState(null)
 
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
-  const [locationFilter, setLocationFilter] = useState('all')
-
-  const [statusFilter, setStatusFilter] = useState('all')
+  const [activeFilters, setActiveFilters] = useState({})
 
   const [viewMode, setViewMode] = useState('table') // 'table' or 'card'
 
   const [submitError, setSubmitError] = useState(null)
+
+  const debouncedSearch = useDebounce(searchQuery, 500)
 
 
 
@@ -394,11 +394,7 @@ const HallsManagement = () => {
 
   const { addNotification: showNotification } = useNotification()
 
-  const debouncedSearch = useDebounce(searchTerm, 500)
-
-
-
-  // Dialog state management
+// Dialog state management
 
   const {
 
@@ -614,25 +610,58 @@ const HallsManagement = () => {
 
 
 
-    // Apply location filter
+    // Apply location filter from activeFilters
 
-    if (locationFilter && locationFilter !== 'all') {
+    if (activeFilters.location && activeFilters.location !== 'all') {
 
-      filtered = filtered.filter(hall => hall.location === locationFilter)
+      filtered = filtered.filter(hall => hall.location === activeFilters.location)
 
     }
 
 
 
-    // Apply status filter
+    // Apply status filter from activeFilters
 
-    if (statusFilter && statusFilter !== 'all') {
+    if (activeFilters.status && activeFilters.status !== 'all') {
 
       filtered = filtered.filter(hall => {
 
-        if (statusFilter === 'active') return hall.isActive === true
+        if (activeFilters.status === 'active') return hall.isActive === true
 
-        if (statusFilter === 'inactive') return hall.isActive === false
+        if (activeFilters.status === 'inactive') return hall.isActive === false
+
+        return true
+
+      })
+
+    }
+
+
+
+    // Apply date range filter
+
+    if (activeFilters.dateFrom || activeFilters.dateTo) {
+
+      filtered = filtered.filter(hall => {
+
+        if (!hall.createdAt) return false
+
+        const hallDate = new Date(hall.createdAt)
+
+        const fromDate = activeFilters.dateFrom ? new Date(activeFilters.dateFrom) : null
+
+        const toDate = activeFilters.dateTo ? new Date(activeFilters.dateTo) : null
+
+        // Set toDate to end of day to include the selected date
+        if (toDate) {
+          toDate.setHours(23, 59, 59, 999)
+        }
+
+        if (fromDate && hallDate < fromDate) return false
+
+        if (toDate && hallDate > toDate) return false
+
+
 
         return true
 
@@ -644,7 +673,7 @@ const HallsManagement = () => {
 
     return filtered
 
-  }, [halls, debouncedSearch, locationFilter, statusFilter])
+  }, [halls, debouncedSearch, activeFilters])
 
 
 
@@ -657,6 +686,60 @@ const HallsManagement = () => {
     return [...new Set(locations)]
 
   }, [halls])
+
+
+
+  // Filter configuration for AdvancedFilter
+
+  const filterConfig = useMemo(() => {
+
+    const locationOptions = uniqueLocations.map(loc => ({ value: loc, label: loc }))
+
+    return [
+
+      {
+
+        key: 'location',
+
+        label: 'الموقع',
+
+        type: 'select',
+
+        options: locationOptions
+
+      },
+
+      {
+
+        key: 'status',
+
+        label: 'الحالة',
+
+        type: 'select',
+
+        options: [
+
+          { value: 'active', label: 'نشطة' },
+
+          { value: 'inactive', label: 'غير نشطة' }
+
+        ]
+
+      },
+
+      {
+
+        key: 'createdAt',
+
+        label: 'تاريخ الإنشاء',
+
+        type: 'dateRange'
+
+      }
+
+    ]
+
+  }, [uniqueLocations])
 
 
 
@@ -905,6 +988,48 @@ const HallsManagement = () => {
               </MuiTypography>
 
             )}
+
+          </MuiBox>
+
+        )
+
+      }
+
+    },
+
+    {
+
+      id: 'createdAt',
+
+      label: 'تاريخ الإنشاء',
+
+      align: 'center',
+
+      format: (value) => {
+
+        if (!value) return '—'
+
+        const date = new Date(value)
+
+        return (
+
+          <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
+
+            <Calendar size={16} style={{ color: 'var(--color-icon)' }} />
+
+            <span style={{ color: 'var(--color-text-secondary)' }}>
+
+              {date.toLocaleDateString('en-US', {
+
+                year: 'numeric',
+
+                month: 'short',
+
+                day: 'numeric'
+
+              })}
+
+            </span>
 
           </MuiBox>
 
@@ -1566,97 +1691,21 @@ const HallsManagement = () => {
 
 
 
-      {/* Search & Filter */}
+      {/* Advanced Filter */}
 
-      <MuiPaper
+      <AdvancedFilter
 
-        elevation={0}
+        onSearch={setSearchQuery}
 
-        sx={{
+        onFilterChange={setActiveFilters}
 
-          p: 2,
+        filters={filterConfig}
 
-          mb: 3,
+        onRefresh={fetchHalls}
 
-          background: 'var(--color-paper)',
+        searchPlaceholder="بحث ..."
 
-          border: '1px solid var(--color-border)',
-
-          borderRadius: '16px'
-
-        }}
-
-      >
-
-        <MuiGrid container spacing={2} alignItems="center">
-
-          <MuiGrid item xs={12} md={6}>
-
-            <MuiTextField
-
-              fullWidth
-
-              placeholder="ابحث (اسم قاعة/صالة، المدير، رقم الهاتف)..."
-
-              value={searchTerm}
-
-              onChange={(e) => setSearchTerm(e.target.value)}
-
-              startIcon={<Search size={20} />}
-
-            />
-
-          </MuiGrid>
-
-          <MuiGrid item xs={12} md={3}>
-
-            <MuiSelect
-
-              fullWidth
-
-              value={locationFilter}
-
-              onChange={(e) => setLocationFilter(e.target.value)}
-
-              options={[
-
-                { label: 'جميع المواقع', value: 'all' },
-
-                ...uniqueLocations.map(loc => ({ label: loc, value: loc }))
-
-              ]}
-
-            />
-
-          </MuiGrid>
-
-          <MuiGrid item xs={12} md={3}>
-
-            <MuiSelect
-
-              fullWidth
-
-              value={statusFilter}
-
-              onChange={(e) => setStatusFilter(e.target.value)}
-
-              options={[
-
-                { label: 'جميع الحالات', value: 'all' },
-
-                { label: 'نشطة', value: 'active' },
-
-                { label: 'غير نشطة', value: 'inactive' }
-
-              ]}
-
-            />
-
-          </MuiGrid>
-
-        </MuiGrid>
-
-      </MuiPaper>
+      />
 
 
 

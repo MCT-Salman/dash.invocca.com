@@ -34,7 +34,7 @@ import MuiAvatar from '@/components/ui/MuiAvatar'
 
 import MuiIconButton from '@/components/ui/MuiIconButton'
 
-import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog } from '@/components/common'
+import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog, AdvancedFilter } from '@/components/common'
 
 import { QUERY_KEYS } from '@/config/constants'
 
@@ -85,6 +85,8 @@ import {
 export default function ClientsManagement() {
 
     const [searchQuery, setSearchQuery] = useState('')
+
+    const [activeFilters, setActiveFilters] = useState({})
 
     const debouncedSearch = useDebounce(searchQuery, 500)
 
@@ -200,6 +202,26 @@ export default function ClientsManagement() {
 
 
 
+    // Filter configuration for AdvancedFilter
+    const filterConfig = useMemo(() => {
+        return [
+            {
+                key: 'status',
+                label: 'الحالة',
+                type: 'select',
+                options: [
+                    { value: 'active', label: 'نشط' },
+                    { value: 'inactive', label: 'غير نشط' }
+                ]
+            },
+            {
+                key: 'createdAt',
+                label: 'تاريخ الإنشاء',
+                type: 'dateRange'
+            }
+        ]
+    }, [])
+
     // Filter clients
 
     const filteredClients = useMemo(() => {
@@ -222,11 +244,38 @@ export default function ClientsManagement() {
 
         }
 
+        // Apply status filter
+        if (activeFilters.status) {
+            filtered = filtered.filter(client => {
+                if (activeFilters.status === 'active') return client.isActive !== false
+                if (activeFilters.status === 'inactive') return client.isActive === false
+                return true
+            })
+        }
 
+        // Apply date range filter
+        if (activeFilters.dateFrom || activeFilters.dateTo) {
+            filtered = filtered.filter(client => {
+                if (!client.createdAt) return false
+                const clientDate = new Date(client.createdAt)
+                const fromDate = activeFilters.dateFrom ? new Date(activeFilters.dateFrom) : null
+                const toDate = activeFilters.dateTo ? new Date(activeFilters.dateTo) : null
+
+                // Set toDate to end of day to include the selected date
+                if (toDate) {
+                    toDate.setHours(23, 59, 59, 999)
+                }
+
+                if (fromDate && clientDate < fromDate) return false
+                if (toDate && clientDate > toDate) return false
+
+                return true
+            })
+        }
 
         return filtered
 
-    }, [clients, debouncedSearch])
+    }, [clients, debouncedSearch, activeFilters])
 
 
 
@@ -1163,93 +1212,14 @@ export default function ClientsManagement() {
 
 
 
-                {/* Search */}
-
-                <MuiPaper
-
-                    elevation={0}
-
-                    sx={{
-
-                        p: 3,
-
-                        mb: 4.5,
-
-                        background: 'var(--color-paper)',
-
-                        backdropFilter: 'blur(20px)',
-
-                        WebkitBackdropFilter: 'blur(20px)',
-
-                        border: '1px solid var(--color-border-glass)',
-
-                        borderRadius: '20px',
-
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-
-                    }}
-
-                >
-
-                    <MuiTextField
-
-                        placeholder="البحث عن عميل (الاسم، الهاتف)..."
-
-                        value={searchQuery}
-
-                        onChange={(e) => setSearchQuery(e.target.value)}
-
-                        fullWidth
-
-                        InputProps={{
-
-                            startAdornment: (
-
-                                <MuiInputAdornment position="start">
-
-                                    <Search size={20} style={{ color: 'var(--color-text-secondary)' }} />
-
-                                </MuiInputAdornment>
-
-                            ),
-
-                        }}
-
-                        sx={{
-
-                            '& .MuiOutlinedInput-root': {
-
-                                borderRadius: '14px',
-
-                                background: 'rgba(255, 255, 255, 0.03)',
-
-                                border: '1px solid var(--color-border-glass)',
-
-                                '&:hover': {
-
-                                    borderColor: 'rgba(216, 185, 138, 0.3)',
-
-                                },
-
-                                '&.Mui-focused': {
-
-                                    borderColor: 'var(--color-primary-500)',
-
-                                }
-
-                            },
-
-                            '& .MuiOutlinedInput-input': {
-
-                                color: 'var(--color-text-primary)',
-
-                            }
-
-                        }}
-
-                    />
-
-                </MuiPaper>
+                {/* Advanced Filter */}
+                <AdvancedFilter
+                    onSearch={setSearchQuery}
+                    onFilterChange={setActiveFilters}
+                    filters={filterConfig}
+                    onRefresh={refetch}
+                    searchPlaceholder="بحث..."
+                />
 
 
 

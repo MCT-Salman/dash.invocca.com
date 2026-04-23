@@ -12,7 +12,7 @@
 
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog, ButtonLoading } from '@/components/common'
+import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog, ButtonLoading, AdvancedFilter } from '@/components/common'
 import { QUERY_KEYS } from '@/config/constants'
 import { useAuth, useNotification, useDebounce, useDialogState, useCRUD } from '@/hooks'
 import { getStaff, deleteStaff, addStaff, updateStaff } from '@/api/manager'
@@ -126,6 +126,7 @@ export default function StaffManagement() {
     const { user } = useAuth()
     const { addNotification: showNotification } = useNotification()
     const [searchQuery, setSearchQuery] = useState('')
+    const [activeFilters, setActiveFilters] = useState({})
 
     const debouncedSearch = useDebounce(searchQuery, 500)
 
@@ -215,6 +216,35 @@ export default function StaffManagement() {
 
 
 
+    // Filter configuration for AdvancedFilter
+    const filterConfig = useMemo(() => {
+        return [
+            {
+                key: 'role',
+                label: 'الدور',
+                type: 'select',
+                options: [
+                    { value: 'manager', label: 'مدير صالة' },
+                    { value: 'scanner', label: 'موظف استقبال' }
+                ]
+            },
+            {
+                key: 'status',
+                label: 'الحالة',
+                type: 'select',
+                options: [
+                    { value: 'active', label: 'نشط' },
+                    { value: 'inactive', label: 'غير نشط' }
+                ]
+            },
+            {
+                key: 'joinDate',
+                label: 'تاريخ الانضمام',
+                type: 'dateRange'
+            }
+        ]
+    }, [])
+
     // Filter staff
 
     const filteredStaff = useMemo(() => {
@@ -225,23 +255,65 @@ export default function StaffManagement() {
 
         if (debouncedSearch) {
 
-            filtered = filtered.filter(member =>
-
-                member.name?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-
-                member.phone?.includes(debouncedSearch) ||
-
-                member.role?.toLowerCase().includes(debouncedSearch.toLowerCase())
-
-            )
+            filtered = filtered.filter(member => {
+                const name = member.name || ''
+                const phone = member.phone || ''
+                const role = member.role || ''
+                return (
+                    name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+                    phone.includes(debouncedSearch) ||
+                    (typeof role === 'string' && role.toLowerCase().includes(debouncedSearch.toLowerCase()))
+                )
+            })
 
         }
 
+        // Apply role filter
+        if (activeFilters.role) {
+            filtered = filtered.filter(member => {
+                const memberRole = member.role
+                const filterRole = activeFilters.role
+                if (!memberRole) return false
+                if (typeof memberRole === 'string') {
+                    return memberRole.toLowerCase() === filterRole.toLowerCase()
+                }
+                return String(memberRole).toLowerCase() === filterRole.toLowerCase()
+            })
+        }
 
+        // Apply status filter
+        if (activeFilters.status) {
+            filtered = filtered.filter(member => {
+                if (activeFilters.status === 'active') return member.isActive !== false
+                if (activeFilters.status === 'inactive') return member.isActive === false
+                return true
+            })
+        }
+
+        // Apply date range filter
+        if (activeFilters.dateFrom || activeFilters.dateTo) {
+            filtered = filtered.filter(member => {
+                const hireDate = member.staffInfo?.hireDate || member.joinDate
+                if (!hireDate) return false
+                const memberDate = new Date(hireDate)
+                const fromDate = activeFilters.dateFrom ? new Date(activeFilters.dateFrom) : null
+                const toDate = activeFilters.dateTo ? new Date(activeFilters.dateTo) : null
+
+                // Set toDate to end of day to include the selected date
+                if (toDate) {
+                    toDate.setHours(23, 59, 59, 999)
+                }
+
+                if (fromDate && memberDate < fromDate) return false
+                if (toDate && memberDate > toDate) return false
+
+                return true
+            })
+        }
 
         return filtered
 
-    }, [staff, debouncedSearch])
+    }, [staff, debouncedSearch, activeFilters])
 
 
 
@@ -1323,6 +1395,17 @@ export default function StaffManagement() {
                     </MuiGrid>
 
                 </MuiGrid>
+
+
+
+                {/* Advanced Filter */}
+                <AdvancedFilter
+                    onSearch={setSearchQuery}
+                    onFilterChange={setActiveFilters}
+                    filters={filterConfig}
+                    onRefresh={refetch}
+                    searchPlaceholder="بحث..."
+                />
 
 
 

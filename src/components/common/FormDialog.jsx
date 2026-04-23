@@ -44,8 +44,9 @@ export default function FormDialog({
     fullWidth = true,
 }) {
     const handleSubmit = (e) => {
-        e?.preventDefault?.()
+        if (e && typeof e.preventDefault === 'function') e.preventDefault()
         // react-hook-form's handleSubmit should be called without event
+        // It will handle the form submission internally
         // It will handle the form submission internally
         if (typeof onSubmit === 'function') {
             // Pass event if function expects it, otherwise call without

@@ -565,7 +565,7 @@ function InvoiceDialog({ open, onClose, invoice, onSubmit, loading }) {
     }, [open, invoice])
 
     const handleSubmit = (e) => {
-        e.preventDefault()
+        if (e && typeof e.preventDefault === 'function') e.preventDefault()
         onSubmit(formData)
     }
 
@@ -786,7 +786,7 @@ function PaymentDialog({ open, onClose, paymentData, onSubmit, loading }) {
     })
 
     const handleSubmit = (e) => {
-        e.preventDefault()
+        if (e && typeof e.preventDefault === 'function') e.preventDefault()
         onSubmit(formData)
     }
 

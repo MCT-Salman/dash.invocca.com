@@ -48,7 +48,7 @@ import MuiStack from '@/components/ui/MuiStack'
 
 // Layout & Common Components
 
-import { LoadingScreen, EmptyState, SEOHead, DataTable, FormDialog, ConfirmDialog } from '@/components/common'
+import { LoadingScreen, EmptyState, SEOHead, DataTable, FormDialog, ConfirmDialog, AdvancedFilter } from '@/components/common'
 
 import ViewServiceDialog from '@/pages/admin/components/ViewServiceDialog'
 
@@ -116,11 +116,11 @@ export default function ServicesManagement() {
 
     // State
 
-    const [searchTerm, setSearchTerm] = useState('')
+    const [searchQuery, setSearchQuery] = useState('')
 
-    const debouncedSearch = useDebounce(searchTerm, 500)
+    const [activeFilters, setActiveFilters] = useState({})
 
-    const [categoryFilter, setCategoryFilter] = useState('all')
+    const debouncedSearch = useDebounce(searchQuery, 500)
 
 
 
@@ -188,21 +188,45 @@ export default function ServicesManagement() {
 
 
 
-    const services = Array.isArray(servicesData?.services) 
+    const services = Array.isArray(servicesData?.services)
 
-        ? servicesData.services 
+        ? servicesData.services
 
-        : Array.isArray(servicesData?.data) 
+        : Array.isArray(servicesData?.data)
 
-            ? servicesData.data 
+            ? servicesData.data
 
-            : Array.isArray(servicesData) 
+            : Array.isArray(servicesData)
 
-                ? servicesData 
+                ? servicesData
 
                 : []
 
 
+
+    // Filter configuration for AdvancedFilter
+    const filterConfig = useMemo(() => {
+        return [
+            {
+                key: 'category',
+                label: 'الفئة',
+                type: 'select',
+                options: Object.entries(SERVICE_CATEGORY_LABELS).map(([key, label]) => ({
+                    value: key,
+                    label: label
+                }))
+            },
+            {
+                key: 'status',
+                label: 'الحالة',
+                type: 'select',
+                options: [
+                    { value: 'active', label: 'نشط' },
+                    { value: 'inactive', label: 'معطل' }
+                ]
+            }
+        ]
+    }, [])
 
     // Filtered Services
 
@@ -226,21 +250,23 @@ export default function ServicesManagement() {
 
         }
 
-
-
         // Apply category filter
-
-        if (categoryFilter && categoryFilter !== 'all') {
-
-            filtered = filtered.filter(service => service.category === categoryFilter)
-
+        if (activeFilters.category) {
+            filtered = filtered.filter(service => service.category === activeFilters.category)
         }
 
-
+        // Apply status filter
+        if (activeFilters.status) {
+            filtered = filtered.filter(service => {
+                if (activeFilters.status === 'active') return service.isActive === true
+                if (activeFilters.status === 'inactive') return service.isActive === false
+                return true
+            })
+        }
 
         return filtered
 
-    }, [services, debouncedSearch, categoryFilter])
+    }, [services, debouncedSearch, activeFilters])
 
 
 
@@ -838,87 +864,14 @@ export default function ServicesManagement() {
 
 
 
-            {/* Filters */}
-
-            <MuiPaper
-
-                elevation={0}
-
-                sx={{
-
-                    p: 3,
-
-                    mb: 3,
-
-                    background: 'var(--color-paper)',
-
-                    border: '1px solid var(--color-border-glass)',
-
-                    borderRadius: '16px',
-
-                }}
-
-            >
-
-                <MuiGrid container spacing={2}>
-
-                    <MuiGrid item xs={12} md={6}>
-
-                        <MuiTextField
-
-                            fullWidth
-
-                            placeholder="ابحث عن خدمة..."
-
-                            value={searchTerm}
-
-                            onChange={(e) => setSearchTerm(e.target.value)}
-
-                            InputProps={{
-
-                                startAdornment: (
-
-                                    <MuiInputAdornment position="start">
-
-                                        <Search size={20} style={{ color: 'var(--color-text-secondary)' }} />
-
-                                    </MuiInputAdornment>
-
-                                ),
-
-                            }}
-
-                        />
-
-                    </MuiGrid>
-
-                    <MuiGrid item xs={12} md={6}>
-
-                        <MuiSelect
-
-                            fullWidth
-
-                            value={categoryFilter}
-
-                            onChange={(e) => setCategoryFilter(e.target.value)}
-
-                        >
-
-                            <MuiMenuItem value="all">جميع الفئات</MuiMenuItem>
-
-                            {Object.entries(SERVICE_CATEGORY_LABELS).map(([key, label]) => (
-
-                                <MuiMenuItem key={key} value={key}>{label}</MuiMenuItem>
-
-                            ))}
-
-                        </MuiSelect>
-
-                    </MuiGrid>
-
-                </MuiGrid>
-
-            </MuiPaper>
+            {/* Advanced Filter */}
+            <AdvancedFilter
+                onSearch={setSearchQuery}
+                onFilterChange={setActiveFilters}
+                filters={filterConfig}
+                onRefresh={refetch}
+                searchPlaceholder="بحث..."
+            />
 
 
 
@@ -948,7 +901,7 @@ export default function ServicesManagement() {
 
                     title="لا توجد خدمات"
 
-                    description={searchTerm || categoryFilter !== 'all' ? 'لم يتم العثور على خدمات تطابق البحث' : 'لم يتم إضافة أي خدمات بعد'}
+                    description={searchQuery || activeFilters.category || activeFilters.status ? 'لم يتم العثور على خدمات تطابق البحث' : 'لم يتم إضافة أي خدمات بعد'}
 
                     icon={Package}
 
