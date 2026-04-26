@@ -2,7 +2,7 @@
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 
-const StyledTypography = styled(Typography)(({ theme, color, variant }) => {
+const StyledTypography = styled(Typography)(({ color, variant }) => {
   const getColor = () => {
     if (color === 'primary') return 'var(--color-primary-500)';
     if (color === 'secondary') return 'var(--color-text-secondary)';
@@ -23,13 +23,13 @@ const StyledTypography = styled(Typography)(({ theme, color, variant }) => {
     '&.MuiTypography-h1': { fontWeight: 800, fontSize: '3rem' },
     '&.MuiTypography-h2': { fontWeight: 700, fontSize: '2.5rem' },
     '&.MuiTypography-h3': { fontWeight: 700, fontSize: '2rem' },
-    '&.MuiTypography-h4': { fontWeight: 710, fontSize: '1.75rem', color: 'var(--color-primary-500)' },
+    '&.MuiTypography-h4': { fontWeight: 710, fontSize: '1.75rem' },
     '&.MuiTypography-h5': { fontWeight: 600, fontSize: '1.5rem' },
     '&.MuiTypography-h6': { fontWeight: 600, fontSize: '1.25rem' },
-    '&.MuiTypography-subtitle1': { color: 'var(--color-text-secondary)', fontSize: '1rem' },
+    '&.MuiTypography-subtitle1': { fontSize: '1rem' },
     '&.MuiTypography-subtitle2': { fontWeight: 600, fontSize: '0.875rem' },
     '&.MuiTypography-body1': { fontSize: '1rem' },
-    '&.MuiTypography-body2': { fontSize: '0.875rem', color: 'var(--color-text-secondary)' },
+    '&.MuiTypography-body2': { fontSize: '0.875rem' },
   };
 });
 

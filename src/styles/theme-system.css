@@ -4,6 +4,7 @@
 :root {
   --color-dark: #1A1A1A;
   --color-light: #FFF8DA;
+  --color-light-soft: #FFFDF6;
   --color-gold: #D8B98A;
 
   /* Light mode mapping */
@@ -55,9 +56,10 @@
   --color-success-50: var(--color-gold);
   --color-success-500: var(--color-gold);
   --color-success-700: var(--color-gold);
-  --color-error-50: var(--color-gold);
-  --color-error-500: var(--color-gold);
-  --color-error-700: var(--color-gold);
+  --color-error-50: #FEF2F2;
+  --color-error-100: #FEE2E2;
+  --color-error-500: #DC2626;
+  --color-error-700: #B91C1C;
   --color-warning-50: var(--color-gold);
   --color-warning-500: var(--color-gold);
   --color-warning-700: var(--color-gold);
@@ -85,6 +87,11 @@
   --color-border: var(--color-gold);
   --color-border-glass: color-mix(in srgb, var(--color-gold) 35%, transparent);
   --color-divider: var(--color-gold);
+
+  --color-error-50: rgba(220, 38, 38, 0.14);
+  --color-error-100: rgba(220, 38, 38, 0.22);
+  --color-error-500: #F87171;
+  --color-error-700: #FCA5A5;
 }
 
 /* Global enforcement for pages/components */
@@ -121,9 +128,7 @@ svg,
 
 .MuiInputBase-root,
 .MuiFormLabel-root,
-.MuiTypography-root,
 .MuiTableCell-root,
-.MuiButton-root,
 .MuiChip-root {
   color: var(--color-text-primary) !important;
 }
@@ -155,11 +160,7 @@ svg,
 .MuiChip-colorSuccess,
 .MuiChip-colorError,
 .MuiChip-colorWarning,
-.MuiChip-colorInfo,
-.MuiAlert-standardSuccess,
-.MuiAlert-standardError,
-.MuiAlert-standardWarning,
-.MuiAlert-standardInfo {
+.MuiChip-colorInfo {
   background-color: var(--color-icon) !important;
   color: var(--color-dark) !important;
   border-color: var(--color-border) !important;

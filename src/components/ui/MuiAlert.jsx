@@ -8,6 +8,7 @@ const MuiAlert = ({
   variant = 'standard',
   onClose,
   className = '',
+  sx,
   ...props
 }) => {
   return (
@@ -25,7 +26,8 @@ const MuiAlert = ({
             severity === 'success' ? 'var(--color-success-500)' :
               severity === 'warning' ? 'var(--color-warning-500)' :
                 'var(--color-error-500)'
-        }
+        },
+        ...sx,
       }}
       className={className}
       {...props}

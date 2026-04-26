@@ -245,51 +245,67 @@ const MuiTextField = ({
                 variant={variant}
                 color={color}
                 sx={{
-                    '& .MuiOutlinedInput-root': {
-                        borderRadius: '12px !important',
+                    // Apply a thin bottom border and remove any radius for all variants
+                    '& .MuiOutlinedInput-root, & .MuiFilledInput-root, & .MuiInput-root': {
+                        borderRadius: '0 !important',
                         backgroundColor: 'transparent',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transition: 'background-color 0.2s ease, border-color 0.2s ease',
+                        position: 'relative',
+                        // Default thin bottom border
+                        border: 'none',
+                        borderBottom: `1px solid ${error ? 'var(--color-error-500)' : 'var(--color-border)'} `,
                         '&:hover': {
                             backgroundColor: 'var(--color-surface-hover)',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: error ? 'var(--color-error-600) !important' : 'var(--color-primary-500) !important',
-                            },
+                            borderBottom: `1px solid ${error ? 'var(--color-error-600)' : 'var(--color-primary-500)'} `,
                         },
                         '&.Mui-focused': {
                             backgroundColor: 'var(--color-surface-hover)',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
-                                borderWidth: '1px !important',
-                            },
+                            borderBottom: `1px solid ${error ? 'var(--color-error-500)' : 'var(--color-primary-500)'} `,
                         },
                         '&.Mui-disabled': {
                             backgroundColor: 'var(--color-surface)',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'var(--color-border) !important',
-                            },
+                            borderBottom: '1px solid var(--color-border)',
                         },
-                        '& .MuiOutlinedInput-notchedOutline': {
-                            borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-border) !important',
-                            borderWidth: '1px !important',
-                            borderRadius: '12px !important',
-                        },
-                        // Ensure text color is forced even for Select
                         '& .MuiSelect-select': {
                             color: 'var(--color-text-primary) !important',
                             WebkitTextFillColor: 'var(--color-text-primary) !important',
+                        },
+                        // Focus animation bar: scaled ::after that grows on focus
+                        '&:after': {
+                            content: '""',
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            height: '2px',
+                            backgroundColor: error ? 'var(--color-error-500)' : 'var(--color-primary-500)',
+                            transform: 'scaleX(0)',
+                            transformOrigin: 'left',
+                            transition: 'transform 220ms cubic-bezier(0.4,0,0.2,1), background-color 220ms',
+                            pointerEvents: 'none',
+                        },
+                        '&.Mui-focused:after': {
+                            transform: 'scaleX(1)'
+                        },
+                        '&.Mui-disabled:after': {
+                            backgroundColor: 'var(--color-border)'
                         }
+                    },
+                    // For outlined variant specifically, hide the notched outline
+                    '& .MuiOutlinedInput-notchedOutline': {
+                        border: 'none !important',
+                        borderRadius: '0 !important',
                     },
                     '& .MuiInputBase-input': {
                         color: 'var(--color-text-primary) !important',
                         WebkitTextFillColor: 'var(--color-text-primary) !important',
                         fontSize: size === 'small' ? '0.875rem' : '1rem',
-                        padding: size === 'small' ? '10.5px 14px' : '14px 16px',
+                        padding: size === 'small' ? '8px 0' : '12px 0',
                         fontFamily: 'var(--font-family-base)',
                         '&:focus': {
                             color: 'var(--color-text-primary) !important',
                             WebkitTextFillColor: 'var(--color-text-primary) !important',
                         },
-                        // Date/Time picker icon styling
                         '&::-webkit-calendar-picker-indicator': {
                             filter: 'var(--color-icon-filter)',
                             cursor: 'pointer',
@@ -301,14 +317,12 @@ const MuiTextField = ({
                             opacity: 0.6,
                             fontFamily: 'var(--font-family-base)',
                         },
-                        // TARGETING AUTOFILL SPECIFICALLY
                         '&:-webkit-autofill': {
                             WebkitBoxShadow: '0 0 0 100px var(--color-surface) inset !important',
                             WebkitTextFillColor: 'var(--color-text-primary) !important',
                             caretColor: 'var(--color-text-primary)',
                             transition: 'background-color 5000s ease-in-out 0s',
                         },
-                        // Fallback for other browsers
                         '&:autofill': {
                             WebkitBoxShadow: '0 0 0 100px var(--color-surface) inset !important',
                             WebkitTextFillColor: 'var(--color-text-primary) !important',
@@ -335,7 +349,6 @@ const MuiTextField = ({
                             color: 'var(--color-error-500)',
                         }
                     },
-                    // Merge with sx prop - external sx can override base styles
                     ...(props.sx || {})
                 }}
                 className={className}

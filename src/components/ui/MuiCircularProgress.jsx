@@ -7,6 +7,7 @@ const MuiCircularProgress = ({
   variant = 'indeterminate',
   value,
   className = '',
+  sx,
   ...props
 }) => {
   return (
@@ -16,7 +17,11 @@ const MuiCircularProgress = ({
       color={color}
       variant={variant}
       value={value}
-      className={`!text-secondary-500 ${className}`}
+      className={className}
+      sx={{
+        color: color === 'inherit' ? 'inherit' : undefined,
+        ...sx,
+      }}
       {...props}
     />
   );
