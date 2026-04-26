@@ -285,6 +285,7 @@ export default function Login() {
                                 mb: 1.5,
                                 textAlign: 'center',
                                 fontFamily: 'Alexandria, var(--font-family-base)',
+                                display: { xs: 'none', md: 'block' },
                                 ...revealUp,
                                 animationDelay: '0.28s',
                             }}
@@ -301,6 +302,7 @@ export default function Login() {
                                 mb: { xs: 3.5, sm: 4.5 },
                                 textAlign: 'center',
                                 fontFamily: 'Alexandria, var(--font-family-base)',
+                                display: { xs: 'none', md: 'block' },
                                 ...revealUp,
                                 animationDelay: '0.38s',
                             }}
@@ -473,9 +475,9 @@ export default function Login() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        minHeight: { xs: '42dvh', sm: '46dvh', md: '100dvh' },
+                        minHeight: { xs: '22dvh', sm: '28dvh', md: '100dvh' },
                         px: { xs: 2.5, sm: 4, md: 8, lg: 10 },
-                        py: { xs: 4, sm: 5, md: 6 },
+                        py: { xs: 2, sm: 3, md: 6 },
                         overflow: 'hidden',
                         ...revealRight,
                     }}
@@ -484,6 +486,7 @@ export default function Login() {
                         sx={{
                             textAlign: 'center',
                             maxWidth: '560px',
+                            width: '100%',
                         }}
                     >
                         <MuiBox
@@ -491,9 +494,9 @@ export default function Login() {
                             src="/logo/logo_white_with_invocca.png"
                             alt="INVOCCA"
                             sx={{
-                                width: { xs: '132px', sm: '170px', md: '220px' },
+                                width: { xs: '108px', sm: '145px', md: '220px' },
                                 maxWidth: '52%',
-                                mb: { xs: 2.5, sm: 3, md: 4 },
+                                mb: { xs: 0, md: 4 },
                                 mx: 'auto',
                                 display: 'block',
                                 opacity: 0,
@@ -511,6 +514,7 @@ export default function Login() {
                                 fontWeight: 300,
                                 letterSpacing: '0.4em',
                                 fontFamily: 'Montserrat, sans-serif',
+                                display: { xs: 'none', md: 'block' },
                                 ...revealRight,
                                 animationDelay: '0.72s',
                             }}
@@ -524,6 +528,7 @@ export default function Login() {
                                 color: 'var(--color-text-primary)',
                                 mb: { xs: 2, sm: 2.5, md: 4 },
                                 fontWeight: 500,
+                                display: { xs: 'none', md: 'block' },
                                 ...revealRight,
                                 animationDelay: '0.86s',
                             }}
@@ -540,6 +545,7 @@ export default function Login() {
                                 fontFamily: 'Alexandria, var(--font-family-base)',
                                 maxWidth: { xs: '300px', sm: '420px', md: '100%' },
                                 mx: 'auto',
+                                display: { xs: 'none', md: 'block' },
                                 ...revealRight,
                                 animationDelay: '1s',
                             }}
