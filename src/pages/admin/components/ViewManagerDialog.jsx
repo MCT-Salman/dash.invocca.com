@@ -33,12 +33,12 @@ export default function ViewManagerDialog({ open, onClose, manager }) {
                 <MuiBox sx={{ position: 'relative' }}>
                     {/* Header Image */}
                     <MuiBox sx={{ height: '192px', width: '100%', backgroundColor: 'var(--color-bg-dark)', position: 'relative' }}>
-                        <MuiBox sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(216, 185, 138, 0.1)' }}>
-                            <MuiTypography variant="h3" sx={{ color: 'var(--color-primary-300)', fontWeight: 'bold' }}>
+                        <MuiBox sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)' }}>
+                            <MuiTypography variant="h3" sx={{ color: 'var(--color-icon)', fontWeight: 'bold' }}>
                                 {manager.name?.[0]}
                             </MuiTypography>
                         </MuiBox>
-                        <MuiBox sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }} />
+                        <MuiBox sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top, var(--color-dark), transparent)' }} />
 
                         <MuiIconButton
                             onClick={onClose}
@@ -46,11 +46,11 @@ export default function ViewManagerDialog({ open, onClose, manager }) {
                                 position: 'absolute',
                                 top: 16,
                                 right: 16,
-                                backgroundColor: 'rgba(255,255,255,0.1)',
+                                backgroundColor: 'color-mix(in srgb, var(--color-light) 10%, transparent)',
                                 color: 'var(--color-text-primary)',
                                 backdropFilter: 'blur(4px)',
                                 '&:hover': {
-                                    backgroundColor: 'rgba(255,255,255,0.2)',
+                                    backgroundColor: 'color-mix(in srgb, var(--color-light) 20%, transparent)',
                                 }
                             }}
                         >
@@ -58,12 +58,12 @@ export default function ViewManagerDialog({ open, onClose, manager }) {
                         </MuiIconButton>
 
                         <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: 'var(--color-text-primary)' }}>
-                            <MuiTypography variant="h4" sx={{ fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                            <MuiTypography variant="h4" sx={{ fontWeight: 'bold', textShadow: 'none' }}>
                                 {manager.name}
                             </MuiTypography>
                             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                <User size={16} style={{ color: 'rgba(255,255,255,0.8)' }} />
-                                <MuiTypography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>
+                                <User size={16} style={{ color: 'var(--color-text-secondary)' }} />
+                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
                                     مدير قاعة/صالة
                                 </MuiTypography>
                             </MuiBox>
@@ -78,13 +78,13 @@ export default function ViewManagerDialog({ open, onClose, manager }) {
                                     label={manager.isActive !== false ? 'نشط' : 'غير نشط'}
                                     icon={manager.isActive !== false ? <CheckCircle size={14} /> : <XCircle size={14} />}
                                     sx={{
-                                        backgroundColor: manager.isActive !== false ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)',
+                                        backgroundColor: manager.isActive !== false ? 'color-mix(in srgb, var(--color-gold) 20%, transparent)' : 'color-mix(in srgb, var(--color-gold) 20%, transparent)',
                                         color: manager.isActive !== false ? 'var(--color-icon)' : 'var(--color-icon)',
                                         fontWeight: 'bold',
                                         border: 'none',
                                     }}
                                 />
-                                <MuiTypography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--color-primary-500)' }}>
+                                <MuiTypography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--color-icon)' }}>
                                     {manager.phone}
                                 </MuiTypography>
                             </MuiGrid>
@@ -103,8 +103,8 @@ export default function ViewManagerDialog({ open, onClose, manager }) {
                                         { icon: Calendar, label: 'تاريخ الإنشاء', value: manager.createdAt ? new Date(manager.createdAt).toLocaleDateString('ar-SA') : '—' }
                                     ].map((item, idx) => (
                                         <MuiGrid item xs={12} sm={6} key={idx}>
-                                            <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--color-border-glass)' }}>
-                                                <item.icon size={24} style={{ margin: '0 auto 8px', color: 'var(--color-secondary-500)' }} />
+                                            <MuiBox sx={{ p: 2, backgroundColor: 'color-mix(in srgb, var(--color-light) 3%, transparent)', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--color-border-glass)' }}>
+                                                <item.icon size={24} style={{ margin: '0 auto 8px', color: 'var(--color-icon)' }} />
                                                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>{item.label}</MuiTypography>
                                                 <MuiTypography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary-dark)' }}>{item.value}</MuiTypography>
                                             </MuiBox>
@@ -121,9 +121,9 @@ export default function ViewManagerDialog({ open, onClose, manager }) {
                                     </MuiGrid>
                                     <MuiGrid item xs={12}>
                                         <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>قاعة/صالة المرتبطة</MuiTypography>
-                                        <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
+                                        <MuiBox sx={{ p: 2, backgroundColor: 'color-mix(in srgb, var(--color-light) 3%, transparent)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
                                             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <Building2 size={20} style={{ color: 'var(--color-primary-400)' }} />
+                                                <Building2 size={20} style={{ color: 'var(--color-icon)' }} />
                                                 <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 'bold' }}>
                                                     {manager.hallId?.name || manager.hallName || 'غير معين'}
                                                 </MuiTypography>

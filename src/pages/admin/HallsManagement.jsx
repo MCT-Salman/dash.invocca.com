@@ -48,8 +48,6 @@ import MuiDivider from '@/components/ui/MuiDivider'
 
 import MuiGrid from '@/components/ui/MuiGrid'
 
-import MuiChip from '@/components/ui/MuiChip'
-
 import MuiAlert from '@/components/ui/MuiAlert'
 
 import MuiCircularProgress from '@/components/ui/MuiCircularProgress'
@@ -68,19 +66,17 @@ import MuiInputAdornment from '@/components/ui/MuiInputAdornment'
 
 import MuiIconButton from '@/components/ui/MuiIconButton'
 
-
+import { StatusBadge } from '@/components/common'
 
 // Layout & Common Components
 
 import DashboardLayout from '@/components/layout/DashboardLayout'
 
-import { LoadingScreen, EmptyState, ConfirmDialog, SEOHead, CardsView, TablePagination, DataTable, PageHeader, StatCard, AdvancedFilter } from '@/components/common'
+import { LoadingScreen, EmptyState, ConfirmDialog, SEOHead, CrudPageLayout } from '@/components/common'
 
 import CreateEditHallDialog from './components/CreateEditHallDialog'
 
 import ViewHallDialog from './components/ViewHallDialog'
-
-
 
 // Hooks & Utilities
 
@@ -91,8 +87,6 @@ import { QUERY_KEYS, API_CONFIG } from '@/config/constants'
 import { getAllHalls, createHall, updateHall, deleteHall, getServicesList } from '@/api/admin'
 
 import { formatCurrency, formatPhoneNumber, generateExportFileName } from '@/utils/helpers'
-
-
 
 // Icons
 
@@ -170,8 +164,6 @@ import {
 
 } from 'lucide-react'
 
-
-
 // Helper function for truncating text
 
 const truncateText = (text, maxLength = 50) => {
@@ -184,85 +176,46 @@ const truncateText = (text, maxLength = 50) => {
 
 }
 
-
-
 // ====================== Validation Schema ======================
 
 const createHallSchema = (editingHall = null) => z.object({
 
   name: z.string()
-
     .min(3, 'اسم قاعة/صالة يجب أن يكون 3 أحرف على الأقل')
-
     .max(100, 'اسم قاعة/صالة طويل جداً'),
 
-
-
   location: z.string()
-
     .min(3, 'الموقع مطلوب')
-
     .max(200, 'الموقع طويل جداً'),
 
-
-
   address: z.string()
-
     .min(5, 'العنوان التفصيلي مطلوب')
-
     .max(300, 'العنوان طويل جداً'),
 
-
-
   capacity: z.coerce.number()
-
     .min(1, 'السعة مطلوبة')
-
     .max(10000, 'السعة كبيرة جداً'),
 
-
-
   tables: z.coerce.number()
-
     .min(1, 'عدد الطاولات مطلوب')
-
     .max(1000, 'عدد الطاولات كبير جداً'),
 
-
-
   chairs: z.coerce.number()
-
     .min(1, 'عدد الكراسي مطلوب')
-
     .max(10000, 'عدد الكراسي كبير جداً'),
 
-
-
   defaultPrices: z.coerce.number()
-
     .min(0, 'السعر مطلوب')
-
     .max(1000000, 'السعر كبير جداً'),
 
-
-
   managerName: z.string()
-
     .min(3, 'اسم المدير مطلوب')
-
     .max(100, 'اسم المدير طويل جداً'),
 
-
-
   managerUsername: z.string()
-
     .min(3, 'اسم المستخدم مطلوب')
-
     .max(50, 'اسم المستخدم طويل جداً')
-
     .regex(/^[a-zA-Z0-9_]+$/, 'اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام و _ فقط'),
-
-
 
   managerPhone: z.string()
 
@@ -354,8 +307,6 @@ const createHallSchema = (editingHall = null) => z.object({
 
 })
 
-
-
 // ====================== Main Component ======================
 
 const HallsManagement = () => {
@@ -375,6 +326,7 @@ const HallsManagement = () => {
   const [viewMode, setViewMode] = useState('table') // 'table' or 'card'
 
   const [submitError, setSubmitError] = useState(null)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
 
   const debouncedSearch = useDebounce(searchQuery, 500)
 
@@ -755,6 +707,8 @@ const HallsManagement = () => {
 
       align: 'right',
 
+      // minWidth: 60,
+
       format: (value, row) => {
 
         const imageUrl = row.primaryImage || row.images?.[0]
@@ -791,7 +745,7 @@ const HallsManagement = () => {
 
           <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
 
-            {imageUrl ? (
+            {/* {imageUrl ? (
 
               <MuiAvatar
 
@@ -807,7 +761,7 @@ const HallsManagement = () => {
 
                 sx={{
 
-                  width: 40,
+                  width: 20,
 
                   height: 40,
 
@@ -841,7 +795,7 @@ const HallsManagement = () => {
 
                   borderRadius: '10px',
 
-                  background: 'rgba(216, 185, 138, 0.2)',
+                  background: 'color-mix(in srgb, var(--color-gold) 20%, transparent)',
 
                   display: 'flex',
 
@@ -849,7 +803,7 @@ const HallsManagement = () => {
 
                   justifyContent: 'center',
 
-                  border: '1px solid rgba(216, 185, 138, 0.4)',
+                  border: '1px solid var(--color-border)',
 
                 }}
 
@@ -859,7 +813,7 @@ const HallsManagement = () => {
 
               </MuiBox>
 
-            )}
+            )} */}
 
             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 500 }}>
 
@@ -883,9 +837,11 @@ const HallsManagement = () => {
 
       align: 'center',
 
+      // minWidth: 10,
+
       format: (value) => (
 
-        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
+        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-start' }}>
 
           <Users size={16} style={{ color: 'var(--color-icon)' }} />
 
@@ -904,6 +860,7 @@ const HallsManagement = () => {
       label: 'الموقع',
 
       align: 'right',
+      // minWidth: 40,
 
       format: (value) => (
 
@@ -971,7 +928,7 @@ const HallsManagement = () => {
 
             {username && (
 
-              <MuiTypography variant="caption" sx={{ color: 'var(--color-primary-500)', fontWeight: 500, display: 'block' }}>
+              <MuiTypography variant="caption" sx={{ color: 'var(--color-icon)', fontWeight: 500, display: 'block' }}>
 
                 @{username}
 
@@ -1049,19 +1006,7 @@ const HallsManagement = () => {
 
       format: (value) => (
 
-        <MuiChip
-
-          label={value ? 'نشطة' : 'غير نشطة'}
-
-          size="small"
-
-          color={value ? 'success' : 'error'}
-
-          variant="filled"
-
-          icon={value ? <CheckCircle size={14} /> : <XCircle size={14} />}
-
-        />
+        <StatusBadge value={value} activeLabel="نشطة" inactiveLabel="غير نشطة" />
 
       )
 
@@ -1293,7 +1238,7 @@ const HallsManagement = () => {
 
             boxShadow: 'var(--shadow-xl)',
 
-            borderColor: 'var(--color-primary-500)',
+            borderColor: 'var(--color-icon)',
 
           }
 
@@ -1323,7 +1268,7 @@ const HallsManagement = () => {
 
               height: '100%',
 
-              background: 'var(--color-primary-100)',
+              background: 'color-mix(in srgb, var(--color-gold) 15%, transparent)',
 
               display: 'flex',
 
@@ -1333,7 +1278,7 @@ const HallsManagement = () => {
 
             }}>
 
-              <Building2 size={48} style={{ color: 'var(--color-primary-300)' }} />
+              <Building2 size={48} style={{ color: 'var(--color-icon)' }} />
 
             </MuiBox>
 
@@ -1367,7 +1312,7 @@ const HallsManagement = () => {
 
           <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
 
-            <MapPin size={14} style={{ color: 'var(--color-primary-500)' }} />
+            <MapPin size={14} style={{ color: 'var(--color-icon)' }} />
 
             <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
 
@@ -1385,7 +1330,7 @@ const HallsManagement = () => {
 
               <MuiBox sx={{ p: 1, borderRadius: '12px', background: 'var(--color-surface)', display: 'flex', alignItems: 'center', gap: 1 }}>
 
-                <Users size={14} style={{ color: 'var(--color-info-500)' }} />
+                <Users size={14} style={{ color: 'var(--color-icon)' }} />
 
                 <MuiTypography variant="caption" sx={{ fontWeight: 600 }}>{hall.capacity}</MuiTypography>
 
@@ -1397,7 +1342,7 @@ const HallsManagement = () => {
 
               <MuiBox sx={{ p: 1, borderRadius: '12px', background: 'var(--color-surface)', display: 'flex', alignItems: 'center', gap: 1 }}>
 
-                <DollarSign size={14} style={{ color: 'var(--color-success-500)' }} />
+                <DollarSign size={14} style={{ color: 'var(--color-icon)' }} />
 
                 <MuiTypography variant="caption" sx={{ fontWeight: 600 }}>{formatCurrency(hall.defaultPrices)}</MuiTypography>
 
@@ -1492,13 +1437,9 @@ const HallsManagement = () => {
             onClick={handleRefresh}
 
           >
-
             إعادة المحاولة
-
           </MuiButton>
-
         }
-
         showPaper
 
       />
@@ -1511,243 +1452,126 @@ const HallsManagement = () => {
 
   return (
 
-    <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
+    <MuiBox sx={{ p: { xs: 1.5, sm: 2 }, maxWidth: '100%' }}>
 
       <SEOHead pageKey="hallsManagement" title="إدارة قاعة/صالة | INVOCCA" />
 
-
-
-      <PageHeader
-
-        icon={Building2}
-
-        title={`إدارة قاعة/صالة (${filteredHalls.length})`}
-
-        subtitle="إدارة جميع قاعات/صالات المناسبات في النظام"
-
-        actions={
-
-          <MuiBox sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-
-            <MuiBox sx={{ display: 'flex', background: 'var(--color-surface)', p: 0.5, borderRadius: '12px', border: '1px solid var(--color-border)' }}>
-
-              <MuiIconButton
-
-                size="small"
-
-                onClick={() => setViewMode('table')}
-
-                sx={{
-
-                  borderRadius: '10px',
-
-                  color: viewMode === 'table' ? 'var(--color-primary-500)' : 'var(--color-text-muted)',
-
-                  background: viewMode === 'table' ? 'var(--color-paper)' : 'transparent',
-
-                  boxShadow: viewMode === 'table' ? 'var(--shadow-sm)' : 'none',
-
-                  '&:hover': { background: viewMode === 'table' ? 'var(--color-paper)' : 'rgba(0,0,0,0.05)' }
-
-                }}
-
-              >
-
-                <Table size={20} />
-
-              </MuiIconButton>
-
-              <MuiIconButton
-
-                size="small"
-
-                onClick={() => setViewMode('card')}
-
-                sx={{
-
-                  borderRadius: '10px',
-
-                  color: viewMode === 'card' ? 'var(--color-primary-500)' : 'var(--color-text-muted)',
-
-                  background: viewMode === 'card' ? 'var(--color-paper)' : 'transparent',
-
-                  boxShadow: viewMode === 'card' ? 'var(--shadow-sm)' : 'none',
-
-                  '&:hover': { background: viewMode === 'card' ? 'var(--color-paper)' : 'rgba(0,0,0,0.05)' }
-
-                }}
-
-              >
-
-                <LayoutGrid size={20} />
-
-              </MuiIconButton>
-
-            </MuiBox>
-
-            <MuiButton
-
-              variant="outlined"
-
-              start_icon={<Download size={18} />}
-
-              onClick={handleExport}
-
-            >
-
-              تصدير
-
-            </MuiButton>
-
-            <MuiButton
-
-              variant="contained"
-
-              start_icon={<Plus size={18} />}
-
-              onClick={handleCreateClick}
-
-            >
-
-              إضافة
-
-            </MuiButton>
-
-          </MuiBox>
-
-        }
-
-      />
-
-
-
-      {/* Stats Cards */}
-
-      <MuiGrid container spacing={3} sx={{ mb: 4 }}>
-
-        <MuiGrid item xs={12} sm={6} md={3}>
-
-          <StatCard
-
-            title="عدد قاعات/صالات"
-
-            value={halls.length}
-
-            icon={<Building2 size={24} />}
-
-          />
-
-        </MuiGrid>
-
-        <MuiGrid item xs={12} sm={6} md={3}>
-
-          <StatCard
-
-            title="قاعات/صالات النشطة"
-
-            value={halls.filter(h => h.isActive).length}
-
-            icon={<CheckCircle size={24} />}
-
-            sx={{ borderTop: '4px solid var(--color-success-500)' }}
-
-          />
-
-        </MuiGrid>
-
-        <MuiGrid item xs={12} sm={6} md={3}>
-
-          <StatCard
-
-            title="إجمالي السعة"
-
-            value={halls.reduce((sum, hall) => sum + (hall.capacity || 0), 0)}
-
-            icon={<Users size={24} />}
-
-            sx={{ borderTop: '4px solid var(--color-info-500)' }}
-
-          />
-
-        </MuiGrid>
-
-        <MuiGrid item xs={12} sm={6} md={3}>
-
-          <StatCard
-
-            title="متوسط السعر"
-
-            value={formatCurrency(halls.length > 0 ? halls.reduce((sum, h) => sum + (h.defaultPrices || 0), 0) / halls.length : 0)}
-
-            icon={<DollarSign size={24} />}
-
-            sx={{ borderTop: '4px solid var(--color-primary-500)' }}
-
-          />
-
-        </MuiGrid>
-
-      </MuiGrid>
-
-
-
-      {/* Advanced Filter */}
-
-      <AdvancedFilter
-
+      {/* CrudPageLayout - مكون موحد للتخطيط */}
+      <CrudPageLayout
+        stats={[
+          {
+            title: "عدد قاعات/صالات",
+            value: halls.length,
+            icon: <Building2 size={24} />
+          },
+          {
+            title: "قاعات/صالات النشطة",
+            value: halls.filter(h => h.isActive).length,
+            icon: <CheckCircle size={24} />
+          },
+          {
+            title: "إجمالي السعة",
+            value: halls.reduce((sum, hall) => sum + (hall.capacity || 0), 0),
+            icon: <Users size={24} />
+          },
+          {
+            title: "متوسط السعر",
+            value: formatCurrency(halls.length > 0 ? halls.reduce((sum, h) => sum + (h.defaultPrices || 0), 0) / halls.length : 0),
+            icon: <DollarSign size={24} />
+          }
+        ]}
+        filterConfig={filterConfig}
         onSearch={setSearchQuery}
-
         onFilterChange={setActiveFilters}
-
-        filters={filterConfig}
-
         onRefresh={fetchHalls}
-
         searchPlaceholder="بحث ..."
-
+        columns={columns}
+        data={filteredHalls}
+        loading={loading}
+        emptyMessage="لا توجد قاعات/صالات متاحة"
+        addButtonLabel="إضافة قاعة/صالة"
+        onAdd={handleCreateClick}
+        onEdit={handleEditClick}
+        onDelete={openDeleteDialog}
+        onView={openViewDialog}
+        onToggleStatus={handleToggleStatus}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={setRowsPerPage}
+        dataTableSx={{
+          minWidth: 850,
+          fontSize: '0.75rem',
+          '& .MuiTableCell-root': {
+            padding: '10px 10px',
+            fontSize: '0.75rem',
+            whiteSpace: 'normal',
+            maxWidth: '150px',
+            wordBreak: 'break-word',
+            lineHeight: 1.4
+          },
+          '& .MuiTableHead-root .MuiTableCell-root': {
+            fontWeight: 700,
+            fontSize: '0.85rem',
+            padding: '12px 16px',
+            whiteSpace: 'nowrap',
+            maxWidth: '120px',
+            backgroundColor: 'var(--color-gold)',
+            borderBottom: '3px solid var(--color-gold)',
+            color: 'var(--color-dark)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.8px',
+            position: 'sticky',
+            top: 0,
+            zIndex: 1,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            borderRadius: '8px 8px 0 0',
+            '&:hover': {
+              backgroundColor: 'color-mix(in srgb, var(--color-gold) 90%, var(--color-dark) 10%)'
+            }
+          },
+          '& .MuiTableCell:nth-of-type(1)': {
+            maxWidth: '200px',
+            minWidth: '150px'
+          },
+          '& .MuiTableCell:nth-of-type(2)': {
+            width: '80px',
+            minWidth: '60px',
+            textAlign: 'center'
+          },
+          '& .MuiTableCell:nth-of-type(3)': {
+            width: '100px',
+            minWidth: '80px',
+            textAlign: 'center'
+          },
+          '& .MuiTableCell:nth-of-type(4)': {
+            maxWidth: '180px',
+            minWidth: '120px'
+          },
+          '& .MuiTableCell:nth-of-type(5)': {
+            width: '100px',
+            minWidth: '90px',
+            textAlign: 'center',
+            whiteSpace: 'nowrap'
+          },
+          '& .MuiTableCell:nth-of-type(6)': {
+            width: '90px',
+            minWidth: '80px',
+            textAlign: 'center',
+            whiteSpace: 'nowrap',
+            '& .MuiChip-root': {
+              backgroundColor: (value) => value ? 'rgba(34, 197, 94, 0.15)' : 'rgba(220, 38, 38, 0.15)',
+              color: (value) => value ? '#22c55e' : '#dc2626',
+              border: (value) => `1px solid ${value ? '#22c55e' : '#dc2626'}`,
+              fontWeight: 500
+            }
+          },
+          '& .MuiTableCell:last-child': {
+            width: '160px',
+            minWidth: '140px',
+            textAlign: 'center',
+            whiteSpace: 'nowrap'
+          }
+        }}
       />
-
-
-
-      {/* Content */}
-
-      {viewMode === 'table' ? (
-
-        <DataTable
-
-          columns={columns}
-
-          data={filteredHalls}
-
-          onEdit={handleEditClick}
-
-          onDelete={openDeleteDialog}
-
-          onView={openViewDialog}
-
-          onToggleStatus={handleToggleStatus}
-
-          loading={loading}
-
-          emptyMessage="لا توجد قاعات/صالات متاحة"
-
-        />
-
-      ) : (
-
-        <CardsView
-
-          data={filteredHalls}
-
-          renderCard={renderHallCard}
-
-          loading={loading}
-
-          emptyMessage="لا توجد قاعات/صالات متاحة"
-
-        />
-
-      )}
 
 
 
@@ -1812,7 +1636,5 @@ const HallsManagement = () => {
   )
 
 }
-
-
 
 export default HallsManagement

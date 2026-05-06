@@ -22,7 +22,7 @@ const MuiTabs = ({
       centered={centered}
       className={className}
       TabIndicatorProps={{
-        sx: { backgroundColor: 'var(--color-primary-500)', height: '3px' }
+        sx: { backgroundColor: 'var(--color-icon)', height: '2px' }
       }}
       {...props}
     >
@@ -43,7 +43,7 @@ const MuiTabs = ({
             color: 'var(--color-text-secondary)',
             transition: 'all 0.2s ease',
             '&.Mui-selected': {
-              color: 'var(--color-primary-500)',
+              color: 'var(--color-icon)',
             },
             '&:hover': {
               backgroundColor: 'var(--color-surface-hover)',

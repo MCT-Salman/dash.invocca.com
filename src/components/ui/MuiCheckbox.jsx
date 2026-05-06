@@ -61,9 +61,9 @@ const MuiCheckbox = ({
                         value={value}
                         disableRipple={disableRipple}
                         sx={{
-                            color: 'var(--color-primary-500)',
+                            color: 'var(--color-icon)',
                             '&.Mui-checked': {
-                                color: 'var(--color-primary-500)',
+                                color: 'var(--color-icon)',
                             },
                         }}
                         className="transition-colors"
@@ -76,6 +76,7 @@ const MuiCheckbox = ({
                     '& .MuiFormControlLabel-label': {
                         color: 'var(--color-text-primary)',
                         fontWeight: 500,
+                        fontFamily: 'Alexandria, var(--font-family-base)',
                     }
                 }}
                 className={labelClassName}
@@ -100,9 +101,9 @@ const MuiCheckbox = ({
             value={value}
             disableRipple={disableRipple}
             sx={{
-                color: 'var(--color-primary-500)',
+                color: 'var(--color-icon)',
                 '&.Mui-checked': {
-                    color: 'var(--color-primary-500)',
+                    color: 'var(--color-icon)',
                 },
             }}
             className="rounded-md transition-colors"

@@ -115,7 +115,7 @@ export default function CreateEditManagerDialog({ open, onClose, onSubmit, editi
             <MuiGrid container spacing={3}>
                 {/* Basic Info */}
                 <MuiGrid item xs={12}>
-                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--color-primary-500)' }}>
+                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--color-icon)' }}>
                         المعلومات الأساسية
                     </MuiTypography>
                 </MuiGrid>
@@ -189,7 +189,7 @@ export default function CreateEditManagerDialog({ open, onClose, onSubmit, editi
 
                 {/* Hall Assignment */}
                 <MuiGrid item xs={12}>
-                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 1, color: 'var(--color-primary-500)' }}>
+                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 1, color: 'var(--color-icon)' }}>
                         قاعة/صالة المسؤول عنها
                     </MuiTypography>
                 </MuiGrid>

@@ -162,7 +162,7 @@ export default function AuthLayout({
 
                                             position: 'relative',
 
-                                            background: 'linear-gradient(135deg, var(--color-text-primary), var(--color-primary-500))',
+                                            background: 'linear-gradient(135deg, var(--color-text-primary), var(--color-icon))',
 
                                             WebkitBackgroundClip: 'text',
 
@@ -188,7 +188,7 @@ export default function AuthLayout({
 
                                                 height: 4,
 
-                                                background: 'linear-gradient(90deg, transparent, var(--color-primary-500), transparent)',
+                                                background: 'linear-gradient(90deg, transparent, var(--color-icon), transparent)',
 
                                                 borderRadius: '2px',
 
@@ -214,7 +214,7 @@ export default function AuthLayout({
 
                                         sx={{
 
-                                            color: 'var(--color-primary-400)',
+                                            color: 'var(--color-text-secondary)',
 
                                             fontWeight: 500,
 
@@ -266,7 +266,7 @@ export default function AuthLayout({
 
                                 border: '1px solid var(--color-border)',
 
-                                boxShadow: 'var(--shadow-xl)',
+                                boxShadow: 'none',
 
                                 position: 'relative',
 
@@ -275,11 +275,7 @@ export default function AuthLayout({
                                 transition: 'all 0.4s ease',
 
                                 '&:hover': {
-
-                                    boxShadow: 'var(--shadow-2xl)',
-
-                                    borderColor: 'var(--color-primary-500)',
-
+                                    borderColor: 'var(--color-border)',
                                 },
 
                                 '&::before': {
@@ -296,7 +292,7 @@ export default function AuthLayout({
 
                                     height: '500px',
 
-                                    background: 'radial-gradient(circle, var(--color-primary-500) 0%, transparent 70%)',
+                                    background: 'radial-gradient(circle, var(--color-icon) 0%, transparent 70%)',
 
                                     opacity: 0.12,
 
@@ -320,7 +316,7 @@ export default function AuthLayout({
 
                                     height: '400px',
 
-                                    background: 'radial-gradient(circle, var(--color-primary-500) 0%, transparent 70%)',
+                                    background: 'radial-gradient(circle, var(--color-icon) 0%, transparent 70%)',
 
                                     opacity: 0.08,
 
@@ -394,7 +390,7 @@ export default function AuthLayout({
 
                     overflow: 'hidden',
 
-                    background: 'linear-gradient(135deg, var(--color-primary-700) 0%, var(--color-primary-900) 100%)',
+                    background: 'linear-gradient(135deg, var(--color-dark) 0%, var(--color-bg) 100%)',
 
                 }}>
 
@@ -404,7 +400,7 @@ export default function AuthLayout({
 
                         {/* شبكة خلفية */}
 
-                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.1)_50%,transparent_75%,transparent_100%)] bg-[length:20px_20px] opacity-20" />
+                        <div className="absolute inset-0" style={{background: 'linear-gradient(45deg, transparent 25%, color-mix(in srgb, var(--color-light) 10%, transparent) 50%, transparent 75%, transparent 100%)', backgroundSize: '20px 20px', opacity: 0.2}} />
 
 
 

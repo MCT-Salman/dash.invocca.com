@@ -13,7 +13,7 @@ import MuiTypography from '@/components/ui/MuiTypography'
 import MuiPaper from '@/components/ui/MuiPaper'
 import MuiChip from '@/components/ui/MuiChip'
 import MuiDivider from '@/components/ui/MuiDivider'
-import { LoadingScreen, EmptyState, SEOHead } from '@/components/common'
+import { LoadingScreen, EmptyState, SEOHead, StatCard } from '@/components/common'
 import { QUERY_KEYS } from '@/config/constants'
 import { getAdminDashboard } from '@/api/admin'
 import { formatNumber, formatCurrency } from '@/utils/helpers'
@@ -86,50 +86,7 @@ const CustomTooltip = ({ active, payload, label }) => {
     return null
 }
 
-const statsConfig = [
-    {
-        key: 'totalUsers',
-        title: 'إجمالي المستخدمين',
-        icon: Users,
-        formatter: formatNumber,
-        color: 'primary',
-    },
-    {
-        key: 'totalHalls',
-        title: 'إجمالي القاعات',
-        icon: Building2,
-        formatter: formatNumber,
-        color: 'warning',
-    },
-    {
-        key: 'totalEvents',
-        title: 'إجمالي الفعاليات',
-        icon: Calendar,
-        formatter: formatNumber,
-        color: 'info',
-    },
-    {
-        key: 'totalRevenue',
-        title: 'إجمالي الإيرادات',
-        icon: DollarSign,
-        formatter: (value) => formatCurrency(value, 'SY'),
-        color: 'success',
-    },
-    {
-        key: 'totalInvitations',
-        title: 'إجمالي الدعوات',
-        icon: FileText,
-        formatter: formatNumber,
-        color: 'secondary',
-    },
-    {
-        key: 'completedPayments',
-        title: 'المدفوعات المكتملة',
-        icon: CheckCircle,
-        formatter: formatNumber,
-        color: 'success',
-    },
-]
+
 
 /**
  * Admin Dashboard Content
@@ -180,169 +137,39 @@ function AdminDashboardContent() {
     }
 
     return (
-        <MuiBox sx={{ p: { xs: 2, sm: 3 }, minHeight: '100vh', background: 'var(--color-bg)' }}>
+        <MuiBox sx={{ p: { xs: 2, sm: 3 }, minHeight: '100vh', background: 'var(--color-light-soft)' }}>
             <SEOHead pageKey="adminDashboard" />
 
-            {/* Header Section */}
-            <MuiBox
-                sx={{
-                    mb: 4,
-                    p: { xs: 3, sm: 4 },
-                    borderRadius: '24px',
-                    background: 'linear-gradient(135deg, var(--color-primary-900) 0%, var(--color-primary-800) 100%)',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    boxShadow: 'var(--shadow-xl)',
-                }}
-            >
-                <MuiBox sx={{ position: 'relative', zIndex: 1 }}>
-                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
-                        <MuiBox
-                            sx={{
-                                width: { xs: 64, sm: 72 },
-                                height: { xs: 64, sm: 72 },
-                                borderRadius: '20px',
-                                background: 'rgba(255, 255, 255, 0.1)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                border: '1px solid rgba(255, 255, 255, 0.2)',
-                                backdropFilter: 'blur(10px)',
-                            }}
-                        >
-                            <LayoutDashboard size={36} style={{ color: 'var(--color-text-primary)' }} />
-                        </MuiBox>
-                        <MuiBox sx={{ flex: 1 }}>
-                            <MuiTypography
-                                variant="h4"
-                                sx={{
-                                    color: 'var(--color-text-primary)',
-                                    fontWeight: 800,
-                                    mb: 1,
-                                    fontSize: { xs: '1.5rem', sm: '2rem' },
-                                }}
-                            >
-                                مرحباً، {user?.name || 'المدير'}
-                            </MuiTypography>
-                            <MuiTypography
-                                variant="body1"
-                                sx={{
-                                    color: 'rgba(255, 255, 255, 0.8)',
-                                    fontSize: { xs: '0.9rem', sm: '1rem' },
-                                    fontWeight: 500,
-                                }}
-                            >
-                                نظرة عامة على النظام ولوحة إدارة
-                            </MuiTypography>
-                        </MuiBox>
-                    </MuiBox>
-                </MuiBox>
-
-                {/* Background Decor */}
-                <MuiBox
-                    sx={{
-                        position: 'absolute',
-                        top: 0,
-                        right: 0,
-                        bottom: 0,
-                        left: 0,
-                        opacity: 0.1,
-                        background: 'radial-gradient(circle at top right, var(--color-text-primary) 0%, transparent 60%)',
-                    }}
-                />
-            </MuiBox>
-
             {/* Stats Grid */}
-            <MuiGrid
-                container
-                spacing={3}
-                sx={{ mb: 4 }}
-            >
-                {statsConfig.map((config) => (
-                    <MuiGrid
-                        item
-                        xs={12}
-                        sm={6}
-                        md={4}
-                        lg={2}
-                        key={config.key}
-                    >
-                        <MuiPaper
-                            elevation={0}
-                            sx={{
-                                p: 3,
-                                height: '100%',
-                                background: 'var(--color-paper)',
-                                border: '1px solid var(--color-border-glass)',
-                                borderRadius: '24px',
-                                position: 'relative',
-                                overflow: 'hidden',
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                '&:hover': {
-                                    transform: 'translateY(-6px)',
-                                    boxShadow: '0 12px 24px rgba(0, 0, 0, 0.2)',
-                                    borderColor: `var(--color-${config.color}-500)`,
-                                }
-                            }}
-                        >
-                            <MuiBox sx={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                                <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5 }}>
-                                    <MuiBox
-                                        sx={{
-                                            width: 52,
-                                            height: 52,
-                                            borderRadius: '14px',
-                                            background: `rgba(var(--color-${config.color}-500-rgb), 0.1)`,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            color: `var(--color-${config.color}-500)`,
-                                            border: `1px solid rgba(var(--color-${config.color}-500-rgb), 0.2)`
-                                        }}
-                                    >
-                                        <config.icon size={26} strokeWidth={2.5} />
-                                    </MuiBox>
-                                    <MuiBox sx={{ textAlign: 'left' }}>
-                                        <MuiTypography
-                                            variant="caption"
-                                            sx={{
-                                                color: 'var(--color-text-secondary)',
-                                                fontWeight: 700,
-                                                letterSpacing: 0.5,
-                                                display: 'block',
-                                                mb: 0.5,
-                                                textAlign: 'right'
-                                            }}
-                                        >
-                                            {config.title}
-                                        </MuiTypography>
-                                        <MuiTypography
-                                            variant="h4"
-                                            sx={{
-                                                color: 'var(--color-text-primary)',
-                                                fontWeight: 900,
-                                                fontSize: '1.85rem',
-                                                lineHeight: 1,
-                                                textAlign: 'right'
-                                            }}
-                                        >
-                                            {config.formatter(stats[config.key] || 0)}
-                                        </MuiTypography>
-                                    </MuiBox>
-                                </MuiBox>
-
-                                <MuiBox sx={{ mt: 'auto' }}>
-                                    <MuiBox sx={{ height: 32, opacity: 0.5, display: 'flex', alignItems: 'center' }}>
-                                        <Activity size={14} style={{ marginRight: 8 }} color="var(--color-text-disabled)" />
-                                        <MuiTypography variant="caption" sx={{ color: 'var(--color-text-disabled)' }}>
-                                            حالة النظام نشطة
-                                        </MuiTypography>
-                                    </MuiBox>
-                                </MuiBox>
-                            </MuiBox>
-                        </MuiPaper>
-                    </MuiGrid>
-                ))}
+            <MuiGrid container spacing={3} sx={{ mb: 4 }}>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <StatCard
+                        title="إجمالي المستخدمين"
+                        value={formatNumber(stats.totalUsers || 0)}
+                        icon={<Users size={24} />}
+                    />
+                </MuiGrid>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <StatCard
+                        title="إجمالي القاعات"
+                        value={formatNumber(stats.totalHalls || 0)}
+                        icon={<Building2 size={24} />}
+                    />
+                </MuiGrid>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <StatCard
+                        title="إجمالي الفعاليات"
+                        value={formatNumber(stats.totalEvents || 0)}
+                        icon={<Calendar size={24} />}
+                    />
+                </MuiGrid>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <StatCard
+                        title="إجمالي الإيرادات"
+                        value={formatCurrency(stats.totalRevenue || 0, 'SY')}
+                        icon={<DollarSign size={24} />}
+                    />
+                </MuiGrid>
             </MuiGrid>
 
             {/* Recent Activity */}
@@ -361,7 +188,7 @@ function AdminDashboardContent() {
                             overflow: 'hidden',
                             height: '100%',
                             position: 'relative',
-                            boxShadow: 'var(--shadow-lg)'
+                            boxShadow: 'none'
                         }}
                     >
                         {/* Header */}
@@ -377,11 +204,11 @@ function AdminDashboardContent() {
                                         width: 48,
                                         height: 48,
                                         borderRadius: '12px',
-                                        background: 'var(--color-primary-50)',
+                                        background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        color: 'var(--color-primary-600)'
+                                        color: 'var(--color-icon)'
                                     }}>
                                         <Users size={24} strokeWidth={2.5} />
                                     </MuiBox>
@@ -416,20 +243,20 @@ function AdminDashboardContent() {
                                         sx={{
                                             p: 2,
                                             borderRadius: '12px',
-                                            background: 'var(--color-primary-50)',
-                                            border: '1px solid var(--color-primary-100)',
+                                            background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
+                                            border: '1px solid var(--color-border)',
                                             textAlign: 'center',
                                             minWidth: 80
                                         }}
                                     >
                                         <MuiTypography variant="h6" sx={{
-                                            color: 'var(--color-primary-700)',
+                                            color: 'var(--color-icon)',
                                             fontWeight: 700
                                         }}>
                                             {count}
                                         </MuiTypography>
                                         <MuiTypography variant="caption" sx={{
-                                            color: 'var(--color-primary-600)',
+                                            color: 'var(--color-text-secondary)',
                                             fontWeight: 500,
                                             textTransform: 'capitalize'
                                         }}>
@@ -481,7 +308,7 @@ function AdminDashboardContent() {
                             overflow: 'hidden',
                             height: '100%',
                             position: 'relative',
-                            boxShadow: 'var(--shadow-lg)'
+                            boxShadow: 'none'
                         }}
                     >
                         {/* Header */}
@@ -497,11 +324,11 @@ function AdminDashboardContent() {
                                         width: 48,
                                         height: 48,
                                         borderRadius: '12px',
-                                        background: 'var(--color-primary-50)',
+                                        background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        color: 'var(--color-primary-600)'
+                                        color: 'var(--color-icon)'
                                     }}>
                                         <Calendar size={24} strokeWidth={2.5} />
                                     </MuiBox>
@@ -552,12 +379,12 @@ function AdminDashboardContent() {
                                                         label={event.type === 'graduation' ? 'تخرج' : event.type === 'wedding' ? 'زفاف' : event.type === 'birthday' ? 'عيد ميلاد' : event.type || 'فعالية'}
                                                         size="small"
                                                         sx={{
-                                                            backgroundColor: 'var(--color-primary-50)',
-                                                            color: 'var(--color-primary-700)',
+                                                            backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
+                                                            color: 'var(--color-icon)',
                                                             fontWeight: 600,
                                                             fontSize: '0.75rem',
                                                             height: 24,
-                                                            border: '1px solid var(--color-primary-100)'
+                                                            border: '1px solid var(--color-border)'
                                                         }}
                                                     />
                                                     <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
@@ -588,18 +415,18 @@ function AdminDashboardContent() {
                                                     label={event.status === 'pending' ? 'قيد الانتظار' : event.status === 'confirmed' ? 'مؤكد' : event.status === 'completed' ? 'مكتمل' : event.status || 'نشط'}
                                                     size="small"
                                                     sx={{
-                                                        backgroundColor: event.status === 'pending' ? 'rgba(216, 185, 138, 0.1)' : 'rgba(34, 197, 94, 0.1)',
-                                                        color: event.status === 'pending' ? 'var(--color-primary-500)' : 'var(--color-icon)',
+                                                        backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
+                                                        color: 'var(--color-icon)',
                                                         fontWeight: 700,
                                                         fontSize: '0.75rem',
                                                         height: 28,
                                                         borderRadius: '8px',
-                                                        border: event.status === 'pending' ? '1px solid rgba(216, 185, 138, 0.2)' : '1px solid rgba(34, 197, 94, 0.2)'
+                                                        border: '1px solid var(--color-border)'
                                                     }}
                                                 />
                                                 {event.totalPrice && (
                                                     <MuiTypography variant="caption" sx={{ 
-                                                        color: 'var(--color-primary-600)',
+                                                        color: 'var(--color-text-secondary)',
                                                         fontWeight: 600 
                                                     }}>
                                                         {formatCurrency(event.totalPrice, 'SY')}
@@ -645,15 +472,15 @@ function AdminDashboardContent() {
                                 border: '1px solid var(--color-border)',
                                 borderRadius: '24px',
                                 overflow: 'hidden',
-                                boxShadow: 'var(--shadow-lg)'
+                                boxShadow: 'none'
                             }}
                         >
                             <MuiBox sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2, borderBottom: '1px solid var(--color-border)' }}>
                                 <MuiBox sx={{
                                     width: 40, height: 40, borderRadius: '10px',
-                                    background: 'var(--color-primary-50)',
+                                    background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    color: 'var(--color-primary-600)'
+                                    color: 'var(--color-icon)'
                                 }}>
                                     <BarChart3 size={20} />
                                 </MuiBox>
@@ -696,15 +523,15 @@ function AdminDashboardContent() {
                                 border: '1px solid var(--color-border)',
                                 borderRadius: '24px',
                                 overflow: 'hidden',
-                                boxShadow: 'var(--shadow-lg)'
+                                boxShadow: 'none'
                             }}
                         >
                             <MuiBox sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2, borderBottom: '1px solid var(--color-border)' }}>
                                 <MuiBox sx={{
                                     width: 40, height: 40, borderRadius: '10px',
-                                    background: 'var(--color-success-50)',
+                                    background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    color: 'var(--color-success-600)'
+                                    color: 'var(--color-icon)'
                                 }}>
                                     <PieChartIcon size={20} />
                                 </MuiBox>
@@ -757,15 +584,15 @@ function AdminDashboardContent() {
                             border: '1px solid var(--color-border)',
                             borderRadius: '24px',
                             overflow: 'hidden',
-                            boxShadow: 'var(--shadow-lg)'
+                            boxShadow: 'none'
                         }}
                     >
                         <MuiBox sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2, borderBottom: '1px solid var(--color-border)' }}>
                             <MuiBox sx={{
                                 width: 40, height: 40, borderRadius: '10px',
-                                background: 'var(--color-info-50)',
+                                background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                color: 'var(--color-info-600)'
+                                color: 'var(--color-icon)'
                             }}>
                                 <TrendingUp size={20} />
                             </MuiBox>
@@ -839,11 +666,11 @@ function AdminDashboardContent() {
                                     width: 48,
                                     height: 48,
                                     borderRadius: '12px',
-                                    background: 'var(--color-success-50)',
+                                    background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    color: 'var(--color-success-600)'
+                                    color: 'var(--color-icon)'
                                 }}>
                                     <TrendingUp size={24} strokeWidth={2.5} />
                                 </MuiBox>
@@ -871,15 +698,15 @@ function AdminDashboardContent() {
                                         sx={{
                                             p: 3,
                                             borderRadius: '16px',
-                                            background: 'var(--color-success-50)',
-                                            border: '1px solid var(--color-success-100)',
+                                            background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
+                                            border: '1px solid var(--color-border)',
                                             position: 'relative',
                                             overflow: 'hidden'
                                         }}
                                     >
                                         <MuiBox sx={{ position: 'relative', zIndex: 1 }}>
                                             <MuiTypography variant="h6" sx={{
-                                                color: 'var(--color-success-700)',
+                                                color: 'var(--color-icon)',
                                                 fontWeight: 700,
                                                 mb: 2
                                             }}>
@@ -888,18 +715,18 @@ function AdminDashboardContent() {
                                             
                                             <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                                                 <MuiBox sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-success-600)' }}>
+                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-icon)' }}>
                                                         الفعاليات
                                                     </MuiTypography>
-                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-success-700)', fontWeight: 600 }}>
+                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-icon)', fontWeight: 600 }}>
                                                         {hall.eventCount || 0}
                                                     </MuiTypography>
                                                 </MuiBox>
                                                 <MuiBox sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-success-600)' }}>
+                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-icon)' }}>
                                                         إجمالي الإيرادات
                                                     </MuiTypography>
-                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-success-700)', fontWeight: 600 }}>
+                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-icon)', fontWeight: 600 }}>
                                                         {formatCurrency(hall.totalRevenue, 'SY')}
                                                     </MuiTypography>
                                                 </MuiBox>
@@ -915,7 +742,7 @@ function AdminDashboardContent() {
                                                 width: 80,
                                                 height: 80,
                                                 borderRadius: '50%',
-                                                background: 'rgba(34, 197, 94, 0.1)',
+                                                background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
                                                 zIndex: 0
                                             }}
                                         />

@@ -1,8 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useTheme, useMediaQuery } from '@mui/material'
-import * as XLSX from 'xlsx'
-
 // MUI Components
 import MuiBox from '@/components/ui/MuiBox'
 import MuiTypography from '@/components/ui/MuiTypography'
@@ -14,19 +12,10 @@ import MuiChip from '@/components/ui/MuiChip'
 import MuiCard from '@/components/ui/MuiCard'
 import MuiCardContent from '@/components/ui/MuiCardContent'
 import MuiCardActions from '@/components/ui/MuiCardActions'
-import MuiInputAdornment from '@/components/ui/MuiInputAdornment'
 import MuiIconButton from '@/components/ui/MuiIconButton'
-import MuiDialog from '@/components/ui/MuiDialog'
-import MuiDialogContent from '@/components/ui/MuiDialogContent'
-import MuiDialogActions from '@/components/ui/MuiDialogActions'
-import MuiDialogTitle from '@/components/ui/MuiDialogTitle'
-import MuiDivider from '@/components/ui/MuiDivider'
-import MuiSelect from '@/components/ui/MuiSelect'
-import MuiMenuItem from '@/components/ui/MuiMenuItem'
-import MuiAvatar from '@/components/ui/MuiAvatar'
 
 // Layout & Common Components
-import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog, PageHeader, StatCard, CardsView, AdvancedFilter } from '@/components/common'
+import { LoadingScreen, EmptyState, SEOHead, ConfirmDialog, CrudPageLayout, StatusBadge } from '@/components/common'
 
 // Dialog Components
 import ViewTemplateDialog from './components/ViewTemplateDialog'
@@ -36,7 +25,7 @@ import CreateEditTemplateDialog from './components/CreateEditTemplateDialog'
 import { useDebounce, useDialogState, useCRUD, useNotification } from '@/hooks'
 import { QUERY_KEYS } from '@/config/constants'
 import { getTemplates, createTemplate, updateTemplate, deleteTemplate, toggleTemplateStatus } from '@/api/admin'
-import { formatDate, generateExportFileName } from '@/utils/helpers'
+import { formatDate } from '@/utils/helpers'
 
 // Icons
 import {
@@ -47,22 +36,16 @@ import {
     CheckCircle,
     XCircle,
     FileText,
-    Upload,
     Eye,
     Trash2,
     Edit2,
-    Download,
     Filter,
     X,
     Package,
     Tag,
     DollarSign,
     Calendar,
-    Building2,
-    Users,
-    MapPin,
-    LayoutGrid,
-    Table
+    Building2
 } from 'lucide-react'
 
 // ====================== Main Component ======================
@@ -76,6 +59,7 @@ export default function TemplatesManagement() {
     const [activeFilters, setActiveFilters] = useState({})
     const debouncedSearch = useDebounce(searchQuery, 500)
     const [viewMode, setViewMode] = useState('table') // 'card' or 'table'
+    const [rowsPerPage, setRowsPerPage] = useState(10)
 
     // Dialog state management
     const {
@@ -257,11 +241,11 @@ export default function TemplatesManagement() {
                             height: 50,
                             borderRadius: '8px',
                             overflow: 'hidden',
-                            background: 'rgba(216, 185, 138, 0.1)',
+                            background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            border: '1px solid rgba(216, 185, 138, 0.2)',
+                            border: '1px solid var(--color-border)',
                         }}
                     >
                         {row.imageUrl ? (
@@ -271,7 +255,7 @@ export default function TemplatesManagement() {
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                         ) : (
-                            <ImageIcon size={24} style={{ color: 'var(--color-primary-500)' }} />
+                            <ImageIcon size={24} style={{ color: 'var(--color-icon)' }} />
                         )}
                     </MuiBox>
                     <MuiBox>
@@ -344,16 +328,7 @@ export default function TemplatesManagement() {
             label: 'الحالة',
             align: 'center',
             format: (value, row) => (
-                <MuiChip
-                    label={value ? 'مفعّل' : 'معطّل'}
-                    size="small"
-                    sx={{
-                        backgroundColor: value ? 'rgba(46, 204, 113, 0.15)' : 'rgba(231, 76, 60, 0.15)',
-                        color: value ? 'var(--color-icon)' : 'var(--color-icon)',
-                        fontWeight: 600,
-                        borderRadius: '8px'
-                    }}
-                />
+                <StatusBadge value={value} activeLabel="مفعّل" inactiveLabel="معطّل" />
             )
         },
         {
@@ -367,8 +342,8 @@ export default function TemplatesManagement() {
                         size="small"
                         icon={<Building2 size={14} />}
                         sx={{
-                            backgroundColor: 'var(--color-primary-100)',
-                            color: 'var(--color-primary-600)',
+                            backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
+                            color: 'var(--color-icon)',
                             fontWeight: 600,
                             borderRadius: '8px'
                         }}
@@ -382,7 +357,7 @@ export default function TemplatesManagement() {
             align: 'center',
             format: (value) => (
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
-                    <Calendar size={16} style={{ color: 'var(--color-primary-400)' }} />
+                    <Calendar size={16} style={{ color: 'var(--color-icon)'}} />
                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
                         {formatDate(value, 'DD/MM/YYYY')}
                     </MuiTypography>
@@ -405,11 +380,11 @@ export default function TemplatesManagement() {
                     '&:hover': {
                         transform: 'translateY(-8px)',
                         boxShadow: 'var(--shadow-xl)',
-                        borderColor: 'var(--color-primary-500)',
+                        borderColor: 'var(--color-icon)',
                     }
                 }}
             >
-                <MuiBox sx={{ position: 'relative', height: 200, background: 'var(--color-primary-100)' }}>
+                <MuiBox sx={{ position: 'relative', height: 200, background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)' }}>
                     {imageUrl ? (
                         <img
                             src={imageUrl}
@@ -424,13 +399,13 @@ export default function TemplatesManagement() {
                             alignItems: 'center',
                             justifyContent: 'center'
                         }}>
-                            <ImageIcon size={48} style={{ color: 'var(--color-primary-300)' }} />
+                            <ImageIcon size={48} style={{ color: 'var(--color-icon)'}} />
                         </MuiBox>
                     )}
                     <MuiChip
                         label={categoryTranslations[template.category] || template.category || 'عام'}
                         size="small"
-                        sx={{ position: 'absolute', top: 12, right: 12, fontWeight: 700, background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)' }}
+                        sx={{ position: 'absolute', top: 12, right: 12, fontWeight: 700, background: 'color-mix(in srgb, var(--color-light) 90%, transparent)', backdropFilter: 'blur(4px)' }}
                     />
                 </MuiBox>
 
@@ -443,7 +418,7 @@ export default function TemplatesManagement() {
                     </MuiTypography>
 
                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Calendar size={14} style={{ color: 'var(--color-primary-500)' }} />
+                        <Calendar size={14} style={{ color: 'var(--color-icon)'}} />
                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-muted)' }}>
                             تاريخ الإضافة: {formatDate(template.createdAt, 'DD/MM/YYYY')}
                         </MuiTypography>
@@ -482,149 +457,53 @@ export default function TemplatesManagement() {
         showNotification({ title: 'تحديث', message: 'تم تحديث البيانات بنجاح', type: 'success' })
     }
 
-    const handleExport = () => {
-        try {
-            const worksheet = XLSX.utils.json_to_sheet(
-                filteredTemplates.map(template => ({
-                    'اسم القالب': template.templateName,
-                    'قاعة/صالة': template.hallId?.name || '—',
-                    'موقع قاعة/صالة': template.hallId?.location || '—',
-                    'السعة': template.hallId?.capacity || '—',
-                    'الطاولات': template.hallId?.tables || '—',
-                    'السعر الافتراضي': template.hallId?.defaultPrices ? `${template.hallId.defaultPrices} ريال` : '—',
-                    'الوصف': template.hallId?.description || '—',
-                    'تاريخ الإضافة': formatDate(template.createdAt, 'DD/MM/YYYY'),
-                    'تاريخ التحديث': formatDate(template.updatedAt, 'DD/MM/YYYY'),
-                    'معرّف القالب': template._id,
-                    'معرّف قاعة/صالة': template.hallId?._id || '—'
-                }))
-            )
-            const workbook = XLSX.utils.book_new()
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'القوالب')
-            XLSX.writeFile(workbook, generateExportFileName('templates'))
-            showNotification({ title: 'نجاح', message: 'تم تصدير القوالب بنجاح', type: 'success' })
-        } catch (error) {
-            showNotification({ title: 'خطأ', message: 'فشل تصدير القوالب', type: 'error' })
-        }
-    }
-
     if (isLoading) return <LoadingScreen message="جاري تحميل القوالب..." />
 
     return (
         <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
             <SEOHead title="إدارة القوالب | INVOCCA" />
 
-            <PageHeader
-                icon={ImageIcon}
-                title={`إدارة القوالب (${filteredTemplates.length})`}
-                subtitle="إدارة قوالب بطاقات الدعوة والمستندات الرسمية المتاحة في النظام"
-                actions={
-                    <MuiBox sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                        <MuiBox sx={{ display: 'flex', background: 'var(--color-surface)', p: 0.5, borderRadius: '12px', border: '1px solid var(--color-border)' }}>
-                            <MuiIconButton
-                                size="small"
-                                onClick={() => setViewMode('table')}
-                                sx={{
-                                    borderRadius: '10px',
-                                    color: viewMode === 'table' ? 'var(--color-primary-500)' : 'var(--color-text-muted)',
-                                    background: viewMode === 'table' ? 'var(--color-paper)' : 'transparent',
-                                    boxShadow: viewMode === 'table' ? 'var(--shadow-sm)' : 'none',
-                                    '&:hover': { background: viewMode === 'table' ? 'var(--color-paper)' : 'rgba(0,0,0,0.05)' }
-                                }}
-                            >
-                                <Table size={20} />
-                            </MuiIconButton>
-                            <MuiIconButton
-                                size="small"
-                                onClick={() => setViewMode('card')}
-                                sx={{
-                                    borderRadius: '10px',
-                                    color: viewMode === 'card' ? 'var(--color-primary-500)' : 'var(--color-text-muted)',
-                                    background: viewMode === 'card' ? 'var(--color-paper)' : 'transparent',
-                                    boxShadow: viewMode === 'card' ? 'var(--shadow-sm)' : 'none',
-                                    '&:hover': { background: viewMode === 'card' ? 'var(--color-paper)' : 'rgba(0,0,0,0.05)' }
-                                }}
-                            >
-                                <LayoutGrid size={20} />
-                            </MuiIconButton>
-                        </MuiBox>
-                        <MuiButton
-                            variant="outlined"
-                            startIcon={<Download size={20} />}
-                            onClick={handleExport}
-                            disabled={filteredTemplates.length === 0}
-                        >
-                            تصدر
-                        </MuiButton>
-                        <MuiButton
-                            variant="contained"
-                            startIcon={<Upload size={20} />}
-                            onClick={handleCreateClick}
-                        >
-                            رفع قالب جديد
-                        </MuiButton>
-                    </MuiBox>
-                }
-            />
-
-            {/* Stats Cards */}
-            <MuiGrid container spacing={3} sx={{ mb: 4 }}>
-                <MuiGrid item xs={12} sm={6} md={4}>
-                    <StatCard
-                        title="عدد القوالب"
-                        value={filteredTemplates.length}
-                        icon={<ImageIcon size={24} />}
-                        color="primary"
-                    />
-                </MuiGrid>
-                <MuiGrid item xs={12} sm={6} md={4}>
-                    <StatCard
-                        title="القوالب المفعّلة"
-                        value={filteredTemplates.filter(t => t.isActive).length}
-                        icon={<CheckCircle size={24} />}
-                        color="success"
-                    />
-                </MuiGrid>
-                <MuiGrid item xs={12} sm={6} md={4}>
-                    <StatCard
-                        title="القوالب المعطّلة"
-                        value={filteredTemplates.filter(t => !t.isActive).length}
-                        icon={<XCircle size={24} />}
-                        color="error"
-                    />
-                </MuiGrid>
-            </MuiGrid>
-
-            {/* Advanced Filter */}
-            <AdvancedFilter
+            {/* CrudPageLayout - مكون موحد للتخطيط */}
+            <CrudPageLayout
+                stats={[
+                    {
+                        title: "عدد القوالب",
+                        value: filteredTemplates.length,
+                        icon: <ImageIcon size={24} />
+                    },
+                    {
+                        title: "القوالب المفعّلة",
+                        value: filteredTemplates.filter(t => t.isActive).length,
+                        icon: <CheckCircle size={24} />
+                    },
+                    {
+                        title: "القوالب المعطّلة",
+                        value: filteredTemplates.filter(t => !t.isActive).length,
+                        icon: <XCircle size={24} />
+                    }
+                ]}
+                filterConfig={filterConfig}
                 onSearch={setSearchQuery}
                 onFilterChange={setActiveFilters}
-                filters={filterConfig}
                 onRefresh={refetch}
                 searchPlaceholder="بحث..."
+                columns={columns}
+                data={filteredTemplates}
+                loading={isLoading}
+                emptyMessage="لا توجد قوالب متاحة"
+                addButtonLabel="رفع قالب جديد"
+                onAdd={handleCreateClick}
+                onEdit={openEditDialog}
+                onDelete={openDeleteDialog}
+                onView={openViewDialog}
+                onToggleStatus={handleToggleStatus}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={setRowsPerPage}
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
+                showViewModeToggle={true}
+                renderCard={renderTemplateCard}
             />
-
-            {/* Templates Grid/Table */}
-            {viewMode === 'table' ? (
-                <DataTable
-                    columns={columns}
-                    data={filteredTemplates}
-                    onEdit={openEditDialog}
-                    onDelete={openDeleteDialog}
-                    onView={openViewDialog}
-                    onToggleStatus={handleToggleStatus}
-                    loading={isLoading}
-                    emptyMessage="لا توجد قوالب متاحة"
-                    showActions={true}
-                />
-            ) : (
-                <CardsView
-                    data={filteredTemplates}
-                    renderCard={renderTemplateCard}
-                    loading={isLoading}
-                    emptyMessage="لا توجد قوالب متاحة"
-                />
-            )}
 
             {/* Delete Confirmation Dialog */}
             <ConfirmDialog

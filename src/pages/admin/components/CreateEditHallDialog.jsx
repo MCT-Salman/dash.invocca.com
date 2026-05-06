@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { z } from 'zod'
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 import MuiGrid from '@/components/ui/MuiGrid'
 
@@ -32,11 +32,11 @@ import MuiFormControl from '@/components/ui/MuiFormControl'
 
 import MuiInputLabel from '@/components/ui/MuiInputLabel'
 
-import { FormDialog } from '@/components/common'
+import { ModernDialog } from '@/components/common'
 
 import { getTemplates, getManagers } from '@/api/admin'
 
-import { Plus, Trash2, UploadCloud, X } from 'lucide-react'
+import { Plus, Trash2, UploadCloud, X, Building, UserPlus, Users } from 'lucide-react'
 
 import { FILE_UPLOAD } from '@/config/constants'
 
@@ -129,6 +129,10 @@ export default function CreateEditHallDialog({
 }) {
 
     const { addNotification: showNotification } = useNotification()
+
+    const queryClient = useQueryClient()
+
+    const [managerMode, setManagerMode] = useState('select') // 'select' or 'new'
 
 
 
@@ -495,37 +499,35 @@ export default function CreateEditHallDialog({
 
 
 
-        // Sometimes the backend expects managerPhone in different formats when editing
+        // Send manager fields for both create and edit
 
-        if (data.managerPhone) {
+        if (data.managerName) {
 
-            formData.append('generalManagerPhone', data.managerPhone)
-
-            formData.append('generalManager[phone]', data.managerPhone)
+            formData.append('managerName', data.managerName)
 
         }
 
 
 
-        // When editing, also send manager name and username in generalManager format
+        if (data.managerUsername) {
 
-        if (editingHall) {
+            formData.append('managerUsername', data.managerUsername)
 
-            if (data.managerName) {
+        }
 
-                formData.append('generalManagerName', data.managerName)
 
-                formData.append('generalManager[name]', data.managerName)
 
-            }
+        if (data.managerPhone) {
 
-            if (data.managerUsername) {
+            formData.append('managerPhone', data.managerPhone)
 
-                formData.append('generalManagerUsername', data.managerUsername)
+        }
 
-                formData.append('generalManager[username]', data.managerUsername)
 
-            }
+
+        if (data.managerPassword) {
+
+            formData.append('managerPassword', data.managerPassword)
 
         }
 
@@ -613,17 +615,27 @@ export default function CreateEditHallDialog({
 
     }
 
+    const handleManagerSelect = (manager) => {
+        setValue('managerName', manager.name)
+        setValue('managerUsername', manager.username || '')
+        setValue('managerPhone', manager.phone || '')
+    }
+
 
 
     return (
-
-        <FormDialog
+        <>
+        <ModernDialog
 
             open={open}
 
             onClose={handleClose}
 
             title={editingHall ? 'تعديل قاعة/صالة' : 'إضافة قاعة/صالة جديدة'}
+
+            subtitle={editingHall ? 'تعديل معلومات القاعة والبيانات المتعلقة بها' : 'إضافة قاعة جديدة مع جميع التفاصيل'}
+
+            isForm={true}
 
             onSubmit={handleSubmit(handleFormSubmit, (errors) => {
 
@@ -647,7 +659,9 @@ export default function CreateEditHallDialog({
 
             cancelText="إلغاء"
 
-            maxWidth="lg"
+            maxWidth="sm"
+
+            headerIcon={<Building size={20} />}
 
         >
 
@@ -655,7 +669,7 @@ export default function CreateEditHallDialog({
 
             {/* {error && (
 
-                <MuiBox sx={{ mb: 3, p: 2, backgroundColor: 'rgba(211, 47, 47, 0.1)', border: '1px solid var(--color-icon)', borderRadius: '8px' }}>
+                <MuiBox sx={{ mb: 3, p: 2, backgroundColor: 'color-mix(in srgb, var(--color-icon) 10%, transparent)', border: '1px solid var(--color-icon)', borderRadius: '8px' }}>
 
                     <MuiTypography variant="body2" sx={{ color: 'var(--color-icon)', fontWeight: 500 }}>
 
@@ -673,7 +687,7 @@ export default function CreateEditHallDialog({
 
                 <MuiGrid item xs={12}>
 
-                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--color-primary-500)' }}>
+                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--color-icon)' }}>
 
                         المعلومات الأساسية
 
@@ -787,7 +801,7 @@ export default function CreateEditHallDialog({
 
                 <MuiGrid item xs={12}>
 
-                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 1, color: 'var(--color-primary-500)' }}>
+                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 1, color: 'var(--color-icon)' }}>
 
                         السعة والأسعار
 
@@ -797,7 +811,7 @@ export default function CreateEditHallDialog({
 
 
 
-                <MuiGrid item xs={6} md={3}>
+                <MuiGrid item xs={12} md={6}>
 
                     <Controller
 
@@ -831,7 +845,7 @@ export default function CreateEditHallDialog({
 
 
 
-                <MuiGrid item xs={6} md={3}>
+                <MuiGrid item xs={12} md={6}>
 
                     <Controller
 
@@ -905,7 +919,7 @@ export default function CreateEditHallDialog({
 
 
 
-                <MuiGrid item xs={6} md={3}>
+                <MuiGrid item xs={12} md={6}>
 
                     <Controller
 
@@ -939,7 +953,7 @@ export default function CreateEditHallDialog({
 
 
 
-                <MuiGrid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'center' }}>
+                {/* <MuiGrid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'center' }}>
 
                     <Controller
 
@@ -965,7 +979,7 @@ export default function CreateEditHallDialog({
 
                     />
 
-                </MuiGrid>
+                </MuiGrid> */}
 
 
 
@@ -973,7 +987,7 @@ export default function CreateEditHallDialog({
 
                 <MuiGrid item xs={12}>
 
-                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 1, color: 'var(--color-primary-500)' }}>
+                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 1, color: 'var(--color-icon)' }}>
 
                         معلومات المدير
 
@@ -983,70 +997,116 @@ export default function CreateEditHallDialog({
 
 
 
-                <MuiGrid item xs={12} md={6}>
+                {/* Manager Mode Toggle */}
+                {!editingHall && (
+                    <MuiGrid item xs={12}>
+                        <MuiBox sx={{ 
+                            display: 'flex', 
+                            gap: 1, 
+                            p: 1, 
+                            backgroundColor: 'var(--color-surface)', 
+                            borderRadius: '8px',
+                            border: '1px solid var(--color-border)'
+                        }}>
+                            <MuiButton
+                                variant={managerMode === 'select' ? 'contained' : 'text'}
+                                size="small"
+                                onClick={() => {
+                                    setManagerMode('select')
+                                    setValue('managerName', '')
+                                    setValue('managerUsername', '')
+                                    setValue('managerPhone', '')
+                                    setValue('managerPassword', '')
+                                }}
+                                startIcon={<Users size={16} />}
+                                sx={{
+                                    flex: 1,
+                                    borderRadius: '6px',
+                                    backgroundColor: managerMode === 'select' ? 'var(--color-primary-500)' : 'transparent',
+                                    color: managerMode === 'select' ? '#fff' : 'var(--color-text-secondary)',
+                                    '&:hover': {
+                                        backgroundColor: managerMode === 'select' ? 'var(--color-primary-600)' : 'var(--color-surface-hover)'
+                                    }
+                                }}
+                            >
+                                اختيار مدير موجود
+                            </MuiButton>
+                            <MuiButton
+                                variant={managerMode === 'new' ? 'contained' : 'text'}
+                                size="small"
+                                onClick={() => {
+                                    setManagerMode('new')
+                                    setValue('managerName', '')
+                                    setValue('managerUsername', '')
+                                    setValue('managerPhone', '')
+                                    setValue('managerPassword', '')
+                                }}
+                                startIcon={<UserPlus size={16} />}
+                                sx={{
+                                    flex: 1,
+                                    borderRadius: '6px',
+                                    backgroundColor: managerMode === 'new' ? 'var(--color-primary-500)' : 'transparent',
+                                    color: managerMode === 'new' ? '#fff' : 'var(--color-text-secondary)',
+                                    '&:hover': {
+                                        backgroundColor: managerMode === 'new' ? 'var(--color-primary-600)' : 'var(--color-surface-hover)'
+                                    }
+                                }}
+                            >
+                                مدير جديد
+                            </MuiButton>
+                        </MuiBox>
+                    </MuiGrid>
+                )}
 
+                {/* Manager Name - Select or Input */}
+                <MuiGrid item xs={12}>
                     <Controller
-
                         name="managerName"
-
                         control={control}
-
                         render={({ field }) => (
-
                             editingHall ? (
-
                                 <MuiTextField
-
                                     {...field}
-
                                     label="اسم المدير"
-
                                     fullWidth
-
                                     error={!!errors.managerName}
-
                                     helperText={errors.managerName?.message}
-
                                 />
-
-                            ) : (
-
+                            ) : managerMode === 'select' ? (
                                 <MuiSelect
-
                                     {...field}
-
                                     label="تحديد المدير"
-
                                     fullWidth
-
                                     error={!!errors.managerName}
-
                                     helperText={errors.managerName?.message}
-
                                     displayEmpty
-
+                                    onChange={(e) => {
+                                        const selectedManager = managersList.find(m => m.name === e.target.value)
+                                        if (selectedManager) {
+                                            handleManagerSelect(selectedManager)
+                                        }
+                                        field.onChange(e)
+                                    }}
                                 >
-
                                     <MuiMenuItem value="" disabled>اختر المدير</MuiMenuItem>
-
                                     {managersList.map((manager) => (
-
                                         <MuiMenuItem key={manager._id || manager.id} value={manager.name}>
-
                                             {manager.name} ({manager.phone})
-
                                         </MuiMenuItem>
-
                                     ))}
-
                                 </MuiSelect>
-
+                            ) : (
+                                <MuiTextField
+                                    {...field}
+                                    label="اسم المدير الجديد"
+                                    fullWidth
+                                    error={!!errors.managerName}
+                                    helperText={errors.managerName?.message}
+                                    placeholder="أدخل اسم المدير"
+                                />
                             )
-
                         )}
-
                     />
-
                 </MuiGrid>
 
 
@@ -1073,7 +1133,7 @@ export default function CreateEditHallDialog({
 
                                 helperText={errors.managerUsername?.message}
 
-                                disabled={!editingHall}
+                                disabled={!editingHall && managerMode === 'select'}
 
                             />
 
@@ -1107,7 +1167,7 @@ export default function CreateEditHallDialog({
 
                                 helperText={errors.managerPhone?.message}
 
-                                disabled={!editingHall}
+                                disabled={!editingHall && managerMode === 'select'}
 
                             />
 
@@ -1159,7 +1219,7 @@ export default function CreateEditHallDialog({
 
                     <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1, mt: 1 }}>
 
-                        <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--color-primary-500)' }}>
+                        <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--color-icon)' }}>
 
                             القوالب
 
@@ -1321,7 +1381,7 @@ export default function CreateEditHallDialog({
 
                                                                             borderRadius: '6px',
 
-                                                                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                                                            backgroundColor: 'color-mix(in srgb, var(--color-light) 5%, transparent)',
 
                                                                             border: '1px solid var(--color-border-glass)',
 
@@ -1439,15 +1499,15 @@ export default function CreateEditHallDialog({
 
                                             border: '1px solid var(--color-border-glass)',
 
-                                            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                                            backgroundColor: 'color-mix(in srgb, var(--color-light) 3%, transparent)',
 
                                             transition: 'all 0.2s ease',
 
                                             '&:hover': {
 
-                                                borderColor: 'var(--color-primary-500)',
+                                                borderColor: 'var(--color-icon)',
 
-                                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                                backgroundColor: 'color-mix(in srgb, var(--color-light) 5%, transparent)',
 
                                             }
 
@@ -1495,7 +1555,7 @@ export default function CreateEditHallDialog({
 
                                                         borderRadius: '8px',
 
-                                                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                                        backgroundColor: 'color-mix(in srgb, var(--color-light) 5%, transparent)',
 
                                                         border: '1px solid var(--color-border-glass)',
 
@@ -1625,7 +1685,7 @@ export default function CreateEditHallDialog({
 
                 <MuiGrid item xs={12}>
 
-                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 1, color: 'var(--color-primary-500)' }}>
+                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 1, color: 'var(--color-icon)' }}>
 
                         الصور
 
@@ -1671,13 +1731,13 @@ export default function CreateEditHallDialog({
 
                                     overflow: 'hidden',
 
-                                    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                                    backgroundColor: 'color-mix(in srgb, var(--color-light) 2%, transparent)',
 
                                     '&:hover': {
 
-                                        borderColor: 'var(--color-primary-500)',
+                                        borderColor: 'var(--color-icon)',
 
-                                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                        backgroundColor: 'color-mix(in srgb, var(--color-light) 5%, transparent)',
 
                                     }
 
@@ -1759,13 +1819,13 @@ export default function CreateEditHallDialog({
 
                                         transition: 'all 0.3s',
 
-                                        backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                                        backgroundColor: 'color-mix(in srgb, var(--color-light) 2%, transparent)',
 
                                         '&:hover': {
 
-                                            borderColor: 'var(--color-primary-500)',
+                                            borderColor: 'var(--color-icon)',
 
-                                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                            backgroundColor: 'color-mix(in srgb, var(--color-light) 5%, transparent)',
 
                                         }
 
@@ -1815,7 +1875,7 @@ export default function CreateEditHallDialog({
 
                                                 inset: 0,
 
-                                                backgroundColor: 'rgba(0,0,0,0.5)',
+                                                backgroundColor: 'color-mix(in srgb, var(--color-dark) 50%, transparent)',
 
                                                 opacity: 0,
 
@@ -1831,7 +1891,7 @@ export default function CreateEditHallDialog({
 
                                         >
 
-                                            <MuiIconButton size="small" sx={{ color: 'white' }} onClick={() => removeGalleryImage(index)}>
+                                            <MuiIconButton size="small" sx={{ color: 'var(--color-text-primary)' }} onClick={() => removeGalleryImage(index)}>
 
                                                 <X size={16} />
 
@@ -1867,7 +1927,8 @@ export default function CreateEditHallDialog({
 
             </MuiGrid>
 
-        </FormDialog>
+        </ModernDialog>
+        </>
 
     )
 

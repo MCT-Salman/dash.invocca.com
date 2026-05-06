@@ -1,5 +1,4 @@
-// src/pages/manager/ManagerFinancialDashboard.jsx
-import React from 'react'
+// src\pages\manager\ManagerFinancialDashboard.jsx
 import { useQuery } from '@tanstack/react-query'
 import { getFinancialDashboard } from '@/api/manager'
 import MuiBox from '@/components/ui/MuiBox'
@@ -8,9 +7,9 @@ import MuiPaper from '@/components/ui/MuiPaper'
 import MuiButton from '@/components/ui/MuiButton'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiChip from '@/components/ui/MuiChip'
-import { SEOHead, LoadingScreen, EmptyState } from '@/components/common'
+import { SEOHead, LoadingScreen } from '@/components/common'
 import { useNavigate } from 'react-router-dom'
-import { DollarSign, TrendingUp, TrendingDown, Receipt, AlertCircle, ArrowUpRight, ArrowDownRight, Wallet, Activity } from 'lucide-react'
+import { DollarSign, Receipt, AlertCircle, ArrowUpRight, ArrowDownRight, Wallet, Activity, TrendingUp, TrendingDown } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/utils/helpers'
 
 export default function ManagerFinancialDashboard() {
@@ -20,432 +19,102 @@ export default function ManagerFinancialDashboard() {
         queryFn: getFinancialDashboard,
     })
 
-    if (isLoading) {
-        return <LoadingScreen message="جاري تحميل لوحة التحكم المالية..." fullScreen={false} />
-    }
+    if (isLoading) return <LoadingScreen message="جاري تحميل البيانات المالية..." />
 
     const summary = data?.summary || {}
     const currentMonth = summary?.currentMonth || {}
     const invoices = summary?.invoices || {}
     const recentTransactions = data?.recentTransactions || []
     const overdueInvoices = data?.overdueInvoices || []
-    const monthlyTrend = data?.monthlyTrend || []
 
     return (
-        <MuiBox sx={{
-            p: { xs: 2, sm: 3 },
-            minHeight: '100vh',
-            background: 'var(--color-bg)'
-        }}>
+        <MuiBox sx={{ p: { xs: 2, sm: 3 }, minHeight: '100vh', background: 'var(--color-bg-dark)' }}>
             <SEOHead title="لوحة التحكم المالية | INVOCCA" />
 
-            {/* Header */}
             <MuiBox sx={{ mb: 4, textAlign: 'center' }}>
-                <MuiTypography variant="h3" sx={{
-                    fontWeight: 800,
-                    color: 'var(--color-primary-600)',
-                    mb: 1,
-                    textShadow: 'rgba(216, 185, 138, 0.2) 0px 0px 30px',
-                }}>
-                    لوحة التحكم المالية
-                </MuiTypography>
-                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-secondary)' }}>
-                    نظرة شاملة على الأداء المالي والعمليات الحالية
-                </MuiTypography>
+                <MuiTypography variant="h3" sx={{ fontWeight: 800, color: 'var(--color-icon)', mb: 1 }}>لوحة التحكم المالية</MuiTypography>
+                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-secondary)' }}>نظرة شاملة على الأداء المالي والعمليات الحالية</MuiTypography>
             </MuiBox>
 
-            {/* Summary Cards */}
             <MuiGrid container spacing={3} sx={{ mb: 4 }}>
-                {/* Total Revenue */}
                 <MuiGrid item xs={12} sm={6} md={3}>
-                    <StatCard
-                        title="إجمالي الإيرادات"
-                        value={formatCurrency(currentMonth.totalRevenue || 0)}
-                        icon={DollarSign}
-                        color="var(--color-icon)"
-                        bgColor="rgba(34, 197, 94, 0.1)"
-                        trend="up"
-                    />
+                    <StatCard title="إجمالي الإيرادات" value={formatCurrency(currentMonth.totalRevenue || 0)} icon={DollarSign} trend="up" />
                 </MuiGrid>
-
-                {/* Total Expenses */}
                 <MuiGrid item xs={12} sm={6} md={3}>
-                    <StatCard
-                        title="إجمالي المصروفات"
-                        value={formatCurrency(currentMonth.totalExpenses || 0)}
-                        icon={TrendingDown}
-                        color="var(--color-icon)"
-                        bgColor="rgba(239, 68, 68, 0.1)"
-                        trend="down"
-                    />
+                    <StatCard title="إجمالي المصاريف" value={formatCurrency(currentMonth.totalExpenses || 0)} icon={TrendingDown} trend="down" />
                 </MuiGrid>
-
-                {/* Net Profit */}
                 <MuiGrid item xs={12} sm={6} md={3}>
-                    <StatCard
-                        title="صافي الربح"
-                        value={formatCurrency(currentMonth.netProfit || 0)}
-                        icon={Wallet}
-                        color="var(--color-primary-500)"
-                        bgColor="rgba(216, 185, 138, 0.1)"
-                        trend={currentMonth.netProfit >= 0 ? 'up' : 'down'}
-                    />
+                    <StatCard title="صافي الربح" value={formatCurrency(currentMonth.netProfit || 0)} icon={Wallet} trend={currentMonth.netProfit >= 0 ? 'up' : 'down'} />
                 </MuiGrid>
-
-                {/* Transaction Count */}
                 <MuiGrid item xs={12} sm={6} md={3}>
-                    <StatCard
-                        title="عدد المعاملات"
-                        value={currentMonth.transactionCount || 0}
-                        icon={Activity}
-                        color="var(--color-icon)"
-                        bgColor="rgba(59, 130, 246, 0.1)"
-                        trend="neutral"
-                    />
+                    <StatCard title="عدد العمليات" value={currentMonth.transactionCount || 0} icon={Activity} />
                 </MuiGrid>
             </MuiGrid>
 
-            {/* Invoice Summary & Overdue Alerts */}
-            <MuiGrid container spacing={3} sx={{ mb: 4 }}>
-                {/* Invoice Summary */}
+            <MuiGrid container spacing={3}>
                 <MuiGrid item xs={12} md={6}>
-                    <MuiPaper
-                        elevation={0}
-                        sx={{
-                            p: 3,
-                            background: 'var(--color-paper)',
-                            border: '1px solid var(--color-border)',
-                            borderRadius: '24px',
-                            height: '100%',
-                            transition: 'all 0.3s ease',
-                            '&:hover': {
-                                boxShadow: 'var(--shadow-lg)',
-                                borderColor: 'var(--color-primary-200)'
-                            }
-                        }}
-                    >
-                        <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-primary-500)', mb: 3, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                            <Receipt size={24} />
-                            ملخص الفواتير
+                    <MuiPaper sx={{ p: 3, borderRadius: '24px', background: 'var(--color-paper)', border: '1px solid var(--color-border)' }}>
+                        <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-icon)', mb: 3, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <Receipt size={24} /> ملخص الفواتير
                         </MuiTypography>
-                        <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                        <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             <InfoRow label="إجمالي الفواتير" value={invoices.totalInvoices || 0} />
                             <InfoRow label="المبلغ الإجمالي" value={formatCurrency(invoices.totalAmount || 0)} />
-                            <InfoRow label="المدفوع" value={formatCurrency(invoices.totalPaid || 0)} color="var(--color-success-600)" />
-                            <InfoRow label="المتبقي" value={formatCurrency(invoices.totalOutstanding || 0)} color="var(--color-warning-600)" />
+                            <InfoRow label="المبلغ المدفوع" value={formatCurrency(invoices.totalPaid || 0)} color="#22c55e" />
+                            <InfoRow label="المبلغ المتبقي" value={formatCurrency(invoices.totalOutstanding || 0)} color="#ef4444" />
                         </MuiBox>
                     </MuiPaper>
                 </MuiGrid>
 
-                {/* Overdue Invoices Alert */}
                 <MuiGrid item xs={12} md={6}>
-                    <MuiPaper
-                        elevation={0}
-                        sx={{
-                            p: 3,
-                            background: overdueInvoices.length > 0 ? 'var(--color-error-50)' : 'var(--color-paper)',
-                            border: `1px solid ${overdueInvoices.length > 0 ? 'var(--color-error-200)' : 'var(--color-border)'}`,
-                            borderRadius: '24px',
-                            height: '100%',
-                            transition: 'all 0.3s ease',
-                            '&:hover': {
-                                boxShadow: 'var(--shadow-lg)',
-                                borderColor: overdueInvoices.length > 0 ? 'var(--color-error-300)' : 'var(--color-primary-200)'
-                            }
-                        }}
-                    >
+                    <MuiPaper sx={{ p: 3, borderRadius: '24px', background: 'var(--color-paper)', border: '1px solid var(--color-border)' }}>
                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                            <AlertCircle size={24} style={{ color: overdueInvoices.length > 0 ? 'var(--color-icon)' : 'var(--color-icon)' }} />
-                            <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-primary-500)' }}>
-                                فواتير متأخرة
-                            </MuiTypography>
+                            <AlertCircle size={24} style={{ color: '#ef4444' }} />
+                            <MuiTypography variant="h6" sx={{ fontWeight: 700 }}>فواتير متأخرة</MuiTypography>
                         </MuiBox>
                         {overdueInvoices.length === 0 ? (
-                            <MuiBox sx={{ textAlign: 'center', py: 2 }}>
-                                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-secondary)', mb: 1 }}>
-                                    ممتاز! لا توجد فواتير متأخرة
-                                </MuiTypography>
-                                <MuiTypography variant="caption" sx={{ color: 'var(--color-text-disabled)' }}>
-                                    جميع المدفوعات في موعدها ✅
-                                </MuiTypography>
-                            </MuiBox>
+                            <MuiTypography variant="body2" sx={{ textAlign: 'center', py: 4, color: 'var(--color-text-secondary)' }}>لا توجد فواتير متأخرة حالياً</MuiTypography>
                         ) : (
-                            <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                                <InfoRow label="عدد الفواتير المتأخرة" value={invoices.overdueCount || 0} color="var(--color-icon)" />
-                                <InfoRow label="المبلغ المتأخر" value={formatCurrency(invoices.overdueAmount || 0)} color="var(--color-icon)" />
-                                <MuiButton
-                                    variant="outlined"
-                                    color="error"
-                                    size="small"
-                                    sx={{ mt: 1, borderRadius: '10px' }}
-                                    onClick={() => navigate('/manager/financial/invoices')}
-                                >
-                                    عرض التفاصيل
-                                </MuiButton>
+                            <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                <InfoRow label="عدد الفواتير" value={invoices.overdueCount || 0} color="#ef4444" />
+                                <InfoRow label="المبلغ المتأخر" value={formatCurrency(invoices.overdueAmount || 0)} color="#ef4444" />
+                                <MuiButton variant="outlined" color="error" fullWidth onClick={() => navigate('/manager/financial/invoices')}>عرض التفاصيل</MuiButton>
                             </MuiBox>
                         )}
                     </MuiPaper>
                 </MuiGrid>
             </MuiGrid>
-
-            {/* Recent Transactions */}
-            <MuiPaper
-                elevation={0}
-                sx={{
-                    p: 3,
-                    background: 'var(--color-paper)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: '24px',
-                    mb: 4,
-                    overflow: 'hidden'
-                }}
-            >
-                <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                    <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-primary-500)', display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Activity size={24} />
-                        المعاملات الأخيرة
-                    </MuiTypography>
-                    <MuiButton
-                        variant="text"
-                        sx={{ color: 'var(--color-primary-500)' }}
-                        onClick={() => navigate('/manager/financial/transactions')}
-                    >
-                        عرض الكل
-                    </MuiButton>
-                </MuiBox>
-
-                {recentTransactions.length === 0 ? (
-                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', textAlign: 'center', py: 4 }}>
-                        لا توجد معاملات حديثة
-                    </MuiTypography>
-                ) : (
-                    <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        {recentTransactions.slice(0, 5).map((transaction) => (
-                            <MuiBox
-                                key={transaction._id}
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    p: 2,
-                                    borderRadius: '16px',
-                                    background: 'var(--color-surface)',
-                                    border: '1px solid var(--color-border)',
-                                    transition: 'all 0.2s ease',
-                                    '&:hover': {
-                                        background: 'var(--color-surface-hover)',
-                                        borderColor: 'var(--color-primary-200)',
-                                        transform: 'translateX(-4px)'
-                                    }
-                                }}
-                            >
-                                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                    <MuiBox sx={{
-                                        width: 40,
-                                        height: 40,
-                                        borderRadius: '10px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        background: transaction.type === 'payment' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                                    }}>
-                                        {transaction.type === 'payment' ?
-                                            <ArrowUpRight size={20} color="var(--color-icon)" /> :
-                                            <ArrowDownRight size={20} color="var(--color-icon)" />
-                                        }
-                                    </MuiBox>
-                                    <MuiBox sx={{ display: 'flex', flexDirection: 'column' }}>
-                                        <MuiTypography variant="body2" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                                            {transaction.displayName || transaction.description || transaction.category}
-                                        </MuiTypography>
-                                        <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
-                                            {formatDate(transaction.processedAt || transaction.createdAt)}
-                                        </MuiTypography>
-                                    </MuiBox>
-                                </MuiBox>
-                                <MuiTypography
-                                    variant="body1"
-                                    sx={{
-                                        fontWeight: 700,
-                                        color: transaction.type === 'payment' ? 'var(--color-icon)' : 'var(--color-icon)',
-                                        fontFamily: 'monospace',
-                                        fontSize: '1.1rem'
-                                    }}
-                                >
-                                    {transaction.type === 'payment' ? '+' : '-'}{formatCurrency(transaction.amount)}
-                                </MuiTypography>
-                            </MuiBox>
-                        ))}
-                    </MuiBox>
-                )}
-            </MuiPaper>
-
-            {/* Monthly Trend */}
-            {monthlyTrend.length > 0 && (
-                <MuiPaper
-                    elevation={0}
-                    sx={{
-                        p: 3,
-                        background: 'var(--color-paper)',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: '24px',
-                        overflow: 'hidden'
-                    }}
-                >
-                    <MuiTypography variant="h6" sx={{ fontWeight: 700, color: 'var(--color-primary-500)', mb: 3 }}>
-                        الاتجاه الشهري
-                    </MuiTypography>
-                    <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        {monthlyTrend.map((month, index) => (
-                            <MuiBox key={index} sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                p: 1.5,
-                                borderRadius: '12px',
-                                background: 'var(--color-surface)'
-                            }}>
-                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', minWidth: 100, fontWeight: 600 }}>
-                                    {month.month}
-                                </MuiTypography>
-                                <MuiBox sx={{ display: 'flex', gap: 3, flex: 1, justifyContent: 'flex-end' }}>
-                                    {/* Stats for small breakdown could go here */}
-                                    <MuiBox sx={{ textAlign: 'right' }}>
-                                        <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block' }}>
-                                            الإيرادات
-                                        </MuiTypography>
-                                        <MuiTypography variant="body2" sx={{ fontWeight: 600, color: 'var(--color-icon)' }}>
-                                            {formatCurrency(month.revenue)}
-                                        </MuiTypography>
-                                    </MuiBox>
-                                    <MuiBox sx={{ textAlign: 'right' }}>
-                                        <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block' }}>
-                                            المصروفات
-                                        </MuiTypography>
-                                        <MuiTypography variant="body2" sx={{ fontWeight: 600, color: 'var(--color-icon)' }}>
-                                            {formatCurrency(month.expenses)}
-                                        </MuiTypography>
-                                    </MuiBox>
-                                    <MuiBox sx={{ textAlign: 'right' }}>
-                                        <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block' }}>
-                                            الربح
-                                        </MuiTypography>
-                                        <MuiTypography variant="body2" sx={{ fontWeight: 600, color: 'var(--color-primary-500)' }}>
-                                            {formatCurrency(month.profit)}
-                                        </MuiTypography>
-                                    </MuiBox>
-                                </MuiBox>
-                            </MuiBox>
-                        ))}
-                    </MuiBox>
-                </MuiPaper>
-            )}
         </MuiBox>
     )
 }
 
-// Stat Card Component
-function StatCard({ title, value, icon: Icon, color, bgColor, trend }) {
+function StatCard({ title, value, icon: Icon, trend }) {
     return (
-        <MuiPaper
-            elevation={0}
-            sx={{
-                p: 3,
-                background: 'var(--color-paper)',
-                border: '1px solid var(--color-border)',
-                borderRadius: '24px',
-                height: '100%',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                cursor: 'pointer',
-                position: 'relative',
-                overflow: 'hidden',
-                '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '3px',
-                    background: color.startsWith('#') ? color : `var(--color-${color.replace('var(--color-', '').replace(')', '')})`,
-                    opacity: 0.8
-                },
-                '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: 'var(--shadow-lg)',
-                    borderColor: 'var(--color-primary-200)'
-                }
-            }}
-        >
-            <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                <MuiBox
-                    sx={{
-                        width: 56,
-                        height: 56,
-                        borderRadius: '16px',
-                        background: bgColor,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: `0 4px 12px ${bgColor}`
-                    }}
-                >
-                    <Icon size={28} style={{ color }} />
+        <MuiPaper sx={{ p: 3, borderRadius: '24px', background: 'var(--color-paper)', border: '1px solid var(--color-border)', height: '100%' }}>
+            <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                <MuiBox sx={{ p: 1.5, borderRadius: '12px', bgcolor: 'rgba(216, 185, 138, 0.1)', color: 'var(--color-icon)' }}>
+                    <Icon size={24} />
                 </MuiBox>
-                {trend !== 'neutral' && (
-                    <MuiBox sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                        background: trend === 'up' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                        padding: '4px 8px',
-                        borderRadius: '8px'
-                    }}>
-                        {trend === 'up' ? (
-                            <ArrowUpRight size={16} style={{ color: 'var(--color-icon)' }} />
-                        ) : (
-                            <ArrowDownRight size={16} style={{ color: 'var(--color-icon)' }} />
-                        )}
-                        <MuiTypography variant="caption" sx={{
-                            color: trend === 'up' ? 'var(--color-icon)' : 'var(--color-icon)',
-                            fontWeight: 700
-                        }}>
-                            {trend === 'up' ? '+2.5%' : '-1.2%'}
-                        </MuiTypography>
-                    </MuiBox>
+                {trend && (
+                    <MuiChip 
+                        size="small" 
+                        icon={trend === 'up' ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />} 
+                        label={trend === 'up' ? 'صعود' : 'هبوط'} 
+                        sx={{ bgcolor: trend === 'up' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: trend === 'up' ? '#22c55e' : '#ef4444', fontWeight: 700 }}
+                    />
                 )}
             </MuiBox>
-            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1, fontWeight: 500 }}>
-                {title}
-            </MuiTypography>
-            <MuiTypography variant="h4" sx={{
-                fontWeight: 800,
-                color: 'var(--color-text-primary)'
-            }}>
-                {value}
-            </MuiTypography>
+            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>{title}</MuiTypography>
+            <MuiTypography variant="h5" sx={{ fontWeight: 800 }}>{value}</MuiTypography>
         </MuiPaper>
     )
 }
 
-// Info Row Component
 function InfoRow({ label, value, color }) {
     return (
-        <MuiBox sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            p: 1.5,
-            borderRadius: '12px',
-            '&:hover': {
-                background: 'var(--color-surface-hover)'
-            }
-        }}>
-            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                {label}
-            </MuiTypography>
-            <MuiTypography variant="body1" sx={{ fontWeight: 700, color: color || 'var(--color-text-primary)' }}>
-                {value}
-            </MuiTypography>
+        <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', py: 1 }}>
+            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>{label}</MuiTypography>
+            <MuiTypography variant="body2" sx={{ fontWeight: 700, color: color || 'var(--color-text-primary)' }}>{value}</MuiTypography>
         </MuiBox>
     )
 }

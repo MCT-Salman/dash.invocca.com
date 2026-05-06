@@ -18,7 +18,7 @@ import MuiTab from '@mui/material/Tab'
 import Box from '@mui/material/Box'
 
 // Layout & Common Components
-import { LoadingScreen, EmptyState, SEOHead, DataTable, ConfirmDialog, PageHeader, StatCard, AdvancedFilter } from '@/components/common'
+import { LoadingScreen, EmptyState, ConfirmDialog, SEOHead, StatusBadge, DataTable, PageHeader, StatCard, AdvancedFilter, CrudPageLayout } from '@/components/common'
 import ViewUserDialog from './components/ViewUserDialog'
 import CreateAdminDialog from './components/CreateAdminDialog'
 import EditUserDialog from './components/EditUserDialog'
@@ -226,7 +226,7 @@ export default function UsersManagement() {
             sx={{
               width: 36,
               height: 36,
-              background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
+              background: 'linear-gradient(135deg, var(--color-icon), var(--color-gold))',
               color: 'var(--color-text-on-primary)',
               fontWeight: 600,
               fontSize: '0.8rem'
@@ -251,7 +251,7 @@ export default function UsersManagement() {
       align: 'right',
       format: (value) => (
         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Phone size={14} style={{ color: 'var(--color-primary-500)' }} />
+          <Phone size={14} style={{ color: 'var(--color-icon)' }} />
           <MuiTypography variant="body2">{value || '---'}</MuiTypography>
         </MuiBox>
       )
@@ -267,13 +267,7 @@ export default function UsersManagement() {
       label: 'الحالة',
       align: 'center',
       format: (value) => (
-        <MuiChip
-          label={value ? 'نشط' : 'معطل'}
-          size="small"
-          color={value ? 'success' : 'error'}
-          variant="filled"
-          icon={value ? <CheckCircle size={14} /> : <XCircle size={14} />}
-        />
+        <StatusBadge value={value} activeLabel="نشط" inactiveLabel="معطل" />
       )
     }
   ]
@@ -326,109 +320,47 @@ export default function UsersManagement() {
 
   if (isLoading) return <LoadingScreen message="جاري تحميل المستخدمين..." />
 
-  return (
-    <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
-      <SEOHead title="إدارة المستخدمين | INVOCCA" />
+    return (
+        <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
+            <SEOHead title="إدارة المستخدمين | INVOCCA" />
 
-      <PageHeader
-        icon={Shield}
-        title={`مدراء النظام (${filteredUsers.length})`}
-        subtitle="إدارة حسابات مدراء النظام وصلاحياتهم"
-        actions={
-          <MuiBox sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            <MuiButton
-              variant="contained"
-              start_icon={<Plus size={18} />}
-              onClick={() => openCreateDialog()}
-            >
-              إضافة مدير نظام
-            </MuiButton>
-            <MuiButton
-              variant="outlined"
-              start_icon={<RefreshCw size={18} />}
-              onClick={() => refetch()}
-            >
-              تحديث
-            </MuiButton>
-          </MuiBox>
-        }
-      />
-
-      {/* Stats Cards - Admin Focused */}
-      <MuiGrid container spacing={3} sx={{ mb: 4 }}>
-        <MuiGrid item xs={12} sm={6}>
-          <StatCard
-            title="إجمالي مدراء النظام"
-            value={users.filter(u => {
-              const roles = Array.isArray(u.role) ? u.role : [u.role]
-              return roles.includes(USER_ROLES.ADMIN)
-            }).length}
-            icon={<Shield size={24} />}
-            sx={{ borderTop: '4px solid var(--color-error-500)' }}
-          />
-        </MuiGrid>
-        <MuiGrid item xs={12} sm={6}>
-          <StatCard
-            title="المدراء النشطون"
-            value={users.filter(u => {
-              const roles = Array.isArray(u.role) ? u.role : [u.role]
-              return roles.includes(USER_ROLES.ADMIN) && u.isActive !== false
-            }).length}
-            icon={<CheckCircle size={24} />}
-            color="success"
-          />
-        </MuiGrid>
-      </MuiGrid>
-
-      {/* Advanced Filter */}
-      <AdvancedFilter
-        onSearch={setSearchQuery}
-        onFilterChange={setActiveFilters}
-        filters={filterConfig}
-        onRefresh={refetch}
-        searchPlaceholder="بحث..."
-      />
-
-      {/* Tabs hidden - only showing admins */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3, display: 'none' }}>
-        <MuiTabs
-          value={USER_ROLES.ADMIN}
-          sx={{
-            '& .MuiTab-root': {
-              color: 'var(--color-text-secondary)',
-              fontWeight: 'bold',
-              fontSize: '1rem',
-              '&.Mui-selected': {
-                color: 'var(--color-primary-500)',
-              }
-            },
-            '& .MuiTabs-indicator': {
-              backgroundColor: 'var(--color-primary-500)',
-            }
-          }}
-        >
-          <MuiTab label="مدراء النظام" value={USER_ROLES.ADMIN} />
-        </MuiTabs>
-      </Box>
-
-      {/* Users Table */}
-      {filteredUsers.length === 0 ? (
-        <EmptyState
-          title="لا يوجد مستخدمين"
-          description="لم يتم العثور على أي مستخدمين يطابقون بحثك"
-          icon={Users}
-          showPaper
-        />
-      ) : (
-        <DataTable
-          columns={columns}
-          data={filteredUsers}
-          onView={openViewDialog}
-          onEdit={openEditDialog}
-          onDelete={openDeleteDialog}
-          onToggleStatus={handleToggleStatus}
-        />
-      )}
+            <CrudPageLayout
+                stats={[
+                    {
+                        title: "إجمالي مدراء النظام",
+                        value: users.filter(u => {
+                            const roles = Array.isArray(u.role) ? u.role : [u.role]
+                            return roles.includes(USER_ROLES.ADMIN)
+                        }).length,
+                        icon: <Shield size={24} />,
+                        sx: { borderTop: '4px solid var(--color-icon)' }
+                    },
+                    {
+                        title: "المدراء النشطون",
+                        value: users.filter(u => {
+                            const roles = Array.isArray(u.role) ? u.role : [u.role]
+                            return roles.includes(USER_ROLES.ADMIN) && u.isActive !== false
+                        }).length,
+                        icon: <CheckCircle size={24} />,
+                        color: "success"
+                    }
+                ]}
+                filterConfig={filterConfig}
+                onSearch={setSearchQuery}
+                onFilterChange={setActiveFilters}
+                onRefresh={refetch}
+                searchPlaceholder="بحث..."
+                columns={columns}
+                data={filteredUsers}
+                loading={isLoading}
+                emptyMessage="لم يتم العثور على أي مستخدمين يطابقون بحثك"
+                addButtonLabel="إضافة مدير نظام"
+                onAdd={openCreateDialog}
+                onEdit={openEditDialog}
+                onDelete={openDeleteDialog}
+                onView={openViewDialog}
+                onToggleStatus={handleToggleStatus}
+            />
 
       {/* User View Dialog */}
       <ViewUserDialog

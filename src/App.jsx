@@ -7,6 +7,7 @@ import { LoadingScreen } from './components/common'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import MainLayout from './components/layout/MainLayout'
 import DashboardLayout from './components/layout/DashboardLayout'
+import { ClientProvider } from './providers/ClientProvider'
 
 // Auth Pages
 import Login from './pages/auth/Login'
@@ -113,7 +114,7 @@ export default function App() {
             </Route>
 
             {/* Client Routes under DashboardLayout */}
-            <Route element={<ProtectedRoute requiredRole={USER_ROLES.CLIENT}><MainLayout /></ProtectedRoute>}>
+            <Route element={<ProtectedRoute requiredRole={USER_ROLES.CLIENT}><ClientProvider><MainLayout /></ClientProvider></ProtectedRoute>}>
                 <Route path="/client" element={<Navigate to={ROUTES.CLIENT.DASHBOARD} replace />} />
                 <Route path={ROUTES.CLIENT.DASHBOARD} element={<ClientDashboard />} />
                 <Route path={ROUTES.CLIENT.BOOKINGS} element={<ClientBookings />} />

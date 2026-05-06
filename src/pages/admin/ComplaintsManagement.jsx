@@ -123,14 +123,14 @@ export default function ComplaintsManagement() {
                             width: 36,
                             height: 36,
                             borderRadius: '10px',
-                            background: 'var(--color-primary-100)',
+                            background: 'color-mix(in srgb, var(--color-gold) 15%, transparent)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            border: '1px solid var(--color-primary-200)',
+                            border: '1px solid var(--color-border)',
                         }}
                     >
-                        <MessageCircle size={18} style={{ color: 'var(--color-primary-500)' }} />
+                        <MessageCircle size={18} style={{ color: 'var(--color-icon)' }} />
                     </MuiBox>
                     <MuiBox>
                         <MuiTypography variant="body2" sx={{ fontWeight: 600 }}>
@@ -150,7 +150,7 @@ export default function ComplaintsManagement() {
             format: (value, row) => (
                 <MuiBox>
                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <User size={14} style={{ color: 'var(--color-primary-500)' }} />
+                        <User size={14} style={{ color: 'var(--color-icon)' }} />
                         <MuiTypography variant="body2">{value}</MuiTypography>
                     </MuiBox>
                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -218,7 +218,7 @@ export default function ComplaintsManagement() {
                         title="إجمالي الشكاوى"
                         value={complaints.length}
                         icon={<MessageCircle size={24} />}
-                        sx={{ borderTop: '4px solid var(--color-primary-500)' }}
+                        sx={{ borderTop: '4px solid var(--color-icon)' }}
                     />
                 </MuiGrid>
                 <MuiGrid item xs={12} sm={6} md={3}>
@@ -226,7 +226,7 @@ export default function ComplaintsManagement() {
                         title="قيد الانتظار"
                         value={complaints.filter(c => c.status === COMPLAINT_STATUS.PENDING).length}
                         icon={<Clock size={24} />}
-                        sx={{ borderTop: '4px solid var(--color-warning-500)' }}
+                        sx={{ borderTop: '4px solid var(--color-icon)' }}
                     />
                 </MuiGrid>
                 <MuiGrid item xs={12} sm={6} md={3}>
@@ -234,7 +234,7 @@ export default function ComplaintsManagement() {
                         title="قيد المعالجة"
                         value={complaints.filter(c => c.status === COMPLAINT_STATUS.IN_PROGRESS).length}
                         icon={<AlertCircle size={24} />}
-                        sx={{ borderTop: '4px solid var(--color-info-500)' }}
+                        sx={{ borderTop: '4px solid var(--color-icon)' }}
                     />
                 </MuiGrid>
                 <MuiGrid item xs={12} sm={6} md={3}>
@@ -242,7 +242,7 @@ export default function ComplaintsManagement() {
                         title="تم الحل"
                         value={complaints.filter(c => c.status === COMPLAINT_STATUS.RESOLVED).length}
                         icon={<CheckCircle size={24} />}
-                        sx={{ borderTop: '4px solid var(--color-success-500)' }}
+                        sx={{ borderTop: '4px solid var(--color-icon)' }}
                     />
                 </MuiGrid>
             </MuiGrid>

@@ -25,7 +25,7 @@ const MuiBreadcrumbs = ({
             <MuiTypography
               key={index}
               variant="body2"
-              sx={{ color: 'var(--color-primary-500)', fontWeight: 700 }}
+              sx={{ color: 'var(--color-icon)', fontWeight: 700 }}
             >
               {item.label}
             </MuiTypography>
@@ -43,8 +43,9 @@ const MuiBreadcrumbs = ({
               textDecoration: 'none',
               transition: 'all 0.2s ease',
               '&:hover': {
-                color: 'var(--color-primary-500)',
-                textDecoration: 'underline',
+                color: 'var(--color-icon)',
+                textDecoration: 'none',
+                backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)'
               }
             }}
           >

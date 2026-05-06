@@ -10,7 +10,7 @@ import { useAuth } from '@/hooks'
 import { formatNumber, formatEmptyValue } from '@/utils/helpers'
 
 // eslint-disable-next-line no-unused-vars
-function StatCard({ title, value, icon: Icon, color = 'var(--color-primary-500)' }) {
+function StatCard({ title, value, icon: Icon, color = 'var(--color-icon)' }) {
   return (
     <MuiPaper
       elevation={0}
@@ -25,7 +25,7 @@ function StatCard({ title, value, icon: Icon, color = 'var(--color-primary-500)'
         transition: 'all 0.3s ease',
         '&:hover': {
           transform: 'translateY(-4px)',
-          boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
+          boxShadow: 'none',
           borderColor: color,
         },
         '&::before': {
@@ -53,7 +53,7 @@ function StatCard({ title, value, icon: Icon, color = 'var(--color-primary-500)'
             width: 56,
             height: 56,
             borderRadius: '12px',
-            background: 'rgba(255, 255, 255, 0.05)',
+            background: 'var(--color-surface)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -68,7 +68,7 @@ function StatCard({ title, value, icon: Icon, color = 'var(--color-primary-500)'
 }
 
 // eslint-disable-next-line no-unused-vars
-function ActionCard({ title, description, icon: Icon, onClick, color = 'var(--color-primary-500)' }) {
+function ActionCard({ title, description, icon: Icon, onClick, color = 'var(--color-icon)' }) {
   return (
     <MuiPaper
       elevation={0}
@@ -83,7 +83,7 @@ function ActionCard({ title, description, icon: Icon, onClick, color = 'var(--co
         '&:hover': {
           transform: 'translateY(-4px)',
           borderColor: color,
-          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+          boxShadow: 'none',
         }
       }}
     >
@@ -93,11 +93,11 @@ function ActionCard({ title, description, icon: Icon, onClick, color = 'var(--co
             width: 56,
             height: 56,
             borderRadius: '14px',
-            background: `linear-gradient(135deg, ${color}, ${color}CC)`,
+            background: 'var(--color-icon)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: `0 4px 12px ${color}40`
+            boxShadow: 'none'
           }}
         >
           <Icon size={28} style={{ color: 'var(--color-text-primary)' }} />
@@ -147,7 +147,7 @@ export default function EmployeeDashboard() {
             title="إجمالي المهام"
             value={stats.totalTasks}
             icon={ClipboardList}
-            color="var(--color-primary-500)"
+            color="var(--color-icon)"
           />
         </MuiGrid>
         <MuiGrid item xs={12} sm={6} md={4}>
@@ -155,7 +155,7 @@ export default function EmployeeDashboard() {
             title="المهام المكتملة"
             value={stats.completedTasks}
             icon={CheckCircle2}
-            color="var(--color-success-500)"
+            color="var(--color-icon)"
           />
         </MuiGrid>
         <MuiGrid item xs={12} sm={6} md={4}>
@@ -163,7 +163,7 @@ export default function EmployeeDashboard() {
             title="فعاليات اليوم"
             value={stats.todayEvents}
             icon={Clock}
-            color="var(--color-info-500)"
+            color="var(--color-icon)"
           />
         </MuiGrid>
       </MuiGrid>
@@ -175,7 +175,7 @@ export default function EmployeeDashboard() {
             title="ماسح التذاكر"
             description="ابدأ بمسح كود الـ QR الخاص بالضيوف"
             icon={QrCode}
-            color="var(--color-primary-500)"
+            color="var(--color-icon)"
             onClick={() => navigate('/employee/scanner')}
           />
         </MuiGrid>
@@ -184,7 +184,7 @@ export default function EmployeeDashboard() {
             title="قائمة المهام"
             description="عرض المهام والفعاليات المكلف بها"
             icon={ClipboardList}
-            color="var(--color-secondary-500)"
+            color="var(--color-icon)"
             onClick={() => navigate('/employee/tasks')}
           />
         </MuiGrid>

@@ -21,7 +21,7 @@ const MuiMenu = ({
           backgroundColor: 'var(--color-paper)',
           border: '1px solid var(--color-border)',
           borderRadius: '16px',
-          boxShadow: 'var(--shadow-lg)',
+          boxShadow: 'none',
           backdropFilter: 'blur(12px)',
           minWidth: 180,
           mt: 1,
@@ -46,21 +46,21 @@ const MuiMenu = ({
             color: 'var(--color-text-primary)',
             fontSize: '0.9rem',
             fontWeight: 500,
+            fontFamily: 'Alexandria, var(--font-family-base)',
             borderRadius: '8px',
             mx: 0.5,
             my: 0.5,
             transition: 'all 0.2s ease',
             '&:hover': {
-              backgroundColor: 'var(--color-surface-hover)',
-              color: 'var(--color-primary-500)',
-              transform: 'translateX(4px)',
+              backgroundColor: 'color-mix(in srgb, var(--color-gold) 12%, transparent)',
             },
             '&.Mui-selected': {
-              backgroundColor: 'var(--color-primary-500) !important',
-              color: 'var(--color-text-on-primary) !important',
+              backgroundColor: 'var(--color-icon) !important',
+              color: 'var(--color-dark) !important',
               fontWeight: 600,
               '&:hover': {
-                backgroundColor: 'var(--color-primary-600) !important',
+                backgroundColor: 'var(--color-icon) !important',
+                opacity: 0.9,
               }
             }
           }}

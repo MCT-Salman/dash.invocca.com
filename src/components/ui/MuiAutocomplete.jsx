@@ -33,7 +33,7 @@ const MuiAutocomplete = ({
           backgroundColor: 'var(--color-paper)',
           border: '1px solid var(--color-border)',
           borderRadius: '16px',
-          boxShadow: 'var(--shadow-xl)',
+          boxShadow: 'none',
           '& .MuiAutocomplete-listbox': {
             '& .MuiAutocomplete-option': {
               color: 'var(--color-text-primary)',
@@ -41,8 +41,8 @@ const MuiAutocomplete = ({
                 backgroundColor: 'var(--color-surface-hover)',
               },
               '&[aria-selected="true"]': {
-                backgroundColor: 'var(--color-primary-500) !important',
-                color: 'var(--color-text-on-primary) !important',
+                backgroundColor: 'var(--color-icon) !important',
+                color: 'var(--color-dark) !important',
                 fontWeight: 600
               }
             }

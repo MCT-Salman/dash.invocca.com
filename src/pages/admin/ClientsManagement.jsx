@@ -106,7 +106,7 @@ export default function ClientsManagement() {
                         sx={{
                             width: 36,
                             height: 36,
-                            background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
+                            background: 'linear-gradient(135deg, var(--color-icon), var(--color-gold))',
                             color: 'var(--color-text-on-primary)',
                             fontWeight: 600,
                             fontSize: '0.8rem'
@@ -141,7 +141,7 @@ export default function ClientsManagement() {
             align: 'right',
             format: (value) => (
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Phone size={14} style={{ color: 'var(--color-primary-500)' }} />
+                    <Phone size={14} style={{ color: 'var(--color-icon)' }} />
                     <MuiTypography variant="body2">{formatPhoneNumber(value) || value || '---'}</MuiTypography>
                 </MuiBox>
             )
@@ -152,7 +152,7 @@ export default function ClientsManagement() {
             align: 'center',
             format: (value) => (
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Calendar size={14} style={{ color: 'var(--color-primary-500)' }} />
+                    <Calendar size={14} style={{ color: 'var(--color-icon)' }} />
                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
                         {formatDate(value) || '—'}
                     </MuiTypography>

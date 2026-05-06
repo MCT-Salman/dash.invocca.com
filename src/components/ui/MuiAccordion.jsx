@@ -21,17 +21,17 @@ const MuiAccordion = ({
             mb: 2,
             overflow: 'hidden',
             '&:before': { display: 'none' }, // Remove default MUI divider
-            boxShadow: 'var(--shadow-sm)',
+            boxShadow: 'none',
             '&:hover': {
-              boxShadow: 'var(--shadow-md)',
-              borderColor: 'var(--color-primary-500)',
+              backgroundColor: 'color-mix(in srgb, var(--color-gold) 6%, transparent)',
+              borderColor: 'var(--color-border)',
             },
             transition: 'all 0.3s ease',
           }}
           className={className}
         >
           <AccordionSummary
-            expandIcon={<ExpandMoreIcon sx={{ color: 'var(--color-primary-500)' }} />}
+            expandIcon={<ExpandMoreIcon sx={{ color: 'var(--color-icon)' }} />}
             sx={{
               color: 'var(--color-text-primary)',
               fontWeight: 600,

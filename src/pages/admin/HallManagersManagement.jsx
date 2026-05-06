@@ -9,11 +9,10 @@ import MuiButton from '@/components/ui/MuiButton'
 import MuiTextField from '@/components/ui/MuiTextField'
 import MuiPaper from '@/components/ui/MuiPaper'
 import MuiGrid from '@/components/ui/MuiGrid'
-import MuiChip from '@/components/ui/MuiChip'
 import MuiAvatar from '@/components/ui/MuiAvatar'
 
 // Layout & Common Components
-import { LoadingScreen, EmptyState, SEOHead, PageHeader, StatCard, DataTable, ConfirmDialog, AdvancedFilter } from '@/components/common'
+import { LoadingScreen, EmptyState, ConfirmDialog, SEOHead, PageHeader, StatCard, DataTable, StatusBadge, AdvancedFilter, CrudPageLayout } from '@/components/common'
 import ViewUserDialog from './components/ViewUserDialog'
 import EditUserDialog from './components/EditUserDialog'
 import CreateAdminDialog from './components/CreateAdminDialog'
@@ -172,7 +171,7 @@ export default function HallManagersManagement() {
                         sx={{
                             width: 36,
                             height: 36,
-                            background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
+                            background: 'linear-gradient(135deg, var(--color-icon), var(--color-gold))',
                             color: 'var(--color-text-on-primary)',
                             fontWeight: 600,
                             fontSize: '0.8rem'
@@ -197,7 +196,7 @@ export default function HallManagersManagement() {
             align: 'right',
             format: (value) => (
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Phone size={14} style={{ color: 'var(--color-primary-500)' }} />
+                    <Phone size={14} style={{ color: 'var(--color-icon)' }} />
                     <MuiTypography variant="body2">{formatPhoneNumber(value) || value || '---'}</MuiTypography>
                 </MuiBox>
             )
@@ -208,7 +207,7 @@ export default function HallManagersManagement() {
             align: 'right',
             format: (value) => (
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Building2 size={14} style={{ color: 'var(--color-primary-500)' }} />
+                    <Building2 size={14} style={{ color: 'var(--color-icon)' }} />
                     <MuiTypography variant="body2">{value?.name || '—'}</MuiTypography>
                 </MuiBox>
             )
@@ -218,13 +217,7 @@ export default function HallManagersManagement() {
             label: 'الحالة',
             align: 'center',
             format: (value) => (
-                <MuiChip
-                    label={value ? 'نشط' : 'معطل'}
-                    size="small"
-                    color={value ? 'success' : 'error'}
-                    variant="filled"
-                    icon={value ? <CheckCircle size={14} /> : <XCircle size={14} />}
-                />
+                <StatusBadge value={value} activeLabel="نشط" inactiveLabel="معطل" />
             )
         }
     ]
@@ -275,77 +268,37 @@ export default function HallManagersManagement() {
         <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
             <SEOHead title="مدراء الصالات | INVOCCA" />
 
-            <PageHeader
-                icon={Users}
-                title={`مدراء الصالات (${filteredManagers.length})`}
-                subtitle="إدارة مدراء الصالات والقاعات في النظام"
-                actions={
-                    <MuiBox sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                        <MuiButton
-                            variant="contained"
-                            startIcon={<Plus size={18} />}
-                            onClick={() => openCreateDialog()}
-                        >
-                            إضافة مدير
-                        </MuiButton>
-                        <MuiButton
-                            variant="outlined"
-                            startIcon={<RefreshCw size={18} />}
-                            onClick={handleRefresh}
-                        >
-                            تحديث
-                        </MuiButton>
-                    </MuiBox>
-                }
-            />
-
-            {/* Stats Cards */}
-            <MuiGrid container spacing={3} sx={{ mb: 4 }}>
-                <MuiGrid item xs={12} sm={6}>
-                    <StatCard
-                        title="إجمالي مدراء الصالات"
-                        value={filteredManagers.length}
-                        icon={<Shield size={24} />}
-                        sx={{ borderTop: '4px solid var(--color-secondary-500)' }}
-                    />
-                </MuiGrid>
-                <MuiGrid item xs={12} sm={6}>
-                    <StatCard
-                        title="المدراء النشطون"
-                        value={filteredManagers.filter(m => m.isActive !== false).length}
-                        icon={<CheckCircle size={24} />}
-                        color="success"
-                    />
-                </MuiGrid>
-            </MuiGrid>
-
-            {/* Advanced Filter */}
-            <AdvancedFilter
+            <CrudPageLayout
+                stats={[
+                    {
+                        title: "إجمالي مدراء الصالات",
+                        value: filteredManagers.length,
+                        icon: <Shield size={24} />,
+                        sx: { borderTop: '4px solid var(--color-icon)' }
+                    },
+                    {
+                        title: "المدراء النشطون",
+                        value: filteredManagers.filter(m => m.isActive !== false).length,
+                        icon: <CheckCircle size={24} />,
+                        color: "success"
+                    }
+                ]}
+                filterConfig={filterConfig}
                 onSearch={setSearchQuery}
                 onFilterChange={setActiveFilters}
-                filters={filterConfig}
-                onRefresh={refetch}
+                onRefresh={handleRefresh}
                 searchPlaceholder="بحث..."
+                columns={columns}
+                data={filteredManagers}
+                loading={isLoading}
+                emptyMessage="لا يوجد مدراء صالات يطابقون بحثك"
+                addButtonLabel="إضافة مدير"
+                onAdd={openCreateDialog}
+                onEdit={openEditDialog}
+                onDelete={openDeleteDialog}
+                onView={openViewDialog}
+                onToggleStatus={handleToggleStatus}
             />
-
-            {/* Managers Table */}
-            {filteredManagers.length === 0 ? (
-                <EmptyState
-                    title="لا يوجد مدراء صالات"
-                    description="لم يتم العثور على أي مدراء صالات يطابقون بحثك"
-                    icon={Users}
-                    showPaper
-                />
-            ) : (
-                <DataTable
-                    columns={columns}
-                    data={filteredManagers}
-                    onView={openViewDialog}
-                    onEdit={openEditDialog}
-                    onDelete={openDeleteDialog}
-                    onToggleStatus={handleToggleStatus}
-                />
-            )}
 
             {/* View User Dialog */}
             <ViewUserDialog

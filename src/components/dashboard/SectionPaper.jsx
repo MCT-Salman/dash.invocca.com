@@ -42,7 +42,7 @@ export default function SectionPaper({
                                     width: 40,
                                     height: 40,
                                     borderRadius: '10px',
-                                    backgroundColor: 'var(--color-primary-500)',
+                                    backgroundColor: 'var(--color-icon)',
                                     color: 'var(--color-text-on-primary)',
                                     display: 'flex',
                                     alignItems: 'center',

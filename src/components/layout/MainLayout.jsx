@@ -4,7 +4,7 @@ import Sidebar from './Sidebar'
 import { Outlet } from 'react-router-dom'
 import MuiBox from '@/components/ui/MuiBox'
 
-const DRAWER_WIDTH = 280
+const DRAWER_WIDTH = 240
 const DRAWER_WIDTH_COLLAPSED = 80
 
 export default function MainLayout() {

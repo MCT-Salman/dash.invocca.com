@@ -53,10 +53,10 @@ const roleLabels = {
 }
 
 const roleColors = {
-    admin: 'var(--color-secondary-500)',
-    manager: 'var(--color-primary-500)',
-    client: 'var(--color-success-500)',
-    scanner: 'var(--color-info-500)',
+    admin: 'var(--color-icon)',
+    manager: 'var(--color-icon)',
+    client: 'var(--color-icon)',
+    scanner: 'var(--color-icon)',
 }
 
 const serviceCategoryLabels = {
@@ -151,7 +151,7 @@ export default function ReportsManagement() {
 
     const getRoleColor = (roleId) => {
         const primaryRole = Array.isArray(roleId) ? roleId[0] : roleId
-        return roleColors[primaryRole] || 'var(--color-primary-500)'
+        return roleColors[primaryRole] || 'var(--color-icon)'
     }
 
     if (isLoading) return <LoadingScreen message="جاري تحليل البيانات وإعداد التقارير..." />
@@ -193,7 +193,7 @@ export default function ReportsManagement() {
                         title="إجمالي القاعات"
                         value={stats.totalHalls || 0}
                         icon={<Building2 size={24} />}
-                        sx={{ borderTop: '4px solid var(--color-primary-500)' }}
+                        sx={{ borderTop: '4px solid var(--color-icon)' }}
                     />
                 </MuiGrid>
                 <MuiGrid item xs={12} sm={6} md={3}>
@@ -201,7 +201,7 @@ export default function ReportsManagement() {
                         title="القاعات النشطة"
                         value={stats.activeHalls || 0}
                         icon={<CheckCircle size={24} />}
-                        sx={{ borderTop: '4px solid var(--color-success-500)' }}
+                        sx={{ borderTop: '4px solid var(--color-icon)' }}
                     />
                 </MuiGrid>
                 <MuiGrid item xs={12} sm={6} md={3}>
@@ -209,7 +209,7 @@ export default function ReportsManagement() {
                         title="إجمالي المستخدمين"
                         value={stats.totalUsers || 0}
                         icon={<Users size={24} />}
-                        sx={{ borderTop: '4px solid var(--color-secondary-500)' }}
+                        sx={{ borderTop: '4px solid var(--color-icon)' }}
                     />
                 </MuiGrid>
                 <MuiGrid item xs={12} sm={6} md={3}>
@@ -284,8 +284,8 @@ export default function ReportsManagement() {
                                     {stats.activeHalls || 0} / {stats.totalHalls || 0}
                                 </MuiTypography>
                             </MuiBox>
-                            <MuiBox sx={{ height: '12px', width: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', overflow: 'hidden' }}>
-                                <MuiBox sx={{ height: '100%', width: `${stats.totalHalls > 0 ? (stats.activeHalls / stats.totalHalls) * 100 : 0}%`, background: 'linear-gradient(90deg, var(--color-success-500), var(--color-success-600))', borderRadius: '6px' }} />
+                            <MuiBox sx={{ height: '12px', width: '100%', background: 'color-mix(in srgb, var(--color-light) 5%, transparent)', borderRadius: '6px', overflow: 'hidden' }}>
+                                <MuiBox sx={{ height: '100%', width: `${stats.totalHalls > 0 ? (stats.activeHalls / stats.totalHalls) * 100 : 0}%`, background: 'linear-gradient(90deg, var(--color-icon), var(--color-gold))', borderRadius: '6px' }} />
                             </MuiBox>
 
                             <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
@@ -294,13 +294,13 @@ export default function ReportsManagement() {
                                     {stats.inactiveHalls || 0}
                                 </MuiTypography>
                             </MuiBox>
-                            <MuiBox sx={{ height: '12px', width: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', overflow: 'hidden' }}>
-                                <MuiBox sx={{ height: '100%', width: `${stats.totalHalls > 0 ? (stats.inactiveHalls / stats.totalHalls) * 100 : 0}%`, background: 'linear-gradient(90deg, var(--color-error-500), var(--color-error-600))', borderRadius: '6px' }} />
+                            <MuiBox sx={{ height: '12px', width: '100%', background: 'color-mix(in srgb, var(--color-light) 5%, transparent)', borderRadius: '6px', overflow: 'hidden' }}>
+                                <MuiBox sx={{ height: '100%', width: `${stats.totalHalls > 0 ? (stats.inactiveHalls / stats.totalHalls) * 100 : 0}%`, background: 'linear-gradient(90deg, var(--color-icon), var(--color-gold))', borderRadius: '6px' }} />
                             </MuiBox>
 
                             <MuiDivider sx={{ my: 2, borderColor: 'var(--color-border-glass)' }} />
 
-                            <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-primary-400)', mb: 2 }}>توزيع السعة</MuiTypography>
+                            <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-icon)', mb: 2 }}>توزيع السعة</MuiTypography>
                             {(() => {
                                 const capacityRanges = {
                                     'صغيرة (0-100)': halls.filter(h => (h.capacity || 0) <= 100).length,
@@ -315,8 +315,8 @@ export default function ReportsManagement() {
                                             <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>{label}</MuiTypography>
                                             <MuiTypography variant="caption" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>{count}</MuiTypography>
                                         </MuiBox>
-                                        <MuiBox sx={{ height: '6px', width: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '3px', overflow: 'hidden' }}>
-                                            <MuiBox sx={{ height: '100%', width: `${halls.length > 0 ? (count / halls.length) * 100 : 0}%`, background: 'var(--color-primary-500)', borderRadius: '3px' }} />
+                                        <MuiBox sx={{ height: '6px', width: '100%', background: 'color-mix(in srgb, var(--color-light) 5%, transparent)', borderRadius: '3px', overflow: 'hidden' }}>
+                                            <MuiBox sx={{ height: '100%', width: `${halls.length > 0 ? (count / halls.length) * 100 : 0}%`, background: 'var(--color-icon)', borderRadius: '3px' }} />
                                         </MuiBox>
                                     </MuiBox>
                                 ))
@@ -399,20 +399,20 @@ export default function ReportsManagement() {
                                     <MuiGrid item xs={12} sm={6} md={4} key={hall._id || hall.id}>
                                         <MuiBox sx={{
                                             borderRadius: '16px',
-                                            background: 'rgba(255,255,255,0.03)',
+                                            background: 'color-mix(in srgb, var(--color-light) 3%, transparent)',
                                             border: '1px solid var(--color-border-glass)',
                                             overflow: 'hidden',
                                             transition: 'all 0.3s ease',
                                             '&:hover': {
-                                                borderColor: 'var(--color-primary-500)',
+                                                borderColor: 'var(--color-icon)',
                                                 transform: 'translateY(-4px)',
-                                                boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                                                boxShadow: 'none',
                                             }
                                         }}>
                                             {/* Hall Image */}
                                             <MuiBox sx={{
                                                 height: 160,
-                                                background: imageUrl ? 'transparent' : 'linear-gradient(135deg, var(--color-primary-900), var(--color-primary-800))',
+                                                background: imageUrl ? 'transparent' : 'linear-gradient(135deg, var(--color-dark), color-mix(in srgb, var(--color-dark) 90%, var(--color-gold)))',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
@@ -427,7 +427,7 @@ export default function ReportsManagement() {
                                                         onError={(e) => { e.target.style.display = 'none' }}
                                                     />
                                                 ) : (
-                                                    <Building2 size={48} style={{ color: 'var(--color-primary-400)', opacity: 0.5 }} />
+                                                    <Building2 size={48} style={{ color: 'var(--color-icon)', opacity: 0.5 }} />
                                                 )}
                                                 {/* Status Badge */}
                                                 <MuiBox sx={{
@@ -439,7 +439,7 @@ export default function ReportsManagement() {
                                                         label={hall.isActive ? 'نشطة' : 'غير نشطة'}
                                                         size="small"
                                                         sx={{
-                                                            backgroundColor: hall.isActive ? 'rgba(34, 197, 94, 0.9)' : 'rgba(239, 68, 68, 0.9)',
+                                                            backgroundColor: hall.isActive ? 'var(--color-icon)' : 'var(--color-icon)',
                                                             color: 'var(--color-text-primary)',
                                                             fontWeight: 700,
                                                             fontSize: '0.7rem',
@@ -467,19 +467,19 @@ export default function ReportsManagement() {
                                                 {/* Capacity & Resources */}
                                                 <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 2 }}>
                                                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                        <UsersRound size={14} style={{ color: 'var(--color-primary-400)' }} />
+                                                        <UsersRound size={14} style={{ color: 'var(--color-icon)' }} />
                                                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
                                                             {hall.capacity} شخص
                                                         </MuiTypography>
                                                     </MuiBox>
                                                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                        <Table size={14} style={{ color: 'var(--color-success-400)' }} />
+                                                        <Table size={14} style={{ color: 'var(--color-icon)' }} />
                                                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
                                                             {hall.tables} طاولة
                                                         </MuiTypography>
                                                     </MuiBox>
                                                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                        <Armchair size={14} style={{ color: 'var(--color-info-400)' }} />
+                                                        <Armchair size={14} style={{ color: 'var(--color-icon)' }} />
                                                         <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
                                                             {hall.chairs} كرسي
                                                         </MuiTypography>
@@ -491,7 +491,7 @@ export default function ReportsManagement() {
                                                     <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
                                                         السعر الافتراضي
                                                     </MuiTypography>
-                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-300)', fontWeight: 700 }}>
+                                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-icon)', fontWeight: 700 }}>
                                                         {formatCurrency(hall.defaultPrices || 0)}
                                                     </MuiTypography>
                                                 </MuiBox>
@@ -501,11 +501,11 @@ export default function ReportsManagement() {
                                                     <MuiBox sx={{
                                                         p: 1.5,
                                                         borderRadius: '10px',
-                                                        background: 'rgba(255,255,255,0.03)',
+                                                        background: 'color-mix(in srgb, var(--color-light) 3%, transparent)',
                                                         border: '1px solid var(--color-border-glass)',
                                                         mb: 2
                                                     }}>
-                                                        <MuiTypography variant="caption" sx={{ color: 'var(--color-primary-400)', fontWeight: 600, display: 'block', mb: 1 }}>
+                                                        <MuiTypography variant="caption" sx={{ color: 'var(--color-icon)', fontWeight: 600, display: 'block', mb: 1 }}>
                                                             مدير الصالة
                                                         </MuiTypography>
                                                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
@@ -526,7 +526,7 @@ export default function ReportsManagement() {
                                                 {/* Services */}
                                                 {hall.services && hall.services.length > 0 && (
                                                     <MuiBox>
-                                                        <MuiTypography variant="caption" sx={{ color: 'var(--color-primary-400)', fontWeight: 600, display: 'block', mb: 1 }}>
+                                                        <MuiTypography variant="caption" sx={{ color: 'var(--color-icon)', fontWeight: 600, display: 'block', mb: 1 }}>
                                                             الخدمات ({hall.services.length})
                                                         </MuiTypography>
                                                         <MuiBox sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -536,13 +536,13 @@ export default function ReportsManagement() {
                                                                     label={`${service.name} - ${formatCurrency(service.price || 0)}`}
                                                                     size="small"
                                                                     sx={{
-                                                                        backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                                                                        color: 'var(--color-primary-300)',
+                                                                        backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
+                                                                        color: 'var(--color-icon)',
                                                                         fontWeight: 500,
                                                                         fontSize: '0.65rem',
                                                                         height: 22,
                                                                         borderRadius: '6px',
-                                                                        border: '1px solid rgba(216, 185, 138, 0.2)',
+                                                                        border: '1px solid var(--color-border)',
                                                                     }}
                                                                 />
                                                             ))}
@@ -586,19 +586,19 @@ export default function ReportsManagement() {
                                     <MuiBox key={hall._id || index} sx={{
                                         p: 2,
                                         borderRadius: '12px',
-                                        background: 'rgba(255,255,255,0.03)',
+                                        background: 'color-mix(in srgb, var(--color-light) 3%, transparent)',
                                         border: '1px solid var(--color-border-glass)',
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         alignItems: 'center'
                                     }}>
                                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                            <Building2 size={20} style={{ color: 'var(--color-primary-400)' }} />
+                                            <Building2 size={20} style={{ color: 'var(--color-icon)' }} />
                                             <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                                                 {hall.hallName || hall.name || 'قاعة غير معروفة'}
                                             </MuiTypography>
                                         </MuiBox>
-                                        <MuiTypography variant="h6" sx={{ color: 'var(--color-success-400)', fontWeight: 700 }}>
+                                        <MuiTypography variant="h6" sx={{ color: 'var(--color-icon)', fontWeight: 700 }}>
                                             {formatCurrency(hall.totalRevenue || 0)}
                                         </MuiTypography>
                                     </MuiBox>
@@ -628,7 +628,7 @@ export default function ReportsManagement() {
                                     <MuiBox key={activity._id || index} sx={{
                                         p: 2,
                                         borderRadius: '10px',
-                                        background: 'rgba(255,255,255,0.03)',
+                                        background: 'color-mix(in srgb, var(--color-light) 3%, transparent)',
                                         border: '1px solid var(--color-border-glass)',
                                     }}>
                                         <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)', fontWeight: 500 }}>
@@ -664,14 +664,14 @@ export default function ReportsManagement() {
                                     <MuiBox key={hall._id || index} sx={{
                                         p: 2,
                                         borderRadius: '12px',
-                                        background: 'rgba(255,255,255,0.03)',
+                                        background: 'color-mix(in srgb, var(--color-light) 3%, transparent)',
                                         border: '1px solid var(--color-border-glass)',
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         alignItems: 'center'
                                     }}>
                                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                            <Calendar size={20} style={{ color: 'var(--color-info-400)' }} />
+                                            <Calendar size={20} style={{ color: 'var(--color-icon)' }} />
                                             <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                                                 {hall.hallName || hall.name || 'قاعة غير معروفة'}
                                             </MuiTypography>
@@ -679,10 +679,10 @@ export default function ReportsManagement() {
                                         <MuiChip
                                             label={`${hall.count || 0} فعالية`}
                                             sx={{
-                                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                                color: 'var(--color-info-400)',
+                                                backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
+                                                color: 'var(--color-icon)',
                                                 fontWeight: 600,
-                                                border: '1px solid rgba(59, 130, 246, 0.2)',
+                                                border: '1px solid var(--color-border)',
                                             }}
                                         />
                                     </MuiBox>

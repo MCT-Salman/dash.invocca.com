@@ -8,34 +8,55 @@ import { styled } from '@mui/material/styles';
 const StyledSelect = styled(Select, {
   shouldForwardProp: (prop) => prop !== 'error',
 })(({ error }) => ({
-  borderRadius: '12px !important',
+  borderRadius: '0 !important',
   backgroundColor: 'transparent',
   color: 'var(--color-text-primary)',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
     backgroundColor: 'var(--color-surface-hover)',
     '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: error ? 'var(--color-error-600) !important' : 'var(--color-primary-500) !important',
+      borderColor: error ? 'var(--color-icon) !important' : 'var(--color-border) !important',
     },
   },
   '&.Mui-focused': {
     backgroundColor: 'var(--color-surface-hover)',
     '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
+      borderColor: error ? 'var(--color-icon) !important' : 'var(--color-border) !important',
       borderWidth: '1px !important',
     },
   },
   '& .MuiOutlinedInput-notchedOutline': {
-    borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-border) !important',
-    borderWidth: '1px !important',
-    borderRadius: '12px !important',
+    border: 'none !important',
+    borderRadius: '0 !important',
+  },
+  border: 'none',
+  borderBottom: `1px solid ${error ? 'var(--color-icon)' : 'var(--color-border)'}`,
+  position: 'relative',
+  '&:after': {
+    content: '""',
+    position: 'absolute',
+    right: 0,
+    left: 0,
+    bottom: '-1px',
+    height: '2px',
+    backgroundColor: error ? 'var(--color-icon)' : 'var(--color-icon)',
+    transform: 'scaleX(0)',
+    transformOrigin: 'right center',
+    transition: 'transform 260ms cubic-bezier(0.4, 0, 0.2, 1)',
+    pointerEvents: 'none',
+  },
+  '&.Mui-focused:after': {
+    transform: 'scaleX(1)',
   },
   '& .MuiSelect-select': {
     color: 'var(--color-text-primary)',
-    padding: '14px 16px',
+    padding: '14px 0',
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
+    fontFamily: 'Alexandria, var(--font-family-base)',
+    justifyContent: 'flex-start',
+    textAlign: 'start',
   },
   '& .MuiSvgIcon-root': {
     color: 'var(--color-text-secondary)',
@@ -56,20 +77,20 @@ const StyledMenuItem = styled(MenuItem)(() => ({
   borderRadius: '8px',
   margin: '4px 8px',
   color: 'var(--color-text-primary)',
+  fontFamily: 'Alexandria, var(--font-family-base)',
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
   border: '1px solid transparent',
   '&:hover': {
-    backgroundColor: 'var(--color-surface-hover)',
-    color: 'var(--color-primary-500)',
-    borderColor: 'var(--color-primary-500)',
-    transform: 'translateX(4px)',
+    backgroundColor: 'color-mix(in srgb, var(--color-gold) 12%, transparent)',
+    borderColor: 'var(--color-border)',
   },
   '&.Mui-selected': {
-    backgroundColor: 'var(--color-primary-500) !important',
-    color: 'var(--color-text-on-primary) !important',
+    backgroundColor: 'var(--color-icon) !important',
+    color: 'var(--color-dark) !important',
     fontWeight: 600,
     '&:hover': {
-      backgroundColor: 'var(--color-primary-600) !important',
+      backgroundColor: 'var(--color-icon) !important',
+      opacity: 0.9,
     },
   },
 }));
@@ -101,9 +122,9 @@ const MuiSelect = ({
       {label && (
         <InputLabel
           sx={{
-            color: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
-            fontFamily: 'var(--font-family-base)',
-            fontWeight: 500,
+            color: error ? 'var(--color-icon) !important' : 'var(--color-text-primary) !important',
+            fontFamily: 'Alexandria, var(--font-family-base)',
+            fontWeight: 700,
             fontSize: '0.95rem',
             textAlign: 'right',
             direction: 'rtl',
@@ -113,14 +134,14 @@ const MuiSelect = ({
             position: 'absolute',
             top: '-8px',
             '&.Mui-focused': {
-              color: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
-              fontWeight: 600,
+              color: error ? 'var(--color-icon) !important' : 'var(--color-text-primary) !important',
+              fontWeight: 700,
             },
             '&.Mui-disabled': {
               color: 'var(--color-text-muted) !important',
             },
             '&.Mui-error': {
-              color: 'var(--color-error-500) !important',
+              color: 'var(--color-icon) !important',
             },
           }}
           className={labelClassName}
@@ -139,16 +160,7 @@ const MuiSelect = ({
         error={error}
         sx={{
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-border) !important',
-            borderWidth: '1px !important',
-            borderRadius: '12px !important',
-          },
-          '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: error ? 'var(--color-error-600) !important' : 'var(--color-primary-500) !important',
-          },
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
-            borderWidth: '1px !important',
+            border: 'none !important',
           },
           ...(sx || {})
         }}
@@ -158,7 +170,7 @@ const MuiSelect = ({
               backgroundColor: 'var(--color-paper)',
               border: '1px solid var(--color-border)',
               borderRadius: '16px',
-              boxShadow: 'var(--shadow-xl)',
+              boxShadow: 'none',
               backdropFilter: 'blur(12px)',
               marginTop: '8px',
               maxHeight: '240px',

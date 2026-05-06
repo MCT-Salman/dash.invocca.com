@@ -15,10 +15,10 @@ export const dashboardTokens = {
     border: 'var(--color-border)',
     textPrimary: 'var(--color-text-primary)',
     textSecondary: 'var(--color-text-secondary)',
-    success: 'var(--color-success-500)',
-    info: 'var(--color-info-500)',
-    warning: 'var(--color-warning-500)',
-    danger: 'var(--color-error-500)',
+    success: 'var(--color-icon)',
+    info: 'var(--color-icon)',
+    warning: 'var(--color-icon)',
+    danger: 'var(--color-icon)',
   },
   elevation: {
     card: 'var(--shadow-lg)',
@@ -39,17 +39,17 @@ export const dashboardTokens = {
 }
 
 export const statPalette = [
-  'var(--color-success-500)',
-  'var(--color-info-500)',
-  'var(--color-warning-500)',
-  'var(--color-secondary-500)',
-  'var(--color-primary-500)',
+  'var(--color-icon)',
+  'var(--color-icon)',
+  'var(--color-icon)',
+  'var(--color-icon)',
+  'var(--color-icon)',
 ]
 
 export const translucent = (cssColor) => {
-  if (!cssColor) return 'rgba(0,0,0,0.08)'
+  if (!cssColor) return 'rgba(26, 26, 26, 0.08)'
   if (cssColor.startsWith('var(')) {
-    return `color-mix(in srgb, ${cssColor} 20%, transparent)`
+    return `rgba(216, 185, 138, 0.20)`
   }
   return `${cssColor}26`
 }

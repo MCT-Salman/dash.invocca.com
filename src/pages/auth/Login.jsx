@@ -36,13 +36,13 @@ const fieldSx = {
             borderBottom: '1px solid var(--color-border) !important',
         },
         '&.Mui-error': {
-            borderBottom: '1px solid var(--color-error-500) !important',
+            borderBottom: '1px solid var(--color-icon) !important',
         },
         '&.Mui-error:hover': {
-            borderBottom: '1px solid var(--color-error-500) !important',
+            borderBottom: '1px solid var(--color-icon) !important',
         },
         '&.Mui-error.Mui-focused': {
-            borderBottom: '1px solid var(--color-error-500) !important',
+            borderBottom: '1px solid var(--color-icon) !important',
         },
         '&:after': {
             content: '""',
@@ -61,7 +61,7 @@ const fieldSx = {
             transform: 'scaleX(1)',
         },
         '&.Mui-error:after': {
-            backgroundColor: 'var(--color-error-500) !important',
+            backgroundColor: 'var(--color-icon) !important',
         },
         '&.Mui-error.Mui-focused:after': {
             transform: 'scaleX(1)',
@@ -93,7 +93,7 @@ const fieldSx = {
         fontSize: '1rem',
         fontFamily: 'Alexandria, var(--font-family-base)',
         '&.Mui-error': {
-            color: 'var(--color-error-500) !important',
+            color: 'var(--color-icon) !important',
         },
     },
     '& .MuiFormHelperText-root': {
@@ -103,7 +103,7 @@ const fieldSx = {
         marginLeft: 0,
         fontFamily: 'Alexandria, var(--font-family-base)',
         '&.Mui-error': {
-            color: 'var(--color-error-500) !important',
+            color: 'var(--color-icon) !important',
         },
     },
 }
@@ -318,7 +318,7 @@ export default function Login() {
                                 borderRadius: '24px',
                                 border: '5px solid transparent',
                                 backgroundImage:
-                                    'linear-gradient(var(--color-light-soft), var(--color-light-soft)), linear-gradient(127.12deg, #D8B98A -1.37%, #FFF8DA 21.3%, #D8B98A 51.52%, #FFF8DA 68.99%, #D8B98A 96.85%)',
+                                    'linear-gradient(var(--color-light-soft), var(--color-light-soft)), linear-gradient(127.12deg, var(--color-gold) -1.37%, var(--color-light) 21.3%, var(--color-gold) 51.52%, var(--color-light) 68.99%, var(--color-gold) 96.85%)',
                                 backgroundOrigin: 'border-box',
                                 backgroundClip: 'padding-box, border-box',
                                 px: { xs: 2.5, sm: 3.5, md: 4.5 },
@@ -335,20 +335,20 @@ export default function Login() {
                                     sx={{
                                         mb: 3,
                                         borderRadius: '14px',
-                                        border: '1px solid var(--color-error-500) !important',
-                                        backgroundColor: 'var(--color-error-50) !important',
-                                        color: 'var(--color-error-700) !important',
+                                        border: '1px solid var(--color-icon) !important',
+                                        backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent) !important',
+                                        color: 'var(--color-icon) !important',
                                         px: 2,
                                         py: 1.5,
                                         '& .MuiAlert-icon': {
-                                            color: 'var(--color-error-500) !important',
+                                            color: 'var(--color-icon) !important',
                                             px: 1,
                                         },
                                         '& .MuiAlert-message': {
-                                            color: 'var(--color-error-700) !important',
+                                            color: 'var(--color-icon) !important',
                                         },
                                         '& .MuiSvgIcon-root': {
-                                            color: 'var(--color-error-500) !important',
+                                            color: 'var(--color-icon) !important',
                                         },
                                     }}
                                 >
@@ -470,7 +470,7 @@ export default function Login() {
                 <MuiBox
                     sx={{
                         order: { xs: 1, md: 2 },
-                        backgroundColor: 'var(--color-primary-500)',
+                        backgroundColor: 'var(--color-icon)',
                         color: 'var(--color-text-primary)',
                         display: 'flex',
                         alignItems: 'center',

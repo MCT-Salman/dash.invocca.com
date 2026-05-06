@@ -33,7 +33,7 @@ const MuiDateTimePicker = ({
             InputLabelProps: {
               shrink: true,
               sx: {
-                color: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
+                color: error ? 'var(--color-icon) !important' : 'var(--color-icon) !important',
                 fontFamily: 'var(--font-family-base)',
                 fontWeight: 500,
                 fontSize: '0.95rem',
@@ -42,18 +42,18 @@ const MuiDateTimePicker = ({
                 right: 0,
                 left: 'auto',
                 transformOrigin: 'top right',
-                textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                textShadow: 'none',
                 position: 'absolute',
                 top: '-8px',
                 '&.Mui-focused': {
-                  color: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
+                  color: error ? 'var(--color-icon) !important' : 'var(--color-icon) !important',
                   fontWeight: 600,
                 },
                 '&.Mui-disabled': {
                   color: 'var(--color-text-muted) !important',
                 },
                 '&.Mui-error': {
-                  color: 'var(--color-error-500) !important',
+                  color: 'var(--color-icon) !important',
                 },
               }
             },
@@ -65,13 +65,13 @@ const MuiDateTimePicker = ({
                 '&:hover': {
                   backgroundColor: 'var(--color-surface-hover)',
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: error ? 'var(--color-error-600) !important' : 'var(--color-primary-500) !important',
+                    borderColor: error ? 'var(--color-icon) !important' : 'var(--color-icon) !important',
                   },
                 },
                 '&.Mui-focused': {
                   backgroundColor: 'var(--color-surface-hover)',
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
+                    borderColor: error ? 'var(--color-icon) !important' : 'var(--color-icon) !important',
                     borderWidth: '1px !important',
                   },
                 },
@@ -82,7 +82,7 @@ const MuiDateTimePicker = ({
                   },
                 },
                 '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-border) !important',
+                  borderColor: error ? 'var(--color-icon) !important' : 'var(--color-border) !important',
                   borderWidth: '1px !important',
                   borderRadius: '12px !important',
                 },
@@ -111,13 +111,13 @@ const MuiDateTimePicker = ({
               },
               '& .MuiFormHelperText-root': {
                 fontSize: '0.75rem',
-                color: error ? 'var(--color-error-500)' : 'var(--color-text-secondary)',
+                color: error ? 'var(--color-icon)' : 'var(--color-text-secondary)',
                 marginTop: '6px',
                 fontFamily: 'var(--font-family-base)',
               },
               '& .MuiInputAdornment-root': {
                 '& .MuiSvgIcon-root': {
-                  color: 'var(--color-primary-500) !important',
+                  color: 'var(--color-icon) !important',
                 },
               },
             }

@@ -20,8 +20,8 @@ const MuiList = ({
             cursor: 'pointer',
             transition: 'all 0.2s ease',
             '&:hover': {
-              backgroundColor: 'var(--color-surface-hover)',
-              color: 'var(--color-primary-500)',
+              backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
+              color: 'var(--color-icon)',
             }
           }}
           className={className}

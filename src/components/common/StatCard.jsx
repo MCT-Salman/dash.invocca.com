@@ -1,109 +1,131 @@
+import React from 'react'
 import MuiPaper from '@/components/ui/MuiPaper'
 import MuiBox from '@/components/ui/MuiBox'
 import MuiTypography from '@/components/ui/MuiTypography'
-import { TrendingUp, TrendingDown } from 'lucide-react'
 
 export default function StatCard({
     title,
     value,
     icon,
-    trend,
-    color = 'primary',
+    highlighted = false,
     sx = {}
 }) {
-    const getColor = () => {
-        switch (color) {
-            case 'primary': return 'var(--color-primary-500)';
-            case 'secondary': return 'var(--color-secondary-500)';
-            case 'success': return 'var(--color-success-500)';
-            case 'error': return 'var(--color-error-500)';
-            case 'warning': return 'var(--color-warning-500)';
-            case 'info': return 'var(--color-info-500)';
-            default: return 'var(--color-primary-500)';
-        }
-    }
-
-    const brandColor = getColor()
-
+    // Check if icon is already a JSX element or a component
+    const isJsxElement = icon && typeof icon === 'object' && icon.$$typeof === Symbol.for('react.element');
+    
     return (
         <MuiPaper
+            elevation={0}
             sx={{
-                p: 3,
+                p: 2,
                 height: '100%',
-                background: 'var(--color-paper)',
-                boxShadow: 'var(--shadow-sm)',
-                borderRadius: '20px',
+                background: highlighted ? 'var(--color-icon)' : 'var(--color-paper)',
                 border: '1px solid var(--color-border)',
+                borderRight: '4px solid var(--color-icon)',
+                borderRadius: '12px',
                 position: 'relative',
                 overflow: 'hidden',
                 transition: 'all 0.3s ease',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    width: '4px',
+                    background: 'var(--color-icon)',
+                    transition: 'width 0.5s ease-out',
+                    zIndex: 0,
+                },
+                '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    width: '0%',
+                    background: 'var(--color-icon)',
+                    transition: 'width 0.5s ease-out',
+                    zIndex: 0,
+                },
                 '&:hover': {
-                    transform: 'translateY(-5px)',
-                    borderColor: 'var(--color-primary-500)',
-                    boxShadow: 'var(--shadow-lg)'
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+                    '&::after': {
+                        width: '100%',
+                    },
+                    '& .statcard-icon-box': {
+                        background: 'rgba(255,255,255,0.2)',
+                        borderColor: 'rgba(255,255,255,0.3)',
+                        color: 'var(--color-dark)',
+                        '& svg': {
+                            color: 'currentColor !important',
+                        },
+                    },
+                    '& .statcard-value': {
+                        color: 'var(--color-dark)',
+                    },
+                    '& .statcard-title': {
+                        color: 'var(--color-dark)',
+                    },
                 },
                 ...sx
             }}
         >
-            <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2, position: 'relative', zIndex: 1 }}>
+            <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
+                {/* Value - Left Side */}
+                <MuiTypography
+                    className="statcard-value"
+                    variant="h4"
+                    sx={{
+                        fontWeight: 600,
+                        fontSize: '2rem',
+                        color: highlighted ? '#fff' : 'var(--color-text-primary)',
+                        lineHeight: 1,
+                        transition: 'color 0.3s ease',
+                    }}
+                >
+                    {value}
+                </MuiTypography>
+
+                {/* Icon Box - Right Side */}
                 <MuiBox
+                    className="statcard-icon-box"
                     sx={{
                         width: 48,
                         height: 48,
-                        borderRadius: '12px',
+                        borderRadius: '10px',
+                        background: highlighted ? 'rgba(255,255,255,0.2)' : 'rgba(216, 185, 138, 0.15)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        backgroundColor: 'var(--color-surface)',
-                        color: brandColor,
-                        border: '1px solid var(--color-border)'
+                        border: `1px solid ${highlighted ? 'rgba(255,255,255,0.3)' : 'var(--color-icon)'}`,
+                        color: highlighted ? '#fff' : 'var(--color-icon)',
+                        transition: 'all 0.3s ease',
                     }}
                 >
                     {icon}
                 </MuiBox>
-                {trend && (
-                    <MuiBox
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 0.5,
-                            color: trend.isPositive ? 'var(--color-success-500)' : 'var(--color-error-500)',
-                            backgroundColor: 'var(--color-surface)',
-                            px: 1,
-                            py: 0.5,
-                            borderRadius: '8px',
-                            fontSize: '0.75rem',
-                            fontWeight: 700,
-                            border: '1px solid var(--color-border)'
-                        }}
-                    >
-                        {trend.isPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                        {trend.value}%
-                    </MuiBox>
-                )}
             </MuiBox>
 
-            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', fontWeight: 500, mb: 1, position: 'relative', zIndex: 1 }}>
+            {/* Title - Below */}
+            <MuiTypography
+                className="statcard-title"
+                variant="body2"
+                sx={{
+                    color: highlighted ? 'rgba(255,255,255,0.9)' : 'var(--color-text-secondary)',
+                    fontWeight: 500,
+                    fontSize: '0.85rem',
+                    mt: 1.5,
+                    transition: 'color 0.3s ease',
+                    textAlign: 'right',
+                    position: 'relative',
+                    zIndex: 1
+                }}
+            >
                 {title}
             </MuiTypography>
-            <MuiTypography variant="h4" sx={{ fontWeight: 800, color: 'var(--color-text-primary)', position: 'relative', zIndex: 1 }}>
-                {value}
-            </MuiTypography>
-
-            {/* Subtle background decoration */}
-            <MuiBox
-                sx={{
-                    position: 'absolute',
-                    bottom: -20,
-                    right: -20,
-                    width: 100,
-                    height: 100,
-                    borderRadius: '50%',
-                    background: `radial-gradient(circle, ${brandColor} 0%, transparent 70%)`,
-                    opacity: 0.05,
-                    zIndex: 0
-                }}
-            />
         </MuiPaper>
     )
 }

@@ -23,7 +23,7 @@ import MuiIconButton from '@/components/ui/MuiIconButton'
 import MuiStack from '@/components/ui/MuiStack'
 
 // Layout & Common Components
-import { LoadingScreen, EmptyState, SEOHead, DataTable, FormDialog, ConfirmDialog, PageHeader, StatCard, CardsView } from '@/components/common'
+import { LoadingScreen, EmptyState, ConfirmDialog, SEOHead, StatusBadge, FormDialog, PageHeader, StatCard, CardsView, DataTable } from '@/components/common'
 import ViewServiceDialog from './components/ViewServiceDialog'
 
 // Hooks & Utilities
@@ -168,14 +168,14 @@ export default function ServicesManagement() {
                             width: 40,
                             height: 40,
                             borderRadius: '10px',
-                            background: 'rgba(216, 185, 138, 0.1)',
+                            background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            border: '1px solid rgba(216, 185, 138, 0.2)',
+                            border: '1px solid var(--color-border)',
                         }}
                     >
-                        <Package size={20} style={{ color: 'var(--color-primary-500)' }} />
+                        <Package size={20} style={{ color: 'var(--color-icon)' }} />
                     </MuiBox>
                     <MuiBox>
                         <MuiTypography variant="body2" component="span" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 600 }}>
@@ -197,8 +197,8 @@ export default function ServicesManagement() {
                     label={SERVICE_CATEGORY_LABELS[value] || value}
                     size="small"
                     sx={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                        color: 'var(--color-primary-300)',
+                        backgroundColor: 'color-mix(in srgb, var(--color-light) 5%, transparent)',
+                        color: 'var(--color-icon)',
                         fontWeight: 600,
                         border: '1px solid var(--color-border-glass)',
                     }}
@@ -211,7 +211,7 @@ export default function ServicesManagement() {
             label: 'السعر الأساسي',
             align: 'center',
             format: (value) => (
-                <MuiTypography variant="body2" component="span" sx={{ color: 'var(--color-primary-400)', fontWeight: 700 }}>
+                <MuiTypography variant="body2" component="span" sx={{ color: 'var(--color-icon)', fontWeight: 700 }}>
                     {formatCurrency(value)}
                 </MuiTypography>
             )
@@ -221,17 +221,7 @@ export default function ServicesManagement() {
             label: 'الحالة',
             align: 'center',
             format: (value) => (
-                <MuiChip
-                    label={value ? 'نشط' : 'معطل'}
-                    size="small"
-                    sx={{
-                        backgroundColor: value ? 'rgba(22, 163, 74, 0.1)' : 'rgba(220, 38, 38, 0.1)',
-                        color: value ? 'var(--color-icon)' : 'var(--color-icon)',
-                        fontWeight: 600,
-                        border: `1px solid ${value ? 'var(--color-icon)' : 'var(--color-icon)'}33`,
-                    }}
-                    icon={value ? <CheckCircle size={14} /> : <XCircle size={14} />}
-                />
+                <StatusBadge value={value} activeLabel="نشط" inactiveLabel="معطل" />
             )
         }
     ]
@@ -249,7 +239,7 @@ export default function ServicesManagement() {
                     '&:hover': {
                         transform: 'translateY(-8px)',
                         boxShadow: 'var(--shadow-xl)',
-                        borderColor: 'var(--color-primary-500)',
+                        borderColor: 'var(--color-icon)',
                     }
                 }}
             >
@@ -258,7 +248,7 @@ export default function ServicesManagement() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    background: 'var(--color-primary-50)',
+                    background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
                     borderBottom: '1px solid var(--color-divider)'
                 }}>
                     <MuiBox sx={{
@@ -270,7 +260,7 @@ export default function ServicesManagement() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         boxShadow: 'var(--shadow-sm)',
-                        color: 'var(--color-primary-500)'
+                        color: 'var(--color-icon)'
                     }}>
                         <Package size={32} />
                     </MuiBox>
@@ -304,7 +294,7 @@ export default function ServicesManagement() {
                             icon={<DollarSign size={12} />}
                             label={formatCurrency(service.basePrice)}
                             size="small"
-                            sx={{ background: 'var(--color-success-50)', color: 'var(--color-success-700)', fontWeight: 700 }}
+                            sx={{ background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)', color: 'var(--color-icon)', fontWeight: 700 }}
                         />
                     </MuiBox>
                 </MuiCardContent>
@@ -456,10 +446,10 @@ export default function ServicesManagement() {
                                 onClick={() => setViewMode('table')}
                                 sx={{
                                     borderRadius: '10px',
-                                    color: viewMode === 'table' ? 'var(--color-primary-500)' : 'var(--color-text-muted)',
+                                    color: viewMode === 'table' ? 'var(--color-icon)' : 'var(--color-text-muted)',
                                     background: viewMode === 'table' ? 'var(--color-paper)' : 'transparent',
                                     boxShadow: viewMode === 'table' ? 'var(--shadow-sm)' : 'none',
-                                    '&:hover': { background: viewMode === 'table' ? 'var(--color-paper)' : 'rgba(0,0,0,0.05)' }
+                                    '&:hover': { background: viewMode === 'table' ? 'var(--color-paper)' : 'color-mix(in srgb, var(--color-dark) 5%, transparent)' }
                                 }}
                             >
                                 <Table size={20} />
@@ -469,10 +459,10 @@ export default function ServicesManagement() {
                                 onClick={() => setViewMode('card')}
                                 sx={{
                                     borderRadius: '10px',
-                                    color: viewMode === 'card' ? 'var(--color-primary-500)' : 'var(--color-text-muted)',
+                                    color: viewMode === 'card' ? 'var(--color-icon)' : 'var(--color-text-muted)',
                                     background: viewMode === 'card' ? 'var(--color-paper)' : 'transparent',
                                     boxShadow: viewMode === 'card' ? 'var(--shadow-sm)' : 'none',
-                                    '&:hover': { background: viewMode === 'card' ? 'var(--color-paper)' : 'rgba(0,0,0,0.05)' }
+                                    '&:hover': { background: viewMode === 'card' ? 'var(--color-paper)' : 'color-mix(in srgb, var(--color-dark) 5%, transparent)' }
                                 }}
                             >
                                 <LayoutGrid size={20} />
@@ -718,7 +708,7 @@ export default function ServicesManagement() {
                         InputProps={{
                             startAdornment: (
                                 <MuiInputAdornment position="start">
-                                    <DollarSign size={20} style={{ color: 'var(--color-primary-400)' }} />
+                                    <DollarSign size={20} style={{ color: 'var(--color-icon)' }} />
                                 </MuiInputAdornment>
                             ),
                         }}
@@ -726,7 +716,7 @@ export default function ServicesManagement() {
 
                     {/* Requirements Array */}
                     <MuiBox>
-                        <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-primary-300)', mb: 1, fontWeight: 600 }}>
+                        <MuiTypography variant="subtitle2" sx={{ color: 'var(--color-icon)', mb: 1, fontWeight: 600 }}>
                             المتطلبات (اختياري)
                         </MuiTypography>
                         <MuiBox sx={{ display: 'flex', gap: 1, mb: 2 }}>
@@ -742,7 +732,7 @@ export default function ServicesManagement() {
                                 variant="outlined"
                                 onClick={handleAddRequirement}
                                 disabled={!newRequirement.trim()}
-                                sx={{ borderColor: 'var(--color-primary-500)', color: 'var(--color-primary-500)' }}
+                                sx={{ borderColor: 'var(--color-icon)', color: 'var(--color-icon)' }}
                             >
                                 إضافة
                             </MuiButton>
@@ -754,7 +744,7 @@ export default function ServicesManagement() {
                                     sx={{
                                         px: 2,
                                         py: 1,
-                                        background: 'rgba(255,255,255,0.03)',
+                                        background: 'color-mix(in srgb, var(--color-light) 3%, transparent)',
                                         border: '1px solid var(--color-border-glass)',
                                         display: 'flex',
                                         justifyContent: 'space-between',

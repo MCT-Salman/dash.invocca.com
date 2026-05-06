@@ -23,6 +23,7 @@
 
   --color-icon: var(--color-gold);
   --color-icon-filter: none;
+  --color-date-icon-filter: none;
 
   --color-border: var(--color-gold);
   --color-border-glass: color-mix(in srgb, var(--color-gold) 35%, transparent);
@@ -53,9 +54,9 @@
   --color-secondary-900: var(--color-dark);
   --color-secondary-950: var(--color-dark);
 
-  --color-success-50: var(--color-gold);
-  --color-success-500: var(--color-gold);
-  --color-success-700: var(--color-gold);
+  --color-success-50: #F0FDF4;
+  --color-success-500: #22C55E;
+  --color-success-700: #16A34A;
   --color-error-50: #FEF2F2;
   --color-error-100: #FEE2E2;
   --color-error-500: #DC2626;
@@ -77,12 +78,15 @@
   --color-surface-glass: color-mix(in srgb, var(--color-dark) 82%, transparent);
   --color-overlay: color-mix(in srgb, var(--color-dark) 78%, transparent);
 
+  --color-light-soft: #1a1a1a;
+
   --color-text-primary: var(--color-light);
   --color-text-secondary: var(--color-light);
   --color-text-muted: var(--color-light);
 
   --color-icon: var(--color-gold);
   --color-icon-filter: invert(1) brightness(2);
+  --color-date-icon-filter: invert(1);
 
   --color-border: var(--color-gold);
   --color-border-glass: color-mix(in srgb, var(--color-gold) 35%, transparent);
@@ -90,14 +94,14 @@
 
   --color-error-50: rgba(220, 38, 38, 0.14);
   --color-error-100: rgba(220, 38, 38, 0.22);
-  --color-error-500: #F87171;
-  --color-error-700: #FCA5A5;
+  --color-error-500: #DC2626;
+  --color-error-700: #B91C1C;
 }
 
 /* Global enforcement for pages/components */
 body,
 #root {
-  background-color: var(--color-bg) !important;
+  background-color: var(--color-light-soft) !important;
   color: var(--color-text-primary) !important;
 }
 

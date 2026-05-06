@@ -17,7 +17,7 @@ const MuiDivider = ({
       className={className}
       {...props}
     >
-      {children && <span style={{ color: 'var(--color-primary-500)', fontSize: '0.875rem', fontWeight: 600 }}>{children}</span>}
+      {children && <span style={{ color: 'var(--color-icon)', fontSize: '0.875rem', fontWeight: 600, fontFamily: 'Alexandria, var(--font-family-base)' }}>{children}</span>}
     </Divider>
   );
 };

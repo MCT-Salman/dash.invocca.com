@@ -15,6 +15,7 @@
  */
 
 import { useState, useCallback } from 'react'
+import { useMediaQuery, useTheme } from '@mui/material'
 import MuiPaper from '@/components/ui/MuiPaper'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiTextField from '@/components/ui/MuiTextField'
@@ -34,7 +35,12 @@ export default function AdvancedFilter({
     searchPlaceholder = 'بحث...',
     sx = {},
     showResetButton = true,
+    topActions,
 }) {
+    const theme = useTheme()
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
+    
     const [searchValue, setSearchValue] = useState('')
     const [filterValues, setFilterValues] = useState({})
     const [dateRange, setDateRange] = useState({
@@ -107,57 +113,78 @@ export default function AdvancedFilter({
         <MuiPaper
             elevation={0}
             sx={{
-                p: 3,
-                mb: 3,
+                p: isSmallMobile ? 2 : isMobile ? 2.5 : 3,
                 background: 'var(--color-paper)',
-                backdropFilter: 'blur(10px)',
                 border: '1px solid var(--color-border)',
                 borderRadius: '16px',
                 ...sx
             }}
         >
-            <MuiGrid container spacing={1.5} alignItems="flex-end" flexWrap="nowrap">
+            {/* Top Actions Row */}
+            {topActions && (
+                <MuiBox sx={{ display: 'flex', justifyContent: 'flex-start', mb: isSmallMobile ? 1.5 : 2 }}>
+                    {topActions}
+                </MuiBox>
+            )}
+            
+            {/* Search and Filters - Single Line Layout */}
+            <MuiBox sx={{ 
+                display: 'flex', 
+                flexDirection: isMobile ? 'column' : 'row',
+                flexWrap: isMobile ? 'nowrap' : 'wrap',
+                gap: 1.5, 
+                alignItems: 'flex-end'
+            }}>
                 {/* Search Field */}
-                <MuiGrid item xs="auto" minWidth="200px">
+                <MuiBox sx={{ 
+                    flex: isMobile ? '1 1 100%' : '0 1 220px',
+                    minWidth: isMobile ? '100%' : '180px'
+                }}>
                     <MuiTextField
                         fullWidth
+                        size="small"
                         placeholder={searchPlaceholder}
                         value={searchValue}
                         onChange={(e) => handleSearchChange(e.target.value)}
                         InputProps={{
                             startAdornment: (
                                 <MuiInputAdornment position="start">
-                                    <Search size={20} style={{ color: 'var(--color-primary-400)' }} />
+                                    <Search size={18} style={{ color: 'var(--color-primary-400)' }} />
                                 </MuiInputAdornment>
                             ),
                         }}
                         sx={{
                             '& .MuiOutlinedInput-root': {
-                                borderRadius: '12px',
+                                borderRadius: '10px',
                                 backgroundColor: 'var(--color-surface)',
+                                height: '40px'
                             }
                         }}
                     />
-                </MuiGrid>
+                </MuiBox>
 
                 {/* Select Filters */}
                 {filters
                     .filter(f => f.type === 'select')
                     .map((filter) => (
-                        <MuiGrid item xs="auto" minWidth="150px" key={filter.key}>
+                        <MuiBox key={filter.key} sx={{ 
+                            flex: isMobile ? '1 1 100%' : '0 1 160px',
+                            minWidth: isMobile ? '100%' : '140px'
+                        }}>
                             <MuiSelect
                                 fullWidth
+                                size="small"
                                 displayEmpty
                                 value={filterValues[filter.key] || ''}
                                 onChange={(e) => handleFilterChange(filter.key, e.target.value)}
                                 sx={{
-                                    borderRadius: '12px',
+                                    borderRadius: '10px',
                                     backgroundColor: 'var(--color-surface)',
-                                    height: '56px'
+                                    height: '40px'
                                 }}
                             >
                                 <MuiMenuItem value="">
-                                    <span style={{ color: 'var(--color-text-secondary)' }}>
+                                    <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
                                         {filter.label}
                                     </span>
                                 </MuiMenuItem>
@@ -170,59 +197,80 @@ export default function AdvancedFilter({
                                     </MuiMenuItem>
                                 ))}
                             </MuiSelect>
-                        </MuiGrid>
+                        </MuiBox>
                     ))}
 
                 {/* Date Range Filters */}
                 {filters
                     .filter(f => f.type === 'dateRange')
                     .map((filter) => (
-                        <MuiGrid item container spacing={1} xs={12} md={6} lg={4} key={filter.key}>
-                            <MuiGrid item xs={6}>
-                                <MuiTextField
-                                    fullWidth
-                                    type="date"
-                                    label={`${filter.label} من`}
-                                    value={dateRange.from}
-                                    onChange={(e) => handleDateChange('from', e.target.value)}
-                                    InputLabelProps={{ shrink: true }}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            borderRadius: '12px',
-                                            backgroundColor: 'var(--color-surface)',
-                                        }
-                                    }}
-                                />
-                            </MuiGrid>
-                            <MuiGrid item xs={6}>
-                                <MuiTextField
-                                    fullWidth
-                                    type="date"
-                                    label={`${filter.label} إلى`}
-                                    value={dateRange.to}
-                                    onChange={(e) => handleDateChange('to', e.target.value)}
-                                    InputLabelProps={{ shrink: true }}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            borderRadius: '12px',
-                                            backgroundColor: 'var(--color-surface)',
-                                        }
-                                    }}
-                                />
-                            </MuiGrid>
-                        </MuiGrid>
+                        <MuiBox key={filter.key} sx={{ 
+                            display: 'flex',
+                            gap: 1,
+                            flex: isMobile ? '1 1 100%' : '0 1 auto'
+                        }}>
+                            <MuiTextField
+                                size="small"
+                                type="date"
+                                label={`من`}
+                                value={dateRange.from}
+                                onChange={(e) => handleDateChange('from', e.target.value)}
+                                InputLabelProps={{ shrink: true }}
+                                sx={{
+                                    flex: 1,
+                                    minWidth: '130px',
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '10px',
+                                        backgroundColor: 'var(--color-surface)',
+                                        height: '40px'
+                                    },
+                                    '& input[type="date"]::-webkit-calendar-picker-indicator': {
+                                        filter: 'var(--color-date-icon-filter)',
+                                        cursor: 'pointer'
+                                    }
+                                }}
+                            />
+                            <MuiTextField
+                                size="small"
+                                type="date"
+                                label={`إلى`}
+                                value={dateRange.to}
+                                onChange={(e) => handleDateChange('to', e.target.value)}
+                                InputLabelProps={{ shrink: true }}
+                                sx={{
+                                    flex: 1,
+                                    minWidth: '130px',
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '10px',
+                                        backgroundColor: 'var(--color-surface)',
+                                        height: '40px'
+                                    },
+                                    '& input[type="date"]::-webkit-calendar-picker-indicator': {
+                                        filter: 'var(--color-date-icon-filter)',
+                                        cursor: 'pointer'
+                                    }
+                                }}
+                            />
+                        </MuiBox>
                     ))}
 
                 {/* Action Buttons */}
-                <MuiGrid item xs="auto" sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', marginLeft: 'auto' }}>
+                <MuiBox sx={{ 
+                    display: 'flex', 
+                    gap: 1, 
+                    flex: isMobile ? '1 1 100%' : '0 0 auto',
+                    justifyContent: isMobile ? 'flex-start' : 'flex-end',
+                    ml: isMobile ? 0 : 'auto'
+                }}>
                     {showResetButton && hasActiveFilters && (
                         <MuiButton
                             variant="outlined"
-                            startIcon={<X size={20} />}
+                            size="small"
+                            startIcon={<X size={18} />}
                             onClick={handleReset}
                             sx={{
-                                borderRadius: '12px',
-                                height: '56px',
+                                borderRadius: '10px',
+                                height: '40px',
                                 borderColor: 'var(--color-border)',
                                 color: 'var(--color-text-secondary)',
                                 '&:hover': {
@@ -239,11 +287,12 @@ export default function AdvancedFilter({
                     {onRefresh && (
                         <MuiButton
                             variant="outlined"
-                            startIcon={<RefreshCw size={20} />}
+                            size="small"
+                            startIcon={<RefreshCw size={18} />}
                             onClick={onRefresh}
                             sx={{
-                                borderRadius: '12px',
-                                height: '56px',
+                                borderRadius: '10px',
+                                height: '40px',
                                 borderColor: 'var(--color-border)',
                                 color: 'var(--color-text-secondary)',
                                 '&:hover': {
@@ -255,8 +304,8 @@ export default function AdvancedFilter({
                             تحديث
                         </MuiButton>
                     )}
-                </MuiGrid>
-            </MuiGrid>
+                </MuiBox>
+            </MuiBox>
 
             {/* Active Filters Display - Second Line */}
             {hasActiveFilters && (

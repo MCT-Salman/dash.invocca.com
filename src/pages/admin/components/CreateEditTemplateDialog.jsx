@@ -10,8 +10,8 @@ import MuiTypography from '@/components/ui/MuiTypography'
 import MuiIconButton from '@/components/ui/MuiIconButton'
 import MuiSelect from '@/components/ui/MuiSelect'
 import MuiMenuItem from '@/components/ui/MuiMenuItem'
-import { FormDialog } from '@/components/common'
-import { UploadCloud, X } from 'lucide-react'
+import { ModernDialog } from '@/components/common'
+import { UploadCloud, X, Image as ImageIcon } from 'lucide-react'
 import { FILE_UPLOAD } from '@/config/constants'
 import { useNotification } from '@/hooks'
 import { getAllHalls, assignTemplateToHall } from '@/api/admin'
@@ -146,10 +146,15 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
     }
 
     return (
-        <FormDialog
+        <ModernDialog
             open={open}
             onClose={onClose}
             title={editingTemplate ? 'تعديل القالب' : 'إضافة قالب جديد'}
+            subtitle={editingTemplate ? 'تعديل تفاصيل القالب' : 'إضافة قالب جديد للنظام'}
+            maxWidth="md"
+            showCancel={true}
+            cancelText="إلغاء"
+            submitText={editingTemplate ? 'تحديث' : 'إضافة'}
             onSubmit={handleSubmit(handleFormSubmit, (errors) => {
                 const firstError = Object.values(errors)[0]
                 showNotification({
@@ -159,14 +164,13 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
                 })
             })}
             loading={loading}
-            submitText={editingTemplate ? 'تحديث' : 'إضافة'}
-            cancelText="إلغاء"
-            maxWidth="md"
+            isForm={true}
+            headerIcon={<ImageIcon size={24} />}
         >
             <MuiGrid container spacing={3}>
                 {/* Basic Info */}
                 <MuiGrid item xs={12}>
-                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--color-primary-500)' }}>
+                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--color-icon)' }}>
                         المعلومات الأساسية
                     </MuiTypography>
                 </MuiGrid>
@@ -240,7 +244,7 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
 
                 {/* Image Upload */}
                 <MuiGrid item xs={12}>
-                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--color-primary-500)' }}>
+                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--color-icon)' }}>
                         صورة القالب
                     </MuiTypography>
                 </MuiGrid>
@@ -253,11 +257,11 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
                                 borderRadius: '12px',
                                 p: 3,
                                 textAlign: 'center',
-                                backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                                backgroundColor: 'color-mix(in srgb, var(--color-light) 2%, transparent)',
                                 cursor: 'pointer',
                                 '&:hover': {
-                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                    borderColor: 'var(--color-primary-500)',
+                                    backgroundColor: 'color-mix(in srgb, var(--color-light) 5%, transparent)',
+                                    borderColor: 'var(--color-icon)',
                                 }
                             }}
                         >
@@ -270,7 +274,7 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
                             />
                             <label htmlFor="template-image-upload">
                                 <MuiBox sx={{ cursor: 'pointer' }}>
-                                    <UploadCloud size={48} style={{ color: 'var(--color-primary-400)', marginBottom: '16px' }} />
+                                    <UploadCloud size={48} style={{ color: 'var(--color-icon)', marginBottom: '16px' }} />
                                     <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
                                         انقر لرفع صورة القالب أو اسحب وأفلت
                                     </MuiTypography>
@@ -324,10 +328,10 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
                                         position: 'absolute',
                                         top: -8,
                                         right: -8,
-                                        backgroundColor: 'rgba(239, 68, 68, 0.9)',
+                                        backgroundColor: 'var(--color-icon)',
                                         color: 'var(--color-text-primary)',
                                         '&:hover': {
-                                            backgroundColor: 'rgba(220, 38, 38, 1)',
+                                            backgroundColor: 'var(--color-icon)',
                                         }
                                     }}
                                 >
@@ -341,7 +345,7 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
                     </MuiBox>
                 </MuiGrid>
             </MuiGrid>
-        </FormDialog>
+        </ModernDialog>
     )
 }
 

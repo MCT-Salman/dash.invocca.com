@@ -123,7 +123,7 @@ export default function AdminProfile() {
           fontWeight: 800, 
           color: 'var(--color-text-primary-dark)', 
           mb: 1,
-          background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
+          background: 'linear-gradient(135deg, var(--color-icon), var(--color-gold))',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text'
@@ -153,7 +153,7 @@ export default function AdminProfile() {
             right: 0,
             width: '300px',
             height: '300px',
-            background: 'radial-gradient(circle, rgba(216, 185, 138, 0.08) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, color-mix(in srgb, var(--color-gold) 8%, transparent) 0%, transparent 70%)',
             borderRadius: '50%',
           }
         }}
@@ -169,11 +169,11 @@ export default function AdminProfile() {
                   sx={{
                     width: 100,
                     height: 100,
-                    border: '3px solid var(--color-primary-500)',
-                    boxShadow: '0 8px 24px rgba(216, 185, 138, 0.3)',
+                    border: '3px solid var(--color-icon)',
+                    boxShadow: 'none',
                   }}
                 >
-                  <User size={50} style={{ color: 'var(--color-primary-500)' }} />
+                  <User size={50} style={{ color: 'var(--color-icon)' }} />
                 </MuiAvatar>
                 <MuiBox
                   sx={{
@@ -202,7 +202,7 @@ export default function AdminProfile() {
                   {user?.name}
                 </MuiTypography>
                 <MuiTypography variant="body1" sx={{ 
-                  color: 'var(--color-primary-300)', 
+                  color: 'var(--color-icon)', 
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1
@@ -219,9 +219,9 @@ export default function AdminProfile() {
               sx={{
                 borderRadius: '12px',
                 px: 3,
-                background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
+                background: 'linear-gradient(135deg, var(--color-icon), var(--color-gold))',
                 color: 'var(--color-text-primary)',
-                boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
+                boxShadow: 'none',
               }}
             >
               تعديل الملف
@@ -246,8 +246,8 @@ export default function AdminProfile() {
                   الاسم الكامل
                 </MuiTypography>
                 <MuiCard sx={{ 
-                  background: 'rgba(216, 185, 138, 0.1)',
-                  border: '1px solid rgba(216, 185, 138, 0.2)',
+                  background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
+                  border: '1px solid var(--color-border)',
                   borderRadius: '12px'
                 }}>
                   <MuiCardContent sx={{ py: 2 }}>
@@ -276,8 +276,8 @@ export default function AdminProfile() {
                   رقم الهاتف
                 </MuiTypography>
                 <MuiCard sx={{ 
-                  background: 'rgba(216, 185, 138, 0.1)',
-                  border: '1px solid rgba(216, 185, 138, 0.2)',
+                  background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
+                  border: '1px solid var(--color-border)',
                   borderRadius: '12px'
                 }}>
                   <MuiCardContent sx={{ py: 2 }}>
@@ -306,8 +306,8 @@ export default function AdminProfile() {
                   الدور
                 </MuiTypography>
                 <MuiCard sx={{ 
-                  background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(220, 38, 38, 0.05))',
-                  border: '1px solid rgba(220, 38, 38, 0.2)',
+                  background: 'linear-gradient(135deg, color-mix(in srgb, var(--color-icon) 10%, transparent), color-mix(in srgb, var(--color-icon) 5%, transparent))',
+                  border: '1px solid var(--color-border)',
                   borderRadius: '12px'
                 }}>
                   <MuiCardContent sx={{ py: 2 }}>
@@ -343,7 +343,7 @@ export default function AdminProfile() {
             left: 0,
             width: '200px',
             height: '200px',
-            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, color-mix(in srgb, var(--color-gold) 5%, transparent) 0%, transparent 70%)',
             borderRadius: '50%',
           
           }
@@ -358,7 +358,7 @@ export default function AdminProfile() {
             alignItems: 'center', 
             gap: 1 
           }}>
-            <Lock size={24} style={{ color: 'var(--color-primary-500)' }} />
+            <Lock size={24} style={{ color: 'var(--color-icon)' }} />
             تغيير كلمة المرور
           </MuiTypography>
 
@@ -375,7 +375,7 @@ export default function AdminProfile() {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '12px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    backgroundColor: 'color-mix(in srgb, var(--color-light) 5%, transparent)',
                   }
                 }}
               />
@@ -393,7 +393,7 @@ export default function AdminProfile() {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '12px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    backgroundColor: 'color-mix(in srgb, var(--color-light) 5%, transparent)',
                   }
                 }}
               />
@@ -409,7 +409,7 @@ export default function AdminProfile() {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '12px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    backgroundColor: 'color-mix(in srgb, var(--color-light) 5%, transparent)',
                   }
                 }}
               />
@@ -423,9 +423,9 @@ export default function AdminProfile() {
                   alignSelf: 'flex-start',
                   borderRadius: '12px',
                   px: 4,
-                  background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
+                  background: 'linear-gradient(135deg, var(--color-icon), var(--color-gold))',
                   color: 'var(--color-text-primary)',
-                  boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
+                  boxShadow: 'none',
                   mt: 1
                 }}
               >
@@ -475,7 +475,7 @@ export default function AdminProfile() {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '12px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    backgroundColor: 'color-mix(in srgb, var(--color-light) 5%, transparent)',
                   }
                 }}
               />
@@ -490,7 +490,7 @@ export default function AdminProfile() {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '12px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    backgroundColor: 'color-mix(in srgb, var(--color-light) 5%, transparent)',
                   }
                 }}
               />
@@ -523,9 +523,9 @@ export default function AdminProfile() {
             disabled={updateProfileMutation.isPending}
             startIcon={updateProfileMutation.isPending ? <ButtonLoading /> : <Save size={18} />}
             sx={{
-              background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
+              background: 'linear-gradient(135deg, var(--color-icon), var(--color-gold))',
               color: 'var(--color-text-primary)',
-              boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
+              boxShadow: 'none',
             }}
           >
             {updateProfileMutation.isPending ? 'جاري الحفظ...' : 'حفظ التغييرات'}

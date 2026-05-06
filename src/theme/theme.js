@@ -9,7 +9,7 @@ export const createAppTheme = (mode = 'light') => createTheme({
       light: '#D8B98A',
       main: '#D8B98A',
       dark: '#D8B98A',
-      contrastText: mode === 'dark' ? '#1A1A1A' : '#FFF8DA',
+      contrastText: '#1A1A1A',
     },
     secondary: {
       light: mode === 'dark' ? '#FFF8DA' : '#1A1A1A',
@@ -21,25 +21,25 @@ export const createAppTheme = (mode = 'light') => createTheme({
       light: '#D8B98A',
       main: '#D8B98A',
       dark: '#D8B98A',
-      contrastText: mode === 'dark' ? '#1A1A1A' : '#FFF8DA',
+      contrastText: '#1A1A1A',
     },
     error: {
-      light: '#D8B98A',
-      main: '#D8B98A',
-      dark: '#D8B98A',
-      contrastText: mode === 'dark' ? '#1A1A1A' : '#FFF8DA',
+      light: '#DC2626',
+      main: '#DC2626',
+      dark: '#B91C1C',
+      contrastText: '#FFF8DA',
     },
     warning: {
       light: '#D8B98A',
       main: '#D8B98A',
       dark: '#D8B98A',
-      contrastText: mode === 'dark' ? '#1A1A1A' : '#FFF8DA',
+      contrastText: '#1A1A1A',
     },
     info: {
       light: '#D8B98A',
       main: '#D8B98A',
       dark: '#D8B98A',
-      contrastText: mode === 'dark' ? '#1A1A1A' : '#FFF8DA',
+      contrastText: '#1A1A1A',
     },
     background: {
       default: mode === 'dark' ? '#1A1A1A' : '#FFF8DA',
@@ -59,23 +59,18 @@ export const createAppTheme = (mode = 'light') => createTheme({
     },
   },
   typography: {
-    fontFamily: [
-      'Alexandria',
-      'Montserrat',
-      'system-ui',
-      'sans-serif',
-    ].join(','),
+    fontFamily: ['Alexandria', 'var(--font-family-base)', 'system-ui', 'sans-serif'].join(','),
     button: {
       textTransform: 'none',
       fontWeight: 600,
-      fontFamily: 'Alexandria, Montserrat',
+      fontFamily: 'Alexandria, var(--font-family-base)',
     },
-    h1: { fontFamily: 'Alexandria, Montserrat', fontWeight: 700 },
-    h2: { fontFamily: 'Alexandria, Montserrat', fontWeight: 700 },
-    h3: { fontFamily: 'Alexandria, Montserrat', fontWeight: 700 },
-    h4: { fontFamily: 'Alexandria, Montserrat', fontWeight: 700 },
-    h5: { fontFamily: 'Alexandria, Montserrat', fontWeight: 600 },
-    h6: { fontFamily: 'Alexandria, Montserrat', fontWeight: 600 },
+    h1: { fontFamily: 'Alexandria, var(--font-family-base)', fontWeight: 700 },
+    h2: { fontFamily: 'Alexandria, var(--font-family-base)', fontWeight: 700 },
+    h3: { fontFamily: 'Alexandria, var(--font-family-base)', fontWeight: 700 },
+    h4: { fontFamily: 'Alexandria, var(--font-family-base)', fontWeight: 700 },
+    h5: { fontFamily: 'Alexandria, var(--font-family-base)', fontWeight: 600 },
+    h6: { fontFamily: 'Alexandria, var(--font-family-base)', fontWeight: 600 },
   },
   shape: {
     borderRadius: 12,
@@ -140,7 +135,7 @@ export const createAppTheme = (mode = 'light') => createTheme({
           backgroundColor: 'var(--color-surface)',
           backgroundImage: 'none',
           border: '1px solid var(--color-border-glass)',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+          boxShadow: 'none',
         }
       }
     },
@@ -150,7 +145,7 @@ export const createAppTheme = (mode = 'light') => createTheme({
           backgroundColor: 'var(--color-paper)',
           backgroundImage: 'none',
           border: '1px solid var(--color-border-glass)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+          boxShadow: 'none',
         }
       }
     },
@@ -171,14 +166,14 @@ export const createAppTheme = (mode = 'light') => createTheme({
             borderRadius: '12px !important',
           },
           '&:hover:not(.Mui-disabled):not(.Mui-error) .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'var(--color-primary-500) !important',
+            borderColor: 'var(--color-icon) !important',
           },
           '&.Mui-focused:not(.Mui-error) .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'var(--color-primary-500) !important',
+            borderColor: 'var(--color-icon) !important',
             borderWidth: '1px !important',
           },
           '&.Mui-error .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'var(--color-error-500) !important',
+            borderColor: 'var(--color-icon) !important',
           },
         },
         input: {
@@ -199,7 +194,7 @@ export const createAppTheme = (mode = 'light') => createTheme({
           fontSize: '0.875rem',
           fontWeight: 600,
           '&.Mui-focused': {
-            color: 'var(--color-primary-500)',
+            color: 'var(--color-icon)',
           },
           '&.MuiInputLabel-shrink': {
             transform: 'none',

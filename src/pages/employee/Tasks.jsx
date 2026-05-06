@@ -39,7 +39,7 @@ export default function Tasks() {
                   borderRadius: '16px',
                   transition: 'all 0.3s ease',
                   '&:hover': {
-                    borderColor: 'var(--color-primary-500)',
+                    borderColor: 'var(--color-icon)',
                     transform: 'translateY(-4px)',
                   }
                 }}
@@ -53,15 +53,11 @@ export default function Tasks() {
                     size="small"
                     sx={{
                       backgroundColor: task.status === 'completed' 
-                        ? 'rgba(34, 197, 94, 0.2)' 
+                        ? 'color-mix(in srgb, var(--color-gold) 15%, transparent)' 
                         : task.status === 'in_progress'
-                        ? 'rgba(59, 130, 246, 0.2)'
-                        : 'rgba(251, 191, 36, 0.2)',
-                      color: task.status === 'completed' 
-                        ? 'var(--color-icon)' 
-                        : task.status === 'in_progress'
-                        ? 'var(--color-icon)'
-                        : 'var(--color-icon)',
+                        ? 'color-mix(in srgb, var(--color-gold) 10%, transparent)'
+                        : 'color-mix(in srgb, var(--color-gold) 5%, transparent)',
+                      color: 'var(--color-icon)',
                       fontWeight: 600,
                     }}
                   />

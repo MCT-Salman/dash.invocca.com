@@ -1,877 +1,237 @@
-// src/pages/client/ClientDashboard.jsx
+// src\pages\client\ClientDashboard.jsx
 import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
-import { useState, useEffect, useRef } from 'react'
+import { useMemo, useEffect } from 'react'
 import MuiBox from '@/components/ui/MuiBox'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiPaper from '@/components/ui/MuiPaper'
 import MuiTypography from '@/components/ui/MuiTypography'
-import { LoadingScreen, SEOHead } from '@/components/common'
+import MuiChip from '@/components/ui/MuiChip'
+import MuiAvatar from '@/components/ui/MuiAvatar'
+import MuiButton from '@/components/ui/MuiButton'
+import { LoadingScreen, SEOHead, EmptyState } from '@/components/common'
 import { QUERY_KEYS } from '@/config/constants'
-import { getClientReports } from '@/api/client'
+import { getClientReports, getClientDashboard } from '@/api/client'
 import { formatNumber, formatDate, formatCurrency } from '@/utils/helpers'
 import { useAuth } from '@/hooks'
-import MuiChip from '@/components/ui/MuiChip'
+import { useClient } from '@/providers/ClientProvider'
+import ClientEventSelector from './components/ClientEventSelector'
 import {
-  LayoutDashboard,
-  Calendar,
-  ClipboardList,
-  MessageCircle,
-  TrendingUp,
-  Clock,
-  Star,
-  MapPin,
-  Users,
-  DollarSign,
-  AlertCircle,
-  Mail,
-  CheckCircle,
-  XCircle,
-  Building2,
-  Tag
+    LayoutDashboard,
+    Calendar,
+    CheckCircle,
+    Clock,
+    Users,
+    DollarSign,
+    Building2,
+    MapPin,
+    AlertCircle,
+    ChevronLeft
 } from 'lucide-react'
 
-function StatCard({ title, value, icon: Icon, color = 'var(--color-primary-500)' }) {
-  return (
+const StatCard = ({ title, value, icon: Icon }) => (
     <MuiPaper
-      elevation={0}
-      sx={{
-        p: 3,
-        height: '100%',
-        background: 'var(--color-surface-dark)',
-        border: '1px solid var(--color-border-glass)',
-        borderRadius: '16px',
-        position: 'relative',
-        overflow: 'hidden',
-        transition: 'all 0.3s ease',
-        '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-          borderColor: color,
-        },
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '4px',
-          background: `linear-gradient(90deg, ${color}, transparent)`,
-        }
-      }}
+        elevation={0}
+        sx={{
+            p: 3,
+            height: '100%',
+            background: 'var(--color-paper)',
+            border: '1px solid var(--color-border-glass)',
+            borderRadius: '24px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+                transform: 'translateY(-4px)',
+                borderColor: 'var(--color-icon)',
+            }
+        }}
     >
-      <MuiBox sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
-        <MuiBox>
-          <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1, fontWeight: 500 }}>
-            {title}
-          </MuiTypography>
-          <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-            {formatNumber(value)}
-          </MuiTypography>
+        <MuiBox sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <MuiBox>
+                <MuiTypography variant="h4" sx={{ fontWeight: 800, mb: 0.5 }}>{value}</MuiTypography>
+                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>{title}</MuiTypography>
+            </MuiBox>
+            <MuiBox
+                sx={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: '12px',
+                    background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--color-icon)',
+                    border: '1px solid var(--color-border)'
+                }}
+            >
+                <Icon size={24} />
+            </MuiBox>
         </MuiBox>
-        <MuiBox
-          sx={{
-            width: 56,
-            height: 56,
-            borderRadius: '12px',
-            background: 'rgba(255, 255, 255, 0.05)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: `1px solid ${color}`,
-          }}
-        >
-          <Icon size={28} style={{ color }} />
-        </MuiBox>
-      </MuiBox>
     </MuiPaper>
-  )
-}
+)
 
 export default function ClientDashboard() {
-  const { user } = useAuth()
-  const navigate = useNavigate()
-  const eventsScrollRef = useRef(null)
-  const invitationsScrollRef = useRef(null)
-  const [currentEventIndex, setCurrentEventIndex] = useState(0)
-  const [currentInvitationIndex, setCurrentInvitationIndex] = useState(0)
+    const { user } = useAuth()
+    const { selectedEventId, selectEvent, selectedEvent, setSelectedEvent } = useClient()
 
-  const { data, isLoading } = useQuery({
-    queryKey: QUERY_KEYS.CLIENT_REPORTS,
-    queryFn: getClientReports,
-  })
+    const { data: dashboardData, isLoading: dashboardLoading } = useQuery({
+        queryKey: QUERY_KEYS.CLIENT_DASHBOARD,
+        queryFn: getClientDashboard,
+    })
 
-  // Extract data from the new API response structure (/client/reports)
-  const responseData = data?.data || data || {}
+    const { data: reportData, isLoading: reportLoading, error } = useQuery({
+        queryKey: [QUERY_KEYS.CLIENT_REPORTS, selectedEventId],
+        queryFn: () => getClientReports({ eventId: selectedEventId }),
+        enabled: !!selectedEventId
+    })
 
-  // New structure: { hasEvent, event, invitations, dailyUsage, period }
-  const hasEvent = responseData.hasEvent || false
-  const event = responseData.event || null
-  const invitations = responseData.invitations || []
-  const dailyUsage = responseData.dailyUsage || []
-  const period = responseData.period || 'all'
+    const allEvents = useMemo(() => {
+        const d = dashboardData?.data || dashboardData || {}
+        return d.allEvents || d.events || []
+    }, [dashboardData])
 
-  // Create event as a single item array for backward compatibility
-  const bookings = event ? [event] : []
-
-  // Auto scroll for events - Must be called before any conditional returns
-  useEffect(() => {
-    if (isLoading || bookings.length <= 3 || !eventsScrollRef.current) return
-
-    const container = eventsScrollRef.current
-    const itemHeight = 150 // Approximate height of each item including gap
-    const maxScroll = (bookings.length - 3) * itemHeight
-
-    const interval = setInterval(() => {
-      setCurrentEventIndex((prev) => {
-        const nextIndex = prev + 1
-        const scrollPosition = nextIndex * itemHeight
-
-        if (scrollPosition > maxScroll) {
-          // Reset to top smoothly
-          container.scrollTo({ top: 0, behavior: 'smooth' })
-          return 0
+    // Validate selected event against available events
+    useEffect(() => {
+        if (!dashboardLoading && allEvents.length > 0) {
+            if (selectedEventId) {
+                const ev = allEvents.find(e => (e._id || e.id) === selectedEventId)
+                if (ev) {
+                    setSelectedEvent(ev)
+                } else {
+                    // Stale or invalid ID, clear it
+                    selectEvent(null)
+                }
+            }
         }
+    }, [selectedEventId, allEvents, dashboardLoading, setSelectedEvent, selectEvent])
 
-        // Scroll to next position
-        container.scrollTo({ top: scrollPosition, behavior: 'smooth' })
-        return nextIndex
-      })
-    }, 3000) // Change every 3 seconds
+    if (dashboardLoading) return <LoadingScreen />
 
-    return () => clearInterval(interval)
-  }, [bookings.length, isLoading])
-
-  // Auto scroll for invitations - Must be called before any conditional returns
-  useEffect(() => {
-    if (isLoading || invitations.length <= 3 || !invitationsScrollRef.current) return
-
-    const container = invitationsScrollRef.current
-    const itemHeight = 150 // Approximate height of each item including gap
-    const maxScroll = (invitations.length - 3) * itemHeight
-
-    const interval = setInterval(() => {
-      setCurrentInvitationIndex((prev) => {
-        const nextIndex = prev + 1
-        const scrollPosition = nextIndex * itemHeight
-
-        if (scrollPosition > maxScroll) {
-          // Reset to top smoothly
-          container.scrollTo({ top: 0, behavior: 'smooth' })
-          return 0
-        }
-
-        // Scroll to next position
-        container.scrollTo({ top: scrollPosition, behavior: 'smooth' })
-        return nextIndex
-      })
-    }, 3000) // Change every 3 seconds
-
-    return () => clearInterval(interval)
-  }, [invitations.length, isLoading])
-
-  if (isLoading) {
-    return <LoadingScreen message="جاري تحميل لوحة التحكم..." fullScreen={false} />
-  }
-
-  // Event type labels
-  const eventTypeLabels = {
-    wedding: 'زفاف',
-    birthday: 'عيد ميلاد',
-    engagement: 'خطوبة',
-    graduation: 'تخرج',
-    corporate: 'فعالية شركات',
-    other: 'أخرى'
-  }
-
-  // Status labels
-  const statusLabels = {
-    pending: 'قيد الانتظار',
-    confirmed: 'مؤكد',
-    in_progress: 'جاري',
-    completed: 'مكتمل',
-    cancelled: 'ملغي'
-  }
-
-  // Calculate stats from new API response structure
-  const sentInvitations = invitations.filter(inv => inv.status === 'sent').length
-  const usedInvitations = invitations.filter(inv => inv.used).length
-  const totalGuests = invitations.reduce((sum, inv) => sum + (inv.numOfPeople || 0), 0)
-  const checkedInGuests = invitations.reduce((sum, inv) => {
-    const checkedIn = inv.guests?.filter(g => g.checkedIn).length || 0
-    return sum + checkedIn
-  }, 0)
-  const usageRate = totalGuests > 0 ? ((checkedInGuests / totalGuests) * 100).toFixed(2) : '0.00'
-
-  const stats = {
-    totalBookings: hasEvent ? 1 : 0,
-    totalInvitations: invitations.length,
-    upcomingEvents: hasEvent ? 1 : 0,
-    pastEvents: 0,
-    completedEvents: 0,
-    cancelledEvents: 0,
-    pendingEvents: hasEvent && event?.status === 'pending' ? 1 : 0,
-    confirmedEvents: hasEvent && event?.status === 'confirmed' ? 1 : 0,
-    sentInvitations,
-    usedInvitations,
-    pendingInvitations: invitations.filter(inv => !inv.status || inv.status !== 'sent').length,
-    totalGuests,
-    checkedInGuests,
-    usageRate,
-    checkInRate: totalGuests > 0 ? Math.round((checkedInGuests / totalGuests) * 100) : 0,
-    totalSpent: event?.totalPrice || 0,
-    totalPaid: event?.paidAmount || 0,
-    totalUnpaid: event?.remainingBalance || (event?.totalPrice || 0) - (event?.paidAmount || 0),
-    currency: 'ل.س',
-    totalComplaints: 0,
-    openComplaints: 0,
-    resolvedComplaints: 0,
-  }
-
-  return (
-    <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
-      <SEOHead title="لوحة تحكم العميل - INVOCCA" />
-
-      {/* Header */}
-      <MuiBox sx={{ mb: 4 }}>
-        <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 1 }}>
-          مرحباً بك، {user?.name}
-        </MuiTypography>
-        <MuiTypography variant="body1" sx={{ color: 'var(--color-text-secondary)' }}>
-          إليك ملخص لنشاطاتك وحجوزاتك الحالية
-        </MuiTypography>
-      </MuiBox>
-
-      {/* Stats Grid - Events */}
-      <MuiGrid container spacing={3} sx={{ mb: 4 }}>
-        <MuiGrid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="إجمالي الحجوزات"
-            value={stats.totalBookings}
-            icon={Calendar}
-            color="var(--color-primary-500)"
-          />
-        </MuiGrid>
-        <MuiGrid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="المناسبات القادمة"
-            value={stats.upcomingEvents}
-            icon={Clock}
-            color="var(--color-info-500)"
-          />
-        </MuiGrid>
-        <MuiGrid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="الفعاليات المكتملة"
-            value={stats.completedEvents}
-            icon={CheckCircle}
-            color="var(--color-primary-500)"
-          />
-        </MuiGrid>
-        <MuiGrid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="الفعاليات الملغاة"
-            value={stats.cancelledEvents}
-            icon={XCircle}
-            color="var(--color-primary-600)"
-          />
-        </MuiGrid>
-      </MuiGrid>
-
-      {/* Stats Grid - Invitations */}
-      <MuiGrid container spacing={3} sx={{ mb: 4 }}>
-        <MuiGrid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="إجمالي الدعوات"
-            value={stats.totalInvitations}
-            icon={Mail}
-            color="var(--color-secondary-500)"
-          />
-        </MuiGrid>
-        <MuiGrid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="الدعوات المرسلة"
-            value={stats.sentInvitations}
-            icon={ClipboardList}
-            color="var(--color-gold)"
-          />
-        </MuiGrid>
-        <MuiGrid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="الدعوات المستخدمة"
-            value={stats.usedInvitations}
-            icon={CheckCircle}
-            color="var(--color-primary-500)"
-          />
-        </MuiGrid>
-        <MuiGrid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="إجمالي المدعوين"
-            value={stats.totalGuests}
-            icon={Users}
-            color="var(--color-primary-500)"
-          />
-        </MuiGrid>
-      </MuiGrid>
-
-      {/* Stats Grid - Financial */}
-      <MuiGrid container spacing={3} sx={{ mb: 4 }}>
-        <MuiGrid item xs={12} sm={6} md={4}>
-          <MuiPaper
-            elevation={0}
-            sx={{
-              p: 3,
-              height: '100%',
-              background: 'var(--color-surface-dark)',
-              border: '1px solid var(--color-border-glass)',
-              borderRadius: '16px',
-              position: 'relative',
-              overflow: 'hidden',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                borderColor: 'var(--color-primary-500)',
-              },
-            }}
-          >
-            <MuiBox sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
-              <MuiBox>
-                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1, fontWeight: 500 }}>
-                  إجمالي المصروفات
-                </MuiTypography>
-                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                  {formatNumber(stats.totalSpent)} {stats.currency || 'ل.س'}
-                </MuiTypography>
-              </MuiBox>
-              <MuiBox
-                sx={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '12px',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '1px solid var(--color-primary-500)',
-                }}
-              >
-                <DollarSign size={28} style={{ color: 'var(--color-primary-500)' }} />
-              </MuiBox>
+    // If no events at all, show empty state
+    if (allEvents.length === 0) {
+        return (
+            <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
+                <SEOHead title="لوحة التحكم | INVOCCA" />
+                <EmptyState 
+                    title="لا توجد مناسبات حالياً" 
+                    description="لم يتم العثور على أي مناسبات مسجلة باسمك. يرجى التواصل مع إدارة القاعة."
+                    icon={Calendar}
+                />
             </MuiBox>
-          </MuiPaper>
-        </MuiGrid>
-        <MuiGrid item xs={12} sm={6} md={4}>
-          <MuiPaper
-            elevation={0}
-            sx={{
-              p: 3,
-              height: '100%',
-              background: 'var(--color-surface-dark)',
-              border: '1px solid var(--color-border-glass)',
-              borderRadius: '16px',
-              position: 'relative',
-              overflow: 'hidden',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                borderColor: 'var(--color-gold)',
-              },
-            }}
-          >
-            <MuiBox sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
-              <MuiBox>
-                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1, fontWeight: 500 }}>
-                  المدفوع
-                </MuiTypography>
-                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                  {formatNumber(stats.totalPaid)} {stats.currency || 'ل.س'}
-                </MuiTypography>
-              </MuiBox>
-              <MuiBox
-                sx={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '12px',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '1px solid var(--color-gold)',
-                }}
-              >
-                <TrendingUp size={28} style={{ color: 'var(--color-gold)' }} />
-              </MuiBox>
-            </MuiBox>
-          </MuiPaper>
-        </MuiGrid>
-        <MuiGrid item xs={12} sm={6} md={4}>
-          <MuiPaper
-            elevation={0}
-            sx={{
-              p: 3,
-              height: '100%',
-              background: 'var(--color-surface-dark)',
-              border: '1px solid var(--color-border-glass)',
-              borderRadius: '16px',
-              position: 'relative',
-              overflow: 'hidden',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                borderColor: 'var(--color-icon)',
-              },
-            }}
-          >
-            <MuiBox sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
-              <MuiBox>
-                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 1, fontWeight: 500 }}>
-                  المتبقي
-                </MuiTypography>
-                <MuiTypography variant="h4" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                  {formatNumber(stats.totalUnpaid)} {stats.currency || 'ل.س'}
-                </MuiTypography>
-              </MuiBox>
-              <MuiBox
-                sx={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '12px',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '1px solid var(--color-icon)',
-                }}
-              >
-                <DollarSign size={28} style={{ color: 'var(--color-icon)' }} />
-              </MuiBox>
-            </MuiBox>
-          </MuiPaper>
-        </MuiGrid>
-      </MuiGrid>
+        )
+    }
 
-      {/* Stats Grid - Complaints */}
-      {stats.totalComplaints > 0 && (
-        <MuiGrid container spacing={3} sx={{ mb: 4 }}>
-          <MuiGrid item xs={12} sm={6} md={4}>
-            <StatCard
-              title="إجمالي الشكاوى"
-              value={stats.totalComplaints}
-              icon={AlertCircle}
-              color="var(--color-gold)"
-            />
-          </MuiGrid>
-          <MuiGrid item xs={12} sm={6} md={4}>
-            <StatCard
-              title="الشكاوى المفتوحة"
-              value={stats.openComplaints}
-              icon={AlertCircle}
-              color="var(--color-primary-600)"
-            />
-          </MuiGrid>
-          <MuiGrid item xs={12} sm={6} md={4}>
-            <StatCard
-              title="الشكاوى المحلولة"
-              value={stats.resolvedComplaints}
-              icon={CheckCircle}
-              color="var(--color-primary-500)"
-            />
-          </MuiGrid>
-        </MuiGrid>
-      )}
+    if (!selectedEventId) {
+        return (
+            <MuiBox sx={{ p: { xs: 2, sm: 3 } }}>
+                <SEOHead title="اختيار المناسبة | INVOCCA" />
+                <ClientEventSelector events={allEvents} />
+            </MuiBox>
+        )
+    }
 
-      {/* Next Event */}
-      {event && (
-        <MuiPaper
-          elevation={0}
-          sx={{
-            p: 3,
-            mb: 4,
-            background: 'var(--color-surface-dark)',
-            border: '1px solid var(--color-border-glass)',
-            borderRadius: '20px',
-          }}
-        >
-          <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-            <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-              الفعالية القادمة
-            </MuiTypography>
-            <MuiChip
-              label={statusLabels[event.status] || event.status}
-              size="small"
-              sx={{
-                backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                color: 'var(--color-primary-500)',
-                fontWeight: 600,
-              }}
-            />
-          </MuiBox>
-          <MuiGrid container spacing={2}>
-            <MuiGrid item xs={12} md={6}>
-              <MuiTypography variant="h5" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700, mb: 2 }}>
-                {event.name || 'فعالية بدون اسم'}
-              </MuiTypography>
-              <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Tag size={16} style={{ color: 'var(--color-primary-400)' }} />
-                  <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                    النوع: {eventTypeLabels[event.type] || event.type || '—'}
-                  </MuiTypography>
+    const eventData = reportData?.data || reportData || {}
+    const event = selectedEvent || eventData.event
+    const invitations = eventData.invitations || []
+
+    const stats = {
+        totalInvitations: invitations.length,
+        totalGuests: invitations.reduce((sum, inv) => sum + (inv.numOfPeople || 0), 0),
+        totalSpent: event?.totalPrice || 0,
+        totalPaid: event?.paidAmount || 0,
+        totalUnpaid: event?.remainingBalance || (event?.totalPrice || 0) - (event?.paidAmount || 0),
+    }
+
+    return (
+        <MuiBox sx={{ p: { xs: 2, sm: 3 }, minHeight: '100vh', background: 'var(--color-bg-dark)' }}>
+            <SEOHead title={`لوحة التحكم - ${event?.name || 'المناسبة'} | INVOCCA`} />
+
+            {/* Header with Switch Button */}
+            <MuiBox sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <MuiBox>
+                    <MuiTypography variant="h4" sx={{ fontWeight: 900, color: 'var(--color-icon)', mb: 1 }}>
+                        {event?.name || 'لوحة التحكم'}
+                    </MuiTypography>
+                    <MuiTypography variant="body1" sx={{ color: 'var(--color-text-secondary)' }}>
+                        مرحباً بك مجدداً، {user?.name}
+                    </MuiTypography>
                 </MuiBox>
-                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Calendar size={16} style={{ color: 'var(--color-primary-400)' }} />
-                  <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                    التاريخ: {formatDate(event.date, 'MM/DD/YYYY')}
-                  </MuiTypography>
-                </MuiBox>
-                {event.startTime && event.endTime && (
-                  <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Clock size={16} style={{ color: 'var(--color-primary-400)' }} />
-                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                      الوقت: {event.startTime} - {event.endTime}
-                    </MuiTypography>
-                  </MuiBox>
-                )}
-                {event.hall && (
-                  <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Building2 size={16} style={{ color: 'var(--color-primary-400)' }} />
-                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                      قاعة/صالة: {event.hall.name || '—'}
-                    </MuiTypography>
-                  </MuiBox>
-                )}
-                {event.hall?.location && (
-                  <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <MapPin size={16} style={{ color: 'var(--color-primary-400)' }} />
-                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                      الموقع: {event.hall.location}
-                    </MuiTypography>
-                  </MuiBox>
-                )}
-                {event.guestCount && (
-                  <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Users size={16} style={{ color: 'var(--color-primary-400)' }} />
-                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                      عدد الضيوف: {event.guestCount}
-                    </MuiTypography>
-                  </MuiBox>
-                )}
-                {event.totalPrice !== undefined && (
-                  <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <DollarSign size={16} style={{ color: 'var(--color-primary-400)' }} />
-                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                      السعر الإجمالي: {formatCurrency(event.totalPrice)}
-                    </MuiTypography>
-                  </MuiBox>
-                )}
-              </MuiBox>
-            </MuiGrid>
-            {event.template?.imageUrl && (
-              <MuiGrid item xs={12} md={6}>
-                <MuiBox
-                  onClick={() => {
-                    const imageUrl = event.template.imageUrl?.startsWith('http')
-                      ? event.template.imageUrl
-                      : `${import.meta.env.VITE_API_BASE}${event.template.imageUrl}`
-                    window.open(imageUrl, '_blank')
-                  }}
-                  sx={{
-                    width: '100%',
-                    maxWidth: 400,
-                    height: 300,
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    border: '1px solid var(--color-border-glass)',
-                    cursor: 'pointer',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    '&:hover': {
-                      transform: 'scale(1.02)',
-                      boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
-                    }
-                  }}
+                <MuiButton 
+                    variant="outlined" 
+                    startIcon={<ChevronLeft />} 
+                    onClick={() => selectEvent(null)}
+                    sx={{ borderRadius: '12px', borderColor: 'var(--color-border)' }}
                 >
-                  <img
-                    src={event.template.imageUrl?.startsWith('http')
-                      ? event.template.imageUrl
-                      : `${import.meta.env.VITE_API_BASE}${event.template.imageUrl}`}
-                    alt="قالب الفعالية"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </MuiBox>
-              </MuiGrid>
-            )}
-          </MuiGrid>
-        </MuiPaper>
-      )}
-
-      {/* Recent Activity */}
-      <MuiGrid container spacing={3} sx={{ mb: 4 }}>
-        {/* Recent Events */}
-        <MuiGrid item xs={12} md={6}>
-          <MuiPaper
-            elevation={0}
-            sx={{
-              p: 3,
-              background: 'var(--color-surface-dark)',
-              border: '1px solid var(--color-border-glass)',
-              borderRadius: '16px',
-              height: '100%',
-            }}
-          >
-            <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                الفعاليات الأخيرة
-              </MuiTypography>
+                    تغيير المناسبة
+                </MuiButton>
             </MuiBox>
 
-            {bookings.length > 0 ? (
-              <MuiBox
-                ref={eventsScrollRef}
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 2,
-                  overflowY: 'auto',
-                  overflowX: 'hidden',
-                  maxHeight: '450px',
-                  position: 'relative',
-                  scrollBehavior: 'smooth',
-                  '&::-webkit-scrollbar': {
-                    width: '6px',
-                  },
-                  '&::-webkit-scrollbar-track': {
-                    background: 'transparent',
-                  },
-                  '&::-webkit-scrollbar-thumb': {
-                    background: 'var(--color-border-glass)',
-                    borderRadius: '3px',
-                  },
-                  '&::-webkit-scrollbar-thumb:hover': {
-                    background: 'var(--color-primary-500)',
-                  },
-                }}
-              >
-                {bookings.map((booking, idx) => (
-                  <MuiPaper
-                    key={booking._id || booking.id || idx}
-                    elevation={0}
-                    sx={{
-                      p: 2,
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      border: '1px solid var(--color-border-glass)',
-                      borderRadius: '12px',
-                      transition: 'all 0.3s ease',
-                      flexShrink: 0,
-                      minHeight: '120px',
-                      '&:hover': {
-                        borderColor: 'var(--color-primary-500)',
-                      }
-                    }}
-                  >
-                    <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                      <MuiTypography
-                        variant="subtitle1"
-                        sx={{
-                          color: 'var(--color-text-primary-dark)',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {booking.name || booking.eventName || 'فعالية بدون اسم'}
-                      </MuiTypography>
-                      <MuiChip
-                        label={statusLabels[booking.status] || booking.status}
-                        size="small"
-                        sx={{
-                          backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                          color: 'var(--color-primary-400)',
-                          fontSize: '0.7rem',
-                          height: 20
-                        }}
-                      />
-                    </MuiBox>
+            <MuiGrid container spacing={3} sx={{ mb: 4 }}>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <StatCard title="إجمالي الدعوات" value={stats.totalInvitations} icon={Users} />
+                </MuiGrid>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <StatCard title="إجمالي الضيوف" value={stats.totalGuests} icon={Users} />
+                </MuiGrid>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <StatCard title="المدفوع" value={formatCurrency(stats.totalPaid)} icon={DollarSign} />
+                </MuiGrid>
+                <MuiGrid item xs={12} sm={6} md={3}>
+                    <StatCard title="المتبقي" value={formatCurrency(stats.totalUnpaid)} icon={Clock} />
+                </MuiGrid>
+            </MuiGrid>
 
-                    <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                      <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
-                        <Calendar size={12} />
-                        <MuiTypography variant="caption">
-                          {formatDate(booking.date || booking.eventDate, 'MM/DD/YYYY')}
-                        </MuiTypography>
-                      </MuiBox>
+            <MuiGrid container spacing={3}>
+                <MuiGrid item xs={12} md={8}>
+                    <MuiPaper sx={{ p: 4, borderRadius: '24px', background: 'var(--color-paper)', border: '1px solid var(--color-border)' }}>
+                        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+                            <Building2 size={24} style={{ color: 'var(--color-icon)' }} />
+                            <MuiTypography variant="h6" sx={{ fontWeight: 700 }}>معلومات الفعالية</MuiTypography>
+                        </MuiBox>
+                        
+                        <MuiGrid container spacing={3}>
+                            <MuiGrid item xs={12} sm={6}>
+                                <MuiBox sx={{ p: 2, borderRadius: '16px', bgcolor: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border-glass)' }}>
+                                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>التاريخ</MuiTypography>
+                                    <MuiTypography variant="body1" sx={{ fontWeight: 700 }}>{formatDate(event?.date || event?.eventDate)}</MuiTypography>
+                                </MuiBox>
+                            </MuiGrid>
+                            <MuiGrid item xs={12} sm={6}>
+                                <MuiBox sx={{ p: 2, borderRadius: '16px', bgcolor: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border-glass)' }}>
+                                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>الموقع</MuiTypography>
+                                    <MuiTypography variant="body1" sx={{ fontWeight: 700 }}>{event?.hallId?.name || '—'}</MuiTypography>
+                                </MuiBox>
+                            </MuiGrid>
+                            <MuiGrid item xs={12} sm={6}>
+                                <MuiBox sx={{ p: 2, borderRadius: '16px', bgcolor: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border-glass)' }}>
+                                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>السعة</MuiTypography>
+                                    <MuiTypography variant="body1" sx={{ fontWeight: 700 }}>{event?.capacity || 0} ضيف</MuiTypography>
+                                </MuiBox>
+                            </MuiGrid>
+                            <MuiGrid item xs={12} sm={6}>
+                                <MuiBox sx={{ p: 2, borderRadius: '16px', bgcolor: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border-glass)' }}>
+                                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>حالة الحجز</MuiTypography>
+                                    <MuiChip label="مؤكد" color="success" size="small" sx={{ fontWeight: 700 }} />
+                                </MuiBox>
+                            </MuiGrid>
+                        </MuiGrid>
+                    </MuiPaper>
+                </MuiGrid>
 
-                      {booking.hall?.name && (
-                        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
-                          <MapPin size={12} />
-                          <MuiTypography variant="caption">
-                            {booking.hall.name}
-                          </MuiTypography>
+                <MuiGrid item xs={12} md={4}>
+                    <MuiPaper sx={{ p: 4, borderRadius: '24px', background: 'var(--color-paper)', border: '1px solid var(--color-border)', height: '100%' }}>
+                        <MuiTypography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>تذكيرات هامة</MuiTypography>
+                        <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            <MuiBox sx={{ p: 2, borderRadius: '12px', border: '1px solid var(--color-border)', display: 'flex', gap: 2 }}>
+                                <AlertCircle size={20} style={{ color: 'var(--color-icon)' }} />
+                                <MuiTypography variant="body2">يرجى تأكيد قائمة الطعام قبل موعد الحفلة بـ 7 أيام.</MuiTypography>
+                            </MuiBox>
+                            <MuiBox sx={{ p: 2, borderRadius: '12px', border: '1px solid var(--color-border)', display: 'flex', gap: 2 }}>
+                                <Clock size={20} style={{ color: 'var(--color-icon)' }} />
+                                <MuiTypography variant="body2">بانتظار سداد الدفعة الأخيرة.</MuiTypography>
+                            </MuiBox>
                         </MuiBox>
-                      )}
-
-                      {booking.guestCount && (
-                        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
-                          <Users size={12} />
-                          <MuiTypography variant="caption">
-                            {booking.guestCount} ضيف
-                          </MuiTypography>
-                        </MuiBox>
-                      )}
-                    </MuiBox>
-                  </MuiPaper>
-                ))}
-              </MuiBox>
-            ) : (
-              <MuiBox sx={{ py: 4, textAlign: 'center' }}>
-                <MuiTypography sx={{ color: 'var(--color-text-secondary)' }}>
-                  لا توجد فعاليات حالية.
-                </MuiTypography>
-              </MuiBox>
-            )}
-          </MuiPaper>
-        </MuiGrid>
-
-        {/* Recent Invitations */}
-        <MuiGrid item xs={12} md={6}>
-          <MuiPaper
-            elevation={0}
-            sx={{
-              p: 3,
-              background: 'var(--color-surface-dark)',
-              border: '1px solid var(--color-border-glass)',
-              borderRadius: '16px',
-              height: '100%',
-            }}
-          >
-            <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 700 }}>
-                الدعوات الأخيرة
-              </MuiTypography>
-            </MuiBox>
-
-            {invitations.length > 0 ? (
-              <MuiBox
-                ref={invitationsScrollRef}
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 2,
-                  overflowY: 'auto',
-                  overflowX: 'hidden',
-                  maxHeight: '450px',
-                  position: 'relative',
-                  scrollBehavior: 'smooth',
-                  '&::-webkit-scrollbar': {
-                    width: '6px',
-                  },
-                  '&::-webkit-scrollbar-track': {
-                    background: 'transparent',
-                  },
-                  '&::-webkit-scrollbar-thumb': {
-                    background: 'var(--color-border-glass)',
-                    borderRadius: '3px',
-                  },
-                  '&::-webkit-scrollbar-thumb:hover': {
-                    background: 'var(--color-primary-500)',
-                  },
-                }}
-              >
-                {invitations.map((invitation, idx) => (
-                  <MuiPaper
-                    key={invitation._id || invitation.id || idx}
-                    elevation={0}
-                    sx={{
-                      p: 2,
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      border: '1px solid var(--color-border-glass)',
-                      borderRadius: '12px',
-                      flexShrink: 0,
-                      minHeight: '120px',
-                    }}
-                  >
-                    <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                      <MuiTypography
-                        variant="subtitle1"
-                        sx={{
-                          color: 'var(--color-text-primary-dark)',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {invitation.guestName || 'دعوة بدون اسم'}
-                      </MuiTypography>
-                      <MuiChip
-                        label={invitation.status === 'sent' ? 'مرسلة' : invitation.status}
-                        size="small"
-                        sx={{
-                          backgroundColor: invitation.status === 'sent' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(216, 185, 138, 0.1)',
-                          color: invitation.status === 'sent' ? 'var(--color-icon)' : 'var(--color-primary-400)',
-                          fontSize: '0.7rem',
-                          height: 20
-                        }}
-                      />
-                    </MuiBox>
-
-                    <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                      {invitation.eventId && (
-                        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
-                          <Calendar size={12} />
-                          <MuiTypography variant="caption">
-                            {typeof invitation.eventId === 'object' ? invitation.eventId.name : '—'}
-                          </MuiTypography>
-                        </MuiBox>
-                      )}
-                      {invitation.eventDate && (
-                        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
-                          <Calendar size={12} />
-                          <MuiTypography variant="caption">
-                            {formatDate(invitation.eventDate, 'MM/DD/YYYY')}
-                          </MuiTypography>
-                        </MuiBox>
-                      )}
-                      {invitation.numOfPeople && (
-                        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
-                          <Users size={12} />
-                          <MuiTypography variant="caption">
-                            {invitation.numOfPeople} شخص
-                          </MuiTypography>
-                        </MuiBox>
-                      )}
-                      {invitation.qrCode && (
-                        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
-                          <MuiTypography variant="caption">
-                            رمز QR: {invitation.qrCode}
-                          </MuiTypography>
-                        </MuiBox>
-                      )}
-                      {invitation.used !== undefined && (
-                        <MuiChip
-                          label={invitation.used ? 'مستخدمة' : 'غير مستخدمة'}
-                          size="small"
-                          sx={{
-                            mt: 0.5,
-                            backgroundColor: invitation.used ? 'rgba(249, 115, 22, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-                            color: invitation.used ? 'var(--color-icon)' : 'var(--color-icon)',
-                            fontSize: '0.7rem',
-                            height: 18,
-                            width: 'fit-content'
-                          }}
-                        />
-                      )}
-                    </MuiBox>
-                  </MuiPaper>
-                ))}
-              </MuiBox>
-            ) : (
-              <MuiBox sx={{ py: 4, textAlign: 'center' }}>
-                <MuiTypography sx={{ color: 'var(--color-text-secondary)' }}>
-                  لا توجد دعوات حالية.
-                </MuiTypography>
-              </MuiBox>
-            )}
-          </MuiPaper>
-        </MuiGrid>
-      </MuiGrid>
-    </MuiBox>
-  )
+                    </MuiPaper>
+                </MuiGrid>
+            </MuiGrid>
+        </MuiBox>
+    )
 }

@@ -43,13 +43,13 @@ export default function ViewServiceDialog({ open, onClose, service }) {
                             display: 'flex', 
                             alignItems: 'center', 
                             justifyContent: 'center', 
-                            backgroundColor: 'rgba(216, 185, 138, 0.1)' 
+                            backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)' 
                         }}>
-                            <MuiTypography variant="h3" sx={{ color: 'var(--color-primary-300)', fontWeight: 'bold' }}>
+                            <MuiTypography variant="h3" sx={{ color: 'var(--color-icon)', fontWeight: 'bold' }}>
                                 {service.name?.[0]}
                             </MuiTypography>
                         </MuiBox>
-                        <MuiBox sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }} />
+                        <MuiBox sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top, var(--color-dark), transparent)' }} />
 
                         <MuiIconButton
                             onClick={onClose}
@@ -57,11 +57,11 @@ export default function ViewServiceDialog({ open, onClose, service }) {
                                 position: 'absolute',
                                 top: 16,
                                 right: 16,
-                                backgroundColor: 'rgba(255,255,255,0.1)',
+                                backgroundColor: 'color-mix(in srgb, var(--color-light) 10%, transparent)',
                                 color: 'var(--color-text-primary)',
                                 backdropFilter: 'blur(4px)',
                                 '&:hover': {
-                                    backgroundColor: 'rgba(255,255,255,0.2)',
+                                    backgroundColor: 'color-mix(in srgb, var(--color-light) 20%, transparent)',
                                 }
                             }}
                         >
@@ -69,12 +69,12 @@ export default function ViewServiceDialog({ open, onClose, service }) {
                         </MuiIconButton>
 
                         <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: 'var(--color-text-primary)' }}>
-                            <MuiTypography variant="h4" sx={{ fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                            <MuiTypography variant="h4" sx={{ fontWeight: 'bold', textShadow: 'none' }}>
                                 {service.name}
                             </MuiTypography>
                             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                <Package size={16} style={{ color: 'rgba(255,255,255,0.8)' }} />
-                                <MuiTypography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>
+                                <Package size={16} style={{ color: 'var(--color-text-secondary)' }} />
+                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
                                     {SERVICE_CATEGORY_LABELS[service.category] || service.category}
                                 </MuiTypography>
                             </MuiBox>
@@ -89,13 +89,13 @@ export default function ViewServiceDialog({ open, onClose, service }) {
                                     label={service.isActive ? 'نشطة' : 'غير نشطة'}
                                     icon={service.isActive ? <CheckCircle size={14} /> : <XCircle size={14} />}
                                     sx={{
-                                        backgroundColor: service.isActive ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)',
+                                        backgroundColor: service.isActive ? 'color-mix(in srgb, var(--color-gold) 20%, transparent)' : 'color-mix(in srgb, var(--color-gold) 20%, transparent)',
                                         color: service.isActive ? 'var(--color-icon)' : 'var(--color-icon)',
                                         fontWeight: 'bold',
                                         border: 'none',
                                     }}
                                 />
-                                <MuiTypography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--color-primary-500)' }}>
+                                <MuiTypography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--color-icon)' }}>
                                     {formatCurrency(service.price ?? service.basePrice)}
                                 </MuiTypography>
                             </MuiGrid>
@@ -124,8 +124,8 @@ export default function ViewServiceDialog({ open, onClose, service }) {
                                         { icon: Package, label: 'الحالة', value: service.isActive ? 'نشطة' : 'غير نشطة' }
                                     ].map((item, idx) => (
                                         <MuiGrid item xs={6} sm={3} key={idx}>
-                                            <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--color-border-glass)' }}>
-                                                <item.icon size={24} style={{ margin: '0 auto 8px', color: 'var(--color-secondary-500)' }} />
+                                            <MuiBox sx={{ p: 2, backgroundColor: 'color-mix(in srgb, var(--color-light) 3%, transparent)', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--color-border-glass)' }}>
+                                                <item.icon size={24} style={{ margin: '0 auto 8px', color: 'var(--color-icon)' }} />
                                                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>{item.label}</MuiTypography>
                                                 <MuiTypography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary-dark)' }}>{item.value}</MuiTypography>
                                             </MuiBox>
@@ -145,7 +145,7 @@ export default function ViewServiceDialog({ open, onClose, service }) {
                                                 label={requirement}
                                                 variant="outlined"
                                                 sx={{
-                                                    backgroundColor: 'rgba(255,255,255,0.03)',
+                                                    backgroundColor: 'color-mix(in srgb, var(--color-light) 3%, transparent)',
                                                     borderColor: 'var(--color-border-glass)',
                                                     color: 'var(--color-text-primary-dark)',
                                                 }}
@@ -157,7 +157,7 @@ export default function ViewServiceDialog({ open, onClose, service }) {
                         </MuiGrid>
                     </MuiDialogContent>
 
-                    <MuiDialogActions sx={{ p: 2, backgroundColor: 'rgba(0,0,0,0.2)', borderTop: '1px solid var(--color-border-glass)' }}>
+                    <MuiDialogActions sx={{ p: 2, backgroundColor: 'color-mix(in srgb, var(--color-dark) 20%, transparent)', borderTop: '1px solid var(--color-border-glass)' }}>
                         <MuiButton onClick={onClose} variant="contained" color="primary">
                             إغلاق
                         </MuiButton>

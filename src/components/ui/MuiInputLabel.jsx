@@ -3,9 +3,9 @@ import InputLabel from '@mui/material/InputLabel';
 import { styled } from '@mui/material/styles';
 
 const StyledInputLabel = styled(InputLabel)(({ theme, error }) => ({
-    color: error ? 'var(--color-error-500)' : 'var(--color-primary-500)',
-    fontFamily: 'var(--font-family-base)',
-    fontWeight: 500,
+    color: error ? 'var(--color-icon)' : 'var(--color-text-primary)',
+    fontFamily: 'Alexandria, var(--font-family-base)',
+    fontWeight: 700,
     fontSize: '0.95rem',
     textAlign: 'right',
     direction: 'rtl',
@@ -13,14 +13,15 @@ const StyledInputLabel = styled(InputLabel)(({ theme, error }) => ({
     left: 'auto',
     transformOrigin: 'top right',
     '&.Mui-focused': {
-        color: error ? 'var(--color-error-500)' : 'var(--color-primary-500)',
-        fontWeight: 600,
+        color: error ? 'var(--color-icon)' : 'var(--color-text-primary)',
+        fontWeight: 700,
     },
     '&.Mui-error': {
-        color: 'var(--color-error-500)',
+        color: 'var(--color-icon)',
     },
     '&.Mui-disabled': {
-        color: 'rgba(255, 255, 255, 0.5)',
+        color: 'var(--color-text-muted)',
+        opacity: 0.5
     },
 }));
 

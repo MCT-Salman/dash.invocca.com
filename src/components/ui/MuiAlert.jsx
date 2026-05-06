@@ -22,10 +22,10 @@ const MuiAlert = ({
         backgroundColor: 'var(--color-paper)',
         color: 'var(--color-text-primary)',
         '& .MuiAlert-icon': {
-          color: severity === 'info' ? 'var(--color-info-500)' :
-            severity === 'success' ? 'var(--color-success-500)' :
-              severity === 'warning' ? 'var(--color-warning-500)' :
-                'var(--color-error-500)'
+          color: severity === 'info' ? 'var(--color-icon)' :
+            severity === 'success' ? 'var(--color-icon)' :
+              severity === 'warning' ? 'var(--color-icon)' :
+                'var(--color-icon)'
         },
         ...sx,
       }}

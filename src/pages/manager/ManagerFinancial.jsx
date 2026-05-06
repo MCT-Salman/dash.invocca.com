@@ -1,979 +1,139 @@
-// src/pages/manager/ManagerFinancial.jsx
+// src\pages\manager\ManagerFinancial.jsx
+import { useState, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useDebounce, useDialogState, useCRUD, useNotification } from '@/hooks'
 import MuiBox from '@/components/ui/MuiBox'
 import MuiTypography from '@/components/ui/MuiTypography'
-import MuiPaper from '@/components/ui/MuiPaper'
-import MuiButton from '@/components/ui/MuiButton'
-import MuiGrid from '@/components/ui/MuiGrid'
-import MuiTextField from '@/components/ui/MuiTextField'
-import MuiTable from '@/components/ui/MuiTable'
-import MuiTableBody from '@/components/ui/MuiTableBody'
-import MuiTableCell from '@/components/ui/MuiTableCell'
-import MuiTableContainer from '@/components/ui/MuiTableContainer'
-import MuiTableHead from '@/components/ui/MuiTableHead'
-import MuiTableRow from '@/components/ui/MuiTableRow'
-import MuiChip from '@/components/ui/MuiChip'
-import MuiIconButton from '@/components/ui/MuiIconButton'
-import MuiSelect from '@/components/ui/MuiSelect'
-import MuiMenuItem from '@/components/ui/MuiMenuItem'
-import MuiFormControl from '@/components/ui/MuiFormControl'
-import { SEOHead, LoadingScreen } from '@/components/common'
-import { useQuery } from '@tanstack/react-query'
-import { getManagerInvoices, createManagerInvoice, updateManagerInvoice, recordInvoicePayment, getManagerEvents } from '@/api/manager'
-import { useState, useEffect } from 'react'
-import { Edit2, DollarSign, CreditCard, Search, Plus } from 'lucide-react'
-import { useCRUD } from '@/hooks'
-import { formatDate } from '@/utils/helpers'
-
-const premiumMenuProps = {
-    PaperProps: {
-        sx: {
-            bgcolor: 'var(--color-paper)',
-            border: '1px solid var(--color-border-glass)',
-            borderRadius: '12px',
-            mt: 1,
-            '& .MuiMenuItem-root': {
-                color: 'var(--color-text-primary)',
-                fontFamily: 'var(--font-family-base)',
-                py: 1.5,
-                px: 3,
-                '&:hover': {
-                    bgcolor: 'var(--color-surface-hover)',
-                    color: 'var(--color-primary-400)',
-                },
-                '&.Mui-selected': {
-                    bgcolor: 'var(--color-primary-50)',
-                    color: 'var(--color-primary-500)',
-                    fontWeight: 600,
-                    '&:hover': {
-                        bgcolor: 'var(--color-primary-100)',
-                    },
-                },
-            },
-        },
-    },
-}
+import { LoadingScreen, SEOHead, CrudPageLayout, StatusBadge, ConfirmDialog } from '@/components/common'
+import { QUERY_KEYS } from '@/config/constants'
+import { getManagerInvoices, createManagerInvoice, updateManagerInvoice } from '@/api/manager'
+import { formatCurrency, formatDate } from '@/utils/helpers'
+import { FileText, DollarSign, Clock } from 'lucide-react'
+import CreateEditInvoiceDialog from './components/CreateEditInvoiceDialog'
 
 export default function ManagerFinancial() {
-    const [searchTerm, setSearchTerm] = useState('')
-    const [page, setPage] = useState(1)
-    const [statusFilter, setStatusFilter] = useState('all')
-    const [editingInvoice, setEditingInvoice] = useState(null)
-    const [paymentDialog, setPaymentDialog] = useState(null)
+    const [searchQuery, setSearchQuery] = useState('')
+    const {
+        selectedItem: selectedInvoice,
+        openCreateDialog,
+        openEditDialog,
+        openDeleteDialog,
+        closeDialog,
+        isCreate,
+        isEdit,
+        isDelete,
+    } = useDialogState()
 
-    // CRUD operations for invoice update
+    const { data: invoicesData, isLoading, refetch } = useQuery({
+        queryKey: QUERY_KEYS.MANAGER_INVOICES,
+        queryFn: getManagerInvoices,
+    })
+
+    const invoices = useMemo(() => invoicesData?.invoices || invoicesData?.data || [], [invoicesData])
+
     const {
         handleCreate,
         handleUpdate,
+        handleDelete,
         isLoading: crudLoading,
     } = useCRUD({
         createFn: createManagerInvoice,
         updateFn: updateManagerInvoice,
-        deleteFn: null,
-        queryKey: ['manager-invoices'], // Broaden key for full invalidation
-        successMessage: 'تم حفظ الفاتورة بنجاح',
-        errorMessage: 'حدث خطأ أثناء حفظ الفاتورة',
+        deleteFn: null, // deleteInvoice not found in manager.js
+        queryKey: QUERY_KEYS.MANAGER_INVOICES,
+        successMessage: 'تمت العملية بنجاح',
     })
 
-    // Payment mutation - separate because it's a different operation
-    const paymentMutationWrapper = async (data) => {
-        const { id, ...paymentData } = data
-        return recordInvoicePayment(id, paymentData)
-    }
+    const filteredInvoices = useMemo(() => {
+        if (!searchQuery) return invoices
+        return invoices.filter(inv => 
+            inv.invoiceNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            inv.client?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    }, [invoices, searchQuery])
 
-    const {
-        handleCreate: handlePaymentCreate,
-        isLoading: paymentLoading,
-    } = useCRUD({
-        createFn: paymentMutationWrapper,
-        updateFn: null,
-        deleteFn: null,
-        queryKey: ['manager-invoices'], // Broaden key for full invalidation
-        successMessage: 'تم تسجيل الدفعة بنجاح',
-        errorMessage: 'حدث خطأ أثناء تسجيل الدفعة',
-    })
-
-    const { data: invoicesData, isLoading } = useQuery({
-        queryKey: ['manager-invoices', page, statusFilter, searchTerm],
-        queryFn: () => getManagerInvoices({ page, status: statusFilter === 'all' ? undefined : statusFilter, search: searchTerm })
-    })
-
-    const handleEditInvoice = (invoice) => {
-        setEditingInvoice(invoice)
-    }
-
-    const handleCloseEdit = () => {
-        setEditingInvoice(null)
-    }
-
-    const handleSubmitInvoice = async (formData) => {
-        const invoiceId = editingInvoice?._id || editingInvoice?.id
-        const result = invoiceId
-            ? await handleUpdate(invoiceId, formData)
-            : await handleCreate(formData)
-
-        if (result.success) {
-            setEditingInvoice(null)
+    const columns = [
+        {
+            id: 'invoiceNumber',
+            label: 'رقم الفاتورة',
+            align: 'right',
+            format: (value) => (
+                <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <FileText size={20} style={{ color: 'var(--color-icon)' }} />
+                    <MuiTypography variant="body2" sx={{ fontWeight: 700 }}>{value}</MuiTypography>
+                </MuiBox>
+            )
+        },
+        {
+            id: 'client',
+            label: 'العميل',
+            align: 'center',
+            format: (value) => value?.name || '-'
+        },
+        {
+            id: 'totalAmount',
+            label: 'المبلغ الإجمالي',
+            align: 'center',
+            format: (value) => formatCurrency(value)
+        },
+        {
+            id: 'status',
+            label: 'الحالة',
+            align: 'center',
+            format: (value) => <StatusBadge status={value} />
+        },
+        {
+            id: 'dueDate',
+            label: 'تاريخ الاستحقاق',
+            align: 'center',
+            format: (value) => formatDate(value)
         }
-    }
+    ]
 
-    const handleAddPayment = (invoice) => {
-        setPaymentDialog({ invoice, amount: '', method: '', reference: '', notes: '' })
-    }
-
-    const handleClosePayment = () => {
-        setPaymentDialog(null)
-    }
-
-    const handleSubmitPayment = async (paymentData) => {
-        if (paymentDialog) {
-            const result = await handlePaymentCreate({
-                id: paymentDialog.invoice._id || paymentDialog.invoice.id,
-                ...paymentData
-            })
-            if (result.success) {
-                setPaymentDialog(null)
-            }
-        }
-    }
-
-    if (isLoading) {
-        return <LoadingScreen message="جاري تحميل الفواتير..." fullScreen={false} />
-    }
-
-    const invoices = invoicesData?.data || invoicesData?.invoices || []
-    const pagination = invoicesData?.pagination || {}
-
-    // Calculate totals for summary cards
-    const statsSummary = useMemo(() => {
-        return invoices.reduce((acc, inv) => {
-            acc.total += inv.totalAmount || 0
-            acc.paid += inv.paidAmount || 0
-            acc.pending += (inv.totalAmount || 0) - (inv.paidAmount || 0)
-            return acc
-        }, { total: 0, paid: 0, pending: 0 })
-    }, [invoices])
-
+    if (isLoading) return <LoadingScreen />
 
     return (
-        <MuiBox sx={{
-            p: { xs: 2, sm: 3 },
-            minHeight: '100vh',
-            background: 'radial-gradient(circle at 50% 0%, rgba(216, 185, 138, 0.05) 0%, rgba(0, 0, 0, 0) 70%)'
-        }}>
+        <MuiBox sx={{ p: { xs: 2, sm: 3 }, minHeight: '100vh', background: 'var(--color-bg-dark)' }}>
             <SEOHead title="إدارة الفواتير | INVOCCA" />
+            
+            <CrudPageLayout
+                stats={[
+                    { title: 'إجمالي الفواتير', value: invoices.length, icon: <FileText size={24} /> },
+                    { title: 'إجمالي المبالغ', value: formatCurrency(invoices.reduce((acc, curr) => acc + curr.totalAmount, 0)), icon: <DollarSign size={24} /> }
+                ]}
+                onSearch={setSearchQuery}
+                onRefresh={refetch}
+                columns={columns}
+                data={filteredInvoices}
+                loading={isLoading}
+                onAdd={openCreateDialog}
+                onEdit={openEditDialog}
+                onDelete={openDeleteDialog}
+                addButtonLabel="فاتورة جديدة"
+            />
 
-            {/* Header */}
-            <MuiBox sx={{ mb: 4, textAlign: 'center' }}>
-                <MuiTypography variant="h3" sx={{
-                    fontWeight: 800,
-                    color: 'var(--color-primary-500)',
-                    mb: 1,
-                    textShadow: '0 0 30px rgba(216, 185, 138, 0.2)',
-                    background: 'linear-gradient(135deg, var(--color-icon) 0%, var(--color-bg) 50%, var(--color-icon) 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text'
-                }}>
-                    إدارة الفواتير
-                </MuiTypography>
-                <MuiTypography variant="body1" sx={{ color: 'var(--color-text-secondary)', maxWidth: 600, mx: 'auto' }}>
-                    إدارة الفواتير والمبالغ المستحقة للعملاء ومتابعة حالة الدفع
-                </MuiTypography>
-            </MuiBox>
-
-            {/* Price Summary Cards */}
-            <MuiGrid container spacing={3} sx={{ mb: 4 }}>
-                <MuiGrid item xs={12} md={4}>
-                    <MuiPaper sx={{ p: 3, borderRadius: '20px', background: 'var(--color-paper)', border: '1px solid var(--color-border-glass)', textAlign: 'center' }}>
-                        <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', fontWeight: 600 }}>إجمالي الفواتير</MuiTypography>
-                        <MuiTypography variant="h5" sx={{ mt: 1, fontWeight: 800, color: 'var(--color-text-primary)' }}>{statsSummary.total.toLocaleString()} ل.س</MuiTypography>
-                    </MuiPaper>
-                </MuiGrid>
-                <MuiGrid item xs={12} md={4}>
-                    <MuiPaper sx={{ p: 3, borderRadius: '20px', background: 'var(--color-paper)', border: '1px solid rgba(34, 197, 94, 0.2)', textAlign: 'center' }}>
-                        <MuiTypography variant="caption" sx={{ color: 'var(--color-icon)', fontWeight: 600 }}>إجمالي المحصل</MuiTypography>
-                        <MuiTypography variant="h5" sx={{ mt: 1, fontWeight: 800, color: 'var(--color-icon)' }}>{statsSummary.paid.toLocaleString()} ل.س</MuiTypography>
-                    </MuiPaper>
-                </MuiGrid>
-                <MuiGrid item xs={12} md={4}>
-                    <MuiPaper sx={{ p: 3, borderRadius: '20px', background: 'var(--color-paper)', border: '1px solid rgba(220, 38, 38, 0.2)', textAlign: 'center' }}>
-                        <MuiTypography variant="caption" sx={{ color: 'var(--color-icon)', fontWeight: 600 }}>الإجمالي المتبقي</MuiTypography>
-                        <MuiTypography variant="h5" sx={{ mt: 1, fontWeight: 800, color: 'var(--color-icon)' }}>{statsSummary.pending.toLocaleString()} ل.س</MuiTypography>
-                    </MuiPaper>
-                </MuiGrid>
-            </MuiGrid>
-
-            {/* Controls */}
-            <MuiPaper
-                elevation={0}
-                sx={{
-                    p: 2,
-                    mb: 4,
-                    borderRadius: '16px',
-                    background: 'var(--color-paper)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid var(--color-border-glass)',
-                    display: 'flex',
-                    flexDirection: { xs: 'column', md: 'row' },
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: 2
+            <CreateEditInvoiceDialog
+                open={isCreate || isEdit}
+                onClose={closeDialog}
+                onSubmit={async (data) => {
+                    const result = isEdit ? await handleUpdate(selectedInvoice._id, data) : await handleCreate(data)
+                    if (result.success) closeDialog()
                 }}
-            >
-                <MuiButton
-                    variant="contained"
-                    startIcon={<Plus size={20} />}
-                    onClick={() => {
-                        setEditingInvoice({})
-                    }}
-                    sx={{
-                        borderRadius: '12px',
-                        py: 1.5,
-                        px: 3,
-                        background: 'linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%)',
-                        color: 'var(--color-text-primary)',
-                        fontWeight: 700,
-                        whiteSpace: 'nowrap',
-                        '&:hover': {
-                            background: 'linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%)',
-                        }
-                    }}
-                >
-                    فاتورة جديدة
-                </MuiButton>
-
-                <MuiBox sx={{ display: 'flex', gap: 2, flex: 1, width: '100%' }}>
-                    <MuiTextField
-                        placeholder="البحث عن فاتورة (رقم، اسم العميل)..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        sx={{
-                            flex: 1,
-                            '& .MuiOutlinedInput-root': {
-                                borderRadius: '12px',
-                                backgroundColor: 'var(--color-surface)',
-                                border: '1px solid var(--color-border-glass)',
-                                transition: 'all 0.3s ease',
-                                '&:hover': {
-                                    borderColor: 'var(--color-primary-400)',
-                                    backgroundColor: 'var(--color-surface-hover)',
-                                },
-                                '&.Mui-focused': {
-                                    borderColor: 'var(--color-primary-500)',
-                                    boxShadow: '0 0 0 4px var(--color-primary-50)'
-                                }
-                            }
-                        }}
-                        InputProps={{
-                            startAdornment: <Search size={20} style={{ marginLeft: 8, color: 'var(--color-primary-500)' }} />
-                        }}
-                    />
-                    <MuiFormControl size="medium" sx={{ flex: 1 }}>
-                        <MuiSelect
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            displayEmpty
-                            fullWidth
-                            MenuProps={premiumMenuProps}
-                        >
-                            <MuiMenuItem value="all">جميع الحالات</MuiMenuItem>
-                            <MuiMenuItem value="unpaid">غير مدفوعة</MuiMenuItem>
-                            <MuiMenuItem value="partial">مدفوعة جزئياً</MuiMenuItem>
-                            <MuiMenuItem value="paid">مدفوعة بالكامل</MuiMenuItem>
-                        </MuiSelect>
-                    </MuiFormControl>
-                </MuiBox>
-            </MuiPaper>
-
-            {/* Invoices List (Cards) */}
-            <MuiGrid container spacing={3}>
-                {invoices.length === 0 ? (
-                    <MuiGrid item xs={12}>
-                        <MuiPaper sx={{
-                            p: 8,
-                            textAlign: 'center',
-                            background: 'var(--color-paper)',
-                            borderRadius: '24px',
-                            border: '1px dashed var(--color-border-glass)'
-                        }}>
-                            <DollarSign size={64} style={{
-                                color: 'var(--color-primary-500)',
-                                opacity: 0.2,
-                                margin: '0 auto 1.5rem'
-                            }} />
-                            <MuiTypography variant="h6" sx={{ color: 'var(--color-text-secondary)', mb: 1, fontWeight: 700 }}>
-                                لا توجد فواتير
-                            </MuiTypography>
-                            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-disabled)' }}>
-                                لم يتم العثور على أي فواتير مطابقة
-                            </MuiTypography>
-                        </MuiPaper>
-                    </MuiGrid>
-                ) : (
-                    invoices.map((invoice) => (
-                        <MuiGrid item xs={12} sm={6} lg={4} key={invoice._id || invoice.id}>
-                            <InvoiceCard
-                                invoice={invoice}
-                                onEdit={() => handleEditInvoice(invoice)}
-                                onPay={() => handleAddPayment(invoice)}
-                            />
-                        </MuiGrid>
-                    ))
-                )}
-            </MuiGrid>
-
-            {/* Pagination Controls could be added here if needed */}
-
-            {/* Dialogs */}
-            <InvoiceDialog
-                open={!!editingInvoice}
-                onClose={handleCloseEdit}
-                invoice={editingInvoice}
-                onSubmit={handleSubmitInvoice}
+                editingInvoice={selectedInvoice}
                 loading={crudLoading}
             />
 
-            <PaymentDialog
-                open={!!paymentDialog}
-                onClose={handleClosePayment}
-                paymentData={paymentDialog}
-                onSubmit={handleSubmitPayment}
-                loading={paymentLoading}
+            <ConfirmDialog
+                open={isDelete}
+                onClose={closeDialog}
+                onConfirm={async () => {
+                    const result = await handleDelete(selectedInvoice._id)
+                    if (result.success) closeDialog()
+                }}
+                title="حذف فاتورة"
+                message={`هل أنت متأكد من حذف فاتورة رقم "${selectedInvoice?.invoiceNumber}"؟`}
+                loading={crudLoading}
             />
-        </MuiBox>
-    )
-}
-
-function InvoiceCard({ invoice, onEdit, onPay }) {
-    const isPaid = invoice.paymentStatus === 'paid'
-    const isOverdue = invoice.isOverdue
-
-    return (
-        <MuiPaper
-            elevation={0}
-            sx={{
-                p: 3,
-                height: '100%',
-                background: 'var(--color-paper)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid var(--color-border-glass)',
-                borderRadius: '24px',
-                transition: 'all 0.3s ease',
-                display: 'flex',
-                flexDirection: 'column',
-                position: 'relative',
-                overflow: 'hidden',
-                '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 'var(--shadow-lg)',
-                    borderColor: 'var(--color-primary-400)'
-                },
-                '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    width: '4px',
-                    height: '100%',
-                    background: isPaid ? 'var(--color-icon)' : isOverdue ? 'var(--color-icon)' : 'var(--color-primary-500)',
-                    opacity: 0.8
-                }
-            }}
-        >
-            <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-                <MuiBox>
-                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)', display: 'block', mb: 0.5 }}>
-                        رقم الفاتورة
-                    </MuiTypography>
-                    <MuiTypography variant="h6" sx={{ fontWeight: 800, color: 'var(--color-text-primary)' }}>
-                        {invoice.invoiceNumber}
-                    </MuiTypography>
-                </MuiBox>
-                <MuiChip
-                    label={
-                        invoice.paymentStatus === 'paid' ? 'مدفوعة' :
-                            invoice.paymentStatus === 'partial' ? 'مدفوعة جزئياً' :
-                                invoice.isOverdue ? 'متأخرة' : 'غير مدفوعة'
-                    }
-                    size="small"
-                    sx={{
-                        backgroundColor:
-                            isPaid ? 'rgba(34, 197, 94, 0.1)' :
-                                invoice.paymentStatus === 'partial' ? 'rgba(216, 185, 138, 0.1)' :
-                                    isOverdue ? 'rgba(220, 38, 38, 0.1)' : 'rgba(107, 114, 128, 0.1)',
-                        color:
-                            isPaid ? 'var(--color-icon)' :
-                                invoice.paymentStatus === 'partial' ? 'var(--color-primary-500)' :
-                                    isOverdue ? 'var(--color-icon)' : 'var(--color-text-secondary)',
-                        fontWeight: 700,
-                        borderRadius: '8px',
-                        border: `1px solid ${isPaid ? 'rgba(34, 197, 94, 0.2)' :
-                            invoice.paymentStatus === 'partial' ? 'rgba(216, 185, 138, 0.2)' :
-                                isOverdue ? 'rgba(220, 38, 38, 0.2)' : 'rgba(107, 114, 128, 0.2)'
-                            }`
-                    }}
-                />
-            </MuiBox>
-
-            <MuiBox sx={{ mb: 3, flex: 1 }}>
-                <MuiBox sx={{ mb: 3, flex: 1 }}>
-                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                        <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-500)', fontWeight: 600, minWidth: 60 }}>
-                            العميل:
-                        </MuiTypography>
-                        <MuiTypography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 500 }}>
-                            {invoice.client?.name || invoice.clientInfo?.name || invoice.clientId?.name || 'عميل غير معروف'}
-                        </MuiTypography>
-                    </MuiBox>
-                    <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <MuiTypography variant="body2" sx={{ color: 'var(--color-primary-500)', fontWeight: 600, minWidth: 60 }}>
-                            المناسبة:
-                        </MuiTypography>
-                        <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-                            {invoice.event?.name || invoice.eventInfo?.name || invoice.eventId?.name || 'مناسبة غير محددة'}
-                        </MuiTypography>
-                    </MuiBox>
-                </MuiBox>
-            </MuiBox>
-
-            <MuiPaper
-                elevation={0}
-                sx={{
-                    p: 2,
-                    background: 'var(--color-surface)',
-                    borderRadius: '12px',
-                    mb: 2
-                }}
-            >
-                <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>المبلغ الإجمالي</MuiTypography>
-                    <MuiTypography variant="body2" sx={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                        {invoice.totalAmount?.toLocaleString()} ل.س
-                    </MuiTypography>
-                </MuiBox>
-                <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>السعر الأساسي</MuiTypography>
-                    <MuiTypography variant="body2" sx={{ fontWeight: 700, color: 'var(--color-primary-500)' }}>
-                        {invoice.amount || invoice.baseAmount || invoice.totalAmount || 0} ل.س
-                    </MuiTypography>
-                </MuiBox>
-                <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                    <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>المدفوع</MuiTypography>
-                    <MuiTypography variant="body2" sx={{ fontWeight: 700, color: 'var(--color-icon)' }}>
-                        {invoice.paidAmount?.toLocaleString()} ل.س
-                    </MuiTypography>
-                </MuiBox>
-                <MuiBox sx={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden', mt: 1 }}>
-                    <MuiBox sx={{
-                        width: `${Math.min((invoice.paidAmount / invoice.totalAmount) * 100, 100)}%`,
-                        height: '100%',
-                        background: 'var(--color-icon)',
-                        borderRadius: '2px'
-                    }} />
-                </MuiBox>
-            </MuiPaper>
-
-            <MuiBox sx={{ display: 'flex', gap: 1 }}>
-                <MuiButton
-                    fullWidth
-                    variant="outlined"
-                    onClick={onPay}
-                    disabled={isPaid}
-                    sx={{
-                        borderRadius: '10px',
-                        borderColor: isPaid ? 'transparent' : 'rgba(34, 197, 94, 0.3)',
-                        color: 'var(--color-icon)',
-                        background: isPaid ? 'transparent' : 'rgba(34, 197, 94, 0.05)',
-                        '&:hover': {
-                            borderColor: 'var(--color-icon)',
-                            background: 'rgba(34, 197, 94, 0.1)',
-                        },
-                        opacity: isPaid ? 0.5 : 1
-                    }}
-                >
-                    دفع
-                </MuiButton>
-                <MuiButton
-                    fullWidth
-                    variant="outlined"
-                    onClick={onEdit}
-                    sx={{
-                        borderRadius: '10px',
-                        borderColor: 'rgba(216, 185, 138, 0.3)',
-                        color: 'var(--color-primary-500)',
-                        background: 'rgba(216, 185, 138, 0.05)',
-                        '&:hover': {
-                            borderColor: 'var(--color-primary-500)',
-                            background: 'rgba(216, 185, 138, 0.1)',
-                        }
-                    }}
-                >
-                    تعديل
-                </MuiButton>
-            </MuiBox>
-        </MuiPaper>
-    )
-}
-
-// Helper to format date for input type="date"
-const formatForInput = (dateStr) => {
-    if (!dateStr) return ''
-    try {
-        const date = new Date(dateStr)
-        if (isNaN(date.getTime())) return ''
-        return date.toISOString().split('T')[0]
-    } catch (e) {
-        return ''
-    }
-}
-
-// Invoice Dialog Component
-function InvoiceDialog({ open, onClose, invoice, onSubmit, loading }) {
-    const isCreateMode = open && invoice && !invoice._id && !invoice.id
-
-    const { data: eventsData } = useQuery({
-        queryKey: ['manager-events-minimal'],
-        queryFn: () => getManagerEvents({ limit: 100 }),
-        enabled: isCreateMode
-    })
-
-    const events = eventsData?.data || eventsData?.events || []
-
-    const [formData, setFormData] = useState({
-        eventId: (typeof invoice?.eventId === 'string' ? invoice.eventId : (invoice?.eventId?._id || invoice?.eventId?.id)) || '',
-        dueDate: formatForInput(invoice?.dueDate),
-        type: invoice?.type || 'final',
-        totalAmount: invoice?.totalAmount || invoice?.amount || '',
-        notes: invoice?.notes || '',
-        // Calculator helper
-        guestCountCalc: '',
-        pricePerGuestCalc: ''
-    })
-
-    useEffect(() => {
-        if (open) {
-            setFormData({
-                eventId: (typeof invoice?.eventId === 'string' ? invoice.eventId : (invoice?.eventId?._id || invoice?.eventId?.id)) || '',
-                dueDate: formatForInput(invoice?.dueDate),
-                type: invoice?.type || 'final',
-                totalAmount: invoice?.totalAmount || invoice?.amount || '',
-                notes: invoice?.notes || '',
-                guestCountCalc: '',
-                pricePerGuestCalc: ''
-            })
-        }
-    }, [open, invoice])
-
-    const handleSubmit = (e) => {
-        if (e && typeof e.preventDefault === 'function') e.preventDefault()
-        onSubmit(formData)
-    }
-
-    const handleChange = (field) => (e) => {
-        const val = e?.target ? e.target.value : (e || '');
-        setFormData(prev => ({ ...prev, [field]: val }))
-    }
-
-    if (!open) return null
-
-    return (
-        <MuiBox
-            sx={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'var(--color-overlay)',
-                backdropFilter: 'blur(8px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1200
-            }}
-            onClick={onClose}
-        >
-            <MuiPaper
-                elevation={24}
-                sx={{
-                    p: 4,
-                    background: 'var(--color-paper)',
-                    border: '1px solid var(--color-primary-500)',
-                    borderRadius: '24px',
-                    width: '90%',
-                    maxWidth: 450,
-                    boxShadow: 'var(--shadow-2xl)',
-                    position: 'relative'
-                }}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <MuiTypography variant="h5" sx={{
-                    fontWeight: 700,
-                    color: 'var(--color-primary-500)',
-                    mb: 1,
-                    textAlign: 'center'
-                }}>
-                    {isCreateMode ? 'إنشاء فاتورة جديدة' : 'تعديل الفاتورة'}
-                </MuiTypography>
-                {!isCreateMode && (
-                    <MuiTypography variant="body2" sx={{
-                        color: 'var(--color-text-secondary)',
-                        mb: 4,
-                        textAlign: 'center'
-                    }}>
-                        {invoice?.invoiceNumber}
-                    </MuiTypography>
-                )}
-
-                <form onSubmit={handleSubmit}>
-                    <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mt: isCreateMode ? 4 : 0 }}>
-                        {isCreateMode && (
-                            <MuiFormControl fullWidth>
-                                <MuiTextField
-                                    select
-                                    label="المناسبة"
-                                    value={formData.eventId}
-                                    onChange={handleChange('eventId')}
-                                    required
-                                    SelectProps={{ MenuProps: premiumMenuProps }}
-                                >
-                                    {events.map(event => (
-                                        <MuiMenuItem key={event._id || event.id} value={event._id || event.id || ''}>
-                                            {event.name} - {formatDate(event.date)}
-                                        </MuiMenuItem>
-                                    ))}
-                                </MuiTextField>
-                            </MuiFormControl>
-                        )}
-                        <MuiTextField
-                            label="تاريخ الاستحقاق"
-                            type="date"
-                            value={formData.dueDate}
-                            onChange={handleChange('dueDate')}
-                            required
-                            fullWidth
-                        />
-
-                        <MuiTextField
-                            select
-                            label="نوع الفاتورة"
-                            value={formData.type}
-                            onChange={handleChange('type')}
-                            SelectProps={{ MenuProps: premiumMenuProps }}
-                        >
-                            <MuiMenuItem value="preliminary">مبدئية</MuiMenuItem>
-                            <MuiMenuItem value="final">نهائية</MuiMenuItem>
-                        </MuiTextField>
-
-                        <MuiBox sx={{ 
-                            p: 2, 
-                            borderRadius: '12px', 
-                            background: 'rgba(216, 185, 138, 0.05)', 
-                            border: '1px dashed var(--color-primary-200)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 1
-                        }}>
-                            <MuiTypography variant="caption" sx={{ color: 'var(--color-primary-500)', fontWeight: 700, mb: 1 }}>حاسبة المبلغ الإجمالي (اختياري)</MuiTypography>
-                            <MuiBox sx={{ display: 'flex', gap: 1 }}>
-                                <MuiTextField
-                                    size="small"
-                                    label="عدد الضيوف"
-                                    type="number"
-                                    value={formData.guestCountCalc}
-                                    onChange={(e) => {
-                                        const guests = e.target.value;
-                                        setFormData(prev => ({ 
-                                            ...prev, 
-                                            guestCountCalc: guests,
-                                            totalAmount: (guests && prev.pricePerGuestCalc) ? (Number(guests) * Number(prev.pricePerGuestCalc)) : prev.totalAmount
-                                        }))
-                                    }}
-                                />
-                                <MuiTextField
-                                    size="small"
-                                    label="سعر الشخص"
-                                    type="number"
-                                    value={formData.pricePerGuestCalc}
-                                    onChange={(e) => {
-                                        const price = e.target.value;
-                                        setFormData(prev => ({ 
-                                            ...prev, 
-                                            pricePerGuestCalc: price,
-                                            totalAmount: (price && prev.guestCountCalc) ? (Number(price) * Number(prev.guestCountCalc)) : prev.totalAmount
-                                        }))
-                                    }}
-                                />
-                            </MuiBox>
-                        </MuiBox>
-
-                        <MuiTextField
-                            label="المبلغ الإجمالي النهائي (ل.س)"
-                            type="number"
-                            value={formData.totalAmount}
-                            onChange={handleChange('totalAmount')}
-                            required
-                            fullWidth
-                            InputProps={{
-                                inputProps: { min: 0 }
-                            }}
-                        />
-
-                        <MuiTextField
-                            label="ملاحظات"
-                            value={formData.notes}
-                            onChange={handleChange('notes')}
-                            fullWidth
-                            multiline
-                            rows={3}
-                        />
-
-                        <MuiBox sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                            <MuiButton
-                                type="submit"
-                                variant="contained"
-                                fullWidth
-                                disabled={loading}
-                                sx={{
-                                    borderRadius: '12px',
-                                    py: 1.5,
-                                    background: 'linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%)',
-                                    color: 'var(--color-text-primary)',
-                                    fontWeight: 700,
-                                    '&:hover': {
-                                        background: 'linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%)',
-                                        transform: 'translateY(-1px)'
-                                    },
-                                    transition: 'all 0.2s'
-                                }}
-                            >
-                                {loading ? 'جاري الحفظ...' : (isCreateMode ? 'إنشاء الفاتورة' : 'حفظ التغييرات')}
-                            </MuiButton>
-                            <MuiButton
-                                type="button"
-                                variant="outlined"
-                                fullWidth
-                                onClick={onClose}
-                                sx={{
-                                    borderRadius: '12px',
-                                    py: 1.5,
-                                borderColor: 'var(--color-border-glass)',
-                                color: 'var(--color-text-secondary)',
-                                '&:hover': {
-                                    borderColor: 'var(--color-text-primary)',
-                                    color: 'var(--color-text-primary)',
-                                    background: 'var(--color-surface-hover)'
-                                }
-                                }}
-                            >
-                                إلغاء
-                            </MuiButton>
-                        </MuiBox>
-                    </MuiBox>
-                </form>
-            </MuiPaper>
-        </MuiBox>
-    )
-}
-
-// Payment Dialog Component
-function PaymentDialog({ open, onClose, paymentData, onSubmit, loading }) {
-    const [formData, setFormData] = useState({
-        amount: paymentData?.amount || '',
-        paymentMethod: paymentData?.method || '',
-        reference: paymentData?.reference || '',
-        notes: paymentData?.notes || ''
-    })
-
-    const handleSubmit = (e) => {
-        if (e && typeof e.preventDefault === 'function') e.preventDefault()
-        onSubmit(formData)
-    }
-
-    const handleChange = (field) => (e) => {
-        const val = e?.target ? e.target.value : (e || '');
-        setFormData(prev => ({ ...prev, [field]: val }))
-    }
-
-    if (!open) return null
-
-    return (
-        <MuiBox
-            sx={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'var(--color-overlay)',
-                backdropFilter: 'blur(8px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1200
-            }}
-            onClick={onClose}
-        >
-            <MuiPaper
-                elevation={24}
-                sx={{
-                    p: 4,
-                    background: 'var(--color-paper)',
-                    border: '1px solid var(--color-success-500)',
-                    borderRadius: '24px',
-                    width: '90%',
-                    maxWidth: 450,
-                    boxShadow: 'var(--shadow-2xl)'
-                }}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <MuiTypography variant="h5" sx={{
-                    fontWeight: 700,
-                    color: 'var(--color-icon)',
-                    mb: 1,
-                    textAlign: 'center'
-                }}>
-                    تسجيل دفعة جديدة
-                </MuiTypography>
-                <MuiTypography variant="body2" sx={{
-                    color: 'var(--color-text-secondary)',
-                    mb: 4,
-                    textAlign: 'center'
-                }}>
-                    للفاتورة {paymentData?.invoice?.invoiceNumber}
-                </MuiTypography>
-
-                <form onSubmit={handleSubmit}>
-                    <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                        <MuiTextField
-                            label="المبلغ"
-                            type="number"
-                            value={formData.amount}
-                            onChange={handleChange('amount')}
-                            required
-                            fullWidth
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    '&:hover': { borderColor: 'var(--color-icon)' },
-                                    '&.Mui-focused': { borderColor: 'var(--color-icon)' }
-                                },
-                                '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
-                                '& .MuiInputBase-input': { color: 'var(--color-text-primary)' }
-                            }}
-                        />
-
-                        <MuiFormControl fullWidth>
-                            <MuiTextField
-                                select
-                                label="طريقة الدفع"
-                                value={formData.paymentMethod}
-                                onChange={handleChange('paymentMethod')}
-                                required
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: '12px',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        '&:hover': { borderColor: 'var(--color-icon)' },
-                                        '&.Mui-focused': { borderColor: 'var(--color-icon)' }
-                                    },
-                                    '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
-                                    '& .MuiSelect-select': { color: 'var(--color-text-primary)' }
-                                }}
-                                SelectProps={{ MenuProps: premiumMenuProps }}
-                            >
-                                <MuiMenuItem value="cash">نقدي</MuiMenuItem>
-                                <MuiMenuItem value="bank_transfer">تحويل بنكي</MuiMenuItem>
-                                <MuiMenuItem value="credit_card">بطاقة ائتمان</MuiMenuItem>
-                                <MuiMenuItem value="check">شيك</MuiMenuItem>
-                            </MuiTextField>
-                        </MuiFormControl>
-
-                        <MuiTextField
-                            label="رقم المرجع"
-                            value={formData.reference}
-                            onChange={handleChange('reference')}
-                            fullWidth
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    '&:hover': { borderColor: 'var(--color-icon)' },
-                                    '&.Mui-focused': { borderColor: 'var(--color-icon)' }
-                                },
-                                '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
-                                '& .MuiInputBase-input': { color: 'var(--color-text-primary)' }
-                            }}
-                        />
-
-                        <MuiTextField
-                            label="ملاحظات"
-                            value={formData.notes}
-                            onChange={handleChange('notes')}
-                            fullWidth
-                            multiline
-                            rows={2}
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    '&:hover': { borderColor: 'var(--color-icon)' },
-                                    '&.Mui-focused': { borderColor: 'var(--color-icon)' }
-                                },
-                                '& .MuiInputLabel-root': { color: 'var(--color-text-secondary)' },
-                                '& .MuiInputBase-input': { color: 'var(--color-text-primary)' }
-                            }}
-                        />
-
-                        <MuiBox sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                            <MuiButton
-                                type="submit"
-                                variant="contained"
-                                fullWidth
-                                disabled={loading}
-                                sx={{
-                                    borderRadius: '12px',
-                                    py: 1.5,
-                                    background: 'linear-gradient(135deg, var(--color-icon) 0%, var(--color-icon) 100%)',
-                                    color: 'var(--color-text-primary)',
-                                    fontWeight: 700,
-                                    '&:hover': {
-                                        background: 'linear-gradient(135deg, var(--color-icon) 0%, var(--color-icon) 100%)',
-                                        transform: 'translateY(-1px)'
-                                    },
-                                    transition: 'all 0.2s'
-                                }}
-                            >
-                                {loading ? 'جاري التسجيل...' : 'تأكيد الدفعة'}
-                            </MuiButton>
-                            <MuiButton
-                                type="button"
-                                variant="outlined"
-                                fullWidth
-                                onClick={onClose}
-                                sx={{
-                                    borderRadius: '12px',
-                                    py: 1.5,
-                                borderColor: 'var(--color-border-glass)',
-                                color: 'var(--color-text-secondary)',
-                                '&:hover': {
-                                    borderColor: 'var(--color-text-primary)',
-                                    color: 'var(--color-text-primary)',
-                                    background: 'var(--color-surface-hover)'
-                                }
-                                }}
-                            >
-                                إلغاء
-                            </MuiButton>
-                        </MuiBox>
-                    </MuiBox>
-                </form>
-            </MuiPaper>
         </MuiBox>
     )
 }

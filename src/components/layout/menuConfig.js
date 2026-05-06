@@ -21,7 +21,7 @@ import { ROUTES } from '@/config/constants'
 export const ROLE_MENUS = {
   admin: [
     { label: 'الرئيسية', path: '/admin/dashboard', icon: LayoutDashboard },
-    { label: 'التقارير', path: '/admin/reports', icon: BarChart3 },
+    // { label: 'التقارير', path: '/admin/reports', icon: BarChart3 },
     { label: 'قاعة/صالة', path: '/admin/halls', icon: Building2 },
     { label: 'القوالب', path: '/admin/templates', icon: Image },
     { label: 'مدراء النظام', path: '/admin/users', icon: Users },

@@ -34,11 +34,13 @@ const MuiToggleButtonGroup = ({
               backgroundColor: 'var(--color-surface-hover)',
             },
             '&.Mui-selected': {
-              backgroundColor: 'var(--color-primary-500) !important',
-              color: 'var(--color-text-on-primary) !important',
+              backgroundColor: 'var(--color-icon) !important',
+              color: 'var(--color-dark) !important',
               fontWeight: 600,
+              borderColor: 'var(--color-icon) !important',
               '&:hover': {
-                backgroundColor: 'var(--color-primary-600) !important',
+                backgroundColor: 'var(--color-icon) !important',
+                opacity: 0.9
               }
             }
           }}

@@ -4,20 +4,20 @@ import { styled } from '@mui/material/styles';
 
 const StyledTypography = styled(Typography)(({ color, variant }) => {
   const getColor = () => {
-    if (color === 'primary') return 'var(--color-primary-500)';
+    if (color === 'primary') return 'var(--color-icon)';
     if (color === 'secondary') return 'var(--color-text-secondary)';
-    if (color === 'textPrimary') return 'var(--color-text-primary)'; // Map to dynamic variable
+    if (color === 'textPrimary') return 'var(--color-text-primary)';
     if (color === 'textSecondary') return 'var(--color-text-secondary)';
-    if (color === 'error') return 'var(--color-error-500)';
-    if (color === 'success') return 'var(--color-success-500)';
-    if (color === 'warning') return 'var(--color-warning-500)';
-    if (color === 'info') return 'var(--color-info-500)';
-    return color || 'var(--color-text-primary)'; // Default to visible text
+    if (color === 'error') return 'var(--color-icon)';
+    if (color === 'success') return 'var(--color-icon)';
+    if (color === 'warning') return 'var(--color-icon)';
+    if (color === 'info') return 'var(--color-icon)';
+    return color || 'var(--color-text-primary)';
   };
 
   return {
     color: getColor(),
-    fontFamily: 'var(--font-family-base)',
+    fontFamily: 'Alexandria, var(--font-family-base)',
     letterSpacing: variant?.includes('h') ? '-0.02em' : 'normal',
     fontWeight: variant?.includes('h') ? 700 : 400,
     '&.MuiTypography-h1': { fontWeight: 800, fontSize: '3rem' },

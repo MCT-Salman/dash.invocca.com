@@ -17,12 +17,13 @@ const MuiTooltip = ({
       componentsProps={{
         tooltip: {
           sx: {
-            backgroundColor: 'var(--color-primary-500)',
-            color: 'var(--color-text-on-primary)',
+            backgroundColor: 'var(--color-dark)',
+            color: 'var(--color-light)',
             borderRadius: '12px',
             border: '1px solid var(--color-border)',
-            boxShadow: 'var(--shadow-lg)',
-            fontWeight: 600
+            boxShadow: 'none',
+            fontWeight: 600,
+            fontFamily: 'Alexandria, var(--font-family-base)',
           }
         }
       }}

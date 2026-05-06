@@ -132,7 +132,7 @@ export default function EventsManagement() {
                             border: '1px solid var(--color-border)',
                         }}
                     >
-                        <Calendar size={18} style={{ color: 'var(--color-primary-500)' }} />
+                        <Calendar size={18} style={{ color: 'var(--color-icon)' }} />
                     </MuiBox>
                     <MuiBox>
                         <MuiTypography variant="body2" sx={{ fontWeight: 600 }}>
@@ -161,7 +161,7 @@ export default function EventsManagement() {
             align: 'right',
             format: (value) => (
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Users size={14} style={{ color: 'var(--color-primary-500)' }} />
+                    <Users size={14} style={{ color: 'var(--color-icon)' }} />
                     <MuiTypography variant="body2">{value || '---'}</MuiTypography>
                 </MuiBox>
             )

@@ -37,7 +37,7 @@ const MuiRadioGroup = ({
           <FormControlLabel
             key={opt.value}
             value={opt.value}
-            control={<Radio color={color} size={size} sx={{ color: 'var(--color-primary-500)' }} />}
+            control={<Radio color={color} size={size} sx={{ color: 'var(--color-icon)' }} />}
             label={opt.label}
             disabled={opt.disabled}
             sx={{

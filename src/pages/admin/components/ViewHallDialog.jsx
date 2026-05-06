@@ -1,16 +1,11 @@
 // src\pages\admin\components\ViewHallDialog.jsx
-import MuiDialog from '@/components/ui/MuiDialog'
-import MuiDialogTitle from '@/components/ui/MuiDialogTitle'
-import MuiDialogContent from '@/components/ui/MuiDialogContent'
-import MuiDialogActions from '@/components/ui/MuiDialogActions'
-import MuiButton from '@/components/ui/MuiButton'
 import MuiBox from '@/components/ui/MuiBox'
 import MuiTypography from '@/components/ui/MuiTypography'
-import MuiIconButton from '@/components/ui/MuiIconButton'
 import MuiGrid from '@/components/ui/MuiGrid'
 import MuiChip from '@/components/ui/MuiChip'
 import MuiDivider from '@/components/ui/MuiDivider'
-import { X, MapPin, Users, Armchair as Chair, Table, User, Phone, DollarSign, CheckCircle, XCircle } from 'lucide-react'
+import { ModernDialog } from '@/components/common'
+import { MapPin, Users, Armchair as Chair, Table, User, Phone, DollarSign, CheckCircle, XCircle, Building } from 'lucide-react'
 import { formatCurrency } from '@/utils/helpers'
 import { API_CONFIG } from '@/config/constants'
 import { useQuery } from '@tanstack/react-query'
@@ -45,129 +40,67 @@ export default function ViewHallDialog({ open, onClose, hall }) {
     
     // Don't return null early, let the dialog handle the open/close state
     return (
-        <MuiDialog
+        <ModernDialog
             open={open && !!hall}
             onClose={onClose}
+            title={hall?.name || 'تفاصيل القاعة'}
+            subtitle={hall?.location}
             maxWidth="md"
-            fullWidth
-            PaperProps={{
-                sx: {
-                    borderRadius: '16px',
-                    overflow: 'auto',
-                    backgroundColor: 'var(--color-surface-dark)',
-                    backgroundImage: 'none',
-                    border: '1px solid var(--color-border-glass)',
-                    zIndex: 1300,
-                    maxHeight: '90vh'
-                }
-            }}
+            showCancel={true}
+            cancelText="إغلاق"
+            headerIcon={<Building size={20} />}
         >
             {hall ? (
-                <MuiBox sx={{ position: 'relative' }}>
-                    {/* Header Image */}
-                    <MuiBox sx={{ height: '192px', width: '100%', backgroundColor: 'var(--color-bg-dark)', position: 'relative' }}>
-                        {getImageUrl(hall.primaryImage) ? (
-                            <img
-                                src={getImageUrl(hall.primaryImage)}
-                                alt={hall.name}
-                                onClick={() => {
-                                    const imageUrl = getImageUrl(hall.primaryImage)
-                                    if (imageUrl) window.open(imageUrl, '_blank')
-                                }}
-                                style={{ 
-                                    width: '100%', 
-                                    height: '100%', 
-                                    objectFit: 'cover',
-                                    cursor: 'pointer',
-                                    transition: 'opacity 0.2s ease',
-                                }}
-                                onMouseEnter={(e) => e.target.style.opacity = '0.9'}
-                                onMouseLeave={(e) => e.target.style.opacity = '1'}
-                            />
-                        ) : (
-                            <MuiBox sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(216, 185, 138, 0.1)' }}>
-                                <MuiTypography variant="h3" sx={{ color: 'var(--color-primary-300)', fontWeight: 'bold' }}>
-                                    {hall.name?.[0]}
-                                </MuiTypography>
-                            </MuiBox>
-                        )}
-                    <MuiBox sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }} />
-
-                    <MuiIconButton
-                        onClick={onClose}
-                        sx={{
-                            position: 'absolute',
-                            top: 16,
-                            right: 16,
-                            backgroundColor: 'rgba(255,255,255,0.1)',
-                            color: 'var(--color-text-primary)',
-                            backdropFilter: 'blur(4px)',
-                            '&:hover': {
-                                backgroundColor: 'rgba(255,255,255,0.2)',
-                            }
-                        }}
-                    >
-                        <X size={20} />
-                    </MuiIconButton>
-
-                    <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: 'var(--color-text-primary)' }}>
-                        <MuiTypography variant="h4" sx={{ fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-                            {hall.name}
-                        </MuiTypography>
-                        <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                            <MapPin size={16} style={{ color: 'rgba(255,255,255,0.8)' }} />
-                            <MuiTypography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>
-                                {hall.location}
-                            </MuiTypography>
-                        </MuiBox>
-                    </MuiBox>
-                </MuiBox>
-
-                <MuiDialogContent sx={{ p: 3 }}>
-                    <MuiGrid container spacing={3}>
+                <MuiGrid container spacing={3}>
                         {/* Status & Basic Info */}
                         <MuiGrid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <MuiChip
-                                label={hall.isActive ? 'نشطة' : 'غير نشطة'}
-                                icon={hall.isActive ? <CheckCircle size={14} /> : <XCircle size={14} />}
+                                label={hall?.isActive ? 'نشطة' : 'غير نشطة'}
+                                icon={hall?.isActive ? <CheckCircle size={14} /> : <XCircle size={14} />}
                                 sx={{
-                                    backgroundColor: hall.isActive ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)',
-                                    color: hall.isActive ? 'var(--color-icon)' : 'var(--color-icon)',
+                                    backgroundColor: hall?.isActive 
+                                        ? 'rgba(34, 197, 94, 0.15)' 
+                                        : 'rgba(220, 38, 38, 0.15)',
+                                    color: hall?.isActive ? '#22c55e' : '#dc2626',
+                                    border: `1px solid ${hall?.isActive ? '#22c55e' : '#dc2626'}`,
                                     fontWeight: 'bold',
-                                    border: 'none',
+                                    '&.MuiChip-root': {
+                                        backgroundColor: hall?.isActive ? 'rgba(34, 197, 94, 0.15)' : 'rgba(220, 38, 38, 0.15)',
+                                        color: hall?.isActive ? '#22c55e' : '#dc2626',
+                                    }
                                 }}
                             />
-                            <MuiTypography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--color-primary-500)' }}>
-                                {formatCurrency(hall.defaultPrices)}
+                            <MuiTypography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--color-icon)' }}>
+                                {formatCurrency(hall?.defaultPrices)}
                             </MuiTypography>
                         </MuiGrid>
 
                         {/* Description */}
-                        {hall.description && (
+                        {hall?.description && (
                             <MuiGrid item xs={12}>
                                 <MuiTypography variant="body1" sx={{ color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
-                                    {hall.description}
+                                    {hall?.description}
                                 </MuiTypography>
                             </MuiGrid>
                         )}
 
                         <MuiGrid item xs={12}>
-                            <MuiDivider sx={{ borderColor: 'var(--color-border-glass)' }} />
+                            <MuiDivider sx={{ borderColor: 'var(--color-border)' }} />
                         </MuiGrid>
 
                         {/* Capacity Details */}
                         <MuiGrid item xs={12}>
-                            <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>تفاصيل السعة</MuiTypography>
+                            <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary)' }}>تفاصيل السعة</MuiTypography>
                             <MuiGrid container spacing={2}>
-                                {[{ icon: Users, label: 'السعة', value: hall.capacity },
-                                { icon: Table, label: 'الطاولات', value: hall.tables },
-                                { icon: Chair, label: 'الكراسي', value: hall.chairs },
-                                { icon: Users, label: 'الموظفين', value: hall.maxEmployees }].map((item, idx) => (
+                                {[{ icon: Users, label: 'السعة', value: hall?.capacity },
+                                { icon: Table, label: 'الطاولات', value: hall?.tables },
+                                { icon: Chair, label: 'الكراسي', value: hall?.chairs },
+                                { icon: Users, label: 'الموظفين', value: hall?.maxEmployees }].map((item, idx) => (
                                     <MuiGrid item xs={6} sm={3} key={idx}>
-                                        <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--color-border-glass)' }}>
-                                            <item.icon size={24} style={{ margin: '0 auto 8px', color: 'var(--color-secondary-500)' }} />
+                                        <MuiBox sx={{ p: 2, backgroundColor: 'var(--color-surface)', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--color-border)' }}>
+                                            <item.icon size={24} style={{ margin: '0 auto 8px', color: 'var(--color-icon)' }} />
                                             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>{item.label}</MuiTypography>
-                                            <MuiTypography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary-dark)' }}>{item.value}</MuiTypography>
+                                            <MuiTypography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>{item.value}</MuiTypography>
                                         </MuiBox>
                                     </MuiGrid>
                                 ))}
@@ -176,19 +109,19 @@ export default function ViewHallDialog({ open, onClose, hall }) {
 
                         {/* Manager Info */}
                         <MuiGrid item xs={12}>
-                            <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>معلومات المدير</MuiTypography>
-                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, border: '1px solid var(--color-border-glass)', borderRadius: '12px', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                                <MuiBox sx={{ backgroundColor: 'rgba(216, 185, 138, 0.1)', p: 1.5, borderRadius: '50%' }}>
-                                    <User size={24} style={{ color: 'var(--color-primary-500)' }} />
+                            <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary)' }}>معلومات المدير</MuiTypography>
+                            <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, border: '1px solid var(--color-border)', borderRadius: '12px', backgroundColor: 'var(--color-surface)' }}>
+                                <MuiBox sx={{ backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)', p: 1.5, borderRadius: '50%' }}>
+                                    <User size={24} style={{ color: 'var(--color-icon)' }} />
                                 </MuiBox>
                                 <MuiBox>
-                                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary-dark)' }}>
-                                        {hall.managerName || hall.generalManager?.name}
+                                    <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
+                                        {hall?.managerName || hall?.generalManager?.name}
                                     </MuiTypography>
                                     <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-secondary)' }}>
                                         <Phone size={14} />
                                         <MuiTypography variant="body2">
-                                            {hall.managerPhone || hall.generalManager?.phone}
+                                            {hall?.managerPhone || hall?.generalManager?.phone}
                                         </MuiTypography>
                                     </MuiBox>
                                 </MuiBox>
@@ -198,7 +131,7 @@ export default function ViewHallDialog({ open, onClose, hall }) {
                         {/* Templates */}
                         {templatesToDisplay && templatesToDisplay.length > 0 && (
                             <MuiGrid item xs={12}>
-                                <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>القوالب</MuiTypography>
+                                <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary)' }}>القوالب</MuiTypography>
                                 <MuiGrid container spacing={2}>
                                     {templatesToDisplay.map((templateAssignment, index) => {
                                         // Handle both nested template object and direct template properties
@@ -234,8 +167,8 @@ export default function ViewHallDialog({ open, onClose, hall }) {
                                                         position: 'relative',
                                                         borderRadius: '12px',
                                                         overflow: 'hidden',
-                                                        border: '1px solid var(--color-border-glass)',
-                                                        backgroundColor: 'rgba(255,255,255,0.03)',
+                                                        border: '1px solid var(--color-border)',
+                                                        backgroundColor: 'var(--color-surface)',
                                                         cursor: templateImageUrl ? 'pointer' : 'default',
                                                         transition: 'all 0.2s ease',
                                                         height: '100%',
@@ -243,7 +176,7 @@ export default function ViewHallDialog({ open, onClose, hall }) {
                                                         flexDirection: 'column',
                                                         '&:hover': templateImageUrl ? {
                                                             transform: 'scale(1.02)',
-                                                            borderColor: 'var(--color-primary-500)',
+                                                            borderColor: 'var(--color-icon)',
                                                         } : {}
                                                     }}
                                                     onClick={() => {
@@ -261,7 +194,7 @@ export default function ViewHallDialog({ open, onClose, hall }) {
                                                             }}
                                                         />
                                                     ) : (
-                                                        <MuiBox sx={{ width: '100%', height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(216, 185, 138, 0.1)' }}>
+                                                        <MuiBox sx={{ width: '100%', height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)' }}>
                                                             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
                                                                 بدون صورة
                                                             </MuiTypography>
@@ -272,7 +205,7 @@ export default function ViewHallDialog({ open, onClose, hall }) {
                                                             variant="body1" 
                                                             sx={{ 
                                                                 fontWeight: 600, 
-                                                                color: 'var(--color-text-primary-dark)', 
+                                                                color: 'var(--color-text-primary)', 
                                                                 mb: 1,
                                                                 fontSize: '1rem'
                                                             }}
@@ -315,8 +248,8 @@ export default function ViewHallDialog({ open, onClose, hall }) {
                                                                 sx={{
                                                                     height: 24,
                                                                     fontSize: '0.75rem',
-                                                                    backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                                                                    color: 'var(--color-primary-500)',
+                                                                    backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
+                                                                    color: 'var(--color-icon)',
                                                                     alignSelf: 'flex-start',
                                                                     mt: 'auto'
                                                                 }}
@@ -332,11 +265,11 @@ export default function ViewHallDialog({ open, onClose, hall }) {
                         )}
 
                         {/* Gallery */}
-                        {hall.images && hall.images.length > 0 && (
+                        {hall?.images && hall?.images.length > 0 && (
                             <MuiGrid item xs={12}>
-                                <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>معرض الصور</MuiTypography>
+                                <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary)' }}>معرض الصور</MuiTypography>
                                 <MuiGrid container spacing={2}>
-                                    {hall.images.map((img, index) => {
+                                    {hall?.images?.map((img, index) => {
                                         const imageUrl = getImageUrl(img)
                                         return (
                                             <MuiGrid item xs={6} sm={4} md={3} key={index}>
@@ -370,24 +303,7 @@ export default function ViewHallDialog({ open, onClose, hall }) {
                             </MuiGrid>
                         )}
                     </MuiGrid>
-                </MuiDialogContent>
-
-                <MuiDialogActions sx={{ p: 2, backgroundColor: 'rgba(0,0,0,0.2)', borderTop: '1px solid var(--color-border-glass)' }}>
-                    <MuiButton onClick={onClose} variant="contained" color="primary">
-                        إغلاق
-                    </MuiButton>
-                </MuiDialogActions>
-            </MuiBox>
-            ) : (
-                <MuiBox sx={{ p: 4, textAlign: 'center' }}>
-                    <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)' }}>
-                        لم يتم اختيار قاعة/صالة
-                    </MuiTypography>
-                    <MuiButton onClick={onClose} sx={{ mt: 2 }}>
-                        إغلاق
-                    </MuiButton>
-                </MuiBox>
-            )}
-        </MuiDialog>
+            ) : null}
+        </ModernDialog>
     )
 }

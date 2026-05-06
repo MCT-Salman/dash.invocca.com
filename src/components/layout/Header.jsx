@@ -1,31 +1,23 @@
 // src\components\layout\Header.jsx
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import MuiBox from '@/components/ui/MuiBox'
 import MuiTypography from '@/components/ui/MuiTypography'
 import MuiIconButton from '@mui/material/IconButton'
 import MuiAvatar from '@mui/material/Avatar'
-import MuiBadge from '@mui/material/Badge'
 import MuiMenu from '@mui/material/Menu'
 import MuiMenuItem from '@mui/material/MenuItem'
-import { Menu, X, Bell, User, Sparkles, LogOut, Settings, Search } from 'lucide-react'
+import { Menu, X, User, LogOut } from 'lucide-react'
 import { useAuth } from '@/hooks'
+import { useTheme } from '@/contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/config/constants'
 import { ThemeToggle } from '@/components/common'
 
 const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false }) => {
     const { user, logout } = useAuth()
+    const { isDark } = useTheme()
     const navigate = useNavigate()
-    const [scrolled, setScrolled] = useState(false)
     const [menuAnchor, setMenuAnchor] = useState(null)
-
-    useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 10)
-        }
-        window.addEventListener('scroll', handleScroll)
-        return () => window.removeEventListener('scroll', handleScroll)
-    }, [])
 
     const handleMenuOpen = (event) => {
         setMenuAnchor(event.currentTarget)
@@ -48,25 +40,22 @@ const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false 
                 left: 0,
                 right: {
                     xs: 0,
-                    md: sidebarOpen ? (sidebarCollapsed ? '80px' : '280px') : 0
+                    md: sidebarOpen ? (sidebarCollapsed ? '80px' : '240px') : 0
                 },
                 width: {
                     xs: '100%',
-                    md: sidebarOpen ? (sidebarCollapsed ? 'calc(100% - 80px)' : 'calc(100% - 280px)') : '100%'
+                    md: sidebarOpen ? (sidebarCollapsed ? 'calc(100% - 80px)' : 'calc(100% - 240px)') : '100%'
                 },
                 marginLeft: {
                     xs: 0,
-                    md: sidebarOpen ? (sidebarCollapsed ? '80px' : '280px') : 0
+                    md: sidebarOpen ? (sidebarCollapsed ? '80px' : '240px') : 0
                 },
                 height: { xs: '64px', md: '72px' },
                 zIndex: 1100,
-                backdropFilter: 'blur(12px)',
-                backgroundColor: scrolled
-                    ? 'var(--color-surface-glass)'
-                    : 'transparent',
-                borderBottom: scrolled
-                    ? '1px solid var(--color-border)'
-                    : '1px solid transparent',
+                backgroundColor: isDark
+                    ? 'color-mix(in srgb, var(--color-dark) 82%, var(--color-icon) 18%)'
+                    : 'var(--color-gold)',
+                borderBottom: '1px solid color-mix(in srgb, var(--color-border) 52%, transparent)',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
         >
@@ -86,20 +75,66 @@ const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false 
                         onClick={onToggleSidebar}
                         sx={{
                             display: { md: 'none' },
-                            color: 'var(--color-primary-500)',
+                            color: isDark ? 'var(--color-gold)' : 'var(--color-dark)',
+                            '& svg': {
+                                color: 'currentColor !important',
+                            },
                             '&:hover': {
-                                backgroundColor: 'var(--color-surface-hover)',
-                                transform: 'scale(1.05)'
+                                backgroundColor: isDark 
+                                    ? 'rgba(255, 253, 246, 0.2)'  // Using color-light-soft with opacity
+                                    : 'rgba(26, 26, 26, 0.1)',   // Using color-dark with opacity
+                                transform: 'scale(1.05)',
+                                color: isDark ? 'var(--color-light-soft)' : 'var(--color-dark)',
+                                '& svg': {
+                                    color: 'currentColor !important',
+                                }
                             }
                         }}
                     >
                         {sidebarOpen ? <Menu size={22} /> : <X size={22} />}
                     </MuiIconButton>
 
+                    {/* User Menu - Profile */}
+                    <MuiIconButton
+                        onClick={handleMenuOpen}
+                        sx={{
+                            border: `2px solid ${isDark
+                                ? 'color-mix(in srgb, var(--color-light) 35%, transparent)'
+                                : 'color-mix(in srgb, var(--color-dark) 15%, transparent)'
+                            }`,
+                            p: 0.5,
+                            backgroundColor: isDark
+                                ? 'color-mix(in srgb, var(--color-icon) 28%, var(--color-dark) 72%)'
+                                : 'color-mix(in srgb, var(--color-light) 86%, var(--color-icon) 14%)',
+                            '&:hover': {
+                                borderColor: isDark
+                                    ? 'color-mix(in srgb, var(--color-light) 55%, transparent)'
+                                    : 'color-mix(in srgb, var(--color-dark) 28%, transparent)',
+                                backgroundColor: isDark
+                                    ? 'color-mix(in srgb, var(--color-icon) 38%, var(--color-dark) 62%)'
+                                    : 'color-mix(in srgb, var(--color-light) 78%, var(--color-icon) 22%)',
+                            }
+                        }}
+                    >
+                        <MuiAvatar
+                            sx={{
+                                width: 36,
+                                height: 36,
+                                backgroundColor: isDark
+                                    ? 'color-mix(in srgb, var(--color-icon) 28%, var(--color-dark) 72%)'
+                                    : 'color-mix(in srgb, var(--color-light) 86%, var(--color-icon) 14%)',
+                                color: isDark ? 'var(--color-light)' : 'var(--color-dark)',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            {user?.name?.[0]?.toUpperCase() || <User size={18} />}
+                        </MuiAvatar>
+                    </MuiIconButton>
+
                     {/* Greeting/Title */}
                     <MuiBox sx={{ display: { xs: 'none', sm: 'block' } }}>
-                        <MuiTypography variant="subtitle1" sx={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>
-                            مرحباً، <span style={{ color: 'var(--color-primary-500)', fontWeight: 700 }}>{user?.name?.split(' ')[0]}</span>
+                        <MuiTypography variant="subtitle1" sx={{ color: isDark ? 'var(--color-light)' : 'var(--color-dark)', fontWeight: 500 }}>
+                            مرحباً <span style={{ color: isDark ? 'var(--color-light)' : 'var(--color-dark)', fontWeight: 700 }}>{user?.name?.split(' ')[0]}</span>
                         </MuiTypography>
                     </MuiBox>
                 </MuiBox>
@@ -108,31 +143,6 @@ const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false 
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     {/* Theme Toggle */}
                     <ThemeToggle />
-
-                    {/* User Menu */}
-                    <MuiIconButton
-                        onClick={handleMenuOpen}
-                        sx={{
-                            border: '1px solid var(--color-border)',
-                            p: 0.5,
-                            '&:hover': {
-                                transform: 'scale(1.05)',
-                                borderColor: 'var(--color-primary-500)'
-                            }
-                        }}
-                    >
-                        <MuiAvatar
-                            sx={{
-                                width: 36,
-                                height: 36,
-                                backgroundColor: 'var(--color-primary-700)',
-                                color: 'var(--color-primary-100)',
-                                fontWeight: 'bold'
-                            }}
-                        >
-                            {user?.name?.[0]?.toUpperCase() || <User size={18} />}
-                        </MuiAvatar>
-                    </MuiIconButton>
                 </MuiBox>
             </MuiBox>
 
@@ -143,11 +153,11 @@ const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false 
                 onClose={handleMenuClose}
                 anchorOrigin={{
                     vertical: 'bottom',
-                    horizontal: 'left',
+                    horizontal: 'right',
                 }}
                 transformOrigin={{
                     vertical: 'top',
-                    horizontal: 'left',
+                    horizontal: 'right',
                 }}
                 PaperProps={{
                     sx: {
@@ -157,7 +167,7 @@ const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false 
                         backdropFilter: 'blur(20px)',
                         border: '1px solid var(--color-border)',
                         borderRadius: '12px',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                        boxShadow: 'none',
                         color: 'var(--color-text-primary)',
                         '& .MuiMenuItem-root': {
                             color: 'var(--color-text-primary)',
@@ -166,7 +176,7 @@ const Header = ({ onToggleSidebar, sidebarOpen = true, sidebarCollapsed = false 
                 }}
             >
                 <MuiBox sx={{ px: 2, py: 1.5, borderBottom: '1px solid var(--color-border)' }}>
-                    <MuiTypography variant="subtitle2" sx={{ fontWeight: 600, color: 'var(--color-primary-500)' }}>
+                    <MuiTypography variant="subtitle2" sx={{ fontWeight: 600, color: 'var(--color-icon)' }}>
                         {user?.name || 'المستخدم'}
                     </MuiTypography>
                     <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>

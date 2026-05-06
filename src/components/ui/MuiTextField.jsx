@@ -186,7 +186,7 @@ const MuiTextField = ({
     const getInputProps = () => {
         const inputProps = {
             startAdornment: startIcon && (
-                <InputAdornment position="start" sx={{ color: 'var(--color-primary-500)' }}>
+                <InputAdornment position="start" sx={{ color: 'var(--color-icon)' }}>
                     {startIcon}
                 </InputAdornment>
             ),
@@ -202,7 +202,7 @@ const MuiTextField = ({
                             onClick={handleTogglePassword}
                             edge="end"
                             disabled={disabled}
-                            sx={{ color: 'var(--color-text-secondary)', '&:hover': { color: 'var(--color-primary-500)' } }}
+                            sx={{ color: 'var(--color-text-secondary)', '&:hover': { color: 'var(--color-icon)' } }}
                         >
                             {showPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
@@ -253,14 +253,14 @@ const MuiTextField = ({
                         position: 'relative',
                         // Default thin bottom border
                         border: 'none',
-                        borderBottom: `1px solid ${error ? 'var(--color-error-500)' : 'var(--color-border)'} `,
+                        borderBottom: `1px solid ${error ? 'var(--color-icon)' : 'var(--color-border)'} `,
                         '&:hover': {
                             backgroundColor: 'var(--color-surface-hover)',
-                            borderBottom: `1px solid ${error ? 'var(--color-error-600)' : 'var(--color-primary-500)'} `,
+                            borderBottom: `1px solid ${error ? 'var(--color-icon)' : 'var(--color-border)'} `,
                         },
                         '&.Mui-focused': {
                             backgroundColor: 'var(--color-surface-hover)',
-                            borderBottom: `1px solid ${error ? 'var(--color-error-500)' : 'var(--color-primary-500)'} `,
+                            borderBottom: `1px solid ${error ? 'var(--color-icon)' : 'var(--color-border)'} `,
                         },
                         '&.Mui-disabled': {
                             backgroundColor: 'var(--color-surface)',
@@ -278,7 +278,7 @@ const MuiTextField = ({
                             right: 0,
                             bottom: 0,
                             height: '2px',
-                            backgroundColor: error ? 'var(--color-error-500)' : 'var(--color-primary-500)',
+                            backgroundColor: error ? 'var(--color-icon)' : 'var(--color-icon)',
                             transform: 'scaleX(0)',
                             transformOrigin: 'left',
                             transition: 'transform 220ms cubic-bezier(0.4,0,0.2,1), background-color 220ms',
@@ -301,7 +301,7 @@ const MuiTextField = ({
                         WebkitTextFillColor: 'var(--color-text-primary) !important',
                         fontSize: size === 'small' ? '0.875rem' : '1rem',
                         padding: size === 'small' ? '8px 0' : '12px 0',
-                        fontFamily: 'var(--font-family-base)',
+                        fontFamily: 'Alexandria, var(--font-family-base)',
                         '&:focus': {
                             color: 'var(--color-text-primary) !important',
                             WebkitTextFillColor: 'var(--color-text-primary) !important',
@@ -314,8 +314,10 @@ const MuiTextField = ({
                         '&::placeholder': {
                             color: 'var(--color-text-muted) !important',
                             WebkitTextFillColor: 'var(--color-text-muted) !important',
-                            opacity: 0.6,
-                            fontFamily: 'var(--font-family-base)',
+                            opacity: 0.4,
+                            fontFamily: 'Alexandria, var(--font-family-base)',
+                            fontSize: '0.775rem',
+                            fontWeight: 300,
                         },
                         '&:-webkit-autofill': {
                             WebkitBoxShadow: '0 0 0 100px var(--color-surface) inset !important',
@@ -334,19 +336,19 @@ const MuiTextField = ({
                         }
                     },
                     '& .MuiInputLabel-root': {
-                        color: error ? 'var(--color-error-500)' : 'var(--color-primary-500)',
-                        fontFamily: 'var(--font-family-base)',
-                        fontWeight: 500,
+                        color: error ? 'var(--color-icon)' : 'var(--color-text-primary)',
+                        fontFamily: 'Alexandria, var(--font-family-base)',
+                        fontWeight: 700,
                         fontSize: '0.95rem',
                         '&.Mui-focused': {
-                            color: error ? 'var(--color-error-500)' : 'var(--color-primary-500)',
-                            fontWeight: 600,
+                            color: error ? 'var(--color-icon)' : 'var(--color-text-primary)',
+                            fontWeight: 700,
                         },
                         '&.Mui-disabled': {
                             color: 'var(--color-text-muted)',
                         },
                         '&.Mui-error': {
-                            color: 'var(--color-error-500)',
+                            color: 'var(--color-icon)',
                         }
                     },
                     ...(props.sx || {})
@@ -375,9 +377,9 @@ const MuiTextField = ({
                 FormHelperTextProps={{
                     sx: {
                         fontSize: '0.75rem',
-                        color: error ? 'var(--color-error-500)' : 'var(--color-text-secondary)',
+                        color: error ? 'var(--color-icon)' : 'var(--color-text-secondary)',
                         marginTop: '6px',
-                        fontFamily: 'var(--font-family-base)',
+                        fontFamily: 'Alexandria, var(--font-family-base)',
                     },
                     className: helperTextClassName
                 }}
@@ -385,9 +387,9 @@ const MuiTextField = ({
                     shrink: true,
                     ...props.InputLabelProps,
                     sx: {
-                        color: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
-                        fontFamily: 'var(--font-family-base)',
-                        fontWeight: 500,
+                        color: error ? 'var(--color-icon) !important' : 'var(--color-text-primary) !important',
+                        fontFamily: 'Alexandria, var(--font-family-base)',
+                        fontWeight: 700,
                         fontSize: '0.95rem',
                         textAlign: 'right',
                         direction: 'rtl',
@@ -395,14 +397,14 @@ const MuiTextField = ({
                         left: 'auto',
                         transformOrigin: 'top right',
                         '&.Mui-focused': {
-                            color: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
-                            fontWeight: 600,
+                            color: error ? 'var(--color-icon) !important' : 'var(--color-text-primary) !important',
+                            fontWeight: 700,
                         },
                         '&.Mui-disabled': {
                             color: 'var(--color-text-muted) !important',
                         },
                         '&.Mui-error': {
-                            color: 'var(--color-error-500) !important',
+                            color: 'var(--color-icon) !important',
                         },
                         ...props.InputLabelProps?.sx
                     },

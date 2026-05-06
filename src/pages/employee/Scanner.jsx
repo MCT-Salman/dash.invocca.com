@@ -63,7 +63,7 @@ export default function Scanner() {
             justifyContent: 'center',
             transition: 'all 0.3s ease',
             '&:hover': {
-              borderColor: 'var(--color-primary-500)',
+              borderColor: 'var(--color-icon)',
             }
           }}
         >
@@ -74,29 +74,29 @@ export default function Scanner() {
                   width: 80,
                   height: 80,
                   borderRadius: '16px',
-                  background: 'rgba(216, 185, 138, 0.1)',
+                  background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   mx: 'auto',
                   mb: 3,
-                  border: '2px solid var(--color-primary-500)',
+                  border: '2px solid var(--color-icon)',
                 }}
               >
-                <Camera size={40} style={{ color: 'var(--color-primary-500)' }} />
+                <Camera size={40} style={{ color: 'var(--color-icon)' }} />
               </MuiBox>
               <MuiButton
                 variant="contained"
                 onClick={handleScan}
                 startIcon={<QrCode size={20} />}
                 sx={{
-                  background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
-                  color: 'var(--color-text-primary)',
+                  background: 'var(--color-icon)',
+                  color: 'var(--color-dark)',
                   fontWeight: 600,
                   px: 4,
                   py: 1.5,
                   borderRadius: '12px',
-                  boxShadow: '0 4px 12px rgba(216, 185, 138, 0.3)',
+                  boxShadow: 'none',
                 }}
               >
                 تفعيل الكاميرا
@@ -109,7 +109,7 @@ export default function Scanner() {
               sx={{
                 width: '80%',
                 height: '80%',
-                border: '2px solid var(--color-primary-500)',
+                border: '2px solid var(--color-icon)',
                 borderRadius: '12px',
                 position: 'relative',
                 '&::before': {
@@ -119,8 +119,8 @@ export default function Scanner() {
                   left: 0,
                   width: '100%',
                   height: '2px',
-                  background: 'var(--color-primary-500)',
-                  boxShadow: '0 0 15px var(--color-primary-500)',
+                  background: 'var(--color-icon)',
+                  boxShadow: 'none',
                   animation: 'scan 2s ease-in-out infinite'
                 },
                 '@keyframes scan': {
@@ -139,7 +139,7 @@ export default function Scanner() {
                   width: 80,
                   height: 80,
                   borderRadius: '50%',
-                  background: 'rgba(34, 197, 94, 0.1)',
+                  background: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -156,7 +156,7 @@ export default function Scanner() {
               <MuiChip
                 label="مؤكد"
                 sx={{
-                  backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                  backgroundColor: 'color-mix(in srgb, var(--color-gold) 20%, transparent)',
                   color: 'var(--color-icon)',
                   fontWeight: 600,
                   mb: 2,

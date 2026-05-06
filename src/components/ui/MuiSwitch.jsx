@@ -25,7 +25,7 @@ const MuiSwitch = ({
       size={size}
       name={name}
       inputProps={inputProps}
-      sx={{ color: 'var(--color-primary-500)' }}
+      sx={{ color: 'var(--color-icon)' }}
       {...props}
     />
   );

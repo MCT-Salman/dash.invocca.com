@@ -7,13 +7,7 @@ const StyledPaper = styled(Paper)(({ theme, elevation }) => ({
   backgroundImage: 'none',
   backdropFilter: 'blur(12px)',
   border: '1px solid var(--color-border)',
-  boxShadow: elevation === 0
-    ? 'none'
-    : elevation === 1
-      ? 'var(--shadow-sm)'
-      : elevation === 2
-        ? 'var(--shadow-base)'
-        : 'var(--shadow-md)',
+  boxShadow: 'none',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   overflow: 'hidden',
   color: 'var(--color-text-primary)',
@@ -30,7 +24,7 @@ const MuiPaper = ({
 }) => {
   return (
     <StyledPaper
-      elevation={variant === 'elevation' ? elevation : 0}
+      elevation={0}
       variant={variant}
       square={square}
       className={className}

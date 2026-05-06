@@ -31,7 +31,7 @@ html {
 
 body {
   font-family: 'Alexandria', 'Montserrat', sans-serif !important;
-  background-color: var(--color-bg) !important;
+  background-color: var(--color-light-soft) !important;
   color: var(--color-text-primary) !important;
   transition: background-color 0.3s ease, color 0.3s ease;
 }

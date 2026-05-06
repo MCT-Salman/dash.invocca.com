@@ -43,13 +43,13 @@ export default function ViewUserDialog({ open, onClose, user }) {
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                             />
                         ) : (
-                            <MuiBox sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(216, 185, 138, 0.1)' }}>
-                                <MuiTypography variant="h3" sx={{ color: 'var(--color-primary-300)', fontWeight: 'bold' }}>
+                            <MuiBox sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)' }}>
+                                <MuiTypography variant="h3" sx={{ color: 'var(--color-icon)', fontWeight: 'bold' }}>
                                     {user.name?.[0]}
                                 </MuiTypography>
                             </MuiBox>
                         )}
-                        <MuiBox sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }} />
+                        <MuiBox sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top, var(--color-dark), transparent)' }} />
 
                         <MuiIconButton
                             onClick={onClose}
@@ -57,11 +57,11 @@ export default function ViewUserDialog({ open, onClose, user }) {
                                 position: 'absolute',
                                 top: 16,
                                 right: 16,
-                                backgroundColor: 'rgba(255,255,255,0.1)',
+                                backgroundColor: 'color-mix(in srgb, var(--color-light) 10%, transparent)',
                                 color: 'var(--color-text-primary)',
                                 backdropFilter: 'blur(4px)',
                                 '&:hover': {
-                                    backgroundColor: 'rgba(255,255,255,0.2)',
+                                    backgroundColor: 'color-mix(in srgb, var(--color-light) 20%, transparent)',
                                 }
                             }}
                         >
@@ -69,12 +69,12 @@ export default function ViewUserDialog({ open, onClose, user }) {
                         </MuiIconButton>
 
                         <MuiBox sx={{ position: 'absolute', bottom: 16, right: 16, color: 'var(--color-text-primary)' }}>
-                            <MuiTypography variant="h4" sx={{ fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                            <MuiTypography variant="h4" sx={{ fontWeight: 'bold', textShadow: 'none' }}>
                                 {user.name}
                             </MuiTypography>
                             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                <Shield size={16} style={{ color: 'rgba(255,255,255,0.8)' }} />
-                                <MuiTypography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>
+                                <Shield size={16} style={{ color: 'var(--color-text-secondary)' }} />
+                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
                                     {user.role === 'admin' ? 'مدير نظام' : user.role === 'manager' ? 'مدير قاعة/صالة' : user.role === 'client' ? 'عميل' : 'موظف'}
                                 </MuiTypography>
                             </MuiBox>
@@ -89,13 +89,13 @@ export default function ViewUserDialog({ open, onClose, user }) {
                                     label={user.isActive ? 'نشط' : 'غير نشط'}
                                     icon={user.isActive ? <CheckCircle size={14} /> : <XCircle size={14} />}
                                     sx={{
-                                        backgroundColor: user.isActive ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)',
+                                        backgroundColor: user.isActive ? 'color-mix(in srgb, var(--color-gold) 20%, transparent)' : 'color-mix(in srgb, var(--color-gold) 20%, transparent)',
                                         color: user.isActive ? 'var(--color-icon)' : 'var(--color-icon)',
                                         fontWeight: 'bold',
                                         border: 'none',
                                     }}
                                 />
-                                <MuiTypography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--color-primary-500)' }}>
+                                <MuiTypography variant="h5" sx={{ fontWeight: 'bold', color: 'var(--color-icon)' }}>
                                     {user.phone}
                                 </MuiTypography>
                             </MuiGrid>
@@ -123,8 +123,8 @@ export default function ViewUserDialog({ open, onClose, user }) {
                                         { icon: Calendar, label: 'تاريخ الإنشاء', value: new Date(user.createdAt).toLocaleDateString('ar-SA') }
                                     ].map((item, idx) => (
                                         <MuiGrid item xs={12} sm={6} key={idx}>
-                                            <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--color-border-glass)' }}>
-                                                <item.icon size={24} style={{ margin: '0 auto 8px', color: 'var(--color-secondary-500)' }} />
+                                            <MuiBox sx={{ p: 2, backgroundColor: 'color-mix(in srgb, var(--color-light) 3%, transparent)', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--color-border-glass)' }}>
+                                                <item.icon size={24} style={{ margin: '0 auto 8px', color: 'var(--color-icon)' }} />
                                                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>{item.label}</MuiTypography>
                                                 <MuiTypography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary-dark)' }}>{item.value}</MuiTypography>
                                             </MuiBox>
@@ -141,12 +141,12 @@ export default function ViewUserDialog({ open, onClose, user }) {
                                     </MuiGrid>
                                     <MuiGrid item xs={12}>
                                         <MuiTypography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary-dark)' }}>قاعة/صالة المرتبطة</MuiTypography>
-                                        <MuiBox sx={{ p: 2, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
+                                        <MuiBox sx={{ p: 2, backgroundColor: 'color-mix(in srgb, var(--color-light) 3%, transparent)', borderRadius: '12px', border: '1px solid var(--color-border-glass)' }}>
                                             <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary-dark)', fontWeight: 'bold' }}>{user.hallId.name}</MuiTypography>
                                             {user.hallId.location && (
                                                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mt: 1 }}>
                                                     <MuiBox component="span" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                        <Mail size={14} style={{ color: 'var(--color-secondary-500)' }} />
+                                                        <Mail size={14} style={{ color: 'var(--color-icon)' }} />
                                                         {user.hallId.location}
                                                     </MuiBox>
                                                 </MuiTypography>
@@ -171,9 +171,9 @@ export default function ViewUserDialog({ open, onClose, user }) {
                                                     label={translatePermission(permission)}
                                                     size="small"
                                                     sx={{
-                                                        backgroundColor: 'rgba(216, 185, 138, 0.1)',
-                                                        color: 'var(--color-primary-400)',
-                                                        border: '1px solid rgba(216, 185, 138, 0.3)',
+                                                        backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
+                                                        color: 'var(--color-icon)',
+                                                        border: '1px solid var(--color-border)',
                                                     }}
                                                 />
                                             ))}

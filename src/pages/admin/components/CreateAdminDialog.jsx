@@ -92,7 +92,7 @@ export default function CreateAdminDialog({ open, onClose, onSubmit, loading }) 
     >
       <MuiGrid container spacing={3}>
         <MuiGrid item xs={12}>
-          <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--color-primary-500)' }}>
+          <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--color-icon)' }}>
             المعلومات الأساسية
           </MuiTypography>
         </MuiGrid>
@@ -164,7 +164,7 @@ export default function CreateAdminDialog({ open, onClose, onSubmit, loading }) 
         </MuiGrid>
 
         <MuiGrid item xs={12}>
-            <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--color-primary-500)' }}>
+            <MuiTypography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'var(--color-icon)' }}>
                 صورة المستخدم
             </MuiTypography>
             <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -174,11 +174,11 @@ export default function CreateAdminDialog({ open, onClose, onSubmit, loading }) 
                         borderRadius: '12px',
                         p: 3,
                         textAlign: 'center',
-                        backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                        backgroundColor: 'color-mix(in srgb, var(--color-light) 2%, transparent)',
                         cursor: 'pointer',
                         '&:hover': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                            borderColor: 'var(--color-primary-500)',
+                            backgroundColor: 'color-mix(in srgb, var(--color-light) 5%, transparent)',
+                            borderColor: 'var(--color-icon)',
                         }
                     }}
                 >
@@ -211,7 +211,7 @@ export default function CreateAdminDialog({ open, onClose, onSubmit, loading }) 
                                 height: '100px',
                                 objectFit: 'cover',
                                 borderRadius: '50%',
-                                border: '2px solid var(--color-primary-500)'
+                                border: '2px solid var(--color-icon)'
                             }}
                         />
                         <MuiBox
@@ -220,7 +220,7 @@ export default function CreateAdminDialog({ open, onClose, onSubmit, loading }) 
                                 position: 'absolute',
                                 top: 0,
                                 right: 0,
-                                backgroundColor: 'rgba(239, 68, 68, 0.9)',
+                                backgroundColor: 'var(--color-icon)',
                                 color: 'var(--color-text-primary)',
                                 width: 24,
                                 height: 24,
@@ -229,7 +229,7 @@ export default function CreateAdminDialog({ open, onClose, onSubmit, loading }) 
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 cursor: 'pointer',
-                                '&:hover': { backgroundColor: 'rgba(220, 38, 38, 1)' }
+                                '&:hover': { backgroundColor: 'var(--color-icon)' }
                             }}
                         >
                             <span style={{ fontSize: '14px', lineHeight: 1 }}>×</span>

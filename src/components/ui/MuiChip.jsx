@@ -9,6 +9,7 @@ const StyledChip = styled(Chip)(({ theme, color, variant }) => {
     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
     padding: '4px 12px',
     height: 'auto',
+    fontFamily: 'Alexandria, var(--font-family-base)',
     '& .MuiChip-icon': {
       marginLeft: '8px',
       marginRight: '0',
@@ -20,32 +21,27 @@ const StyledChip = styled(Chip)(({ theme, color, variant }) => {
       paddingRight: '4px',
     },
     '&:hover': {
-      transform: 'scale(1.05)',
+      backgroundColor: 'rgba(216, 185, 138, 0.18)',
     },
   };
 
   if (variant === 'filled') {
     return {
       ...baseStyles,
-      backgroundColor: color === 'primary'
-        ? 'var(--color-primary-500)'
-        : color === 'secondary'
-          ? 'var(--color-secondary-500)'
-          : color === 'success'
-            ? 'var(--color-success-500)'
-            : color === 'error'
-              ? 'var(--color-error-500)'
-              : color === 'warning'
-                ? 'var(--color-warning-500)'
-                : color === 'info'
-                  ? 'var(--color-info-500)'
-                  : 'var(--color-gray-light)',
-      color: color === 'primary' || color === 'secondary' || color === 'error' || color === 'info'
-        ? 'var(--color-text-on-dark)'
-        : 'var(--color-text-primary)',
+      border: '1px solid var(--color-border)',
+      backgroundColor: color === 'error'
+        ? 'var(--color-paper)'
+        : color === 'primary'
+          ? 'var(--color-icon)'
+          : 'rgba(216, 185, 138, 0.15)',
+      color: color === 'primary'
+        ? 'var(--color-dark)'
+        : color === 'error'
+          ? 'var(--color-icon)'
+          : 'var(--color-dark)',
       '&:hover': {
         ...baseStyles['&:hover'],
-        boxShadow: 'var(--shadow-sm)',
+        boxShadow: 'none',
       },
     };
   }
@@ -53,25 +49,13 @@ const StyledChip = styled(Chip)(({ theme, color, variant }) => {
   // outlined variant
   return {
     ...baseStyles,
-    border: '1.5px solid',
-    borderColor: color === 'primary'
-      ? 'var(--color-primary-500)'
-      : color === 'secondary'
-        ? 'var(--color-secondary-500)'
-        : 'var(--color-border)',
+    border: '1px solid var(--color-border)',
+    borderColor: color === 'error' ? 'var(--color-icon)' : 'var(--color-border)',
     backgroundColor: 'transparent',
-    color: color === 'primary'
-      ? 'var(--color-primary-500)'
-      : color === 'secondary'
-        ? 'var(--color-secondary-700)'
-        : 'var(--color-text-primary)',
+    color: color === 'error' ? 'var(--color-icon)' : 'var(--color-text-primary)',
     '&:hover': {
       ...baseStyles['&:hover'],
-      backgroundColor: color === 'primary'
-        ? 'var(--color-primary-50)'
-        : color === 'secondary'
-          ? 'var(--color-secondary-50)'
-          : 'var(--color-surface-hover)',
+      backgroundColor: 'rgba(216, 185, 138, 0.12)',
     },
   };
 });

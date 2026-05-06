@@ -3,12 +3,13 @@ import { styled } from '@mui/material/styles';
 
 const StyledButton = styled(Button)(({ theme, variant, color }) => {
   const baseStyles = {
-    borderRadius: '12px',
-    fontWeight: 600,
+    borderRadius: '16px',
+    fontWeight: 700,
     textTransform: 'none',
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     position: 'relative',
     overflow: 'hidden',
+    fontFamily: 'Alexandria, var(--font-family-base)',
     '&::before': {
       content: '""',
       position: 'absolute',
@@ -16,7 +17,7 @@ const StyledButton = styled(Button)(({ theme, variant, color }) => {
       left: '-100%',
       width: '100%',
       height: '100%',
-      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+      background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-light) 20%, transparent), transparent)',
       transition: 'left 0.5s ease',
     },
     '&:hover::before': {
@@ -27,32 +28,23 @@ const StyledButton = styled(Button)(({ theme, variant, color }) => {
   if (variant === 'contained') {
     return {
       ...baseStyles,
-      background: color === 'primary'
-        ? 'linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%)'
-        : color === 'secondary'
-          ? 'linear-gradient(135deg, var(--color-secondary-500) 0%, var(--color-secondary-600) 100%)'
-          : color === 'error'
-            ? 'var(--color-error-500)'
-            : undefined,
-      color: color === 'secondary' ? 'var(--color-text-on-dark)' : 'var(--color-text-on-primary)', // Primary text black on gold
-      boxShadow: 'var(--shadow-md)',
-      border: 'none',
+      background: color === 'error' ? 'var(--color-icon)' : 'var(--color-icon)',
+      color: 'var(--color-dark)',
+      boxShadow: 'none',
+      border: '1px solid var(--color-border)',
       '&:hover': {
-        transform: 'translateY(-2px)',
-        boxShadow: 'var(--shadow-lg)',
-        background: color === 'primary'
-          ? 'linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-600) 100%)'
-          : color === 'secondary'
-            ? 'linear-gradient(135deg, var(--color-secondary-600) 0%, var(--color-secondary-700) 100%)'
-            : undefined,
+        background: color === 'error' ? 'var(--color-icon)' : 'var(--color-icon)',
+        boxShadow: 'none',
+        opacity: 0.9,
       },
       '&:active': {
-        transform: 'translateY(0)',
+        opacity: 0.9,
       },
       '&:disabled': {
-        background: 'var(--color-surface)',
-        color: 'var(--color-text-muted)',
+        background: 'var(--color-border)',
+        color: 'var(--color-dark)',
         boxShadow: 'none',
+        opacity: 0.6,
       },
     };
   }
@@ -60,31 +52,19 @@ const StyledButton = styled(Button)(({ theme, variant, color }) => {
   if (variant === 'outlined') {
     return {
       ...baseStyles,
-      border: '1.5px solid',
-      borderColor: color === 'primary'
-        ? 'var(--color-primary-500)'
-        : color === 'secondary'
-          ? 'var(--color-secondary-500)'
-          : 'var(--color-border)',
-      color: color === 'primary'
-        ? 'var(--color-primary-500)'
-        : color === 'secondary'
-          ? 'var(--color-secondary-500)'
-          : 'var(--color-text-primary)',
+      border: '1px solid var(--color-border)',
+      borderColor: color === 'error' ? 'var(--color-icon)' : 'var(--color-border)',
+      color: color === 'error' ? 'var(--color-icon)' : 'var(--color-text-primary)',
       backgroundColor: 'transparent',
       '&:hover': {
-        backgroundColor: 'var(--color-surface-hover)',
-        borderColor: color === 'primary'
-          ? 'var(--color-primary-400)'
-          : color === 'secondary'
-            ? 'var(--color-secondary-400)'
-            : 'var(--color-text-primary)',
-        transform: 'translateY(-1px)',
-        boxShadow: 'var(--shadow-sm)',
+        backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
+        borderColor: color === 'error' ? 'var(--color-icon)' : 'var(--color-border)',
+        boxShadow: 'none',
       },
       '&:disabled': {
         borderColor: 'var(--color-border)',
         color: 'var(--color-text-muted)',
+        opacity: 0.6,
       },
     };
   }
@@ -92,18 +72,14 @@ const StyledButton = styled(Button)(({ theme, variant, color }) => {
   // text variant
   return {
     ...baseStyles,
-    color: color === 'primary'
-      ? 'var(--color-primary-500)'
-      : color === 'secondary'
-        ? 'var(--color-secondary-300)'
-        : 'var(--color-text-primary)',
+    color: color === 'error' ? 'var(--color-icon)' : 'var(--color-text-primary)',
     backgroundColor: 'transparent',
     '&:hover': {
-      backgroundColor: 'var(--color-surface-hover)',
-      transform: 'translateY(-1px)',
+      backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
     },
     '&:disabled': {
       color: 'var(--color-text-muted)',
+      opacity: 0.6,
     },
   };
 });

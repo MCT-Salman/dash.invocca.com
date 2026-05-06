@@ -53,7 +53,7 @@ const MuiTimePicker = ({
             InputLabelProps: {
               shrink: true,
               sx: {
-                color: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
+                color: error ? 'var(--color-icon) !important' : 'var(--color-icon) !important',
                 fontFamily: 'var(--font-family-base)',
                 fontWeight: 500,
                 fontSize: '0.95rem',
@@ -65,14 +65,14 @@ const MuiTimePicker = ({
                 position: 'absolute',
                 top: '-8px',
                 '&.Mui-focused': {
-                  color: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
+                  color: error ? 'var(--color-icon) !important' : 'var(--color-icon) !important',
                   fontWeight: 600,
                 },
                 '&.Mui-disabled': {
-                  color: 'var(--color-text-muted) !important',
+                  color: 'var(--color-text-muted)',
                 },
                 '&.Mui-error': {
-                  color: 'var(--color-error-500) !important',
+                  color: 'var(--color-icon)',
                 },
               }
             },
@@ -84,24 +84,25 @@ const MuiTimePicker = ({
                 '&:hover': {
                   backgroundColor: 'var(--color-surface-hover)',
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: error ? 'var(--color-error-600) !important' : 'var(--color-primary-500) !important',
+                    borderColor: error ? 'var(--color-icon)' : 'var(--color-icon)',
                   },
                 },
                 '&.Mui-focused': {
                   backgroundColor: 'var(--color-surface-hover)',
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-primary-500) !important',
+                    borderColor: error ? 'var(--color-icon)' : 'var(--color-icon)',
                     borderWidth: '1px !important',
                   },
                 },
                 '&.Mui-disabled': {
                   backgroundColor: 'var(--color-surface)',
                   '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'var(--color-border)',
                     borderColor: 'var(--color-border) !important',
                   },
                 },
                 '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: error ? 'var(--color-error-500) !important' : 'var(--color-border) !important',
+                  borderColor: error ? 'var(--color-icon) !important' : 'var(--color-border) !important',
                   borderWidth: '1px !important',
                   borderRadius: '12px !important',
                 },
@@ -130,13 +131,13 @@ const MuiTimePicker = ({
               },
               '& .MuiFormHelperText-root': {
                 fontSize: '0.75rem',
-                color: error ? 'var(--color-error-500)' : 'var(--color-text-secondary)',
+                color: error ? 'var(--color-icon)' : 'var(--color-text-secondary)',
                 marginTop: '6px',
                 fontFamily: 'var(--font-family-base)',
               },
               '& .MuiInputAdornment-root': {
                 '& .MuiSvgIcon-root': {
-                  color: 'var(--color-primary-500) !important',
+                  color: 'var(--color-icon) !important',
                 },
               },
             }

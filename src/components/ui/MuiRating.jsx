@@ -25,10 +25,10 @@ const MuiRating = ({
         // which reverses the visual meaning. Force LTR direction on the component.
         direction: 'ltr',
         '& .MuiRating-iconFilled': {
-          color: 'var(--color-primary-500)',
+          color: 'var(--color-icon)',
         },
         '& .MuiRating-iconHover': {
-          color: 'var(--color-primary-400)',
+          color: 'var(--color-gold)',
         },
         '& .MuiRating-iconEmpty': {
           color: 'var(--color-text-secondary)',

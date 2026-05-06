@@ -1,3 +1,4 @@
+// src\hooks\useDialogState.js
 /**
  * useDialogState Hook
  * Hook قابل لإعادة الاستخدام لإدارة حالة Dialogs

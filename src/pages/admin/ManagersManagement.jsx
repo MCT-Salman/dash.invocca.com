@@ -15,7 +15,7 @@ import MuiSelect from '@/components/ui/MuiSelect'
 import MuiMenuItem from '@/components/ui/MuiMenuItem'
 
 // Layout & Common Components
-import { LoadingScreen, EmptyState, ConfirmDialog, SEOHead, DataTable, PageHeader, StatCard } from '@/components/common'
+import { LoadingScreen, EmptyState, ConfirmDialog, SEOHead, StatusBadge, DataTable, PageHeader, StatCard } from '@/components/common'
 import ViewManagerDialog from './components/ViewManagerDialog'
 import CreateEditManagerDialog from './components/CreateEditManagerDialog'
 
@@ -142,7 +142,7 @@ export default function ManagersManagement() {
                         sx={{
                             width: 36,
                             height: 36,
-                            background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
+                            background: 'linear-gradient(135deg, var(--color-icon), var(--color-gold))',
                             color: 'var(--color-text-on-primary)',
                             fontWeight: 600,
                             fontSize: '0.8rem'
@@ -167,7 +167,7 @@ export default function ManagersManagement() {
             align: 'right',
             format: (value) => (
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Phone size={14} style={{ color: 'var(--color-primary-500)' }} />
+                    <Phone size={14} style={{ color: 'var(--color-icon)' }} />
                     <MuiTypography variant="body2">{formatPhoneNumber(value) || value || '---'}</MuiTypography>
                 </MuiBox>
             )
@@ -178,7 +178,7 @@ export default function ManagersManagement() {
             align: 'right',
             format: (value, row) => (
                 <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Building2 size={14} style={{ color: 'var(--color-primary-500)' }} />
+                    <Building2 size={14} style={{ color: 'var(--color-icon)' }} />
                     <MuiTypography variant="body2" sx={{ fontWeight: 500 }}>
                         {value?.name || row.hallName || 'غير معين'}
                     </MuiTypography>
@@ -190,13 +190,7 @@ export default function ManagersManagement() {
             label: 'الحالة',
             align: 'center',
             format: (value) => (
-                <MuiChip
-                    label={value !== false ? 'نشط' : 'معطل'}
-                    size="small"
-                    color={value !== false ? 'success' : 'error'}
-                    variant="filled"
-                    icon={value !== false ? <CheckCircle size={14} /> : <XCircle size={14} />}
-                />
+                <StatusBadge value={value !== false} activeLabel="نشط" inactiveLabel="معطل" />
             )
         }
     ]
@@ -267,7 +261,7 @@ export default function ManagersManagement() {
                         title="المدراء النشطون"
                         value={managers.filter(m => m.isActive !== false).length}
                         icon={<CheckCircle size={24} />}
-                        sx={{ borderTop: '4px solid var(--color-success-500)' }}
+                        sx={{ borderTop: '4px solid var(--color-icon)' }}
                     />
                 </MuiGrid>
                 <MuiGrid item xs={12} sm={6} md={3}>
@@ -275,7 +269,7 @@ export default function ManagersManagement() {
                         title="مع قاعة/صالة"
                         value={managers.filter(m => m.hallId).length}
                         icon={<Building2 size={24} />}
-                        sx={{ borderTop: '4px solid var(--color-secondary-500)' }}
+                        sx={{ borderTop: '4px solid var(--color-icon)' }}
                     />
                 </MuiGrid>
                 <MuiGrid item xs={12} sm={6} md={3}>
@@ -283,7 +277,7 @@ export default function ManagersManagement() {
                         title="بدون قاعة/صالة"
                         value={managers.filter(m => !m.hallId).length}
                         icon={<XCircle size={24} />}
-                        sx={{ borderTop: '4px solid var(--color-warning-500)' }}
+                        sx={{ borderTop: '4px solid var(--color-icon)' }}
                     />
                 </MuiGrid>
             </MuiGrid>

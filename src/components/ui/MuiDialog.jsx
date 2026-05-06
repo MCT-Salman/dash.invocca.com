@@ -21,7 +21,7 @@ const MuiDialog = ({
                     borderRadius: '16px',
                     background: 'var(--color-surface)',
                     border: '1px solid var(--color-border)',
-                    boxShadow: 'var(--shadow-2xl)',
+                    boxShadow: 'none',
                 },
                 ...sx
             }}
