@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -35,11 +35,14 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
         staleTime: 5 * 60 * 1000
     })
 
-    const hallsList = Array.isArray(hallsData)
-        ? hallsData
-        : (Array.isArray(hallsData?.data) ? hallsData.data
-            : (Array.isArray(hallsData?.halls) ? hallsData.halls
-                : (Array.isArray(hallsData?.data?.halls) ? hallsData.data.halls : [])))
+    const hallsList = useMemo(() => {
+        if (!hallsData) return []
+        if (Array.isArray(hallsData)) return hallsData
+        if (Array.isArray(hallsData.data)) return hallsData.data
+        if (Array.isArray(hallsData.halls)) return hallsData.halls
+        if (Array.isArray(hallsData.data?.halls)) return hallsData.data.halls
+        return []
+    }, [hallsData])
 
     const {
         register,
@@ -63,10 +66,18 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
     useEffect(() => {
         if (open) {
             if (editingTemplate) {
+                // Get hallId from various possible paths
+                let initialHallId = editingTemplate.hallId?._id || editingTemplate.hallId || '';
+                
+                // If not found, look into the halls array (from the latest API response)
+                if (!initialHallId && Array.isArray(editingTemplate.halls) && editingTemplate.halls.length > 0) {
+                    initialHallId = editingTemplate.halls[0].hall?._id || editingTemplate.halls[0].hall || '';
+                }
+
                 reset({
                     templateName: editingTemplate.templateName || '',
                     description: editingTemplate.description || '',
-                    hallId: '',
+                    hallId: initialHallId,
                 })
                 setPreviewImage(null)
             } else {
@@ -102,20 +113,25 @@ export default function CreateEditTemplateDialog({ open, onClose, onSubmit, edit
         // If hallId is selected, assign template to hall
         if (data.hallId && data.hallId !== '') {
             try {
-                // Handle both editing (existing template) and creating new template
-                const templateId = editingTemplate?._id || editingTemplate?.id || result?._id || result?.id || result?.template?._id || result?.template?.id
+                // Extract template ID from various possible response structures
+                const templateId = result?._id || result?.id || 
+                                 result?.data?._id || result?.data?.id || 
+                                 result?.template?._id || result?.template?.id ||
+                                 editingTemplate?._id || editingTemplate?.id;
+
                 if (templateId) {
                     await assignTemplateToHall(templateId, data.hallId)
                     showNotification({
                         title: 'تم',
-                        message: 'تم ربط القالب بالقاعة بنجاح',
+                        message: 'تم حفظ القالب وربطه بالقاعة بنجاح',
                         type: 'success'
                     })
                 }
             } catch (error) {
+                console.error('Error assigning template to hall:', error);
                 showNotification({
                     title: 'تنبيه',
-                    message: 'تم حفظ القالب ولكن فشل ربطه بالقاعة',
+                    message: 'تم حفظ القالب ولكن فشل ربطه تلقائياً بالقاعة. يمكنك ربطه يدوياً من إعدادات الصالة.',
                     type: 'warning'
                 })
             }

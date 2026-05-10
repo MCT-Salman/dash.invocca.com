@@ -177,7 +177,21 @@ export default function Invitations() {
   }
 
   const onFormSubmit = formSubmit(async (formData) => {
-    const res = isEdit ? await handleUpdate(editingInv._id, formData) : await handleCreate(formData)
+    // Auto-assign default template if none selected
+    let finalData = { ...formData }
+    if (!finalData.templateId || finalData.templateId === '') {
+      // Try to use event's default template first
+      if (currentEvent?.templateId) {
+        finalData.templateId = currentEvent.templateId
+      } else if (currentEvent?.template?._id || currentEvent?.template?.id) {
+        finalData.templateId = currentEvent.template._id || currentEvent.template.id
+      } else if (templates.length > 0) {
+        // Fallback to first available template
+        finalData.templateId = templates[0]._id || templates[0].id
+      }
+    }
+    
+    const res = isEdit ? await handleUpdate(editingInv._id, finalData) : await handleCreate(finalData)
     if (res.success) closeDialog()
   })
 
@@ -192,6 +206,25 @@ export default function Invitations() {
     
     // Otherwise fallback to invitation's template or event's template
     const rawUrl = inv?.template?.imageUrl || inv?.eventId?.template?.imageUrl || currentEvent?.template?.imageUrl
+    
+    // If still no template found, try to get the default template
+    if (!rawUrl) {
+        // Try event's default template
+        if (currentEvent?.templateId) {
+            const defaultTemplate = templates.find(t => (t._id || t.id) === currentEvent.templateId)
+            if (defaultTemplate?.imageUrl) {
+                return defaultTemplate.imageUrl.startsWith('http') ? defaultTemplate.imageUrl : `${import.meta.env.VITE_API_BASE}${defaultTemplate.imageUrl}`
+            }
+        }
+        // Fallback to first available template
+        if (templates.length > 0) {
+            const firstTemplate = templates[0]
+            if (firstTemplate?.imageUrl) {
+                return firstTemplate.imageUrl.startsWith('http') ? firstTemplate.imageUrl : `${import.meta.env.VITE_API_BASE}${firstTemplate.imageUrl}`
+            }
+        }
+    }
+    
     if (!rawUrl) return null
     return rawUrl.startsWith('http') ? rawUrl : `${import.meta.env.VITE_API_BASE}${rawUrl}`
   }

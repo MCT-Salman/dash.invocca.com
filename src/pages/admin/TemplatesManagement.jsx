@@ -269,60 +269,34 @@ export default function TemplatesManagement() {
                 </MuiBox>
             )
         },
-        // {
-        //     id: 'hallId',
-        //     label: 'قاعة/صالة',
-        //     align: 'right',
-        //     format: (value) => (
-        //         <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-        //             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        //                 <Building2 size={16} style={{ color: 'var(--color-primary-400)' }} />
-        //                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-        //                     {value?.name || 'قاعة/صالة غير محددة'}
-        //                 </MuiTypography>
-        //             </MuiBox>
-        //             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        //                 <MapPin size={14} style={{ color: 'var(--color-primary-300)' }} />
-        //                 <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
-        //                     {value?.location || '—'}
-        //                 </MuiTypography>
-        //             </MuiBox>
-        //         </MuiBox>
-        //     )
-        // },
-        // {
-        //     id: 'capacity',
-        //     label: 'السعة',
-        //     align: 'center',
-        //     format: (value, row) => (
-        //         <MuiBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
-        //             <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        //                 <Users size={16} style={{ color: 'var(--color-primary-400)' }} />
-        //                 <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-        //                     {row.hallId?.capacity || value || '—'}
-        //                 </MuiTypography>
-        //             </MuiBox>
-        //             <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
-        //                 {row.hallId?.tables ? `${row.hallId.tables} طاولة` : ''}
-        //                 {row.hallId?.tables && row.hallId?.chairs ? ' • ' : ''}
-        //                 {row.hallId?.chairs ? `${row.hallId?.chairs} كرسي` : ''}
-        //             </MuiTypography>
-        //         </MuiBox>
-        //     )
-        // },
-        // {
-        //     id: 'price',
-        //     label: 'السعر',
-        //     align: 'center',
-        //     format: (value, row) => (
-        //         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
-        //             <DollarSign size={16} style={{ color: 'var(--color-primary-400)' }} />
-        //             <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)' }}>
-        //                 {row.hallId?.defaultPrices ? `${row.hallId.defaultPrices} ريال` : '—'}
-        //             </MuiTypography>
-        //         </MuiBox>
-        //     )
-        // },
+        {
+            id: 'halls',
+            label: 'القاعات المرتبطة',
+            align: 'right',
+            format: (value, row) => {
+                const halls = Array.isArray(value) ? value : []
+                if (halls.length === 0) return <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>غير مرتبطة</MuiTypography>
+                
+                return (
+                    <MuiBox sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                        {halls.slice(0, 2).map((h, i) => (
+                            <MuiBox key={h._id || i} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Building2 size={14} style={{ color: 'var(--color-primary-400)' }} />
+                                <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem' }}>
+                                    {h.hall?.name || 'قاعة غير معروفة'}
+                                    {h.hall?.location && <span style={{ fontSize: '0.7rem', opacity: 0.7 }}> ({h.hall.location})</span>}
+                                </MuiTypography>
+                            </MuiBox>
+                        ))}
+                        {halls.length > 2 && (
+                            <MuiTypography variant="caption" sx={{ color: 'var(--color-primary-400)', fontWeight: 500, mr: 2 }}>
+                                + {halls.length - 2} قاعات أخرى
+                            </MuiTypography>
+                        )}
+                    </MuiBox>
+                )
+            }
+        },
         {
             id: 'isActive',
             label: 'الحالة',

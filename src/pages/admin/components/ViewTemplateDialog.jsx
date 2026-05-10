@@ -188,33 +188,66 @@ export default function ViewTemplateDialog({ open, onClose, template }) {
                         <MuiDivider sx={{ borderColor: 'var(--color-border-glass)' }} />
                     </MuiGrid>
 
-                    {/* Hall Information */}
+                    {/* Associated Halls Information */}
                     <MuiGrid item xs={12}>
                         <MuiBox sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                             <MuiChip
-                                label="معلومات القاعة/صالة"
+                                label={`القاعات المرتبطة (${template?.hallsCount || template?.halls?.length || 0})`}
                                 size="small"
                                 sx={{
                                     backgroundColor: 'color-mix(in srgb, var(--color-gold) 10%, transparent)',
                                     fontWeight: 600,
                                     border: '1px solid var(--color-border-glass)',
                                     '& .MuiChip-label': { color: 'var(--color-dark)' },
-                                    '& .MuiChip-icon': { color: 'var(--color-dark)' },
                                 }}
                             />
                         </MuiBox>
-                        <MuiGrid container spacing={2}>
-                            <MuiGrid item xs={12} md={6}>
-                                <MuiBox sx={{ mb: 2 }}>
-                                    <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', mb: 0.5 }}>
-                                        اسم القاعة/صالة
-                                    </MuiTypography>
-                                    <MuiTypography variant="h6" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
-                                        {template?.hallId?.name || 'غير محدد'}
-                                    </MuiTypography>
-                                </MuiBox>
+                        
+                        {Array.isArray(template?.halls) && template.halls.length > 0 ? (
+                            <MuiGrid container spacing={2}>
+                                {template.halls.map((assignment, index) => (
+                                    <MuiGrid item xs={12} md={6} key={assignment._id || index}>
+                                        <MuiBox 
+                                            sx={{ 
+                                                p: 2, 
+                                                borderRadius: '12px', 
+                                                border: '1px solid var(--color-border-glass)',
+                                                backgroundColor: 'color-mix(in srgb, var(--color-light) 2%, transparent)',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: 1
+                                            }}
+                                        >
+                                            <MuiBox sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <MuiTypography variant="subtitle2" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                                                    {assignment.hall?.name || 'قاعة غير معروفة'}
+                                                </MuiTypography>
+                                                <MuiChip 
+                                                    label={assignment.hall?.isActive ? 'نشطة' : 'غير نشطة'} 
+                                                    size="small"
+                                                    sx={{ 
+                                                        height: '20px', 
+                                                        fontSize: '0.7rem',
+                                                        backgroundColor: assignment.hall?.isActive ? 'rgba(34, 197, 94, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                                                        color: assignment.hall?.isActive ? '#22c55e' : '#dc2626',
+                                                    }}
+                                                />
+                                            </MuiBox>
+                                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+                                                الموقع: {assignment.hall?.location || '—'}
+                                            </MuiTypography>
+                                            <MuiTypography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+                                                السعة: {assignment.hall?.capacity || '—'} شخص
+                                            </MuiTypography>
+                                        </MuiBox>
+                                    </MuiGrid>
+                                ))}
                             </MuiGrid>
-                        </MuiGrid>
+                        ) : (
+                            <MuiTypography variant="body2" sx={{ color: 'var(--color-text-secondary)', fontStyle: 'italic', textAlign: 'center', py: 2 }}>
+                                لا توجد قاعات مرتبطة بهذا القالب حالياً.
+                            </MuiTypography>
+                        )}
                     </MuiGrid>
 
                     <MuiGrid item xs={12}>

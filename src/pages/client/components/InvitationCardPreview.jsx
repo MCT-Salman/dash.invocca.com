@@ -10,10 +10,22 @@ const CREAM = '#fdf9f3'
 const DARK_TEXT = '#2a2a2a'
 const SUB_TEXT = '#555555'
 
-// SVG ornaments encoded as data URLs
-const TOP_ORNAMENT = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 80'%3E%3Cpath d='M0 60 Q50 20 100 50 Q150 80 200 40 Q250 0 300 50 Q350 80 400 30 L400 0 L0 0 Z' fill='%23c8a96e' fill-opacity='0.45'/%3E%3Cpath d='M0 70 Q60 30 120 60 Q180 90 240 50 Q300 10 360 55 Q390 75 400 50 L400 0 L0 0 Z' fill='%23d8b98a' fill-opacity='0.25'/%3E%3C/svg%3E")`
+// Top and Bottom ornaments as inline SVG components to ensure html2canvas captures them correctly
+const TopOrnament = () => (
+    <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '90px', zIndex: 0 }}
+        viewBox="0 0 400 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 60 Q50 20 100 50 Q150 80 200 40 Q250 0 300 50 Q350 80 400 30 L400 0 L0 0 Z" fill="#c8a96e" fillOpacity="0.45"/>
+        <path d="M0 70 Q60 30 120 60 Q180 90 240 50 Q300 10 360 55 Q390 75 400 50 L400 0 L0 0 Z" fill="#d8b98a" fillOpacity="0.25"/>
+    </svg>
+)
 
-const BOTTOM_ORNAMENT = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 80'%3E%3Cpath d='M0 20 Q50 60 100 30 Q150 0 200 40 Q250 80 300 30 Q350 0 400 50 L400 80 L0 80 Z' fill='%23c8a96e' fill-opacity='0.45'/%3E%3Cpath d='M0 10 Q60 50 120 20 Q180 -10 240 30 Q300 70 360 25 Q390 5 400 30 L400 80 L0 80 Z' fill='%23d8b98a' fill-opacity='0.25'/%3E%3C/svg%3E")`
+const BottomOrnament = () => (
+    <svg style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '90px', zIndex: 0 }}
+        viewBox="0 0 400 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 20 Q50 60 100 30 Q150 0 200 40 Q250 80 300 30 Q350 0 400 50 L400 80 L0 80 Z" fill="#c8a96e" fillOpacity="0.45"/>
+        <path d="M0 10 Q60 50 120 20 Q180 -10 240 30 Q300 70 360 25 Q390 5 400 30 L400 80 L0 80 Z" fill="#d8b98a" fillOpacity="0.25"/>
+    </svg>
+)
 
 export default function InvitationCardPreview({
     guestName,
@@ -42,13 +54,7 @@ export default function InvitationCardPreview({
     const isCustom = !!templateUrl
     const cardBg = isCustom
         ? { backgroundImage: `url(${templateUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-        : {
-            backgroundColor: CREAM,
-            backgroundImage: `${TOP_ORNAMENT}, ${BOTTOM_ORNAMENT}`,
-            backgroundPosition: 'top center, bottom center',
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: '100% 90px, 100% 90px',
-        }
+        : { backgroundColor: CREAM }
 
     const txt    = DARK_TEXT
     const sub    = SUB_TEXT
@@ -79,6 +85,14 @@ export default function InvitationCardPreview({
                 padding: '0 24px 24px',
             }}
         >
+            {/* ── Ornaments for default template ────────────────────────────── */}
+            {!isCustom && (
+                <>
+                    <TopOrnament />
+                    <BottomOrnament />
+                </>
+            )}
+
             {/* ── Inner gold border frame ─────────────────────────────────── */}
             {!isCustom && (
                 <div style={{
@@ -132,7 +146,16 @@ export default function InvitationCardPreview({
                 <div style={{ height: isCustom ? 16 : 70 }} />
 
                 {/* ── Event name ──────────────────────────────────────────── */}
-                <p style={{ margin:'0 0 8px', fontSize:'1.25rem', fontWeight:600, color: sub, letterSpacing:'1px' }}>
+                <p style={{ 
+                    margin:'0 0 8px', 
+                    fontSize:'1.25rem', 
+                    fontWeight:600, 
+                    color: sub, 
+                    letterSpacing: '0px',
+                    wordSpacing: '0.05em',
+                    fontVariant: 'arabic-specific',
+                    textRendering: 'optimizeLegibility'
+                }}>
                     {eventName || 'حفل زفاف'}
                 </p>
 
@@ -144,13 +167,39 @@ export default function InvitationCardPreview({
                 </div>
 
                 {/* ── Guest name ──────────────────────────────────────────── */}
-                <p style={{ margin:'0 0 4px', fontSize:'2.1rem', fontWeight:700, lineHeight:1.25, color: txt }}>
+                <p style={{ 
+                    margin:'0 0 4px', 
+                    fontSize:'2.1rem', 
+                    fontWeight:700, 
+                    lineHeight:1.25, 
+                    color: txt,
+                    letterSpacing: '0px',
+                    wordSpacing: '0.05em',
+                    fontVariant: 'arabic-specific',
+                    textRendering: 'optimizeLegibility'
+                }}>
                     {guestName || 'اسم الضيف'}
                 </p>
-                <p style={{ margin:'0 0 16px', fontSize:'1.4rem', color: accent }}>
+                <p style={{ 
+                    margin:'0 0 16px', 
+                    fontSize:'1.4rem', 
+                    color: accent,
+                    letterSpacing: '0px',
+                    wordSpacing: '0.05em',
+                    fontVariant: 'arabic-specific',
+                    textRendering: 'optimizeLegibility'
+                }}>
                     &amp; 
                 </p>
-                <p style={{ margin:'0 0 16px', fontSize:'1.4rem', color: accent }}>
+                <p style={{ 
+                    margin:'0 0 16px', 
+                    fontSize:'1.4rem', 
+                    color: accent,
+                    letterSpacing: '0px',
+                    wordSpacing: '0.05em',
+                    fontVariant: 'arabic-specific',
+                    textRendering: 'optimizeLegibility'
+                }}>
                      كريمته
                 </p>
 
@@ -165,36 +214,103 @@ export default function InvitationCardPreview({
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:0, marginBottom:16 }}>
                     {/* Year – rightmost in RTL */}
                     <div style={{ padding:'0 12px', textAlign:'center' }}>
-                        <span style={{ fontSize:'1.6rem', fontWeight:600, color: txt }}>
+                        <span style={{ 
+                            fontSize:'1.6rem', 
+                            fontWeight:600, 
+                            color: txt,
+                            letterSpacing: '0px',
+                            wordSpacing: '0.05em',
+                            fontVariant: 'arabic-specific',
+                            textRendering: 'optimizeLegibility'
+                        }}>
                             {yearStr || '2025'}
                         </span>
                     </div>
                     <div style={{ width:'1px', height:44, background: accent }} />
                     {/* Day name + number – center */}
                     <div style={{ padding:'0 12px', textAlign:'center', lineHeight:1.1 }}>
-                        <div style={{ fontSize:'1rem', fontWeight:600, color: txt }}>{dayName || 'السبت'}</div>
-                        <div style={{ fontSize:'1.6rem', fontWeight:700, color: txt }}>{dayNum || '1'}</div>
+                        <div style={{ 
+                            fontSize:'1rem', 
+                            fontWeight:600, 
+                            color: txt,
+                            letterSpacing: '0px',
+                            wordSpacing: '0.05em',
+                            fontVariant: 'arabic-specific',
+                            textRendering: 'optimizeLegibility'
+                        }}>{dayName || 'السبت'}</div>
+                        <div style={{ 
+                            fontSize:'1.6rem', 
+                            fontWeight:700, 
+                            color: txt,
+                            letterSpacing: '0px',
+                            wordSpacing: '0.05em',
+                            fontVariant: 'arabic-specific',
+                            textRendering: 'optimizeLegibility'
+                        }}>{dayNum || '1'}</div>
                     </div>
                     <div style={{ width:'1px', height:44, background: accent }} />
                     {/* Month – leftmost in RTL */}
                     <div style={{ padding:'0 12px', textAlign:'center' }}>
-                        <span style={{ fontSize:'1.6rem', fontWeight:600, color: txt }}>
+                        <span style={{ 
+                            fontSize:'1.6rem', 
+                            fontWeight:600, 
+                            color: txt,
+                            letterSpacing: '0px',
+                            wordSpacing: '0.05em',
+                            fontVariant: 'arabic-specific',
+                            textRendering: 'optimizeLegibility'
+                        }}>
                             {monthName || 'يناير'}
                         </span>
                     </div>
                 </div>
 
                 {/* ── Time & Hall ─────────────────────────────────────────── */}
-                <p style={{ margin:'0 0 4px', fontSize:'1rem', color: sub }}>
+                <p style={{ 
+                    margin:'0 0 4px', 
+                    fontSize:'1rem', 
+                    color: sub,
+                    letterSpacing: '0px',
+                    wordSpacing: '0.05em',
+                    fontVariant: 'arabic-specific',
+                    textRendering: 'optimizeLegibility'
+                }}>
                     نتشرف بحضوركم في تمام الساعة
                 </p>
-                <p style={{ margin:'0 0 4px', fontSize:'1.55rem', fontWeight:700, color: txt, direction:'ltr' }}>
+                <p style={{ 
+                    margin:'0 0 4px', 
+                    fontSize:'1.55rem', 
+                    fontWeight:700, 
+                    color: txt, 
+                    direction:'ltr',
+                    letterSpacing: '0px',
+                    wordSpacing: '0.05em',
+                    fontVariant: 'arabic-specific',
+                    textRendering: 'optimizeLegibility'
+                }}>
                     {startTime || '7:00 pm'}
                 </p>
-                <p style={{ margin:'0 0 8px', fontSize:'1.15rem', fontWeight:600, color: txt }}>
+                <p style={{ 
+                    margin:'0 0 8px', 
+                    fontSize:'1.15rem', 
+                    fontWeight:600, 
+                    color: txt,
+                    letterSpacing: '0px',
+                    wordSpacing: '0.05em',
+                    fontVariant: 'arabic-specific',
+                    textRendering: 'optimizeLegibility'
+                }}>
                     في صالة {hallName || '...'}
                 </p>
-                <p style={{ margin:'0 0 0', fontSize:'1rem', color: sub }}>
+                <p style={{ 
+                    margin:'0 0 0', 
+                    fontSize:'1rem', 
+                    color: sub,
+                    letterSpacing: '0px',
+                    wordSpacing: '0.05em',
+                    fontVariant: 'arabic-specific',
+                    textRendering: 'optimizeLegibility'
+                }}>
                     حضوركم يسعدنا
                 </p>
 
